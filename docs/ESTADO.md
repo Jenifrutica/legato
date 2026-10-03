@@ -32,11 +32,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 92 en verde (núcleo, player, biblioteca, playlists, estructura e i18n).
+- **Tests:** 101 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia y audio).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #15: IndexedDB + sesión persistente — guardar biblioteca, playlists y estado de reproducción, y reanudar al recargar la página.
+Issue #16: temporizador de apagado (tiempos predeterminados y número de canciones), controles de shuffle/bucle ya conectados y pulido del scroll de canciones.
