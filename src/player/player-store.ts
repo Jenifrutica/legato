@@ -157,6 +157,12 @@ export const usePlayerStore = create<PlayerState>(() => ({
 
 controller.subscribe((snapshot) => {
   usePlayerStore.setState(snapshot)
+
+  // El avance automático (fin de canción) también debe reanudar el AudioContext:
+  // si el navegador lo suspendió, la pista nueva avanzaría en silencio.
+  if (snapshot.status === 'playing') {
+    void graph.resume()
+  }
 })
 
 sleepTimer.subscribe((snapshot) => {

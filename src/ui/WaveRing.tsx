@@ -4,6 +4,7 @@ import type { AnalyserLike } from '../player'
 type Inks = {
   accent: string
   ink: string
+  paper: string
 }
 
 function parseHex(value: string): string | null {
@@ -20,13 +21,14 @@ function parseHex(value: string): string | null {
 
 function readInks(): Inks {
   if (typeof document === 'undefined') {
-    return { accent: '255, 91, 46', ink: '19, 16, 12' }
+    return { accent: '255, 91, 46', ink: '19, 16, 12', paper: '251, 248, 241' }
   }
 
   const styles = getComputedStyle(document.documentElement)
   return {
     accent: parseHex(styles.getPropertyValue('--color-accent')) ?? '255, 91, 46',
     ink: parseHex(styles.getPropertyValue('--color-ink')) ?? '19, 16, 12',
+    paper: parseHex(styles.getPropertyValue('--color-surface')) ?? '251, 248, 241',
   }
 }
 
@@ -107,6 +109,17 @@ export function WaveRing({
       const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
       const pulse = Math.min(2.2, 1 + bass * 0.9 + beat * 1.1)
 
+      type Segment = {
+        x0: number
+        y0: number
+        x1: number
+        y1: number
+        width: number
+        index: number
+        intensity: number
+      }
+      const drawn: Segment[] = []
+
       for (let index = 0; index < segments; index++) {
         const angle = (index / segments) * Math.PI * 2 - Math.PI / 2
         if (arcRef.current === 'right' && Math.cos(angle) < -0.2) {
@@ -118,31 +131,57 @@ export function WaveRing({
             ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.22 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.05, Math.min(1, raw))
-        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.55
+        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.6
         const length =
-          (6 + intensity * size * (activeRef.current ? 0.09 : 0.03) * pulse) * downScale
+          (8 + intensity * size * (activeRef.current ? 0.16 : 0.05) * pulse) * downScale
         const x0 = center + Math.cos(angle) * base
         const y0 = center + Math.sin(angle) * base
         const x1 = center + Math.cos(angle) * (base + length)
         const y1 = center + Math.sin(angle) * (base + length)
 
-        context.globalAlpha = 0.95
-        context.strokeStyle = index % 5 === 0 ? inks.accent : inks.ink
-        context.lineWidth = index % 10 === 0 ? 9 : index % 3 === 0 ? 5 : 2.4
-        context.lineCap = 'butt'
-        context.beginPath()
-        context.moveTo(x0, y0)
-        context.lineTo(x1, y1)
-        context.stroke()
+        drawn.push({
+          x0,
+          y0,
+          x1,
+          y1,
+          width: index % 12 === 0 ? 3.2 : index % 4 === 0 ? 2.2 : 1.4,
+          index,
+          intensity,
+        })
       }
 
-      context.globalAlpha = 0.3
-      context.strokeStyle = inks.ink
-      context.lineWidth = 1
+      const paint = (color: (segment: Segment) => string) => {
+        context.lineCap = 'butt'
+        for (const segment of drawn) {
+          context.globalAlpha = 0.35 + segment.intensity * 0.6
+          context.strokeStyle = color(segment)
+          context.lineWidth = segment.width
+          context.beginPath()
+          context.moveTo(segment.x0, segment.y0)
+          context.lineTo(segment.x1, segment.y1)
+          context.stroke()
+        }
+        context.globalAlpha = 1
+      }
+
+      // Sobre el campo de tinta directa las líneas van en papel; fuera, en tinta/acento.
+      const fieldHalfWidth = size * 0.3867
+      const fieldBottom = center + size * 0.2667
+
+      context.save()
       context.beginPath()
-      context.arc(center, center, base + size * 0.02, 0, Math.PI * 2)
-      context.stroke()
-      context.globalAlpha = 1
+      context.rect(center - fieldHalfWidth, -size, fieldHalfWidth * 2, fieldBottom + size)
+      context.clip()
+      paint(() => inks.paper)
+      context.restore()
+
+      context.save()
+      context.beginPath()
+      context.rect(0, 0, size, size)
+      context.rect(center - fieldHalfWidth, -size, fieldHalfWidth * 2, fieldBottom + size)
+      context.clip('evenodd')
+      paint((segment) => (segment.index % 5 === 0 ? inks.accent : inks.ink))
+      context.restore()
     }
 
     if (reduced) {

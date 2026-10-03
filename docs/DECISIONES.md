@@ -127,3 +127,6 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D84 | Al pulsar una pista de Spotify se reproduce **esa** primero y el resto de la búsqueda después | Antes sonaba la primera de la búsqueda por pasar todas las URIs en orden |
 | D85 | El crossfade (0–12 s, secuencial) se expone también en el panel de Audio, además del panel de ensayo | Hacerlo visible/fácil de encontrar; el solape real con doble deck sigue post-entrega |
 | D86 | Ondas v3: líneas de 2.4–9 px, longitud hasta 0.14× con pulso ×2.2 y zona del disco más alta (0.68) | Pedido textual: «más notorias, más grandes» |
+| D87 | El avance automático reanuda el `AudioContext` desde la suscripción del store (estado `playing`), no solo al pulsar play | Si el navegador suspendía el contexto, la siguiente canción avanzaba sin sonido |
+| D88 | El slider de progreso usa estado local de arrastre (`scrub`) mientras se mueve y libera al soltar | Antes el valor controlado rebotaba al `currentTime` del store y se trababa |
+| D89 | Ondas v4: líneas finas y largas (1.4–3.2 px, longitud 0.16× con pulso), **papel sobre el campo de tinta directa** y tinta/acento fuera; sin anillo oscuro | «Le pusiste algo negro y se ve feo»: se eliminan los bloques gruesos y el aro |
