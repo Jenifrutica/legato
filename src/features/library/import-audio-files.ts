@@ -17,9 +17,11 @@ const AUDIO_EXTENSIONS = [
   'aif',
 ]
 
+export type ImportErrorCode = 'unsupported' | 'tooLarge' | 'duplicate'
+
 export type ImportError = {
   fileName: string
-  reason: string
+  code: ImportErrorCode
 }
 
 export type ImportResult = {
@@ -58,18 +60,18 @@ export async function importAudioFiles(
 
   for (const file of files) {
     if (!isAudioFile(file)) {
-      errors.push({ fileName: file.name, reason: 'Formato no soportado' })
+      errors.push({ fileName: file.name, code: 'unsupported' })
       continue
     }
 
     if (file.size > MAX_AUDIO_FILE_BYTES) {
-      errors.push({ fileName: file.name, reason: 'Supera el límite de 200 MB' })
+      errors.push({ fileName: file.name, code: 'tooLarge' })
       continue
     }
 
     const dedupeKey = createDedupeKey(file)
     if (seen.has(dedupeKey)) {
-      errors.push({ fileName: file.name, reason: 'Ya está en la biblioteca' })
+      errors.push({ fileName: file.name, code: 'duplicate' })
       continue
     }
 

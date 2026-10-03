@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LibraryIcon, ListMusicIcon, SettingsIcon } from './icons'
 
 function MobileNavItem({
@@ -24,12 +25,14 @@ function MobileNavItem({
 }
 
 export function MobileNav() {
+  const { t } = useTranslation()
+
   return (
-    <nav aria-label="Navegación principal" className="border-t border-border bg-surface lg:hidden">
+    <nav aria-label={t('nav.main')} className="border-t border-border bg-surface lg:hidden">
       <ul className="grid grid-cols-3">
-        <MobileNavItem icon={<LibraryIcon className="size-5" />} label="Biblioteca" active />
-        <MobileNavItem icon={<ListMusicIcon className="size-5" />} label="Playlists" />
-        <MobileNavItem icon={<SettingsIcon className="size-5" />} label="Ajustes" />
+        <MobileNavItem icon={<LibraryIcon className="size-5" />} label={t('nav.library')} active />
+        <MobileNavItem icon={<ListMusicIcon className="size-5" />} label={t('nav.playlists')} />
+        <MobileNavItem icon={<SettingsIcon className="size-5" />} label={t('nav.settings')} />
       </ul>
     </nav>
   )

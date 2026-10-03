@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next'
 import { useAuth } from './auth-context'
 
 export function AccountChip() {
+  const { t } = useTranslation()
   const { user, signIn, signOut } = useAuth()
 
   if (user === null) {
@@ -10,7 +12,7 @@ export function AccountChip() {
         onClick={() => void signIn()}
         type="button"
       >
-        Iniciar sesión
+        {t('account.signIn')}
       </button>
     )
   }
@@ -28,7 +30,7 @@ export function AccountChip() {
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">{user.name}</span>
         <span className="hidden truncate text-xs text-ink-muted sm:block">
-          {user.email ?? 'Perfil local'}
+          {user.email ?? t('account.localProfile')}
         </span>
       </span>
       <button
@@ -36,7 +38,7 @@ export function AccountChip() {
         onClick={() => void signOut()}
         type="button"
       >
-        Salir
+        {t('account.signOut')}
       </button>
     </div>
   )

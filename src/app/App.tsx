@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { AccountChip, AuthContextProvider } from '../features/auth'
+import { LanguageSelector } from '../features/i18n'
 import { LibraryPanel } from '../ui/LibraryPanel'
 import { MobileNav } from '../ui/MobileNav'
 import { PlayerBar } from '../ui/PlayerBar'
@@ -15,13 +17,15 @@ export default function App() {
 }
 
 function AppShell() {
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-dvh bg-bg text-ink">
       <a
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-strong focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
         href="#contenido"
       >
-        Saltar al contenido
+        {t('app.skipToContent')}
       </a>
 
       <div className="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
@@ -33,8 +37,11 @@ function AppShell() {
               <DiscMark className="size-5" />
             </span>
             <h1 className="font-display text-2xl font-semibold tracking-tight">Legato</h1>
-            <div className="ml-auto min-w-0 max-w-44">
-              <AccountChip />
+            <div className="ml-auto flex min-w-0 items-center gap-2">
+              <LanguageSelector compact />
+              <div className="min-w-0 max-w-36">
+                <AccountChip />
+              </div>
             </div>
           </header>
 

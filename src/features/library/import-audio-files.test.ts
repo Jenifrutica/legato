@@ -71,7 +71,7 @@ describe('importAudioFiles', () => {
     const result = await importAudioFiles([new File(['hola'], 'notas.txt', { type: 'text/plain' })])
 
     expect(result.tracks).toHaveLength(0)
-    expect(result.errors[0]?.reason).toBe('Formato no soportado')
+    expect(result.errors[0]?.code).toBe('unsupported')
   })
 
   it('rechaza archivos que superan el limite', async () => {
@@ -81,7 +81,7 @@ describe('importAudioFiles', () => {
     const result = await importAudioFiles([file])
 
     expect(result.tracks).toHaveLength(0)
-    expect(result.errors[0]?.reason).toContain('200 MB')
+    expect(result.errors[0]?.code).toBe('tooLarge')
   })
 
   it('detecta duplicados dentro de la misma importacion y contra existentes', async () => {
@@ -94,7 +94,7 @@ describe('importAudioFiles', () => {
 
     const againstExisting = await importAudioFiles([file], existing)
     expect(againstExisting.tracks).toHaveLength(0)
-    expect(againstExisting.errors[0]?.reason).toBe('Ya está en la biblioteca')
+    expect(againstExisting.errors[0]?.code).toBe('duplicate')
   })
 
   it('si fallan los metadatos igual agrega la cancion con datos basicos', async () => {

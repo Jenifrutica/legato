@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { getAnalyser, usePlayerStore } from '../player'
 import { WaveBars } from './WaveBars'
@@ -48,6 +49,7 @@ function TransportButton({
 }
 
 export function PlayerBar() {
+  const { t } = useTranslation()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
   const currentTime = usePlayerStore((state) => state.currentTime)
@@ -70,19 +72,22 @@ export function PlayerBar() {
   const maxProgress = duration > 0 ? duration : 1
   const loopLabel =
     loopMode === 'none'
-      ? 'Repetición desactivada'
+      ? t('player.repeatOff')
       : loopMode === 'all'
-        ? 'Repetir todas'
-        : 'Repetir una'
+        ? t('player.repeatAll')
+        : t('player.repeatOne')
 
   return (
-    <section aria-label="Reproductor" className="border-t border-border bg-surface shadow-bar">
+    <section
+      aria-label={t('player.region')}
+      className="border-t border-border bg-surface shadow-bar"
+    >
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:gap-6">
         <div className="flex min-w-0 items-center gap-3">
           <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-bg">
             {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
               <img
-                alt={`Portada de ${currentTrack.title}`}
+                alt={t('vinyl.coverAlt', { title: currentTrack.title })}
                 className="size-full object-cover"
                 src={currentTrack.artworkUrl}
               />
@@ -92,10 +97,10 @@ export function PlayerBar() {
           </span>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">
-              {currentTrack?.title ?? 'Sin reproducción'}
+              {currentTrack?.title ?? t('player.noPlayback')}
             </p>
             <p className="truncate text-xs text-ink-muted">
-              {currentTrack?.artist ?? 'Importa una canción'}
+              {currentTrack?.artist ?? t('player.importSong')}
             </p>
           </div>
         </div>
@@ -107,27 +112,27 @@ export function PlayerBar() {
             <TransportButton
               disabled={!hasTrack}
               icon={<ShuffleIcon className="size-4" />}
-              label="Aleatorio"
+              label={t('player.shuffle')}
               onClick={toggleShuffle}
               pressed={shuffle}
             />
             <TransportButton
               disabled={!hasTrack}
               icon={<SkipBackIcon className="size-5" />}
-              label="Anterior"
+              label={t('player.previous')}
               onClick={previous}
             />
             <TransportButton
               disabled={!hasTrack}
               icon={isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
-              label={isPlaying ? 'Pausar' : 'Reproducir'}
+              label={isPlaying ? t('player.pause') : t('player.play')}
               onClick={() => void toggle()}
               primary
             />
             <TransportButton
               disabled={!hasTrack}
               icon={<SkipForwardIcon className="size-5" />}
-              label="Siguiente"
+              label={t('player.next')}
               onClick={next}
             />
             <TransportButton
@@ -153,7 +158,7 @@ export function PlayerBar() {
               {formatDuration(currentTime)}
             </span>
             <input
-              aria-label="Progreso de la canción"
+              aria-label={t('player.progress')}
               className="h-1.5 flex-1 cursor-pointer accent-primary disabled:cursor-not-allowed"
               disabled={!hasTrack}
               max={maxProgress}
@@ -172,7 +177,7 @@ export function PlayerBar() {
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden items-center gap-3 lg:flex">
             <button
-              aria-label="Velocidad de reproducción"
+              aria-label={t('player.speed')}
               className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!hasTrack}
               onClick={cycleRate}
@@ -182,13 +187,13 @@ export function PlayerBar() {
             </button>
             <TransportButton
               icon={<TimerIcon className="size-4" />}
-              label="Temporizador"
+              label={t('player.timer')}
               disabled
             />
             <span className="flex items-center gap-2">
               <VolumeIcon className="size-4 text-ink-muted" />
               <input
-                aria-label="Volumen"
+                aria-label={t('player.volume')}
                 className="h-1.5 w-24 cursor-pointer accent-primary"
                 max={100}
                 min={0}
@@ -203,7 +208,7 @@ export function PlayerBar() {
             <TransportButton
               disabled={!hasTrack}
               icon={isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
-              label={isPlaying ? 'Pausar' : 'Reproducir'}
+              label={isPlaying ? t('player.pause') : t('player.play')}
               onClick={() => void toggle()}
               primary
             />

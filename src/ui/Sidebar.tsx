@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AccountChip } from '../features/auth'
+import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import {
   AccessibilityIcon,
@@ -53,6 +55,7 @@ function NavItem({
 }
 
 export function Sidebar() {
+  const { t } = useTranslation()
   const playlists = usePlaylistsStore((state) => state.playlists)
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
@@ -79,24 +82,24 @@ export function Sidebar() {
         <span className="font-display text-2xl font-semibold tracking-tight">Legato</span>
       </div>
 
-      <nav aria-label="Biblioteca">
+      <nav aria-label={t('nav.libraryRegion')}>
         <ul className="flex flex-col gap-1">
           <NavItem
             active={selectedPlaylistId === null}
             icon={<LibraryIcon className="size-5 shrink-0" />}
-            label="Biblioteca"
+            label={t('nav.library')}
             onClick={() => selectPlaylist(null)}
           />
         </ul>
       </nav>
 
-      <section aria-label="Playlists" className="flex min-h-0 flex-col gap-2">
+      <section aria-label={t('nav.playlists')} className="flex min-h-0 flex-col gap-2">
         <div className="flex items-center justify-between px-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-            Playlists
+            {t('nav.playlists')}
           </h2>
           <button
-            aria-label="Nueva playlist"
+            aria-label={t('playlists.newPlaylist')}
             className="rounded-full p-1 text-ink-muted transition-colors hover:text-primary-strong"
             onClick={() => setIsCreating(true)}
             type="button"
@@ -118,7 +121,7 @@ export function Sidebar() {
                 setIsCreating(false)
               }}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="Nombre de la playlist"
+              placeholder={t('playlists.namePlaceholder')}
               value={draft}
             />
           </form>
@@ -152,14 +155,16 @@ export function Sidebar() {
       </section>
 
       <div className="mt-auto flex flex-col gap-4 border-t border-border pt-5">
+        <LanguageSelector />
         <AccountChip />
         <ul className="flex flex-col gap-1">
-          <NavItem icon={<AccessibilityIcon className="size-5 shrink-0" />} label="Accesibilidad" />
-          <NavItem icon={<SettingsIcon className="size-5 shrink-0" />} label="Ajustes" />
+          <NavItem
+            icon={<AccessibilityIcon className="size-5 shrink-0" />}
+            label={t('nav.accessibility')}
+          />
+          <NavItem icon={<SettingsIcon className="size-5 shrink-0" />} label={t('nav.settings')} />
         </ul>
-        <p className="px-3 text-xs leading-relaxed text-ink-muted">
-          Proyecto académico sin fines de lucro · ES / EN / PT
-        </p>
+        <p className="px-3 text-xs leading-relaxed text-ink-muted">{t('academic')}</p>
       </div>
     </aside>
   )

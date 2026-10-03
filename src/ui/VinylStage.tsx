@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
 import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
 import { WaveRing } from './WaveRing'
 
 export function VinylStage() {
+  const { t } = useTranslation()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
   const toggle = usePlayerStore((state) => state.toggle)
@@ -10,21 +12,21 @@ export function VinylStage() {
 
   return (
     <section
-      aria-label="Escenario de reproducción"
+      aria-label={t('vinyl.region')}
       className="rounded-lg border border-border bg-surface p-6 shadow-soft sm:p-8"
     >
       <div className="relative mx-auto aspect-square w-full max-w-80">
         <WaveRing active={isPlaying} analyser={getAnalyser()} />
 
         <button
-          aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+          aria-label={isPlaying ? t('player.pause') : t('player.play')}
           className="absolute inset-0 rounded-full shadow-disc disabled:cursor-not-allowed"
           disabled={currentTrack === null}
           onClick={() => void toggle()}
           type="button"
         >
           <span
-            className="absolute inset-0 rounded-full motion-reduce:animate-none animate-disc"
+            className="motion-reduce:animate-none absolute inset-0 animate-disc rounded-full"
             style={{
               animationPlayState: isPlaying ? 'running' : 'paused',
               background:
@@ -33,7 +35,7 @@ export function VinylStage() {
           >
             {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
               <img
-                alt={`Portada de ${currentTrack.title}`}
+                alt={t('vinyl.coverAlt', { title: currentTrack.title })}
                 className="absolute inset-[17%] rounded-full object-cover"
                 src={currentTrack.artworkUrl}
               />
@@ -72,10 +74,10 @@ export function VinylStage() {
 
       <div className="mt-8 text-center sm:mt-10">
         <p className="truncate font-display text-lg font-semibold">
-          {currentTrack?.title ?? 'Sin reproducción'}
+          {currentTrack?.title ?? t('vinyl.idleTitle')}
         </p>
         <p className="mt-1 truncate text-sm text-ink-muted">
-          {currentTrack?.artist ?? 'Importa una canción y pulsa reproducir.'}
+          {currentTrack?.artist ?? t('vinyl.idleHint')}
         </p>
       </div>
     </section>

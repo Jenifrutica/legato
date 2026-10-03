@@ -16,6 +16,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   formatDuration,
   formatFileSize,
@@ -23,10 +24,9 @@ import {
   normalizeText,
   useLibraryStore,
 } from '../features/library'
-import type { LibraryTrack } from '../features/library'
-import { usePlaylistsStore, getPlaylistStructure } from '../features/playlists'
+import type { ImportErrorCode, LibraryTrack } from '../features/library'
+import { getPlaylistStructure, usePlaylistsStore } from '../features/playlists'
 import { usePlayerStore } from '../player'
-import { StructureView } from './StructureView'
 import {
   GripIcon,
   ListMusicIcon,
@@ -36,6 +36,13 @@ import {
   UploadIcon,
   XIcon,
 } from './icons'
+import { StructureView } from './StructureView'
+
+const ERROR_KEYS = {
+  unsupported: 'library.errors.unsupported',
+  tooLarge: 'library.errors.tooLarge',
+  duplicate: 'library.errors.duplicate',
+} as const satisfies Record<ImportErrorCode, string>
 
 function TrackMeta({ index, track }: { index: number; track: LibraryTrack }) {
   return (
@@ -69,6 +76,7 @@ function SortableTrackRow({
   disabled: boolean
   children: ReactNode
 }) {
+  const { t } = useTranslation()
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
     disabled,
     id: track.id,
@@ -82,7 +90,7 @@ function SortableTrackRow({
       style={style}
     >
       <button
-        aria-label={`Reordenar ${track.title}`}
+        aria-label={t('playlists.reorder', { title: track.title })}
         className="cursor-grab touch-none rounded p-1 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
         disabled={disabled}
         type="button"
@@ -98,6 +106,7 @@ function SortableTrackRow({
 }
 
 export function LibraryPanel() {
+  const { t } = useTranslation()
   const tracks = useLibraryStore((state) => state.tracks)
   const isImporting = useLibraryStore((state) => state.isImporting)
   const lastErrors = useLibraryStore((state) => state.lastErrors)
@@ -122,13 +131,12 @@ export function LibraryPanel() {
   const queueStructure = usePlayerStore((state) => state.queueStructure)
   const currentTrackId = usePlayerStore((state) => state.currentTrack?.id ?? null)
 
-  const [showStructure, setShowStructure] = useState(false)
-
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameDraft, setRenameDraft] = useState('')
+  const [showStructure, setShowStructure] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -165,7 +173,9 @@ export function LibraryPanel() {
     const result = await importAudioFiles(list, existingDedupeKeys())
     addTracks(result.tracks)
     setErrors(result.errors)
-    setNotice(result.tracks.length > 0 ? `${result.tracks.length} canción(es) importada(s)` : null)
+    setNotice(
+      result.tracks.length > 0 ? t('library.importedCount', { count: result.tracks.length }) : null,
+    )
     setImporting(false)
   }
 
@@ -229,7 +239,7 @@ export function LibraryPanel() {
                 type="button"
               >
                 <XIcon className="size-3" />
-                Volver a la biblioteca
+                {t('playlists.back')}
               </button>
               {isRenaming ? (
                 <form onSubmit={submitRename}>
@@ -247,18 +257,15 @@ export function LibraryPanel() {
                 </h2>
               )}
               <p className="mt-1 text-sm text-ink-muted">
-                {selectedPlaylist.trackIds.length} canción(es). Arrastra con el asa o usa el teclado
-                (espacio, flechas y espacio).
+                {t('playlists.trackCount', { count: selectedPlaylist.trackIds.length })}
               </p>
             </div>
           ) : (
             <div>
               <h2 className="font-display text-xl font-semibold" id="biblioteca-titulo">
-                Biblioteca
+                {t('library.title')}
               </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Importa archivos del equipo o arrástralos aquí.
-              </p>
+              <p className="mt-1 text-sm text-ink-muted">{t('library.subtitle')}</p>
             </div>
           )}
 
@@ -274,7 +281,7 @@ export function LibraryPanel() {
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
               >
-                Estructura
+                {t('playlists.structure')}
               </button>
               <button
                 className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
@@ -284,25 +291,27 @@ export function LibraryPanel() {
                 }}
                 type="button"
               >
-                Renombrar
+                {t('playlists.rename')}
               </button>
               <button
                 className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
                 onClick={() => duplicatePlaylist(selectedPlaylist.id)}
                 type="button"
               >
-                Duplicar
+                {t('playlists.duplicate')}
               </button>
               <button
                 className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
                 onClick={() => {
-                  if (window.confirm(`¿Eliminar la playlist «${selectedPlaylist.name}»?`)) {
+                  if (
+                    window.confirm(t('playlists.confirmDelete', { name: selectedPlaylist.name }))
+                  ) {
                     removePlaylist(selectedPlaylist.id)
                   }
                 }}
                 type="button"
               >
-                Eliminar
+                {t('playlists.delete')}
               </button>
             </div>
           ) : (
@@ -317,7 +326,7 @@ export function LibraryPanel() {
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
               >
-                Estructura
+                {t('playlists.structure')}
               </button>
               <button
                 className="inline-flex items-center gap-2 rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
@@ -326,7 +335,7 @@ export function LibraryPanel() {
                 type="button"
               >
                 <UploadIcon className="size-4" />
-                {isImporting ? 'Importando…' : 'Importar música'}
+                {isImporting ? t('library.importing') : t('library.import')}
               </button>
               <input
                 accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus"
@@ -344,12 +353,12 @@ export function LibraryPanel() {
         </div>
 
         <label className="relative block w-full sm:max-w-72">
-          <span className="sr-only">Buscar canciones</span>
+          <span className="sr-only">{t('library.search')}</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted" />
           <input
             className="w-full rounded-full border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-primary focus:outline-none"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por título, artista o álbum"
+            placeholder={t('library.searchPlaceholder')}
             type="search"
             value={query}
           />
@@ -368,11 +377,13 @@ export function LibraryPanel() {
       {lastErrors.length > 0 && !isPlaylistView && (
         <ul className="border-b border-border bg-primary-soft px-5 py-2 text-xs text-ink">
           {lastErrors.slice(0, 3).map((error) => (
-            <li key={`${error.fileName}-${error.reason}`}>
-              {error.fileName}: {error.reason}
+            <li key={`${error.fileName}-${error.code}`}>
+              {error.fileName}: {t(ERROR_KEYS[error.code])}
             </li>
           ))}
-          {lastErrors.length > 3 && <li>y {lastErrors.length - 3} más</li>}
+          {lastErrors.length > 3 && (
+            <li>{t('library.errors.more', { count: lastErrors.length - 3 })}</li>
+          )}
         </ul>
       )}
 
@@ -392,12 +403,10 @@ export function LibraryPanel() {
               <ListMusicIcon className="size-7" />
             </span>
             <h3 className="mt-4 font-display text-lg font-semibold">
-              {isPlaylistView ? 'Esta playlist está vacía' : 'Tu biblioteca está vacía'}
+              {isPlaylistView ? t('playlists.emptyTitle') : t('library.emptyTitle')}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              {isPlaylistView
-                ? 'Agrega canciones desde la biblioteca con el selector «Agregar a…».'
-                : 'Agrega archivos de audio desde tu equipo para empezar a escuchar y organizar tu música.'}
+              {isPlaylistView ? t('playlists.emptyText') : t('library.emptyText')}
             </p>
           </div>
         </div>
@@ -405,7 +414,7 @@ export function LibraryPanel() {
         <div className="max-h-[30rem] overflow-y-auto">
           {filtered.length === 0 ? (
             <p className="px-5 py-8 text-center text-sm text-ink-muted">
-              Sin resultados para «{query}».
+              {t('library.noResults', { query })}
             </p>
           ) : isPlaylistView ? (
             <DndContext
@@ -426,7 +435,7 @@ export function LibraryPanel() {
                       track={track}
                     >
                       <button
-                        aria-label={`Reproducir ${track.title}`}
+                        aria-label={t('library.playTrack', { title: track.title })}
                         className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
                         onClick={() => playTracks(viewTracks, track.id, selectedPlaylist.id)}
                         type="button"
@@ -434,7 +443,7 @@ export function LibraryPanel() {
                         <PlayIcon className="size-4" />
                       </button>
                       <button
-                        aria-label={`Quitar ${track.title} de la playlist`}
+                        aria-label={t('playlists.removeTrack', { title: track.title })}
                         className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
                         onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
                         type="button"
@@ -451,7 +460,7 @@ export function LibraryPanel() {
               {filtered.map((track, index) => (
                 <li className="flex items-center gap-3 px-5 py-3" key={track.id}>
                   <button
-                    aria-label={`Reproducir ${track.title}`}
+                    aria-label={t('library.playTrack', { title: track.title })}
                     className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
                     onClick={() => playTracks(viewTracks, track.id, null)}
                     type="button"
@@ -461,7 +470,7 @@ export function LibraryPanel() {
                   <TrackMeta index={index} track={track} />
                   {playlists.length > 0 && (
                     <select
-                      aria-label={`Agregar ${track.title} a una playlist`}
+                      aria-label={t('library.addToLabel', { title: track.title })}
                       className="max-w-32 rounded-md border border-border bg-bg px-2 py-1 text-xs text-ink-muted focus:border-primary focus:outline-none"
                       defaultValue=""
                       onChange={(event) => {
@@ -472,7 +481,7 @@ export function LibraryPanel() {
                         }
                       }}
                     >
-                      <option value="">Agregar a…</option>
+                      <option value="">{t('library.addTo')}</option>
                       {playlists.map((playlist) => (
                         <option key={playlist.id} value={playlist.id}>
                           {playlist.name}
@@ -481,7 +490,7 @@ export function LibraryPanel() {
                     </select>
                   )}
                   <button
-                    aria-label={`Eliminar ${track.title} de la biblioteca`}
+                    aria-label={t('library.removeFromLibrary', { title: track.title })}
                     className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
                     onClick={() => handleRemoveFromLibrary(track.id)}
                     type="button"
