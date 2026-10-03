@@ -185,3 +185,19 @@ export function TrashIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </Icon>
+  )
+}
+
+export function XIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </Icon>
+  )
+}

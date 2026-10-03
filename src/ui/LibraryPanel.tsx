@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import type { FormEvent } from 'react'
 import {
   formatDuration,
   formatFileSize,
@@ -6,7 +7,9 @@ import {
   normalizeText,
   useLibraryStore,
 } from '../features/library'
-import { ListMusicIcon, SearchIcon, TrashIcon, UploadIcon } from './icons'
+import type { LibraryTrack } from '../features/library'
+import { usePlaylistsStore } from '../features/playlists'
+import { ListMusicIcon, SearchIcon, TrashIcon, UploadIcon, XIcon } from './icons'
 
 export function LibraryPanel() {
   const tracks = useLibraryStore((state) => state.tracks)
@@ -18,15 +21,35 @@ export function LibraryPanel() {
   const setErrors = useLibraryStore((state) => state.setErrors)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
 
+  const playlists = usePlaylistsStore((state) => state.playlists)
+  const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
+  const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+  const renamePlaylist = usePlaylistsStore((state) => state.renamePlaylist)
+  const duplicatePlaylist = usePlaylistsStore((state) => state.duplicatePlaylist)
+  const removePlaylist = usePlaylistsStore((state) => state.removePlaylist)
+  const addTrackToPlaylist = usePlaylistsStore((state) => state.addTrackToPlaylist)
+  const removeTrackFromPlaylist = usePlaylistsStore((state) => state.removeTrackFromPlaylist)
+
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [renameDraft, setRenameDraft] = useState('')
+
+  const selectedPlaylist = playlists.find((playlist) => playlist.id === selectedPlaylistId) ?? null
+  const isPlaylistView = selectedPlaylist !== null
+
+  const viewTracks: LibraryTrack[] = isPlaylistView
+    ? selectedPlaylist.trackIds
+        .map((id) => tracks.find((track) => track.id === id))
+        .filter((track): track is LibraryTrack => track !== undefined)
+    : tracks
 
   const normalizedQuery = normalizeText(query)
   const filtered =
     normalizedQuery === ''
-      ? tracks
-      : tracks.filter((track) =>
+      ? viewTracks
+      : viewTracks.filter((track) =>
           normalizeText(`${track.title} ${track.artist} ${track.album ?? ''}`).includes(
             normalizedQuery,
           ),
@@ -47,6 +70,23 @@ export function LibraryPanel() {
     setImporting(false)
   }
 
+  function handleRemoveFromLibrary(trackId: string) {
+    for (const playlist of playlists) {
+      if (playlist.trackIds.includes(trackId)) {
+        removeTrackFromPlaylist(playlist.id, trackId)
+      }
+    }
+    removeTrack(trackId)
+  }
+
+  function submitRename(event: FormEvent) {
+    event.preventDefault()
+    if (selectedPlaylist !== null && renameDraft.trim() !== '') {
+      renamePlaylist(selectedPlaylist.id, renameDraft)
+    }
+    setIsRenaming(false)
+  }
+
   return (
     <section
       aria-labelledby="biblioteca-titulo"
@@ -56,40 +96,108 @@ export function LibraryPanel() {
       }}
       onDrop={(event) => {
         event.preventDefault()
-        void handleFiles(event.dataTransfer.files)
+        if (!isPlaylistView) {
+          void handleFiles(event.dataTransfer.files)
+        }
       }}
     >
       <header className="flex flex-col gap-4 border-b border-border p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-xl font-semibold" id="biblioteca-titulo">
-              Biblioteca
-            </h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Importa archivos del equipo o arrástralos aquí.
-            </p>
-          </div>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          {isPlaylistView ? (
+            <div className="min-w-0 flex-1">
+              <button
+                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-primary-strong"
+                onClick={() => selectPlaylist(null)}
+                type="button"
+              >
+                <XIcon className="size-3" />
+                Volver a la biblioteca
+              </button>
+              {isRenaming ? (
+                <form onSubmit={submitRename}>
+                  <input
+                    autoFocus
+                    className="w-full max-w-sm rounded-md border border-border bg-bg px-3 py-1.5 font-display text-xl font-semibold focus:border-primary focus:outline-none"
+                    onBlur={() => setIsRenaming(false)}
+                    onChange={(event) => setRenameDraft(event.target.value)}
+                    value={renameDraft}
+                  />
+                </form>
+              ) : (
+                <h2 className="truncate font-display text-xl font-semibold" id="biblioteca-titulo">
+                  {selectedPlaylist.name}
+                </h2>
+              )}
+              <p className="mt-1 text-sm text-ink-muted">
+                {selectedPlaylist.trackIds.length} canción(es) en la playlist.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h2 className="font-display text-xl font-semibold" id="biblioteca-titulo">
+                Biblioteca
+              </h2>
+              <p className="mt-1 text-sm text-ink-muted">
+                Importa archivos del equipo o arrástralos aquí.
+              </p>
+            </div>
+          )}
 
-          <button
-            className="inline-flex items-center gap-2 rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
-            disabled={isImporting}
-            onClick={() => inputRef.current?.click()}
-            type="button"
-          >
-            <UploadIcon className="size-4" />
-            {isImporting ? 'Importando…' : 'Importar música'}
-          </button>
-          <input
-            accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus"
-            className="sr-only"
-            multiple
-            onChange={(event) => {
-              void handleFiles(event.target.files ?? [])
-              event.target.value = ''
-            }}
-            ref={inputRef}
-            type="file"
-          />
+          {isPlaylistView ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                onClick={() => {
+                  setRenameDraft(selectedPlaylist.name)
+                  setIsRenaming(true)
+                }}
+                type="button"
+              >
+                Renombrar
+              </button>
+              <button
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                onClick={() => duplicatePlaylist(selectedPlaylist.id)}
+                type="button"
+              >
+                Duplicar
+              </button>
+              <button
+                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
+                onClick={() => {
+                  if (window.confirm(`¿Eliminar la playlist «${selectedPlaylist.name}»?`)) {
+                    removePlaylist(selectedPlaylist.id)
+                  }
+                }}
+                type="button"
+              >
+                Eliminar
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                className="inline-flex items-center gap-2 rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+                disabled={isImporting}
+                onClick={() => inputRef.current?.click()}
+                type="button"
+              >
+                <UploadIcon className="size-4" />
+                {isImporting ? 'Importando…' : 'Importar música'}
+              </button>
+              <input
+                accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus"
+                className="sr-only"
+                multiple
+                onChange={(event) => {
+                  void handleFiles(event.target.files ?? [])
+                  event.target.value = ''
+                }}
+                ref={inputRef}
+                type="file"
+              />
+            </>
+          )}
         </div>
 
         <label className="relative block w-full sm:max-w-72">
@@ -114,7 +222,7 @@ export function LibraryPanel() {
         </p>
       )}
 
-      {lastErrors.length > 0 && (
+      {lastErrors.length > 0 && !isPlaylistView && (
         <ul className="border-b border-border bg-primary-soft px-5 py-2 text-xs text-ink">
           {lastErrors.slice(0, 3).map((error) => (
             <li key={`${error.fileName}-${error.reason}`}>
@@ -125,16 +233,19 @@ export function LibraryPanel() {
         </ul>
       )}
 
-      {tracks.length === 0 ? (
+      {viewTracks.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
           <div className="max-w-sm text-center">
             <span className="mx-auto grid size-14 place-items-center rounded-full bg-accent-soft text-accent">
               <ListMusicIcon className="size-7" />
             </span>
-            <h3 className="mt-4 font-display text-lg font-semibold">Tu biblioteca está vacía</h3>
+            <h3 className="mt-4 font-display text-lg font-semibold">
+              {isPlaylistView ? 'Esta playlist está vacía' : 'Tu biblioteca está vacía'}
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Agrega archivos de audio desde tu equipo para empezar a escuchar y organizar tu
-              música.
+              {isPlaylistView
+                ? 'Agrega canciones desde la biblioteca con el selector «Agregar a…».'
+                : 'Agrega archivos de audio desde tu equipo para empezar a escuchar y organizar tu música.'}
             </p>
           </div>
         </div>
@@ -164,14 +275,49 @@ export function LibraryPanel() {
                   <span className="text-xs tabular-nums text-ink-muted">
                     {formatDuration(track.durationSeconds)}
                   </span>
-                  <button
-                    aria-label={`Eliminar ${track.title}`}
-                    className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
-                    onClick={() => removeTrack(track.id)}
-                    type="button"
-                  >
-                    <TrashIcon className="size-4" />
-                  </button>
+
+                  {isPlaylistView ? (
+                    <button
+                      aria-label={`Quitar ${track.title} de la playlist`}
+                      className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                      onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
+                      type="button"
+                    >
+                      <XIcon className="size-4" />
+                    </button>
+                  ) : (
+                    <>
+                      {playlists.length > 0 && (
+                        <select
+                          aria-label={`Agregar ${track.title} a una playlist`}
+                          className="max-w-32 rounded-md border border-border bg-bg px-2 py-1 text-xs text-ink-muted focus:border-primary focus:outline-none"
+                          defaultValue=""
+                          onChange={(event) => {
+                            const playlistId = event.target.value
+                            if (playlistId !== '') {
+                              addTrackToPlaylist(playlistId, track)
+                              event.target.value = ''
+                            }
+                          }}
+                        >
+                          <option value="">Agregar a…</option>
+                          {playlists.map((playlist) => (
+                            <option key={playlist.id} value={playlist.id}>
+                              {playlist.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      <button
+                        aria-label={`Eliminar ${track.title} de la biblioteca`}
+                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                        onClick={() => handleRemoveFromLibrary(track.id)}
+                        type="button"
+                      >
+                        <TrashIcon className="size-4" />
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

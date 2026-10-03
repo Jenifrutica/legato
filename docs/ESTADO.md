@@ -15,8 +15,8 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 7 | AuthProvider + Cognito (timebox, fallback local) | Cerrado |
 | 8 | Player engine + cola sobre lista doble | Cerrado |
 | 9 | Importar archivos/carpetas + metadatos | Cerrado |
-| 10 | CRUD canciones y playlists | En curso |
-| 11 | Drag & drop con fix #12 + teclado | Pendiente |
+| 10 | CRUD canciones y playlists | Cerrado |
+| 11 | Drag & drop con fix #12 + teclado | En curso |
 | 12 | UI vinilo + ondas + mini player | Pendiente |
 | 13 | Modo estructura (visualizador DLL) | Pendiente |
 | 14 | i18n ES/EN/PT | Pendiente |
@@ -31,11 +31,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 67 en verde (núcleo, player, biblioteca).
+- **Tests:** 76 en verde (núcleo, player, biblioteca y playlists).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #10: CRUD de canciones y playlists (varias listas dobles), con selección de playlist y agregar/quitar canciones.
+Issue #11: drag & drop para reordenar playlists con `currentNode` por puntero (fix del bug #12) y alternativa de teclado.

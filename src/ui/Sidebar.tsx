@@ -1,11 +1,13 @@
-import type { ReactNode } from 'react'
+import { useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { AccountChip } from '../features/auth'
+import { usePlaylistsStore } from '../features/playlists'
 import {
   AccessibilityIcon,
   DiscMark,
-  FolderIcon,
   LibraryIcon,
   ListMusicIcon,
+  PlusIcon,
   SettingsIcon,
 } from './icons'
 
@@ -13,27 +15,63 @@ function NavItem({
   icon,
   label,
   active = false,
+  onClick,
 }: {
   icon: ReactNode
   label: string
   active?: boolean
+  onClick?: () => void
 }) {
+  const className = `flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+    active
+      ? 'bg-primary-soft text-primary-strong'
+      : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+  }`
+
+  if (onClick === undefined) {
+    return (
+      <li className={`${className} opacity-70`}>
+        {icon}
+        <span className="truncate">{label}</span>
+      </li>
+    )
+  }
+
   return (
-    <li
-      aria-current={active ? 'page' : undefined}
-      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-        active ? 'bg-primary-soft text-primary-strong' : 'text-ink-muted'
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
+    <li>
+      <button
+        aria-current={active ? 'page' : undefined}
+        className={className}
+        onClick={onClick}
+        type="button"
+      >
+        {icon}
+        <span className="truncate">{label}</span>
+      </button>
     </li>
   )
 }
 
 export function Sidebar() {
+  const playlists = usePlaylistsStore((state) => state.playlists)
+  const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
+  const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+  const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
+
+  const [isCreating, setIsCreating] = useState(false)
+  const [draft, setDraft] = useState('')
+
+  function submitNewPlaylist(event: FormEvent) {
+    event.preventDefault()
+    if (draft.trim() !== '') {
+      createPlaylist(draft)
+    }
+    setDraft('')
+    setIsCreating(false)
+  }
+
   return (
-    <aside className="hidden border-r border-border bg-surface/70 px-5 py-6 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-[17rem] lg:flex-col lg:gap-8 lg:pb-36">
+    <aside className="hidden border-r border-border bg-surface/70 px-5 py-6 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-[17rem] lg:flex-col lg:gap-6 lg:overflow-y-auto lg:pb-36">
       <div className="flex items-center gap-3">
         <span className="grid size-10 place-items-center rounded-full bg-ink text-bg">
           <DiscMark className="size-6" />
@@ -43,11 +81,75 @@ export function Sidebar() {
 
       <nav aria-label="Biblioteca">
         <ul className="flex flex-col gap-1">
-          <NavItem icon={<LibraryIcon className="size-5 shrink-0" />} label="Biblioteca" active />
-          <NavItem icon={<ListMusicIcon className="size-5 shrink-0" />} label="Playlists" />
-          <NavItem icon={<FolderIcon className="size-5 shrink-0" />} label="Carpetas" />
+          <NavItem
+            active={selectedPlaylistId === null}
+            icon={<LibraryIcon className="size-5 shrink-0" />}
+            label="Biblioteca"
+            onClick={() => selectPlaylist(null)}
+          />
         </ul>
       </nav>
+
+      <section aria-label="Playlists" className="flex min-h-0 flex-col gap-2">
+        <div className="flex items-center justify-between px-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            Playlists
+          </h2>
+          <button
+            aria-label="Nueva playlist"
+            className="rounded-full p-1 text-ink-muted transition-colors hover:text-primary-strong"
+            onClick={() => setIsCreating(true)}
+            type="button"
+          >
+            <PlusIcon className="size-4" />
+          </button>
+        </div>
+
+        {isCreating && (
+          <form className="px-1" onSubmit={submitNewPlaylist}>
+            <input
+              autoFocus
+              className="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              onBlur={() => {
+                if (draft.trim() !== '') {
+                  createPlaylist(draft)
+                }
+                setDraft('')
+                setIsCreating(false)
+              }}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="Nombre de la playlist"
+              value={draft}
+            />
+          </form>
+        )}
+
+        <ul className="flex flex-col gap-1">
+          {playlists.map((playlist) => {
+            const active = playlist.id === selectedPlaylistId
+            return (
+              <li key={playlist.id}>
+                <button
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-primary-soft text-primary-strong'
+                      : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+                  }`}
+                  onClick={() => selectPlaylist(playlist.id)}
+                  type="button"
+                >
+                  <ListMusicIcon className="size-5 shrink-0" />
+                  <span className="truncate">{playlist.name}</span>
+                  <span className="ml-auto text-xs tabular-nums text-ink-muted">
+                    {playlist.trackIds.length}
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
 
       <div className="mt-auto flex flex-col gap-4 border-t border-border pt-5">
         <AccountChip />
