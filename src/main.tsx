@@ -15,3 +15,9 @@ void hydrateStores().then((hydrated) => {
     startPersistence()
   }
 })
+
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js')
+  })
+}
