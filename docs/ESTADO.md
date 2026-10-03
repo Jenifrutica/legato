@@ -34,19 +34,23 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 37 | Modo offline (PWA) | Cerrado |
 | 38 | Crossfade configurable | Cerrado |
 | 39 | Rediseño Hi-Fi vivo + vinilo 3D + tema por portada | Cerrado (vinilo ahora 2D con portada completa, sin recorte) |
-| 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | Cerrado (búsqueda + previews; SDK Premium pendiente) |
+| 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | Cerrado |
 | 41 | Integración de pistas online con listas dobles | Cerrado (reproducir desde la búsqueda y guardar Audius/Jamendo en biblioteca) |
+| 42 | Web Playback SDK de Spotify (reproducción completa Premium) | Cerrado (banner de control; el audio lo maneja Spotify, no pasa por nuestro DSP) |
 
 ## Estado técnico
 
-- **Tests:** 153 unitarios + 4 E2E (Playwright) en verde.
+- **Tests:** 154 unitarios + 4 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Rediseño:** top bar sticky, vinilo 2D con la portada como disco completo (sin recorte, sin 3D), tema dinámico por portada en toda la interfaz con contraste AA, panel derecho con pestañas Biblioteca/Buscar/Playlists/Cola/Audio, controles de escenario en el héroe y mini reproductor móvil.
-- **Fuentes:** Spotify (OAuth PKCE + búsqueda + previews 30 s), Audius (streaming completo gratis) y Jamendo (CC, client_id), cada una con interruptor en Ajustes y activadas por defecto; guardar Audius/Jamendo en la biblioteca.
+- **Fuentes:** Spotify (OAuth PKCE + búsqueda + previews 30 s + reproducción completa con Web Playback SDK), Audius (streaming completo gratis) y Jamendo (CC, client_id), con interruptores en Ajustes; por defecto solo Spotify activo.
 - **Credenciales:** Spotify y Jamendo Client ID configurados en `.env.local`.
-- **Pendiente Bloque B:** Web Playback SDK de Spotify (reproducción completa Premium) — el audio lo maneja Spotify y no pasa por nuestro grafo.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 
 ## Próximo paso
 
-Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a conectar Spotify). Después: Web Playback SDK, pulido final y Día 4 (deploy S3 + CloudFront).
+Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a conectar Spotify). Después: nueva funcionalidad pendiente por definir, pulido final y Día 4 (deploy S3 + CloudFront).
+
+## Nota de desarrollo
+
+Si tras agregar archivos nuevos la interfaz queda en blanco con un error de módulo en consola, es caché de Vite: reiniciar el servidor (`Ctrl+C`, `bun run dev`) o borrar `node_modules/.vite`. No afecta al build de producción.
