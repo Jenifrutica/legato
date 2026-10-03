@@ -43,7 +43,12 @@ describe('jamendo source', () => {
     })
   })
 
-  it('sin client id devuelve vacio', async () => {
+  it('con resultados vacios devuelve lista vacia', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json({ results: [] })),
+    )
+
     const { searchJamendo } = await import('./jamendo')
     expect(await searchJamendo('x')).toEqual([])
   })

@@ -10,6 +10,14 @@ export const es = {
     audio: 'Audio',
     search: 'Buscar',
   },
+  spotify: {
+    banner: 'Reproductor de Spotify',
+    premium: 'Spotify Premium',
+    connecting: 'Conectando con Spotify…',
+    error: 'No se pudo conectar Spotify',
+    notConnected: 'Conecta Spotify en Ajustes para reproducir completo.',
+    exit: 'Salir de Spotify',
+  },
   settings: {
     title: 'Ajustes',
     close: 'Cerrar ajustes',
@@ -31,6 +39,7 @@ export const es = {
     searching: 'Buscando…',
     empty: 'Sin resultados en las fuentes activas.',
     play: 'Reproducir',
+    playFull: 'Reproducir completo en Spotify',
     save: 'Guardar',
     saved: 'Guardada en tu biblioteca.',
     duplicate: 'Ya estaba en tu biblioteca.',

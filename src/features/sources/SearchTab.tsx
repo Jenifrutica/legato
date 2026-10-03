@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { importAudioFiles, useLibraryStore } from '../library'
 import { usePlayerStore } from '../../player'
 import type { QueueTrack } from '../../player'
-import { DownloadIcon, PlayIcon, SearchIcon } from '../../ui/icons'
+import { DownloadIcon, DiscMark, PlayIcon, SearchIcon } from '../../ui/icons'
 import { useProvidersStore } from './providers-store'
 import { searchAll } from './search'
+import { useSpotifyStore } from './spotify-store'
 import type { SourceId, SourceTrack } from './types'
 
 const SOURCE_LABELS: Record<SourceId, string> = {
@@ -31,6 +32,7 @@ export function SearchTab() {
   const { t } = useTranslation()
   const enabled = useProvidersStore((state) => state.enabled)
   const playTracks = usePlayerStore((state) => state.playTracks)
+  const playSpotifyUris = useSpotifyStore((state) => state.playUris)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
   const [query, setQuery] = useState('')
@@ -164,6 +166,24 @@ export function SearchTab() {
             >
               <PlayIcon className="size-4" />
             </button>
+
+            {track.sourceId === 'spotify' && (
+              <button
+                aria-label={`${t('search.playFull')} ${track.title}`}
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-[#1db954] text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                disabled={status !== 'idle'}
+                onClick={() =>
+                  void playSpotifyUris(
+                    results
+                      .filter((item) => item.sourceId === 'spotify')
+                      .map((item) => `spotify:track:${item.id}`),
+                  )
+                }
+                type="button"
+              >
+                <DiscMark className="size-4" />
+              </button>
+            )}
 
             {track.downloadable && (
               <button

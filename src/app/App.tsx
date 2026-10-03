@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AuthContextProvider } from '../features/auth'
 import { useHistoryStore } from '../features/history'
 import { CookieConsent, LegalPage } from '../features/legal'
+import { SpotifyBanner } from '../features/sources'
 import { useAlbumTheme } from '../features/theme'
 import { Hero } from '../ui/Hero'
 import { MobileNav } from '../ui/MobileNav'
@@ -59,6 +60,7 @@ function AppShell() {
       </a>
 
       <TopBar />
+      <SpotifyBanner />
 
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_25rem] xl:grid-cols-[minmax(0,1fr)_27rem]">
         <main className="min-w-0" id="contenido">

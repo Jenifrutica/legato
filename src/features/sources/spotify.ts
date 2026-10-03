@@ -182,6 +182,10 @@ async function getAccessToken(): Promise<string | null> {
   return updated.accessToken
 }
 
+export async function getSpotifyAccessToken(): Promise<string | null> {
+  return getAccessToken()
+}
+
 type SpotifyTrack = {
   id: string
   name: string

@@ -32,6 +32,7 @@ type PlayerState = PlayerSnapshot & {
   setOutputDevice: (deviceId: string) => Promise<void>
   playTracks: (tracks: QueueTrack[], startId?: string, sourcePlaylistId?: string | null) => void
   toggle: () => void
+  pause: () => void
   next: () => void
   previous: () => void
   seek: (seconds: number) => void
@@ -85,6 +86,7 @@ export const usePlayerStore = create<PlayerState>(() => ({
     void graph.resume()
     void controller.toggle()
   },
+  pause: () => controller.pause(),
   next: () => controller.next(),
   previous: () => controller.previous(),
   seek: (seconds) => controller.seek(seconds),

@@ -12,6 +12,14 @@ export const pt: typeof es = {
     audio: 'Áudio',
     search: 'Buscar',
   },
+  spotify: {
+    banner: 'Reprodutor do Spotify',
+    premium: 'Spotify Premium',
+    connecting: 'Conectando ao Spotify…',
+    error: 'Não foi possível conectar o Spotify',
+    notConnected: 'Conecte o Spotify em Configurações para reprodução completa.',
+    exit: 'Sair do Spotify',
+  },
   settings: {
     title: 'Configurações',
     close: 'Fechar configurações',
@@ -33,6 +41,7 @@ export const pt: typeof es = {
     searching: 'Buscando…',
     empty: 'Sem resultados nas fontes ativas.',
     play: 'Reproduzir',
+    playFull: 'Reproduzir completo no Spotify',
     save: 'Salvar',
     saved: 'Salva na sua biblioteca.',
     duplicate: 'Já estava na sua biblioteca.',

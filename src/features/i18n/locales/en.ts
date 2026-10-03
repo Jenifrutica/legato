@@ -12,6 +12,14 @@ export const en: typeof es = {
     audio: 'Audio',
     search: 'Search',
   },
+  spotify: {
+    banner: 'Spotify player',
+    premium: 'Spotify Premium',
+    connecting: 'Connecting to Spotify…',
+    error: 'Could not connect Spotify',
+    notConnected: 'Connect Spotify in Settings for full playback.',
+    exit: 'Exit Spotify',
+  },
   settings: {
     title: 'Settings',
     close: 'Close settings',
@@ -33,6 +41,7 @@ export const en: typeof es = {
     searching: 'Searching…',
     empty: 'No results in the active sources.',
     play: 'Play',
+    playFull: 'Play full on Spotify',
     save: 'Save',
     saved: 'Saved to your library.',
     duplicate: 'Already in your library.',
