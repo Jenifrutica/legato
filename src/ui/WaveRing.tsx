@@ -109,12 +109,13 @@ export function WaveRing({
         }
         bass = bass / (bassBins * 255)
 
-        // Promedio móvil del bajo + detección de golpes: la onda late con la música.
-        bassAverage = bassAverage * 0.94 + bass * 0.06
-        const onset = Math.max(0, bass - bassAverage * 1.25)
-        energy = Math.max(energy * 0.86, onset)
-        beat = Math.min(1, energy * 2.2)
-        pulse = Math.min(2.8, 1 + bass * 0.45 + energy * 3.2)
+        // Promedio móvil del bajo + detección de golpes sensible: la onda late con la música.
+        bassAverage = bassAverage * 0.96 + bass * 0.04
+        const deviation = bass > 0.03 ? Math.max(0, bass - bassAverage) : 0
+        const onset = Math.min(1, deviation * 4)
+        energy = Math.max(energy * 0.9, onset)
+        beat = Math.min(1, energy * 2.8)
+        pulse = Math.min(3.4, 1.05 + bass * 0.6 + energy * 4)
       } else {
         // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
         const phase = (seconds * 2) % 1

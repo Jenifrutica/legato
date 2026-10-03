@@ -33,7 +33,7 @@ export class AudioGraph implements AnalyserLike {
       const analyser = context.createAnalyser()
 
       analyser.fftSize = 256
-      analyser.smoothingTimeConstant = 0.82
+      analyser.smoothingTimeConstant = 0.68
       bass.type = 'lowshelf'
       bass.frequency.value = 180
 
