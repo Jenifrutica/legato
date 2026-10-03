@@ -34,6 +34,14 @@ export const en: typeof es = {
     volume: 'Volume',
     progress: 'Song progress',
   },
+  timer: {
+    title: 'Sleep timer',
+    cancel: 'Cancel timer',
+    endOfTrack: 'End of song',
+    afterTracks: 'After {{count}} songs',
+    tracksLeft: '{{count}} songs left',
+    untilEndOfTrack: 'Stops at the end of the song',
+  },
   vinyl: {
     region: 'Playback stage',
     idleTitle: 'Nothing playing',

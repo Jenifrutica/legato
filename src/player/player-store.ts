@@ -3,6 +3,8 @@ import { useLibraryStore } from '../features/library'
 import { AudioGraph } from './audio-graph'
 import { PlayerController } from './controller'
 import type { PlayerSnapshot, RestoreState } from './controller'
+import { SleepTimer } from './sleep-timer'
+import type { TimerSnapshot } from './sleep-timer'
 import type { ChannelMode, QueueTrack } from './types'
 
 const audio = new Audio()
@@ -10,12 +12,18 @@ audio.preload = 'metadata'
 
 const controller = new PlayerController(audio)
 const graph = new AudioGraph(audio)
+const sleepTimer = new SleepTimer(() => {
+  void controller.fadeOutAndPause()
+})
+
+controller.onTrackEnded(() => sleepTimer.onTrackEnded())
 
 export function getAnalyser(): AudioGraph {
   return graph
 }
 
 type PlayerState = PlayerSnapshot & {
+  timer: TimerSnapshot
   playTracks: (tracks: QueueTrack[], startId?: string, sourcePlaylistId?: string | null) => void
   toggle: () => void
   next: () => void
@@ -29,10 +37,15 @@ type PlayerState = PlayerSnapshot & {
   restoreSession: (record: RestoreState) => void
   setBalance: (value: number) => void
   setChannelMode: (mode: ChannelMode) => void
+  startTimerMinutes: (minutes: number) => void
+  startTimerEndOfTrack: () => void
+  startTimerAfterTracks: (count: number) => void
+  cancelTimer: () => void
 }
 
 export const usePlayerStore = create<PlayerState>(() => ({
   ...controller.getSnapshot(),
+  timer: sleepTimer.getSnapshot(),
 
   playTracks: (tracks, startId, sourcePlaylistId = null) => {
     controller.playTracks(tracks, startId, sourcePlaylistId)
@@ -66,8 +79,16 @@ export const usePlayerStore = create<PlayerState>(() => ({
     controller.setChannelMode(mode)
     graph.setChannelMode(mode)
   },
+  startTimerMinutes: (minutes) => sleepTimer.startMinutes(minutes),
+  startTimerEndOfTrack: () => sleepTimer.startEndOfTrack(),
+  startTimerAfterTracks: (count) => sleepTimer.startAfterTracks(count),
+  cancelTimer: () => sleepTimer.cancel(),
 }))
 
 controller.subscribe((snapshot) => {
   usePlayerStore.setState(snapshot)
+})
+
+sleepTimer.subscribe((snapshot) => {
+  usePlayerStore.setState({ timer: snapshot })
 })

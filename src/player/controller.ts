@@ -35,6 +35,7 @@ export class PlayerController {
   #engine: PlayerEngine
   #queue = new PlaybackQueue()
   #listeners = new Set<(snapshot: PlayerSnapshot) => void>()
+  #trackEndedListeners = new Set<() => boolean | void>()
   #volume = 1
   #rate = 1
   #balance = 0
@@ -108,6 +109,33 @@ export class PlayerController {
     this.#engine.load(track)
     void this.#engine.play()
     this.#notify()
+  }
+
+  pause(): void {
+    this.#engine.pause()
+    this.#notify()
+  }
+
+  async fadeOutAndPause(durationMs = 2500): Promise<void> {
+    const steps = 25
+    const stepMs = durationMs / steps
+    const startVolume = this.#volume
+
+    for (let step = 1; step <= steps; step++) {
+      this.#engine.setVolume(startVolume * (1 - step / steps))
+      await new Promise((resolve) => setTimeout(resolve, stepMs))
+    }
+
+    this.#engine.pause()
+    this.#engine.setVolume(startVolume)
+    this.#notify()
+  }
+
+  onTrackEnded(listener: () => boolean | void): () => void {
+    this.#trackEndedListeners.add(listener)
+    return () => {
+      this.#trackEndedListeners.delete(listener)
+    }
   }
 
   seek(seconds: number): void {
@@ -215,6 +243,13 @@ export class PlayerController {
   }
 
   #handleEnded = (): void => {
+    for (const listener of this.#trackEndedListeners) {
+      if (listener() === true) {
+        this.#notify()
+        return
+      }
+    }
+
     if (this.#queue.loopMode === 'one') {
       this.#engine.seek(0)
       void this.#engine.play()

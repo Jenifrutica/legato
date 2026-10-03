@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FakeAudio } from '../test/fake-audio'
 import { PlayerController } from './controller'
 import type { QueueTrack } from './types'
@@ -16,6 +16,10 @@ function track(id: string): QueueTrack {
 }
 
 describe('PlayerController', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('playTracks carga y reproduce desde el id indicado', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)
@@ -194,6 +198,33 @@ describe('PlayerController', () => {
     const snapshot = controller.getSnapshot()
     expect(snapshot.balance).toBe(0)
     expect(snapshot.channelMode).toBe('stereo')
+  })
+
+  it('onTrackEnded puede detener el avance (temporizador)', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a'), track('b')])
+    controller.onTrackEnded(() => true)
+
+    audio.dispatch('ended')
+
+    expect(controller.getSnapshot().currentTrack?.id).toBe('a')
+    expect(controller.getSnapshot().status).toBe('ended')
+  })
+
+  it('fadeOutAndPause baja el volumen, pausa y lo restaura', async () => {
+    vi.useFakeTimers()
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a')])
+    controller.setVolume(1)
+
+    const promise = controller.fadeOutAndPause(1000)
+    await vi.runAllTimersAsync()
+    await promise
+
+    expect(audio.paused).toBe(true)
+    expect(audio.volume).toBe(1)
   })
 
   it('playTracks sin canciones deja el reproductor quieto', () => {

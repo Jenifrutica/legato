@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { getAnalyser, usePlayerStore } from '../player'
+import { TimerPanel } from './TimerPanel'
 import { WaveBars } from './WaveBars'
 import {
   DiscMark,
@@ -66,6 +68,8 @@ export function PlayerBar() {
   const cycleRate = usePlayerStore((state) => state.cycleRate)
   const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
   const cycleLoopMode = usePlayerStore((state) => state.cycleLoopMode)
+  const timer = usePlayerStore((state) => state.timer)
+  const [timerOpen, setTimerOpen] = useState(false)
 
   const isPlaying = status === 'playing'
   const hasTrack = currentTrack !== null
@@ -185,11 +189,15 @@ export function PlayerBar() {
             >
               {rate}x
             </button>
-            <TransportButton
-              icon={<TimerIcon className="size-4" />}
-              label={t('player.timer')}
-              disabled
-            />
+            <div className="relative">
+              <TransportButton
+                icon={<TimerIcon className="size-4" />}
+                label={t('player.timer')}
+                onClick={() => setTimerOpen((value) => !value)}
+                pressed={timer.mode !== 'off'}
+              />
+              {timerOpen && <TimerPanel onClose={() => setTimerOpen(false)} />}
+            </div>
             <span className="flex items-center gap-2">
               <VolumeIcon className="size-4 text-ink-muted" />
               <input

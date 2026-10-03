@@ -34,6 +34,14 @@ export const pt: typeof es = {
     volume: 'Volume',
     progress: 'Progresso da música',
   },
+  timer: {
+    title: 'Temporizador',
+    cancel: 'Cancelar temporizador',
+    endOfTrack: 'Fim da música',
+    afterTracks: 'Depois de {{count}} músicas',
+    tracksLeft: 'Restam {{count}} músicas',
+    untilEndOfTrack: 'Para no fim da música',
+  },
   vinyl: {
     region: 'Palco de reprodução',
     idleTitle: 'Nada tocando',

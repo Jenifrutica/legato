@@ -32,6 +32,14 @@ export const es = {
     volume: 'Volumen',
     progress: 'Progreso de la canción',
   },
+  timer: {
+    title: 'Temporizador',
+    cancel: 'Cancelar temporizador',
+    endOfTrack: 'Fin de la canción',
+    afterTracks: 'Tras {{count}} canciones',
+    tracksLeft: 'Quedan {{count}} canciones',
+    untilEndOfTrack: 'Se detiene al terminar la canción',
+  },
   vinyl: {
     region: 'Escenario de reproducción',
     idleTitle: 'Sin reproducción',
