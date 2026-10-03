@@ -14,6 +14,8 @@ export type PlayerSnapshot = {
   channelMode: ChannelMode
   loopMode: LoopMode
   shuffle: boolean
+  abLoop: { a: number; b: number } | null
+  loopPointA: number | null
   queue: QueueTrack[]
   queueStructure: StructureNode[]
   sourcePlaylistId: string | null
@@ -40,6 +42,8 @@ export class PlayerController {
   #rate = 1
   #balance = 0
   #channelMode: ChannelMode = 'stereo'
+  #abLoop: { a: number; b: number } | null = null
+  #loopPointA: number | null = null
   #sourcePlaylistId: string | null = null
 
   constructor(audio?: AudioLike) {
@@ -48,6 +52,7 @@ export class PlayerController {
       this.#notify()
     })
     this.#engine.on('time', () => {
+      this.#enforceAbLoop()
       this.#notify()
     })
     this.#engine.on('ended', this.#handleEnded)
@@ -69,6 +74,7 @@ export class PlayerController {
 
     const current = this.#queue.currentTrack
     if (current !== null) {
+      this.#resetAbLoop()
       this.#engine.load(current)
       this.#engine.setVolume(this.#volume)
       this.#engine.setRate(this.#rate)
@@ -95,6 +101,7 @@ export class PlayerController {
       return
     }
 
+    this.#resetAbLoop()
     this.#engine.load(track)
     void this.#engine.play()
     this.#notify()
@@ -106,6 +113,7 @@ export class PlayerController {
       return
     }
 
+    this.#resetAbLoop()
     this.#engine.load(track)
     void this.#engine.play()
     this.#notify()
@@ -165,6 +173,33 @@ export class PlayerController {
     this.#notify()
   }
 
+  setLoopPointA(): void {
+    this.#loopPointA = this.#engine.currentTime
+    this.#abLoop = null
+    this.#notify()
+  }
+
+  setLoopPointB(): void {
+    const a = this.#loopPointA
+    if (a === null) {
+      return
+    }
+
+    const b = this.#engine.currentTime
+    if (b <= a) {
+      return
+    }
+
+    this.#abLoop = { a, b }
+    this.#notify()
+  }
+
+  clearAbLoop(): void {
+    this.#loopPointA = null
+    this.#abLoop = null
+    this.#notify()
+  }
+
   cycleRate(): void {
     const presets = [1, 0.9, 0.75, 0.5]
     const index = presets.indexOf(this.#rate)
@@ -208,6 +243,7 @@ export class PlayerController {
 
     const current = this.#queue.currentTrack
     if (current !== null) {
+      this.#resetAbLoop()
       this.#engine.load(current)
       this.#engine.setVolume(this.#volume)
       this.#engine.setRate(this.#rate)
@@ -229,6 +265,8 @@ export class PlayerController {
       channelMode: this.#channelMode,
       loopMode: this.#queue.loopMode,
       shuffle: this.#queue.shuffle,
+      abLoop: this.#abLoop === null ? null : { ...this.#abLoop },
+      loopPointA: this.#loopPointA,
       queue: this.#queue.tracks,
       queueStructure: this.#queue.structure(),
       sourcePlaylistId: this.#sourcePlaylistId,
@@ -240,6 +278,21 @@ export class PlayerController {
     return () => {
       this.#listeners.delete(listener)
     }
+  }
+
+  #enforceAbLoop(): void {
+    if (this.#abLoop === null) {
+      return
+    }
+
+    if (this.#engine.currentTime >= this.#abLoop.b) {
+      this.#engine.seek(this.#abLoop.a)
+    }
+  }
+
+  #resetAbLoop(): void {
+    this.#abLoop = null
+    this.#loopPointA = null
   }
 
   #handleEnded = (): void => {
@@ -259,6 +312,7 @@ export class PlayerController {
 
     const track = this.#queue.next()
     if (track !== null) {
+      this.#resetAbLoop()
       this.#engine.load(track)
       void this.#engine.play()
     }

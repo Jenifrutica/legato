@@ -209,3 +209,12 @@ export function GripIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function FlagIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M5 21V4" />
+      <path d="M5 5h13l-2.5 4L18 13H5" />
+    </Icon>
+  )
+}

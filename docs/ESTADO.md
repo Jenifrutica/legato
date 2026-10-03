@@ -32,11 +32,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 113 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer y accesibilidad con axe).
+- **Tests:** 119 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer, accesibilidad y legal).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #18: páginas legales (privacidad, términos, cookies, accesibilidad) en ES/EN/PT con consentimiento granular de cookies y centro de preferencias.
+Extras del Día 3: #19 herramientas de ensayo (loop A–B + velocidad), #20 undo/redo con pila de comandos, #21 karaoke M/S. Después #22 E2E y Día 4 (pulido, responsive, deploy S3+CloudFront, rotar key).

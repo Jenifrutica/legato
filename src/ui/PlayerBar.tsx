@@ -3,10 +3,12 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { getAnalyser, usePlayerStore } from '../player'
+import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { WaveBars } from './WaveBars'
 import {
   DiscMark,
+  FlagIcon,
   PauseIcon,
   PlayIcon,
   RepeatIcon,
@@ -69,7 +71,9 @@ export function PlayerBar() {
   const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
   const cycleLoopMode = usePlayerStore((state) => state.cycleLoopMode)
   const timer = usePlayerStore((state) => state.timer)
+  const abLoop = usePlayerStore((state) => state.abLoop)
   const [timerOpen, setTimerOpen] = useState(false)
+  const [practiceOpen, setPracticeOpen] = useState(false)
 
   const isPlaying = status === 'playing'
   const hasTrack = currentTrack !== null
@@ -191,9 +195,24 @@ export function PlayerBar() {
             </button>
             <div className="relative">
               <TransportButton
+                icon={<FlagIcon className="size-4" />}
+                label={t('practice.title')}
+                onClick={() => {
+                  setTimerOpen(false)
+                  setPracticeOpen((value) => !value)
+                }}
+                pressed={abLoop !== null}
+              />
+              {practiceOpen && <PracticePanel onClose={() => setPracticeOpen(false)} />}
+            </div>
+            <div className="relative">
+              <TransportButton
                 icon={<TimerIcon className="size-4" />}
                 label={t('player.timer')}
-                onClick={() => setTimerOpen((value) => !value)}
+                onClick={() => {
+                  setPracticeOpen(false)
+                  setTimerOpen((value) => !value)
+                }}
                 pressed={timer.mode !== 'off'}
               />
               {timerOpen && <TimerPanel onClose={() => setTimerOpen(false)} />}

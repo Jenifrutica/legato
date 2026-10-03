@@ -227,6 +227,60 @@ describe('PlayerController', () => {
     expect(audio.volume).toBe(1)
   })
 
+  it('bucle A-B: marca A y B y salta al llegar a B', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a')])
+
+    audio.currentTime = 10
+    controller.setLoopPointA()
+    audio.currentTime = 20
+    controller.setLoopPointB()
+
+    expect(controller.getSnapshot().abLoop).toEqual({ a: 10, b: 20 })
+
+    audio.currentTime = 21
+    audio.dispatch('timeupdate')
+    expect(audio.currentTime).toBe(10)
+  })
+
+  it('bucle A-B: B invalido se ignora, clear lo apaga y cambiar de cancion lo limpia', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a'), track('b')])
+
+    audio.currentTime = 10
+    controller.setLoopPointA()
+    audio.currentTime = 5
+    controller.setLoopPointB()
+    expect(controller.getSnapshot().abLoop).toBeNull()
+    expect(controller.getSnapshot().loopPointA).toBe(10)
+
+    audio.currentTime = 20
+    controller.setLoopPointB()
+    expect(controller.getSnapshot().abLoop).toEqual({ a: 10, b: 20 })
+
+    controller.next()
+    expect(controller.getSnapshot().abLoop).toBeNull()
+    expect(controller.getSnapshot().loopPointA).toBeNull()
+
+    audio.currentTime = 1
+    controller.setLoopPointA()
+    controller.clearAbLoop()
+    expect(controller.getSnapshot().loopPointA).toBeNull()
+  })
+
+  it('setRate fija la velocidad directamente', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a')])
+
+    controller.setRate(0.5)
+
+    expect(controller.getSnapshot().rate).toBe(0.5)
+    expect(audio.playbackRate).toBe(0.5)
+  })
+
   it('playTracks sin canciones deja el reproductor quieto', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

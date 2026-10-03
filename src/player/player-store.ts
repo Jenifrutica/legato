@@ -37,6 +37,10 @@ type PlayerState = PlayerSnapshot & {
   restoreSession: (record: RestoreState) => void
   setBalance: (value: number) => void
   setChannelMode: (mode: ChannelMode) => void
+  setRate: (value: number) => void
+  setLoopPointA: () => void
+  setLoopPointB: () => void
+  clearAbLoop: () => void
   startTimerMinutes: (minutes: number) => void
   startTimerEndOfTrack: () => void
   startTimerAfterTracks: (count: number) => void
@@ -79,6 +83,10 @@ export const usePlayerStore = create<PlayerState>(() => ({
     controller.setChannelMode(mode)
     graph.setChannelMode(mode)
   },
+  setRate: (value) => controller.setRate(value),
+  setLoopPointA: () => controller.setLoopPointA(),
+  setLoopPointB: () => controller.setLoopPointB(),
+  clearAbLoop: () => controller.clearAbLoop(),
   startTimerMinutes: (minutes) => sleepTimer.startMinutes(minutes),
   startTimerEndOfTrack: () => sleepTimer.startEndOfTrack(),
   startTimerAfterTracks: (count) => sleepTimer.startAfterTracks(count),
