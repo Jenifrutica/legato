@@ -112,17 +112,17 @@ export function WaveRing({
         // Promedio móvil del bajo + detección de golpes sensible: la onda late con la música.
         bassAverage = bassAverage * 0.96 + bass * 0.04
         const deviation = bass > 0.03 ? Math.max(0, bass - bassAverage) : 0
-        const onset = Math.min(1, deviation * 4)
-        energy = Math.max(energy * 0.9, onset)
-        beat = Math.min(1, energy * 2.8)
-        pulse = Math.min(3.4, 1.05 + bass * 0.6 + energy * 4)
+        const onset = Math.min(1, deviation * 5)
+        energy = Math.max(energy * 0.82, onset)
+        beat = Math.min(1, energy * 2.6)
+        pulse = Math.min(2.6, 1 + bass * 0.5 + energy * 3.5)
       } else {
         // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
         const phase = (seconds * 2) % 1
         const kick = Math.pow(1 - phase, 7)
-        energy = Math.max(energy * 0.88, kick)
+        energy = Math.max(energy * 0.82, kick)
         beat = kick
-        pulse = 1 + kick * 1.6 + energy * 0.6
+        pulse = Math.min(2.6, 1 + kick * 2.2)
       }
 
       type Segment = {
@@ -146,14 +146,15 @@ export function WaveRing({
           levels.length === 0
             ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
-        const intensity = Math.max(0.12, Math.min(1, Math.sqrt(raw)))
-        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.64
-        const length =
-          (10 + intensity * size * (activeRef.current ? 0.19 : 0.06) * pulse) * downScale
-        const x0 = center + Math.cos(angle) * base
-        const y0 = center + Math.sin(angle) * base
-        const x1 = center + Math.cos(angle) * (base + length)
-        const y1 = center + Math.sin(angle) * (base + length)
+        const intensity = Math.max(0.1, Math.min(1, Math.sqrt(raw)))
+        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.7
+        const wavePart = activeRef.current ? 0.18 : 0.06
+        const length = (8 + intensity * size * wavePart) * pulse * downScale
+        const radius = base + beat * size * 0.035
+        const x0 = center + Math.cos(angle) * radius
+        const y0 = center + Math.sin(angle) * radius
+        const x1 = center + Math.cos(angle) * (radius + length)
+        const y1 = center + Math.sin(angle) * (radius + length)
 
         drawn.push({
           x0,
@@ -169,7 +170,7 @@ export function WaveRing({
       const paint = (color: (segment: Segment) => string, curveColor: string) => {
         context.lineCap = 'butt'
         for (const segment of drawn) {
-          context.globalAlpha = 0.35 + segment.intensity * 0.6
+          context.globalAlpha = 0.2 + segment.intensity * 0.35 + beat * 0.45
           context.strokeStyle = color(segment)
           context.lineWidth = segment.width
           context.beginPath()
@@ -180,7 +181,7 @@ export function WaveRing({
 
         // Línea fina que envuelve las puntas y dibuja la curva de la onda.
         if (drawn.length > 2) {
-          context.globalAlpha = 0.55
+          context.globalAlpha = 0.25 + beat * 0.6
           context.strokeStyle = curveColor
           context.lineWidth = 1.2
           context.lineJoin = 'round'
