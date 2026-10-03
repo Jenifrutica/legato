@@ -25,18 +25,22 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 17 | Accesibilidad WCAG 2.2 AA | Cerrado |
 | 18 | Páginas legales + cookies | Cerrado |
 | 19–21 | Extras: ensayo, undo/redo, karaoke M/S | Cerrado |
-| 22 | E2E smoke + regresión #12 | Pendiente |
+| 22 | E2E smoke + regresión #12 | Cerrado |
 | 23–27 | Día 4: pulido, responsive, deploy S3+CloudFront, docs, rotar key | Pendiente |
 | 28–33 | Post-entrega | Pendiente |
 | 34 | Calidad de audio premium + balance/aislamiento L-R | Cerrado |
+| 35 | Selección de dispositivo de salida | Cerrado |
+| 36 | Jam en tiempo real y playlists compartidas | Post-entrega (diseñado en docs/JAM.md) |
+| 37 | Modo offline (PWA) | Cerrado |
+| 38 | Crossfade configurable | Cerrado |
 
 ## Estado técnico
 
-- **Tests:** 133 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer, accesibilidad, legal, historial y ensayo).
+- **Tests:** 139 unitarios + 4 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #22: pruebas E2E con Playwright (login local, importar, CRUD, drag & drop con regresión del bug #12, timer, recarga de sesión, idioma) y axe en pantallas principales. Después, Día 4: pulido, responsive, deploy S3+CloudFront, docs y rotar la access key.
+Día 4: #23 pulido de UI con impeccable, #24 responsive PC/móvil y PWA, #25 deploy a S3 + CloudFront con `app.jenilarper.dev`, #26 README/docs finales y demo, #27 rotar la access key. Prueba local antes del despliegue: `bun run dev`, `bun run test`, `bun run test:e2e`.

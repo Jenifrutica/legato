@@ -69,3 +69,7 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D36 | La cuenta AWS está en una organización con **SCP** que bloquea Cognito, Amplify, Lambda y DynamoDB | Verificado con errores `AccessDeniedException` explícitos; disponibles S3, CloudFront, ACM, Route 53, EC2 e IAM |
 | D37 | Login del MVP: **perfil local**; `CognitoAuthProvider` implementado y listo para una cuenta sin SCP | Cumple el fallback del timebox sin bloquear el MVP |
 | D38 | Despliegue del Día 4 cambia a **S3 + CloudFront + ACM** en vez de Amplify | Amplify está bloqueado; S3/CloudFront/ACM están permitidos |
+| D39 | Crossfade **secuencial** (fade-out + fade-in) por defecto 2 s, rango 0–12 s | Sin doble deck en el MVP; el solape real con dos elementos de audio queda post-entrega |
+| D40 | Salida de audio con **setSinkId** solo donde el navegador lo soporta (Chromium); fallback silencioso | Firefox/Safari no lo implementan |
+| D41 | Modo offline con **service worker en producción** (app shell) + IndexedDB local | No interfiere con el desarrollo; `sw.js` debe servirse sin caché en CloudFront |
+| D42 | Jam en tiempo real y playlists compartidas: **post-entrega** con interfaz `JamProvider` y diseño en `docs/JAM.md` | Requiere backend WebSocket y cuentas, bloqueados por la SCP; se sincroniza control, nunca audio |

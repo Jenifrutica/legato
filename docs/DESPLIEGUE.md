@@ -66,6 +66,12 @@ GitHub (privado) ──► build local ──► Amazon S3 (privado, solo CloudF
   4. Definir en `.env.local`: `VITE_LOCAL_MODE=false`, `VITE_COGNITO_DOMAIN`, `VITE_COGNITO_CLIENT_ID`, `VITE_COGNITO_REDIRECT_URI`.
 - El IdP de Google se agrega después (Google Cloud quedó diferido).
 
+## PWA y modo offline
+
+- `public/manifest.webmanifest` + `public/sw.js` (app shell). El service worker se registra **solo en producción** (`import.meta.env.PROD`).
+- La biblioteca, las playlists y la sesión viven en IndexedDB, así que la app funciona sin conexión tras la primera visita.
+- En CloudFront: servir `sw.js` y `manifest.webmanifest` con `Cache-Control: no-cache` para que las actualizaciones lleguen; el resto de assets con caché larga.
+
 ## Presupuesto y control de costos
 
 - Alerta de presupuesto mensual de **$1** creada en AWS Budgets.

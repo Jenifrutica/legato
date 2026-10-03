@@ -22,8 +22,11 @@ Leyenda: **[MVP]** comprometido para la entrega · **[EXTRA]** si el tiempo alca
 - **[MVP]** Temporizador: 15/30/45/60/90 min, "al terminar N canciones", "al terminar la actual".
 - **[MVP]** Media Session (controles del sistema/pantalla de bloqueo).
 - **[MVP]** Mini reproductor y PWA instalable.
+- **[MVP]** Crossfade configurable (0–12 s, por defecto 2 s).
+- **[MVP]** Selección de dispositivo de salida (setSinkId, donde el navegador lo soporte).
+- **[MVP]** Modo offline con service worker (app shell) + biblioteca y sesión en IndexedDB.
 - **[EXTRA]** Loop A–B para practicar.
-- **[POST]** Crossfade/gapless, ecualizador avanzado, normalización LUFS.
+- **[POST]** Crossfade con solape real (doble deck) y gapless, ecualizador avanzado, normalización LUFS.
 
 ## 3. Biblioteca y CRUD (sin canciones hardcodeadas)
 
@@ -74,8 +77,10 @@ Leyenda: **[MVP]** comprometido para la entrega · **[EXTRA]** si el tiempo alca
 - **[MVP]** Deploy AWS Amplify en `app.jenilarper.dev` con HTTPS.
 - **[POST]** IdP de Google, ACRCloud (tipo Shazam), Spotify (metadata), Demucs, transcodificación.
 
-## 9. IA (post-entrega)
+## 9. IA y social (post-entrega)
 
+- **[POST]** Jam en tiempo real: escuchar juntos sincronizado (control, no audio) — ver `docs/JAM.md`.
+- **[POST]** Playlists compartidas entre usuarios con roles.
 - **[POST]** ACRCloud: identificar canción por micrófono (proxy en backend).
 - **[POST]** Spotify: búsqueda e importación de metadata (solo previews de 30 s; sin streaming completo).
 - **[POST]** Demucs: separación de instrumentos (interfaz `StemProvider`).
