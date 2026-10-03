@@ -217,11 +217,11 @@ async function describeError(response: Response): Promise<string> {
 type SpotifyTrack = {
   id: string
   name: string
-  artists: Array<{ name: string }>
-  album: { name: string; images: Array<{ url: string }> }
+  artists?: Array<{ name: string }>
+  album?: { name: string; images?: Array<{ url: string }> }
   duration_ms: number
-  preview_url: string | null
-  external_urls: { spotify: string }
+  preview_url?: string | null
+  external_urls?: { spotify: string }
 }
 
 export function mapSpotifyTrack(track: SpotifyTrack): SourceTrack {
@@ -229,13 +229,13 @@ export function mapSpotifyTrack(track: SpotifyTrack): SourceTrack {
     id: track.id,
     sourceId: 'spotify',
     title: track.name,
-    artist: track.artists.map((artist) => artist.name).join(', '),
-    album: track.album.name,
+    artist: (track.artists ?? []).map((artist) => artist.name).join(', '),
+    album: track.album?.name ?? null,
     durationSeconds: track.duration_ms / 1000,
-    streamUrl: track.preview_url,
-    artworkUrl: track.album.images[0]?.url ?? null,
+    streamUrl: track.preview_url ?? null,
+    artworkUrl: track.album?.images?.[0]?.url ?? null,
     downloadable: false,
-    externalUrl: track.external_urls.spotify,
+    externalUrl: track.external_urls?.spotify ?? `spotify:track:${track.id}`,
   }
 }
 
@@ -270,7 +270,8 @@ type SpotifyPlaylistItem = {
   id: string
   name: string
   images?: Array<{ url: string }>
-  tracks?: { total?: number }
+  tracks?: { total?: number } | null
+  items?: { total?: number } | null
 }
 
 /** Playlists de la cuenta conectada (requiere scope playlist-read-private). */
@@ -295,7 +296,7 @@ export async function fetchSpotifyPlaylists(): Promise<SpotifyPlaylistSummary[]>
     .map((item) => ({
       id: item.id,
       name: item.name,
-      trackCount: item.tracks?.total ?? 0,
+      trackCount: item.tracks?.total ?? item.items?.total ?? 0,
       artworkUrl: item.images?.[0]?.url ?? null,
     }))
 }
@@ -313,24 +314,39 @@ export async function fetchSpotifyPlaylistTracks(
   const tracks: SourceTrack[] = []
   let offset = 0
 
+  const fetchPage = async (endpoint: 'tracks' | 'items') =>
+    fetch(`${API}/playlists/${playlistId}/${endpoint}?limit=50&offset=${offset}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
   while (tracks.length < limit) {
-    const response = await fetch(
-      `${API}/playlists/${playlistId}/tracks?limit=50&offset=${offset}`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    )
+    // Spotify renombró `track`/`tracks` a `item`/`items`; probamos ambos.
+    let response = await fetchPage('tracks')
+    if (response.status === 404 || response.status === 400) {
+      response = await fetchPage('items')
+    }
 
     if (!response.ok) {
       throw new Error(await describeError(response))
     }
 
     const data = (await response.json()) as {
-      items?: Array<{ track?: (SpotifyTrack & { is_local?: boolean }) | null } | null>
+      items?: Array<{
+        track?: (SpotifyTrack & { is_local?: boolean }) | null
+        item?: (SpotifyTrack & { is_local?: boolean }) | null
+      } | null>
       next?: string | null
     }
 
-    for (const item of data.items ?? []) {
-      const track = item?.track
-      if (track === null || track === undefined || track.is_local === true || track.id === '') {
+    for (const entry of data.items ?? []) {
+      const track = entry?.track ?? entry?.item
+      if (
+        track === null ||
+        track === undefined ||
+        track.is_local === true ||
+        typeof track.id !== 'string' ||
+        track.id === ''
+      ) {
         continue
       }
       tracks.push(mapSpotifyTrack(track))

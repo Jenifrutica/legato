@@ -73,7 +73,7 @@ export function WaveRing({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       document.documentElement.classList.contains('a11y-reduced-motion')
 
-    const draw = (time: number) => {
+    const draw = (time: number, active: boolean) => {
       const size = canvas.clientWidth
       if (size === 0) {
         return
@@ -90,9 +90,12 @@ export function WaveRing({
       }
 
       context.clearRect(0, 0, size, size)
-      const levels = activeRef.current
-        ? (analyser?.getLevels() ?? new Uint8Array(0))
-        : new Uint8Array(0)
+      const levels = analyser?.getLevels() ?? new Uint8Array(0)
+      let energySum = 0
+      for (const level of levels) {
+        energySum += level
+      }
+      const hasSignal = energySum > 0
       const center = size / 2
       const base = size * 0.314
       const seconds = time / 1000
@@ -102,7 +105,7 @@ export function WaveRing({
       let beat = 0
       let pulse = 1
 
-      if (levels.length > 0) {
+      if (active && hasSignal) {
         const bassBins = Math.max(1, Math.floor(levels.length * 0.06))
         for (let index = 0; index < bassBins; index++) {
           bass += levels[index] ?? 0
@@ -116,13 +119,19 @@ export function WaveRing({
         energy = Math.max(energy * 0.82, onset)
         beat = Math.min(1, energy * 2.6)
         pulse = Math.min(2.6, 1 + bass * 0.5 + energy * 3.5)
-      } else {
+      } else if (active) {
         // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
         const phase = (seconds * 2) % 1
         const kick = Math.pow(1 - phase, 7)
         energy = Math.max(energy * 0.82, kick)
         beat = kick
         pulse = Math.min(2.6, 1 + kick * 2.2)
+      } else {
+        // En reposo: líneas cortas y quietas (sin movimiento por tiempo).
+        energy *= 0.9
+        bass = 0
+        beat = 0
+        pulse = 1
       }
 
       type Segment = {
@@ -143,12 +152,14 @@ export function WaveRing({
         }
 
         const raw =
-          levels.length === 0
-            ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
-            : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
+          active && hasSignal
+            ? (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
+            : active
+              ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
+              : 0.24 + 0.08 * Math.sin(index * 0.7)
         const intensity = Math.max(0.1, Math.min(1, Math.sqrt(raw)))
         const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.7
-        const wavePart = activeRef.current ? 0.18 : 0.06
+        const wavePart = active ? 0.18 : 0.06
         const length = (8 + intensity * size * wavePart) * pulse * downScale
         const radius = base + beat * size * 0.035
         const x0 = center + Math.cos(angle) * radius
@@ -221,9 +232,13 @@ export function WaveRing({
     }
 
     if (reduced) {
-      draw(1200)
+      draw(1200, activeRef.current)
       return
     }
+
+    // Un cuadro en reposo al montar para que el anillo no arranque vacío.
+    draw(performance.now(), activeRef.current)
+    let wasActive = activeRef.current
 
     const loop = (time: number) => {
       frame = requestAnimationFrame(loop)
@@ -236,7 +251,14 @@ export function WaveRing({
         return
       }
 
-      draw(time)
+      const active = activeRef.current
+      // En reposo se dibuja un único cuadro quieto y se deja de repintar.
+      if (!active && !wasActive) {
+        return
+      }
+
+      draw(time, active)
+      wasActive = active
     }
 
     frame = requestAnimationFrame(loop)
