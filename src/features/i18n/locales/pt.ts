@@ -57,6 +57,8 @@ export const pt: typeof es = {
     pointB: 'B: {{time}}',
     loopActive: 'Repetindo A–B',
     loopIdle: 'Marque A e depois B para repetir um trecho.',
+    karaoke: 'Remover voz (karaoke)',
+    karaokeHint: 'Cancela o canal central; funciona melhor quando a voz está no centro da mixagem.',
     hint: 'A velocidade mantém o tom e o loop A–B permite praticar um trecho.',
   },
   vinyl: {

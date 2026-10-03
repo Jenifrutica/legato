@@ -281,6 +281,18 @@ describe('PlayerController', () => {
     expect(audio.playbackRate).toBe(0.5)
   })
 
+  it('karaoke se refleja en el snapshot', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a')])
+
+    controller.setKaraoke(true)
+    expect(controller.getSnapshot().karaoke).toBe(true)
+
+    controller.setKaraoke(false)
+    expect(controller.getSnapshot().karaoke).toBe(false)
+  })
+
   it('playTracks sin canciones deja el reproductor quieto', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

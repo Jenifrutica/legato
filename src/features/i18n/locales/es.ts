@@ -55,6 +55,9 @@ export const es = {
     pointB: 'B: {{time}}',
     loopActive: 'Repitiendo A–B',
     loopIdle: 'Marca A y luego B para repetir un fragmento.',
+    karaoke: 'Quitar voz (karaoke)',
+    karaokeHint:
+      'Cancela el canal central; funciona mejor cuando la voz está al centro de la mezcla.',
     hint: 'La velocidad mantiene el tono y el bucle A–B te deja practicar un pasaje.',
   },
   vinyl: {

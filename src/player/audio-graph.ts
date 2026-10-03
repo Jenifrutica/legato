@@ -13,6 +13,7 @@ export class AudioGraph implements AnalyserLike {
   #data: Uint8Array<ArrayBuffer> | null = null
   #balance = 0
   #channelMode: ChannelMode = 'stereo'
+  #karaoke = false
 
   constructor(audio: HTMLAudioElement) {
     if (typeof AudioContext === 'undefined') {
@@ -68,6 +69,10 @@ export class AudioGraph implements AnalyserLike {
     return this.#channelMode
   }
 
+  get karaoke(): boolean {
+    return this.#karaoke
+  }
+
   getLevels(): Uint8Array {
     if (this.#analyser === null || this.#data === null) {
       return new Uint8Array(0)
@@ -98,6 +103,16 @@ export class AudioGraph implements AnalyserLike {
     this.#applyGains()
   }
 
+  setKaraoke(enabled: boolean): void {
+    if (enabled === this.#karaoke) {
+      return
+    }
+
+    this.#karaoke = enabled
+    this.#applyRouting()
+    this.#applyGains()
+  }
+
   #applyRouting(): void {
     const leftGain = this.#leftGain
     const rightGain = this.#rightGain
@@ -109,6 +124,14 @@ export class AudioGraph implements AnalyserLike {
 
     leftGain.disconnect()
     rightGain.disconnect()
+
+    if (this.#karaoke) {
+      leftGain.connect(merger, 0, 0)
+      leftGain.connect(merger, 0, 1)
+      rightGain.connect(merger, 0, 0)
+      rightGain.connect(merger, 0, 1)
+      return
+    }
 
     if (this.#channelMode === 'mono') {
       leftGain.connect(merger, 0, 0)
@@ -134,7 +157,10 @@ export class AudioGraph implements AnalyserLike {
     let left = Math.cos(angle)
     let right = Math.sin(angle)
 
-    if (this.#channelMode === 'left') {
+    if (this.#karaoke) {
+      left = 1
+      right = -1
+    } else if (this.#channelMode === 'left') {
       left = 1
       right = 0
     } else if (this.#channelMode === 'right') {

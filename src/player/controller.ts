@@ -16,6 +16,7 @@ export type PlayerSnapshot = {
   shuffle: boolean
   abLoop: { a: number; b: number } | null
   loopPointA: number | null
+  karaoke: boolean
   queue: QueueTrack[]
   queueStructure: StructureNode[]
   sourcePlaylistId: string | null
@@ -44,6 +45,7 @@ export class PlayerController {
   #channelMode: ChannelMode = 'stereo'
   #abLoop: { a: number; b: number } | null = null
   #loopPointA: number | null = null
+  #karaoke = false
   #sourcePlaylistId: string | null = null
 
   constructor(audio?: AudioLike) {
@@ -200,6 +202,11 @@ export class PlayerController {
     this.#notify()
   }
 
+  setKaraoke(enabled: boolean): void {
+    this.#karaoke = enabled
+    this.#notify()
+  }
+
   cycleRate(): void {
     const presets = [1, 0.9, 0.75, 0.5]
     const index = presets.indexOf(this.#rate)
@@ -267,6 +274,7 @@ export class PlayerController {
       shuffle: this.#queue.shuffle,
       abLoop: this.#abLoop === null ? null : { ...this.#abLoop },
       loopPointA: this.#loopPointA,
+      karaoke: this.#karaoke,
       queue: this.#queue.tracks,
       queueStructure: this.#queue.structure(),
       sourcePlaylistId: this.#sourcePlaylistId,

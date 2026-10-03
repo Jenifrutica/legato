@@ -29,4 +29,14 @@ describe('AudioGraph', () => {
     const graph = new AudioGraph(new Audio())
     await expect(graph.resume()).resolves.toBeUndefined()
   })
+
+  it('el modo karaoke se activa y desactiva', () => {
+    const graph = new AudioGraph(new Audio())
+
+    expect(graph.karaoke).toBe(false)
+    graph.setKaraoke(true)
+    expect(graph.karaoke).toBe(true)
+    graph.setKaraoke(false)
+    expect(graph.karaoke).toBe(false)
+  })
 })

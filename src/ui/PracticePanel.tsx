@@ -14,6 +14,8 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
   const setLoopPointA = usePlayerStore((state) => state.setLoopPointA)
   const setLoopPointB = usePlayerStore((state) => state.setLoopPointB)
   const clearAbLoop = usePlayerStore((state) => state.clearAbLoop)
+  const karaoke = usePlayerStore((state) => state.karaoke)
+  const setKaraoke = usePlayerStore((state) => state.setKaraoke)
 
   const loopActive = abLoop !== null
 
@@ -93,6 +95,23 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
         >
           {loopActive ? t('practice.loopActive') : t('practice.loopIdle')}
         </p>
+      </div>
+
+      <div className="mt-4">
+        <button
+          aria-pressed={karaoke}
+          className={`w-full rounded-md border px-3 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            karaoke
+              ? 'border-primary bg-primary-soft text-primary-strong'
+              : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+          }`}
+          disabled={!hasTrack}
+          onClick={() => setKaraoke(!karaoke)}
+          type="button"
+        >
+          {t('practice.karaoke')}
+        </button>
+        <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('practice.karaokeHint')}</p>
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('practice.hint')}</p>

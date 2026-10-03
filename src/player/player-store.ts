@@ -41,6 +41,7 @@ type PlayerState = PlayerSnapshot & {
   setLoopPointA: () => void
   setLoopPointB: () => void
   clearAbLoop: () => void
+  setKaraoke: (enabled: boolean) => void
   startTimerMinutes: (minutes: number) => void
   startTimerEndOfTrack: () => void
   startTimerAfterTracks: (count: number) => void
@@ -87,6 +88,10 @@ export const usePlayerStore = create<PlayerState>(() => ({
   setLoopPointA: () => controller.setLoopPointA(),
   setLoopPointB: () => controller.setLoopPointB(),
   clearAbLoop: () => controller.clearAbLoop(),
+  setKaraoke: (enabled) => {
+    controller.setKaraoke(enabled)
+    graph.setKaraoke(enabled)
+  },
   startTimerMinutes: (minutes) => sleepTimer.startMinutes(minutes),
   startTimerEndOfTrack: () => sleepTimer.startEndOfTrack(),
   startTimerAfterTracks: (count) => sleepTimer.startAfterTracks(count),
