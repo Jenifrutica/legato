@@ -94,7 +94,16 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       )}
 
       {playlists.length === 0 ? (
-        <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
+          <button
+            className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            onClick={() => setIsCreating(true)}
+            type="button"
+          >
+            {t('playlists.newPlaylist')}
+          </button>
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {playlists.map((playlist) => {
@@ -250,7 +259,7 @@ export function RightPanel() {
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
 
   return (
-    <aside className="relative z-20 flex min-h-0 flex-col border-t border-border/70 bg-bg pb-40 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
+    <aside className="relative z-20 flex min-h-0 flex-col border-t border-border/70 bg-bg pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
       <div
         aria-label={t('tabs.label')}
         className="flex items-center gap-1 border-b border-border/70 px-3 py-2"

@@ -65,39 +65,39 @@ function AppShell() {
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_25rem] xl:grid-cols-[minmax(0,1fr)_27rem]">
         <main className="min-w-0" id="contenido">
           <Hero />
-
-          <footer className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 pb-8 text-xs text-ink-muted lg:px-8">
-            <a
-              className="underline underline-offset-2 transition-colors hover:text-primary-strong"
-              href="#/legal/privacy"
-            >
-              {t('legal.links.privacy')}
-            </a>
-            <a
-              className="underline underline-offset-2 transition-colors hover:text-primary-strong"
-              href="#/legal/terms"
-            >
-              {t('legal.links.terms')}
-            </a>
-            <a
-              className="underline underline-offset-2 transition-colors hover:text-primary-strong"
-              href="#/legal/cookies"
-            >
-              {t('legal.links.cookies')}
-            </a>
-            <a
-              className="underline underline-offset-2 transition-colors hover:text-primary-strong"
-              href="#/legal/accessibility"
-            >
-              {t('legal.links.accessibility')}
-            </a>
-            <span aria-hidden="true">·</span>
-            <span>{t('academic')}</span>
-          </footer>
         </main>
 
         <RightPanel />
       </div>
+
+      <footer className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/70 px-5 py-4 text-xs text-ink-muted lg:px-8">
+        <a
+          className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+          href="#/legal/privacy"
+        >
+          {t('legal.links.privacy')}
+        </a>
+        <a
+          className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+          href="#/legal/terms"
+        >
+          {t('legal.links.terms')}
+        </a>
+        <a
+          className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+          href="#/legal/cookies"
+        >
+          {t('legal.links.cookies')}
+        </a>
+        <a
+          className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+          href="#/legal/accessibility"
+        >
+          {t('legal.links.accessibility')}
+        </a>
+        <span aria-hidden="true">·</span>
+        <span>{t('academic')}</span>
+      </footer>
 
       <div className="fixed inset-x-0 bottom-0 z-30 lg:hidden">
         <PlayerBar />

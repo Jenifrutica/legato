@@ -312,3 +312,11 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Título**: `break-words` + tamaños responsivos (`text-3xl sm:text-4xl 2xl:text-5xl`) para que no se corte contra el panel.
 - **Responsive por secciones**: móvil (disco mitad inferior + sin controles en héroe), `lg` (disco completo centrado, controles visibles), `xl` (disco grande sangrando con arco derecho de ondas).
 - **Barra móvil**: padding inferior del héroe a `pb-48` para que la barra + nav fija no tape el panel.
+
+### Layout final (sesión 2, tanda 9)
+
+- **Disco completo siempre** (se quitó el recorte de mitad; girando se veía feo).
+- **Ondas contenidas en el héroe** (padding vertical en el bloque del disco) para que no invadan el contenido inferior.
+- **Footer movido al final real de la página** (después del grid, antes de la barra fija); ya no aparece a mitad de página robando espacio.
+- **Héroe más compacto** (sin min-height en móvil) y contenido xl limitado con `xl:max-w-[calc(100%_-_35rem)]` para no desbordar sobre el panel.
+- **Panel con `pb-52`** en móvil para que la barra fija + navegación no tapen resultados ni el botón de playlists; estado vacío de Playlists ahora con botón "Nueva playlist".
