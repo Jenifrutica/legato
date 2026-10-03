@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatFileSize, useLibraryStore } from '../features/library'
-import { supportsOutputSelection, usePlayerStore } from '../player'
-import type { ChannelMode } from '../player'
+import { AMBIENT_IDS, supportsOutputSelection, useAudioFxStore, usePlayerStore } from '../player'
+import type { AmbientId, ChannelMode } from '../player'
 
 const MODE_KEYS = {
   stereo: 'audio.modes.stereo',
@@ -10,6 +10,13 @@ const MODE_KEYS = {
   right: 'audio.modes.right',
   mono: 'audio.modes.mono',
 } as const satisfies Record<ChannelMode, string>
+
+const AMBIENT_KEYS = {
+  rain: 'audio.ambientRain',
+  vinyl: 'audio.ambientVinyl',
+  cafe: 'audio.ambientCafe',
+  wind: 'audio.ambientWind',
+} as const satisfies Record<AmbientId, string>
 
 const CHANNEL_MODES: ChannelMode[] = ['stereo', 'left', 'right', 'mono']
 
@@ -25,6 +32,12 @@ export function AudioQualityPanel() {
   const refreshOutputDevices = usePlayerStore((state) => state.refreshOutputDevices)
   const setOutputDevice = usePlayerStore((state) => state.setOutputDevice)
   const canSelectOutput = supportsOutputSelection()
+  const bassDb = useAudioFxStore((state) => state.bassDb)
+  const ambient = useAudioFxStore((state) => state.ambient)
+  const ambientVolume = useAudioFxStore((state) => state.ambientVolume)
+  const setBass = useAudioFxStore((state) => state.setBass)
+  const setAmbient = useAudioFxStore((state) => state.setAmbient)
+  const setAmbientVolume = useAudioFxStore((state) => state.setAmbientVolume)
   const track = useLibraryStore((state) =>
     currentTrack === null
       ? null
@@ -132,6 +145,75 @@ export function AudioQualityPanel() {
           </select>
         </div>
       )}
+
+      <div className="mt-4">
+        <label className="text-xs font-medium text-ink-muted" htmlFor="audio-bass">
+          {t('audio.bass')}
+        </label>
+        <div className="mt-1 flex items-center gap-3">
+          <input
+            className="h-3 max-w-52 flex-1 cursor-pointer"
+            id="audio-bass"
+            max={12}
+            min={0}
+            onChange={(event) => setBass(Number(event.target.value))}
+            step={1}
+            type="range"
+            value={bassDb}
+          />
+          <span className="w-12 font-mono text-xs tabular-nums text-ink-muted">
+            {bassDb > 0 ? `+${bassDb}` : '0'} dB
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-xs font-medium text-ink-muted">{t('audio.ambient')}</p>
+        <div aria-label={t('audio.ambient')} className="mt-2 flex flex-wrap gap-2" role="group">
+          <button
+            aria-pressed={ambient === null}
+            className={`border-2 px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
+              ambient === null
+                ? 'border-rule bg-accent text-on-accent'
+                : 'border-rule/40 text-ink-muted hover:text-ink'
+            }`}
+            onClick={() => setAmbient(null)}
+            type="button"
+          >
+            {t('audio.ambientNone')}
+          </button>
+          {AMBIENT_IDS.map((id) => (
+            <button
+              aria-pressed={ambient === id}
+              className={`border-2 px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
+                ambient === id
+                  ? 'border-rule bg-accent text-on-accent'
+                  : 'border-rule/40 text-ink-muted hover:text-ink'
+              }`}
+              key={id}
+              onClick={() => setAmbient(ambient === id ? null : id)}
+              type="button"
+            >
+              {t(AMBIENT_KEYS[id])}
+            </button>
+          ))}
+        </div>
+
+        {ambient !== null && (
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-xs text-ink-muted">{t('audio.ambientVolume')}</span>
+            <input
+              aria-label={t('audio.ambientVolume')}
+              className="h-3 max-w-52 flex-1 cursor-pointer"
+              max={100}
+              min={0}
+              onChange={(event) => setAmbientVolume(Number(event.target.value) / 100)}
+              type="range"
+              value={Math.round(ambientVolume * 100)}
+            />
+          </div>
+        )}
+      </div>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('audio.hint')}</p>
     </div>

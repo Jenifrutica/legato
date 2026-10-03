@@ -50,6 +50,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 53 | **Disco (F15)**: rótulo «Lado A · 33⅓» oculto cuando hay portada; campo de tinta extendido hasta el fondo (sin banda que cruce el disco); zona más alta y ondas contenidas | Cerrada: 178 unit + 6 E2E + build |
 | 54 | **Mini reproductor (F16)**: vinilo flotante abajo-derecha en escritorio cuando hay pista, arrastrable (posición persistida), clic = play/pausa, teclado accesible | Cerrada: 178 unit + 6 E2E + captura |
 | 55 | **Letras y hueco (F17)**: toggle «Letra» en héroe y panel de músicos (persistido), tira de cola (anterior · sonando · siguiente) cuando no hay letra y controles anclados al fondo del héroe | Cerrada: 178 unit + 6 E2E, axe 0, detector 0 |
+| 56 | **Bajos y ambiente (F18)**: refuerzo low-shelf 0–12 dB en el grafo + 4 camas generadas (lluvia, vinilo, café, viento) con volumen propio, apagadas por defecto y persistidas | Cerrada: 180 unit, sin errores al activar |
 
 ## Estado técnico
 

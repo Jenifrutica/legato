@@ -1,5 +1,8 @@
 export { AudioGraph } from './audio-graph'
 export type { AnalyserLike } from './audio-graph'
+export { AMBIENT_IDS, AmbientEngine } from './ambient'
+export type { AmbientId } from './ambient'
+export { useAudioFxStore } from './audio-fx'
 export { PlayerController } from './controller'
 export type { PlayerSnapshot, RestoreState } from './controller'
 export { PlayerEngine } from './engine'

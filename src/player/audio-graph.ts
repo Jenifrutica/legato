@@ -7,6 +7,7 @@ export type AnalyserLike = {
 export class AudioGraph implements AnalyserLike {
   #context: AudioContext | null = null
   #analyser: AnalyserNode | null = null
+  #bass: BiquadFilterNode | null = null
   #leftGain: GainNode | null = null
   #rightGain: GainNode | null = null
   #merger: ChannelMergerNode | null = null
@@ -14,6 +15,7 @@ export class AudioGraph implements AnalyserLike {
   #balance = 0
   #channelMode: ChannelMode = 'stereo'
   #karaoke = false
+  #bassDb = 0
 
   constructor(audio: HTMLAudioElement) {
     if (typeof AudioContext === 'undefined') {
@@ -27,19 +29,24 @@ export class AudioGraph implements AnalyserLike {
       const leftGain = context.createGain()
       const rightGain = context.createGain()
       const merger = context.createChannelMerger(2)
+      const bass = context.createBiquadFilter()
       const analyser = context.createAnalyser()
 
       analyser.fftSize = 256
       analyser.smoothingTimeConstant = 0.82
+      bass.type = 'lowshelf'
+      bass.frequency.value = 180
 
       source.connect(splitter)
       splitter.connect(leftGain, 0)
       splitter.connect(rightGain, 1)
-      merger.connect(analyser)
+      merger.connect(bass)
+      bass.connect(analyser)
       analyser.connect(context.destination)
 
       this.#context = context
       this.#analyser = analyser
+      this.#bass = bass
       this.#leftGain = leftGain
       this.#rightGain = rightGain
       this.#merger = merger
@@ -50,6 +57,7 @@ export class AudioGraph implements AnalyserLike {
     } catch {
       this.#context = null
       this.#analyser = null
+      this.#bass = null
       this.#leftGain = null
       this.#rightGain = null
       this.#merger = null
@@ -59,6 +67,10 @@ export class AudioGraph implements AnalyserLike {
 
   get available(): boolean {
     return this.#analyser !== null
+  }
+
+  get audioContext(): AudioContext | null {
+    return this.#context
   }
 
   get balance(): number {
@@ -111,6 +123,15 @@ export class AudioGraph implements AnalyserLike {
     this.#karaoke = enabled
     this.#applyRouting()
     this.#applyGains()
+  }
+
+  setBass(gainDb: number): void {
+    this.#bassDb = Math.min(12, Math.max(0, gainDb))
+    if (this.#bass === null || this.#context === null) {
+      return
+    }
+
+    this.#bass.gain.setTargetAtTime(this.#bassDb, this.#context.currentTime, 0.03)
   }
 
   #applyRouting(): void {
