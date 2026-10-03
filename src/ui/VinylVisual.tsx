@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSpotifyStore } from '../features/sources'
 import { getAnalyser, usePlayerStore } from '../player'
@@ -11,6 +12,14 @@ export function VinylVisual() {
   const toggle = usePlayerStore((state) => state.toggle)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const spotifyToggle = useSpotifyStore((state) => state.toggle)
+  const [bleeding, setBleeding] = useState(false)
+
+  useEffect(() => {
+    const update = () => setBleeding(window.innerWidth >= 1280)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
@@ -29,7 +38,7 @@ export function VinylVisual() {
   return (
     <section aria-label={t('vinyl.region')} className="relative">
       <div className="relative mx-auto aspect-square w-full">
-        <WaveRing active={isPlaying} analyser={getAnalyser()} />
+        <WaveRing active={isPlaying} analyser={getAnalyser()} arc={bleeding ? 'right' : 'full'} />
 
         <span
           className="motion-reduce:animate-none absolute inset-0 animate-disc overflow-hidden rounded-full will-change-transform"

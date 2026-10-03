@@ -10,6 +10,7 @@ import { useProvidersStore } from './providers-store'
 import { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 import { searchAll } from './search'
 import type { SourceSearchError } from './search'
+import { isSpotifyConnected } from './spotify'
 import { useSpotifyStore } from './spotify-store'
 import type { SourceId, SourceTrack } from './types'
 
@@ -67,6 +68,20 @@ export function SearchTab() {
   }
 
   function play(track: SourceTrack) {
+    if (track.sourceId === 'spotify') {
+      if (!isSpotifyConnected()) {
+        setMessage(t('search.spotifyHint'))
+        return
+      }
+
+      void playSpotifyUris(
+        results
+          .filter((item) => item.sourceId === 'spotify')
+          .map((item) => `spotify:track:${item.id}`),
+      )
+      return
+    }
+
     if (track.streamUrl === null) {
       return
     }

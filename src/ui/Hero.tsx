@@ -96,7 +96,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[62vh] overflow-x-hidden px-5 pb-44 pt-8 lg:pb-10 xl:min-h-[calc(100dvh-9rem)]">
+    <section className="relative min-h-[62vh] overflow-x-hidden px-5 pb-40 pt-8 lg:pb-28 xl:min-h-[calc(100dvh-9rem)]">
       <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-5 xl:block">
         <div className="relative z-0 w-64 shrink-0 sm:w-80 xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
           <VinylVisual />

@@ -290,3 +290,10 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Causa raíz de "No se pudo reproducir el audio"**: el audio externo (previews de Spotify, streams Audius/Jamendo) no manda CORS, y un elemento enrutado por `MediaElementSource` no puede sonar en esas condiciones. Solución: **dos elementos de audio** en `player-store`: `audio` (local, pasa por `AudioGraph` con balance/karaoke/analizador) y `streamAudio` (directo, sin grafo). `PlayerController` elige motor por canción (`blob:`/mismo origen → local; externo → stream) y pausa el otro. Tests siguen pasando (con un solo audio, ambos motores son el mismo).
 - El analizador solo recibe audio local; para streaming las ondas usan movimiento sintético.
 - Disco más grande (`xl:w-[min(48rem,78dvh)]`, sin cortarse) y con glow del color del álbum; tema mucho más notorio (fondo/paneles teñidos + halo en `body` con `--album-glow-soft`); ondas con glow y color HSL rotando; botones más grandes/obvios (play 56px, resto 40px, tooltips); héroe con padding inferior para que la barra fija no tape contenido.
+
+### Streaming de Spotify y ondas con paleta (sesión 2, tanda 6)
+
+- **Previews fallan con frecuencia** (CORS/404 en el CDN): el botón ▶ de resultados Spotify ahora usa **reproducción completa del SDK** si hay sesión conectada; si no, avisa que conectes Spotify. El botón verde se mantiene.
+- **Ondas con la paleta del álbum**: `WaveRing` lee `--color-primary` y `--color-accent` (ya teñidos por la portada) cada ~1s y pinta alternando esos colores con glow. Ya no rota el tono libre.
+- **Ondas sin corte**: en `xl` (disco sangrando) se dibuja solo el arco derecho visible (`arc="right"`); en pantallas menores el anillo completo.
+- **Barra**: padding inferior del héroe aumentado (`pb-40 lg:pb-28`) para que nada quede bajo la barra fija.

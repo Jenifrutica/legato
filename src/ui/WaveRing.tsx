@@ -1,10 +1,49 @@
 import { useEffect, useRef } from 'react'
 import type { AnalyserLike } from '../player'
 
-export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; active: boolean }) {
+type Palette = {
+  primary: string
+  accent: string
+}
+
+function parseHex(value: string): string | null {
+  const hex = value.trim().replace('#', '')
+  if (hex.length !== 6) {
+    return null
+  }
+
+  const r = Number.parseInt(hex.slice(0, 2), 16)
+  const g = Number.parseInt(hex.slice(2, 4), 16)
+  const b = Number.parseInt(hex.slice(4, 6), 16)
+  return Number.isNaN(r + g + b) ? null : `${r}, ${g}, ${b}`
+}
+
+function readPalette(): Palette {
+  if (typeof document === 'undefined') {
+    return { primary: '124, 92, 255', accent: '0, 168, 181' }
+  }
+
+  const styles = getComputedStyle(document.documentElement)
+  return {
+    primary: parseHex(styles.getPropertyValue('--color-primary')) ?? '124, 92, 255',
+    accent: parseHex(styles.getPropertyValue('--color-accent')) ?? '0, 168, 181',
+  }
+}
+
+export function WaveRing({
+  analyser,
+  active,
+  arc = 'full',
+}: {
+  analyser: AnalyserLike | null
+  active: boolean
+  arc?: 'full' | 'right'
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const activeRef = useRef(active)
   activeRef.current = active
+  const arcRef = useRef(arc)
+  arcRef.current = arc
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,6 +58,8 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
 
     let frame = 0
     let last = 0
+    let paletteTick = 0
+    let palette = readPalette()
 
     const draw = (time: number) => {
       const size = canvas.clientWidth
@@ -29,6 +70,11 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       if (canvas.width !== size || canvas.height !== size) {
         canvas.width = size
         canvas.height = size
+      }
+
+      paletteTick++
+      if (paletteTick % 30 === 0) {
+        palette = readPalette()
       }
 
       context.clearRect(0, 0, size, size)
@@ -53,28 +99,33 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       const pulse = 1 + bass * 0.65
 
       for (let index = 0; index < bars; index++) {
+        const angle = (index / bars) * Math.PI * 2
+        if (arcRef.current === 'right' && Math.cos(angle) < -0.15) {
+          continue
+        }
+
         const raw =
           levels.length === 0
             ? 0.18 + 0.14 * Math.sin(seconds * 1.6 + index * 0.3)
             : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.04, Math.min(1, raw))
-        const angle = (index / bars) * Math.PI * 2
         const length = 6 + intensity * size * (activeRef.current ? 0.18 : 0.08) * pulse
         const startX = center + Math.cos(angle) * baseRadius
         const startY = center + Math.sin(angle) * baseRadius
         const endX = center + Math.cos(angle) * (baseRadius + length)
         const endY = center + Math.sin(angle) * (baseRadius + length)
 
-        const hue = Math.round((seconds * 40 + index * 4) % 360)
+        const color = index % 2 === 0 ? palette.primary : palette.accent
         context.shadowBlur = 12
-        context.shadowColor = `hsla(${hue}, 90%, 62%, 0.85)`
-        context.strokeStyle = `hsla(${hue}, 90%, 62%, ${0.5 + intensity * 0.5})`
+        context.shadowColor = `rgba(${color}, 0.85)`
+        context.strokeStyle = `rgba(${color}, ${0.45 + intensity * 0.55})`
         context.lineWidth = 4
         context.lineCap = 'round'
         context.beginPath()
         context.moveTo(startX, startY)
         context.lineTo(endX, endY)
         context.stroke()
+        context.shadowBlur = 0
       }
     }
 
