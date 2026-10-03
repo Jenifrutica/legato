@@ -103,3 +103,5 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D60 | Al quitar la pista que suena, la reproducción salta a la siguiente; si la cola queda vacía, se pausa | Evita que el motor siga con un nodo que ya no está en la lista |
 | D61 | «Agregar a…» siempre visible; la opción «＋ Nueva playlist» crea una lista con nombre por defecto («Mi lista») y agrega la pista | DnD y agregado sin salir de la fila, aun sin playlists |
 | D62 | Soltar sobre la pestaña **Playlists** agrega a la lista seleccionada (o a la primera); soltar dentro de una playlist abierta acepta biblioteca y resultados de búsqueda y resalta la zona | Un solo gesto para agregar, con feedback visible |
+| D63 | El rótulo central del vinilo («Lado A · 33⅓» + nodo) solo se muestra cuando la pista **no tiene portada**; con portada el centro queda limpio | La carátula manda; el rótulo era el detalle que «se iba» encima del arte |
+| D64 | El campo de tinta del héroe se extiende hasta el fondo de la zona del disco en vez de terminar sobre él | Su borde inferior y sombra cruzaban el disco y parecía recortado |

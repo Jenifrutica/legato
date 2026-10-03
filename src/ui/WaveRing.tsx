@@ -90,7 +90,7 @@ export function WaveRing({
         ? (analyser?.getLevels() ?? new Uint8Array(0))
         : new Uint8Array(0)
       const center = size / 2
-      const base = size * 0.42
+      const base = size * 0.4
       const seconds = time / 1000
       const segments = 84
 
@@ -118,7 +118,7 @@ export function WaveRing({
             ? 0.16 + 0.13 * Math.sin(seconds * 1.5 + index * 0.42)
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.05, Math.min(1, raw))
-        const length = 3 + intensity * size * (activeRef.current ? 0.1 : 0.035) * pulse
+        const length = 3 + intensity * size * (activeRef.current ? 0.07 : 0.028) * pulse
         const x0 = center + Math.cos(angle) * base
         const y0 = center + Math.sin(angle) * base
         const x1 = center + Math.cos(angle) * (base + length)
@@ -138,7 +138,7 @@ export function WaveRing({
       context.strokeStyle = inks.ink
       context.lineWidth = 1
       context.beginPath()
-      context.arc(center, center, base + size * 0.038, 0, Math.PI * 2)
+      context.arc(center, center, base + size * 0.035, 0, Math.PI * 2)
       context.stroke()
       context.globalAlpha = 1
     }

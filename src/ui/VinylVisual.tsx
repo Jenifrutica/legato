@@ -56,12 +56,14 @@ export function VinylVisual() {
               </span>
             )}
             <span aria-hidden="true" className="disc-grooves" />
-            <span className="disc-label">
-              <b className="font-mono text-[0.6875rem] tracking-[0.14em]">{nodeCode}</b>
-              <em className="absolute bottom-[13%] font-serif text-[0.6875rem] tracking-[0.2em] text-accent-ink not-italic uppercase">
-                Lado A · 33⅓
-              </em>
-            </span>
+            {artworkUrl === null && (
+              <span className="disc-label">
+                <b className="font-mono text-[0.6875rem] tracking-[0.14em]">{nodeCode}</b>
+                <em className="absolute bottom-[13%] font-serif text-[0.6875rem] tracking-[0.2em] text-accent-ink not-italic uppercase">
+                  Lado A · 33⅓
+                </em>
+              </span>
+            )}
           </div>
 
           <button
