@@ -1,6 +1,7 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatFileSize, useLibraryStore } from '../features/library'
-import { usePlayerStore } from '../player'
+import { supportsOutputSelection, usePlayerStore } from '../player'
 import type { ChannelMode } from '../player'
 
 const MODE_KEYS = {
@@ -19,11 +20,22 @@ export function AudioQualityPanel() {
   const channelMode = usePlayerStore((state) => state.channelMode)
   const setBalance = usePlayerStore((state) => state.setBalance)
   const setChannelMode = usePlayerStore((state) => state.setChannelMode)
+  const outputDevices = usePlayerStore((state) => state.outputDevices)
+  const outputDeviceId = usePlayerStore((state) => state.outputDeviceId)
+  const refreshOutputDevices = usePlayerStore((state) => state.refreshOutputDevices)
+  const setOutputDevice = usePlayerStore((state) => state.setOutputDevice)
+  const canSelectOutput = supportsOutputSelection()
   const track = useLibraryStore((state) =>
     currentTrack === null
       ? null
       : (state.tracks.find((item) => item.id === currentTrack.id) ?? null),
   )
+
+  useEffect(() => {
+    if (canSelectOutput) {
+      void refreshOutputDevices()
+    }
+  }, [canSelectOutput, refreshOutputDevices])
 
   const quality = [
     { label: t('audio.codec'), value: track?.codec ?? '—' },
@@ -98,6 +110,26 @@ export function AudioQualityPanel() {
           ))}
         </div>
       </div>
+
+      {canSelectOutput && (
+        <div className="mt-4">
+          <label className="text-xs font-medium text-ink-muted" htmlFor="audio-output">
+            {t('audio.output')}
+          </label>
+          <select
+            className="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            id="audio-output"
+            onChange={(event) => void setOutputDevice(event.target.value)}
+            value={outputDeviceId}
+          >
+            {outputDevices.map((device) => (
+              <option key={device.id === '' ? 'default' : device.id} value={device.id}>
+                {device.label === '' ? t('audio.outputDefault') : device.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('audio.hint')}</p>
     </div>

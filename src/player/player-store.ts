@@ -3,6 +3,8 @@ import { useLibraryStore } from '../features/library'
 import { AudioGraph } from './audio-graph'
 import { PlayerController } from './controller'
 import type { PlayerSnapshot, RestoreState } from './controller'
+import { applyOutputDevice, listOutputDevices, supportsOutputSelection } from './output-devices'
+import type { OutputDevice } from './output-devices'
 import { SleepTimer } from './sleep-timer'
 import type { TimerSnapshot } from './sleep-timer'
 import type { ChannelMode, QueueTrack } from './types'
@@ -24,6 +26,10 @@ export function getAnalyser(): AudioGraph {
 
 type PlayerState = PlayerSnapshot & {
   timer: TimerSnapshot
+  outputDevices: OutputDevice[]
+  outputDeviceId: string
+  refreshOutputDevices: () => Promise<void>
+  setOutputDevice: (deviceId: string) => Promise<void>
   playTracks: (tracks: QueueTrack[], startId?: string, sourcePlaylistId?: string | null) => void
   toggle: () => void
   next: () => void
@@ -52,6 +58,24 @@ type PlayerState = PlayerSnapshot & {
 export const usePlayerStore = create<PlayerState>(() => ({
   ...controller.getSnapshot(),
   timer: sleepTimer.getSnapshot(),
+  outputDevices: [],
+  outputDeviceId: 'default',
+
+  refreshOutputDevices: async () => {
+    if (!supportsOutputSelection()) {
+      return
+    }
+
+    const devices = await listOutputDevices()
+    usePlayerStore.setState({ outputDevices: devices })
+  },
+
+  setOutputDevice: async (deviceId) => {
+    const applied = await applyOutputDevice(audio, deviceId)
+    if (applied) {
+      usePlayerStore.setState({ outputDeviceId: deviceId })
+    }
+  },
 
   playTracks: (tracks, startId, sourcePlaylistId = null) => {
     controller.playTracks(tracks, startId, sourcePlaylistId)

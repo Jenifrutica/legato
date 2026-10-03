@@ -117,6 +117,8 @@ export const en: typeof es = {
     bitrate: 'Bitrate',
     channels: 'Channels',
     size: 'Size',
+    output: 'Audio output',
+    outputDefault: 'Default output',
     mono: 'Mono',
     stereo: 'Stereo',
     balance: 'Left / right balance',

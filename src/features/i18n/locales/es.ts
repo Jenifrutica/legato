@@ -116,6 +116,8 @@ export const es = {
     bitrate: 'Bitrate',
     channels: 'Canales',
     size: 'Tamaño',
+    output: 'Salida de audio',
+    outputDefault: 'Salida predeterminada',
     mono: 'Mono',
     stereo: 'Estéreo',
     balance: 'Balance izquierda / derecha',
