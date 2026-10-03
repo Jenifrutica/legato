@@ -339,6 +339,7 @@ export function LibraryPanel() {
               </button>
               <input
                 accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus"
+                aria-label={t('library.import')}
                 className="sr-only"
                 multiple
                 onChange={(event) => {

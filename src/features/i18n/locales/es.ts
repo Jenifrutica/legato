@@ -119,6 +119,23 @@ export const es = {
     explain:
       'Nodos reales de la lista doblemente enlazada: cada tarjeta conoce su prev y su next. El nodo resaltado es el que está sonando y conserva su identidad aunque muevas o elimines otros (fix #12).',
   },
+  a11y: {
+    title: 'Accesibilidad',
+    close: 'Cerrar panel de accesibilidad',
+    textScale: 'Tamaño del texto',
+    dyslexiaFont: 'Tipografía para dislexia',
+    highContrast: 'Alto contraste',
+    reducedMotion: 'Reducir movimiento',
+    largeControls: 'Controles grandes',
+    colorBlind: 'Modo daltonismo',
+    colorBlindNone: 'Sin filtro',
+    colorBlindDeuteranopia: 'Deuteranopía (azul/naranja)',
+    colorBlindProtanopia: 'Protanopía (azul/amarillo)',
+    reset: 'Restablecer',
+    statementTitle: 'Declaración de accesibilidad',
+    statement:
+      'Legato busca cumplir WCAG 2.2 AA: navegación por teclado, foco visible, texto alternativo y opciones de adaptación. Si encuentras una barrera, escríbenos.',
+  },
   language: {
     label: 'Idioma',
   },

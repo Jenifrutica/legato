@@ -1,5 +1,6 @@
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/fraunces';
+@import '@fontsource/opendyslexic';
 @import 'tailwindcss';
 
 @theme {
@@ -82,4 +83,59 @@
   *::-webkit-scrollbar-track {
     background: transparent;
   }
+}
+
+html {
+  font-size: calc(100% * var(--a11y-text-scale, 1));
+}
+
+html.a11y-dyslexia {
+  --font-body: 'OpenDyslexic', 'Inter Variable', system-ui, sans-serif;
+}
+
+html.a11y-contrast {
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0f0;
+  --color-ink: #000000;
+  --color-ink-muted: #2f2f2f;
+  --color-border: #6b6b6b;
+  --color-primary: #8a2b00;
+  --color-primary-strong: #6d2200;
+  --color-primary-soft: #ffe8e0;
+  --color-accent: #0b4f5c;
+  --color-accent-soft: #dff3f7;
+  --color-wood: #7a5a2e;
+}
+
+html.a11y-cb-deuteranopia {
+  --color-primary: #0072b2;
+  --color-primary-strong: #005a8c;
+  --color-primary-soft: #dbeafe;
+  --color-accent: #d55e00;
+  --color-accent-soft: #ffe6cc;
+}
+
+html.a11y-cb-protanopia {
+  --color-primary: #0072b2;
+  --color-primary-strong: #005a8c;
+  --color-primary-soft: #dbeafe;
+  --color-accent: #e69f00;
+  --color-accent-soft: #fff0cc;
+}
+
+html.a11y-reduced-motion *,
+html.a11y-reduced-motion *::before,
+html.a11y-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+html.a11y-large-controls button,
+html.a11y-large-controls select,
+html.a11y-large-controls input[type='range'],
+html.a11y-large-controls a[href] {
+  min-height: 44px;
+  min-width: 44px;
 }

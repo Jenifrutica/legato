@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { A11yPanel, useA11yStore } from '../features/a11y'
 import { AccountChip, AuthContextProvider } from '../features/auth'
 import { LanguageSelector } from '../features/i18n'
 import { LibraryPanel } from '../ui/LibraryPanel'
@@ -6,7 +7,7 @@ import { MobileNav } from '../ui/MobileNav'
 import { PlayerBar } from '../ui/PlayerBar'
 import { Sidebar } from '../ui/Sidebar'
 import { VinylStage } from '../ui/VinylStage'
-import { DiscMark } from '../ui/icons'
+import { AccessibilityIcon, DiscMark } from '../ui/icons'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
 
 function AppShell() {
   const { t } = useTranslation()
+  const openA11yPanel = useA11yStore((state) => state.openPanel)
 
   return (
     <div className="min-h-dvh bg-bg text-ink">
@@ -38,6 +40,14 @@ function AppShell() {
             </span>
             <h1 className="font-display text-2xl font-semibold tracking-tight">Legato</h1>
             <div className="ml-auto flex min-w-0 items-center gap-2">
+              <button
+                aria-label={t('a11y.title')}
+                className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink"
+                onClick={openA11yPanel}
+                type="button"
+              >
+                <AccessibilityIcon className="size-5" />
+              </button>
               <LanguageSelector compact />
               <div className="min-w-0 max-w-36">
                 <AccountChip />
@@ -58,6 +68,8 @@ function AppShell() {
         <PlayerBar />
         <MobileNav />
       </div>
+
+      <A11yPanel />
     </div>
   )
 }

@@ -120,6 +120,23 @@ export const pt: typeof es = {
     explain:
       'Nós reais da lista duplamente encadeada: cada cartão conhece seu prev e next. O nó destacado está tocando e mantém sua identidade mesmo que você mova ou remova outros (correção do bug #12).',
   },
+  a11y: {
+    title: 'Acessibilidade',
+    close: 'Fechar painel de acessibilidade',
+    textScale: 'Tamanho do texto',
+    dyslexiaFont: 'Fonte para dislexia',
+    highContrast: 'Alto contraste',
+    reducedMotion: 'Reduzir movimento',
+    largeControls: 'Controles grandes',
+    colorBlind: 'Modo daltonismo',
+    colorBlindNone: 'Sem filtro',
+    colorBlindDeuteranopia: 'Deuteranopia (azul/laranja)',
+    colorBlindProtanopia: 'Protanopia (azul/amarelo)',
+    reset: 'Restaurar',
+    statementTitle: 'Declaração de acessibilidade',
+    statement:
+      'O Legato busca atender WCAG 2.2 AA: navegação por teclado, foco visível, texto alternativo e opções de adaptação. Se encontrar uma barreira, escreva para nós.',
+  },
   language: {
     label: 'Idioma',
   },

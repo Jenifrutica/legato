@@ -120,6 +120,23 @@ export const en: typeof es = {
     explain:
       'Real doubly linked list nodes: each card knows its prev and next. The highlighted node is playing and keeps its identity even if you move or remove others (bug #12 fix).',
   },
+  a11y: {
+    title: 'Accessibility',
+    close: 'Close accessibility panel',
+    textScale: 'Text size',
+    dyslexiaFont: 'Dyslexia-friendly font',
+    highContrast: 'High contrast',
+    reducedMotion: 'Reduce motion',
+    largeControls: 'Large controls',
+    colorBlind: 'Color blindness mode',
+    colorBlindNone: 'No filter',
+    colorBlindDeuteranopia: 'Deuteranopia (blue/orange)',
+    colorBlindProtanopia: 'Protanopia (blue/yellow)',
+    reset: 'Reset',
+    statementTitle: 'Accessibility statement',
+    statement:
+      'Legato aims to meet WCAG 2.2 AA: keyboard navigation, visible focus, alternative text and adaptation options. If you find a barrier, write to us.',
+  },
   language: {
     label: 'Language',
   },

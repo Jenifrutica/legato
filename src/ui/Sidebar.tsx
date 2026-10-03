@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AccountChip } from '../features/auth'
+import { useA11yStore } from '../features/a11y'
 import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import {
@@ -60,6 +61,7 @@ export function Sidebar() {
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
   const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
+  const openA11yPanel = useA11yStore((state) => state.openPanel)
 
   const [isCreating, setIsCreating] = useState(false)
   const [draft, setDraft] = useState('')
@@ -161,6 +163,7 @@ export function Sidebar() {
           <NavItem
             icon={<AccessibilityIcon className="size-5 shrink-0" />}
             label={t('nav.accessibility')}
+            onClick={openA11yPanel}
           />
           <NavItem icon={<SettingsIcon className="size-5 shrink-0" />} label={t('nav.settings')} />
         </ul>
