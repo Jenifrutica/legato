@@ -1,7 +1,7 @@
 export { WebAudioAnalyser } from './analyser'
 export type { AnalyserLike } from './analyser'
 export { PlayerController } from './controller'
-export type { PlayerSnapshot } from './controller'
+export type { PlayerSnapshot, RestoreState } from './controller'
 export { PlayerEngine } from './engine'
 export type { AudioLike, EngineEvents, EngineStatus } from './engine'
 export { getAnalyser, usePlayerStore } from './player-store'

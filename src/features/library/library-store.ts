@@ -9,6 +9,7 @@ type LibraryState = {
   tracks: LibraryTrack[]
   isImporting: boolean
   lastErrors: ImportError[]
+  hydrate: (tracks: LibraryTrack[]) => void
   addTracks: (tracks: LibraryTrack[]) => void
   removeTrack: (id: string) => void
   updateTrack: (id: string, patch: Partial<Omit<LibraryTrack, 'id'>>) => void
@@ -21,6 +22,11 @@ export const useLibraryStore = create<LibraryState>((set) => ({
   tracks: [],
   isImporting: false,
   lastErrors: [],
+
+  hydrate: (tracks) => {
+    library.restore(tracks)
+    set({ tracks: library.toArray() })
+  },
 
   addTracks: (newTracks) => {
     for (const track of newTracks) {

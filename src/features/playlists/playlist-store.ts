@@ -1,13 +1,14 @@
 import { create } from 'zustand'
 import type { LibraryTrack } from '../library'
 import { PlaylistCollection } from './playlist-collection'
-import type { PlaylistSnapshot, PlaylistStructureNode } from './types'
+import type { PlaylistRestoreRecord, PlaylistSnapshot, PlaylistStructureNode } from './types'
 
 const collection = new PlaylistCollection()
 
 type PlaylistsState = {
   playlists: PlaylistSnapshot[]
   selectedPlaylistId: string | null
+  hydrate: (records: PlaylistRestoreRecord[], tracks: LibraryTrack[]) => void
   createPlaylist: (name: string) => string
   renamePlaylist: (id: string, name: string) => void
   duplicatePlaylist: (id: string) => void
@@ -21,6 +22,11 @@ type PlaylistsState = {
 export const usePlaylistsStore = create<PlaylistsState>((set, get) => ({
   playlists: [],
   selectedPlaylistId: null,
+
+  hydrate: (records, tracks) => {
+    collection.restore(records, tracks)
+    set({ playlists: collection.toSnapshots(), selectedPlaylistId: null })
+  },
 
   createPlaylist: (name) => {
     const playlist = collection.create(name)

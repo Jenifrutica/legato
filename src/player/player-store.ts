@@ -1,7 +1,8 @@
 import { create } from 'zustand'
+import { useLibraryStore } from '../features/library'
 import { WebAudioAnalyser } from './analyser'
 import { PlayerController } from './controller'
-import type { PlayerSnapshot } from './controller'
+import type { PlayerSnapshot, RestoreState } from './controller'
 import type { QueueTrack } from './types'
 
 const audio = new Audio()
@@ -25,6 +26,7 @@ type PlayerState = PlayerSnapshot & {
   toggleShuffle: () => void
   cycleLoopMode: () => void
   reorder: (trackId: string, targetIndex: number, playlistId: string) => void
+  restoreSession: (record: RestoreState) => void
 }
 
 export const usePlayerStore = create<PlayerState>(() => ({
@@ -47,6 +49,10 @@ export const usePlayerStore = create<PlayerState>(() => ({
   cycleLoopMode: () => controller.cycleLoopMode(),
   reorder: (trackId, targetIndex, playlistId) =>
     controller.reorder(trackId, targetIndex, playlistId),
+  restoreSession: (record) => {
+    const tracks = useLibraryStore.getState().tracks
+    controller.restoreSession(tracks, record)
+  },
 }))
 
 controller.subscribe((snapshot) => {

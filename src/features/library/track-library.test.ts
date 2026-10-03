@@ -11,11 +11,17 @@ function track(id: string): LibraryTrack {
     durationSeconds: 180,
     sourceUrl: `blob:${id}`,
     artworkUrl: null,
+    artworkBlob: null,
+    blob: new Blob(['audio'], { type: 'audio/mpeg' }),
     fileName: `${id}.mp3`,
     fileSize: 1024,
     mimeType: 'audio/mpeg',
     dedupeKey: `${id}.mp3:1024:0`,
     addedAt: 0,
+    sampleRate: 44100,
+    bitrate: 320000,
+    codec: 'MP3',
+    channels: 2,
   }
 }
 

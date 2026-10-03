@@ -17,6 +17,16 @@ export type PlayerSnapshot = {
   sourcePlaylistId: string | null
 }
 
+export type RestoreState = {
+  trackIds: string[]
+  currentId: string | null
+  currentTime: number
+  loopMode: LoopMode
+  shuffle: boolean
+  volume: number
+  rate: number
+}
+
 export class PlayerController {
   #engine: PlayerEngine
   #queue = new PlaybackQueue()
@@ -137,6 +147,28 @@ export class PlayerController {
     if (this.#queue.move(trackId, targetIndex)) {
       this.#notify()
     }
+  }
+
+  restoreSession(tracks: QueueTrack[], state: RestoreState): void {
+    this.#queue.restore(tracks, {
+      trackIds: state.trackIds,
+      currentId: state.currentId,
+      loopMode: state.loopMode,
+      shuffle: state.shuffle,
+    })
+
+    this.#volume = Math.min(1, Math.max(0, state.volume))
+    this.#rate = state.rate
+
+    const current = this.#queue.currentTrack
+    if (current !== null) {
+      this.#engine.load(current)
+      this.#engine.setVolume(this.#volume)
+      this.#engine.setRate(this.#rate)
+      this.#engine.seek(state.currentTime)
+    }
+
+    this.#notify()
   }
 
   getSnapshot(): PlayerSnapshot {

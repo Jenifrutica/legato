@@ -35,6 +35,10 @@ type ParsedMetadata = {
   album: string | null
   duration: number | null
   artwork: Blob | null
+  sampleRate: number | null
+  bitrate: number | null
+  codec: string | null
+  channels: number | null
 }
 
 export function isAudioFile(file: File): boolean {
@@ -87,11 +91,17 @@ export async function importAudioFiles(
       durationSeconds: metadata.duration,
       sourceUrl: URL.createObjectURL(file),
       artworkUrl,
+      artworkBlob: metadata.artwork,
+      blob: file,
       fileName: file.name,
       fileSize: file.size,
       mimeType: file.type === '' ? 'audio/desconocido' : file.type,
       dedupeKey,
       addedAt: Date.now(),
+      sampleRate: metadata.sampleRate,
+      bitrate: metadata.bitrate,
+      codec: metadata.codec,
+      channels: metadata.channels,
     })
   }
 
@@ -117,9 +127,23 @@ async function readMetadata(file: File): Promise<ParsedMetadata> {
         picture === null
           ? null
           : new Blob([new Uint8Array(picture.data)], { type: picture.format }),
+      sampleRate: parsed.format.sampleRate ?? null,
+      bitrate: parsed.format.bitrate ?? null,
+      codec: parsed.format.codec ?? null,
+      channels: parsed.format.numberOfChannels ?? null,
     }
   } catch {
-    return { title: null, artist: null, album: null, duration: null, artwork: null }
+    return {
+      title: null,
+      artist: null,
+      album: null,
+      duration: null,
+      artwork: null,
+      sampleRate: null,
+      bitrate: null,
+      codec: null,
+      channels: null,
+    }
   }
 }
 

@@ -1,7 +1,12 @@
 import { DoublyLinkedList } from '../../core/doubly-linked-list'
 import type { DoublyLinkedListNode } from '../../core/doubly-linked-list'
 import type { LibraryTrack } from '../library'
-import type { Playlist, PlaylistSnapshot, PlaylistStructureNode } from './types'
+import type {
+  Playlist,
+  PlaylistRestoreRecord,
+  PlaylistSnapshot,
+  PlaylistStructureNode,
+} from './types'
 
 export class PlaylistCollection {
   #playlists = new DoublyLinkedList<Playlist>()
@@ -164,6 +169,31 @@ export class PlaylistCollection {
     this.#playlists.clear()
     this.#playlistNodes.clear()
     this.#tracks.clear()
+  }
+
+  restore(records: PlaylistRestoreRecord[], tracks: LibraryTrack[]): void {
+    this.clear()
+    const byId = new Map(tracks.map((track) => [track.id, track]))
+
+    for (const record of records) {
+      const playlist: Playlist = {
+        id: record.id,
+        name: record.name,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+      }
+      const node = this.#playlists.append(playlist)
+      this.#playlistNodes.set(playlist.id, node)
+
+      const list = new DoublyLinkedList<LibraryTrack>()
+      for (const trackId of record.trackIds) {
+        const track = byId.get(trackId)
+        if (track !== undefined) {
+          list.append(track)
+        }
+      }
+      this.#tracks.set(playlist.id, list)
+    }
   }
 
   #touch(id: string): void {

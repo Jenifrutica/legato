@@ -15,3 +15,11 @@ export type PlaylistStructureNode = {
   prevId: string | null
   nextId: string | null
 }
+
+export type PlaylistRestoreRecord = {
+  id: string
+  name: string
+  createdAt: number
+  updatedAt: number
+  trackIds: string[]
+}
