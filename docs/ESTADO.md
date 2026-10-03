@@ -51,6 +51,12 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a conectar Spotify). Después: nueva funcionalidad pendiente por definir, pulido final y Día 4 (deploy S3 + CloudFront).
 
+## Handoff
+
+- **Contexto absoluto:** `docs/CONTEXTO-COMPLETO.md` (todo el proyecto, para continuar en una sesión nueva).
+- **Prompt de arranque:** `docs/PROMPT-NUEVA-SESION.md` (copiar y pegar).
+- Copia en Obsidian: `/home/jenifrutica/Downloads/asas/` → "Legato - Contexto completo.md" y "Legato - Prompt nueva sesion.md".
+
 ## Nota de desarrollo
 
 Si tras agregar archivos nuevos la interfaz queda en blanco con un error de módulo en consola, es caché de Vite: reiniciar el servidor (`Ctrl+C`, `bun run dev`) o borrar `node_modules/.vite`. No afecta al build de producción.
