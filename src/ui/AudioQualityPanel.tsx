@@ -99,7 +99,7 @@ export function AudioQualityPanel() {
               className={` border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 channelMode === mode
                   ? 'border-accent bg-accent-soft text-ink'
-                  : 'border-border text-ink-muted hover:border-accent hover:text-accent'
+                  : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
               }`}
               key={mode}
               onClick={() => setChannelMode(mode)}

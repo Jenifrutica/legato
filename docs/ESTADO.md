@@ -42,7 +42,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 45 | Ondas gráficas siempre vivas (sintéticas sin datos, reales al reproducir) | Cerrado |
 | 46 | Diagnóstico de Spotify (errores visibles + probar conexión) | Cerrado |
 | 47 | Agregar a playlist desde la búsqueda + crear playlist + drag & drop | Cerrado |
-| 48 | Rediseño completo de interfaz — dirección **Duotono 62** (plan en `docs/REDISENO.md`) | En curso: F0–F4, F7 visual, F8 base y detector cerrados; faltan F6 fino, F9 y F10 |
+| 48 | Rediseño completo de interfaz — dirección **Duotono 62** (plan en `docs/REDISENO.md`) | Rediseño cerrado (F0–F10): 154 unit + 4 E2E, axe 0, detector 0. F11 Cápsula y F12 letras reales pendientes |
 
 ## Estado técnico
 

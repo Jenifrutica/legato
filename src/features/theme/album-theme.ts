@@ -14,6 +14,7 @@ export type AlbumTheme = {
   primarySoft: string
   onPrimary: string
   accent: string
+  accentInk: string
   accentSoft: string
   onAccent: string
   darkPrimary: string
@@ -21,6 +22,7 @@ export type AlbumTheme = {
   darkPrimarySoft: string
   darkOnPrimary: string
   darkAccent: string
+  darkAccentInk: string
   darkAccentSoft: string
   darkOnAccent: string
 }
@@ -44,6 +46,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
   const onPrimary = ensureContrast(background, primaryStrong, 4.5)
 
   const accent = ensureContrast(palette.vibrant, background, 3)
+  const accentInk = ensureContrast(palette.vibrant, background, 4.5)
   const accentSoft = mix(background, palette.vibrant, 0.22)
   const onAccent = ensureContrast(ink, accent, 4.5)
 
@@ -52,6 +55,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
   const darkPrimarySoft = mix(DARK_BASE, WHITE, 0.14)
   const darkOnPrimary = ensureContrast(DARK_BASE, darkPrimary, 4.5)
   const darkAccent = ensureContrast(palette.vibrant, DARK_BASE, 4.5)
+  const darkAccentInk = ensureContrast(palette.vibrant, DARK_BASE, 4.5)
   const darkAccentSoft = mix(DARK_BASE, palette.vibrant, 0.3)
   const darkOnAccent = ensureContrast(INK_BASE, darkAccent, 4.5)
 
@@ -68,6 +72,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
     primarySoft: rgbToHex(primarySoft),
     onPrimary: rgbToHex(onPrimary),
     accent: rgbToHex(accent),
+    accentInk: rgbToHex(accentInk),
     accentSoft: rgbToHex(accentSoft),
     onAccent: rgbToHex(onAccent),
     darkPrimary: rgbToHex(darkPrimary),
@@ -75,6 +80,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
     darkPrimarySoft: rgbToHex(darkPrimarySoft),
     darkOnPrimary: rgbToHex(darkOnPrimary),
     darkAccent: rgbToHex(darkAccent),
+    darkAccentInk: rgbToHex(darkAccentInk),
     darkAccentSoft: rgbToHex(darkAccentSoft),
     darkOnAccent: rgbToHex(darkOnAccent),
   }
@@ -93,6 +99,7 @@ const THEME_VARIABLES: Array<[keyof AlbumTheme, string]> = [
   ['primarySoft', '--album-primary-soft'],
   ['onPrimary', '--album-on-primary'],
   ['accent', '--album-accent'],
+  ['accentInk', '--album-accent-ink'],
   ['accentSoft', '--album-accent-soft'],
   ['onAccent', '--album-on-accent'],
   ['darkPrimary', '--album-dark-primary'],
@@ -100,6 +107,7 @@ const THEME_VARIABLES: Array<[keyof AlbumTheme, string]> = [
   ['darkPrimarySoft', '--album-dark-primary-soft'],
   ['darkOnPrimary', '--album-dark-on-primary'],
   ['darkAccent', '--album-dark-accent'],
+  ['darkAccentInk', '--album-dark-accent-ink'],
   ['darkAccentSoft', '--album-dark-accent-soft'],
   ['darkOnAccent', '--album-dark-on-accent'],
 ]

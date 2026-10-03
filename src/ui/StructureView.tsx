@@ -5,7 +5,7 @@ function LinkArrow() {
   return (
     <svg
       aria-hidden="true"
-      className="size-5 shrink-0 text-wood"
+      className="size-5 shrink-0 text-ink-muted"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -42,7 +42,7 @@ export function StructureView({
 
   return (
     <section aria-label={t('structure.region')} className="p-5">
-      <p className="text-xs text-ink-muted">
+      <p className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
         {t('structure.summary', {
           length: nodes.length,
           head: nodes[0].title,
@@ -51,38 +51,51 @@ export function StructureView({
       </p>
 
       <ol className="mt-4 flex items-center gap-1 overflow-x-auto pb-3">
-        {nodes.map((node, index) => (
-          <li className="flex shrink-0 items-center gap-1" key={node.id}>
-            {index > 0 && <LinkArrow />}
-            <div
-              aria-label={t('structure.nodeLabel', {
-                index: index + 1,
-                total: nodes.length,
-                title: node.title,
-                prev: titleOf(node.prevId),
-                next: titleOf(node.nextId),
-              })}
-              className={`w-44  border p-3 transition-colors ${
-                node.id === currentId ? 'border-accent bg-accent-soft' : 'border-border bg-bg'
-              }`}
-              tabIndex={0}
-            >
-              <span className="block text-[0.625rem] uppercase tracking-wide text-ink-muted">
-                {t('structure.node', { index: index + 1 })}
-                {node.id === currentId ? t('structure.playing') : ''}
-              </span>
-              <span className="mt-0.5 block truncate text-sm font-medium">{node.title}</span>
-              <span className="mt-1 flex flex-col text-[0.625rem] text-ink-muted">
-                <span className="truncate">
-                  {t('structure.prev', { title: titleOf(node.prevId) })}
+        {nodes.map((node, index) => {
+          const active = node.id === currentId
+          return (
+            <li className="flex shrink-0 items-center gap-1" key={node.id}>
+              {index > 0 && <LinkArrow />}
+              <div
+                aria-label={t('structure.nodeLabel', {
+                  index: index + 1,
+                  total: nodes.length,
+                  title: node.title,
+                  prev: titleOf(node.prevId),
+                  next: titleOf(node.nextId),
+                })}
+                className={`w-44 border-2 p-3 ${
+                  active
+                    ? 'border-rule bg-accent text-on-accent'
+                    : 'border-rule/40 bg-surface text-ink'
+                }`}
+                tabIndex={0}
+              >
+                <span
+                  className={`block font-mono text-[0.625rem] tracking-[0.14em] uppercase ${
+                    active ? 'text-on-accent/80' : 'text-ink-muted'
+                  }`}
+                >
+                  {t('structure.node', { index: index + 1 })}
+                  {active ? t('structure.playing') : ''}
                 </span>
-                <span className="truncate">
-                  {t('structure.next', { title: titleOf(node.nextId) })}
+                <span className="mt-0.5 block truncate text-sm font-semibold">{node.title}</span>
+                <span
+                  className={`mt-1 flex flex-col font-mono text-[0.625rem] ${
+                    active ? 'text-on-accent/80' : 'text-ink-muted'
+                  }`}
+                >
+                  <span className="truncate">
+                    {t('structure.prev', { title: titleOf(node.prevId) })}
+                  </span>
+                  <span className="truncate">
+                    {t('structure.next', { title: titleOf(node.nextId) })}
+                  </span>
                 </span>
-              </span>
-            </div>
-          </li>
-        ))}
+              </div>
+            </li>
+          )
+        })}
       </ol>
 
       <p className="text-xs leading-relaxed text-ink-muted">{t('structure.explain')}</p>

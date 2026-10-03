@@ -32,7 +32,7 @@ export function CookieConsent() {
               {t('cookies.accept')}
             </button>
             <button
-              className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+              className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
               onClick={acceptEssentialOnly}
               type="button"
             >
@@ -95,7 +95,7 @@ export function CookieConsent() {
 
             <div className="mt-5 flex justify-end gap-2">
               <button
-                className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                 onClick={closePreferences}
                 type="button"
               >

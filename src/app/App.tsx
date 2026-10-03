@@ -73,25 +73,25 @@ function AppShell() {
 
       <footer className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border px-5 py-4 text-xs text-ink-muted lg:px-8">
         <a
-          className="underline underline-offset-2 transition-colors hover:text-accent"
+          className="underline underline-offset-2 transition-colors hover:text-accent-ink"
           href="#/legal/privacy"
         >
           {t('legal.links.privacy')}
         </a>
         <a
-          className="underline underline-offset-2 transition-colors hover:text-accent"
+          className="underline underline-offset-2 transition-colors hover:text-accent-ink"
           href="#/legal/terms"
         >
           {t('legal.links.terms')}
         </a>
         <a
-          className="underline underline-offset-2 transition-colors hover:text-accent"
+          className="underline underline-offset-2 transition-colors hover:text-accent-ink"
           href="#/legal/cookies"
         >
           {t('legal.links.cookies')}
         </a>
         <a
-          className="underline underline-offset-2 transition-colors hover:text-accent"
+          className="underline underline-offset-2 transition-colors hover:text-accent-ink"
           href="#/legal/accessibility"
         >
           {t('legal.links.accessibility')}

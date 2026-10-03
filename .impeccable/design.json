@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-03T00:00:00-05:00",
+  "title": "Design System: Legato",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Papel Hueso",
+        "canonical": "#f1ede4",
+        "tonalRamp": [
+          "#5c574d",
+          "#7a7468",
+          "#999284",
+          "#b8b1a1",
+          "#d3ccbc",
+          "#e3ddd0",
+          "#f1ede4",
+          "#faf8f2"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Hoja de Imprenta",
+        "canonical": "#fbf8f1",
+        "tonalRamp": [
+          "#646052",
+          "#827d6e",
+          "#a19b8b",
+          "#c0b9a8",
+          "#dcd6c8",
+          "#eee9de",
+          "#fbf8f1",
+          "#fffdf8"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta Negra",
+        "canonical": "#13100c",
+        "tonalRamp": [
+          "#000000",
+          "#13100c",
+          "#2a2520",
+          "#443d35",
+          "#5c5548",
+          "#7d7566",
+          "#a49c8c",
+          "#cfc8ba"
+        ]
+      },
+      "spot": {
+        "role": "primary",
+        "displayName": "Tinta Directa",
+        "canonical": "#e14a1f",
+        "tonalRamp": [
+          "#3a1103",
+          "#5f1f06",
+          "#872e0b",
+          "#b23a12",
+          "#e14a1f",
+          "#ef6f47",
+          "#f79a78",
+          "#fdc9b2"
+        ]
+      },
+      "spot-ink": {
+        "role": "primary",
+        "displayName": "Tinta Directa de Texto",
+        "canonical": "#b23a12",
+        "tonalRamp": [
+          "#2e0d02",
+          "#4a1705",
+          "#6d2200",
+          "#8f2d08",
+          "#b23a12",
+          "#cf5a33",
+          "#e88a67",
+          "#f8c3ad"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Noche de Prensa",
+        "canonical": "#0b0e14",
+        "tonalRamp": [
+          "#000000",
+          "#05070b",
+          "#0b0e14",
+          "#12161f",
+          "#1a202b",
+          "#242c3a",
+          "#333d4f",
+          "#455167"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Titular de Cartel",
+        "purpose": "Titular del héroe; mezcla anchos (115%/62%) y la última palabra va en tinta directa."
+      },
+      "label": {
+        "displayName": "Datos de Imprenta",
+        "purpose": "Tiempos, códigos de nodo, matrices y pestañas; siempre en mayúsculas con tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "control",
+        "value": "3px 3px 0 var(--color-rule)",
+        "purpose": "Reposo de botones secundarios, chips y filas destacadas."
+      },
+      {
+        "name": "action",
+        "value": "6px 6px 0 var(--color-rule)",
+        "purpose": "Botón de reproducción y CTA principal."
+      },
+      {
+        "name": "disc",
+        "value": "10px 10px 0 var(--color-rule)",
+        "purpose": "El vinilo y su campo de tinta directa."
+      },
+      {
+        "name": "bar",
+        "value": "0 -4px 0 var(--color-rule)",
+        "purpose": "Borde duro de la barra inferior móvil."
+      }
+    ],
+    "motion": [
+      {
+        "name": "disc-rotate",
+        "value": "legato-disc 6s linear infinite",
+        "purpose": "Giro del vinilo mientras suena; se pausa en silencio y con movimiento reducido."
+      },
+      {
+        "name": "state",
+        "value": "background-color 300ms ease, color 300ms ease",
+        "purpose": "Transición del tema por portada y del modo oscuro."
+      },
+      {
+        "name": "press",
+        "value": "transform 150ms ease",
+        "purpose": "Elevación de 2px en hover y hundimiento al presionar."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón de Tinta Directa",
+      "kind": "button",
+      "refersTo": "button-spot",
+      "description": "Acción primaria (reproducir/importar): campo de tinta directa con sombra dura de 6px.",
+      "html": "<button class=\"ds-btn-spot\" aria-label=\"Reproducir\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7 5h4v14H7zM13 5h4v14h-4z\"/></svg></button>",
+      "css": ".ds-btn-spot { display:grid; place-items:center; width:64px; height:64px; border:2px solid var(--color-rule); border-radius:0; background:var(--color-accent); color:var(--color-on-accent); box-shadow:6px 6px 0 var(--color-rule); transition:transform 150ms ease, box-shadow 150ms ease; } .ds-btn-spot:hover { transform:translateY(-2px); } .ds-btn-spot:active { transform:translateY(2px); box-shadow:2px 2px 0 var(--color-rule); } .ds-btn-spot:focus-visible { outline:3px solid var(--color-accent); outline-offset:2px; }"
+    },
+    {
+      "name": "Botón de Tinta",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "Acción principal de formularios y ajustes: bloque de tinta con texto papel.",
+      "html": "<button class=\"ds-btn-ink\">Guardar preferencias</button>",
+      "css": ".ds-btn-ink { border:2px solid var(--color-rule); border-radius:0; background:var(--color-ink); color:var(--color-on-primary); padding:8px 16px; font-family:var(--font-body); font-weight:700; transition:opacity 150ms ease; } .ds-btn-ink:hover { opacity:0.9; } .ds-btn-ink:focus-visible { outline:3px solid var(--color-accent); outline-offset:2px; }"
+    },
+    {
+      "name": "Botón Fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acción secundaria de panel: hoja con contorno y sombra dura de 3px.",
+      "html": "<button class=\"ds-btn-ghost\">Estructura</button>",
+      "css": ".ds-btn-ghost { border:2px solid var(--color-rule); border-radius:0; background:var(--color-surface); color:var(--color-ink); padding:6px 14px; font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; box-shadow:3px 3px 0 var(--color-rule); transition:transform 150ms ease; } .ds-btn-ghost:hover { transform:translateY(-2px); } .ds-btn-ghost:focus-visible { outline:3px solid var(--color-accent); outline-offset:2px; }"
+    },
+    {
+      "name": "Campo de Texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Entrada de búsqueda o nombre: borde de 2px, fondo hoja, foco en tinta directa.",
+      "html": "<input class=\"ds-input\" placeholder=\"Buscar por título, artista o álbum\" />",
+      "css": ".ds-input { border:2px solid var(--color-rule); border-radius:0; background:var(--color-surface); color:var(--color-ink); padding:8px 12px; font-family:var(--font-body); font-size:14px; } .ds-input::placeholder { color:var(--color-ink-muted); } .ds-input:focus { border-color:var(--color-accent); outline:none; } .ds-input:focus-visible { outline:3px solid var(--color-accent); outline-offset:2px; }"
+    },
+    {
+      "name": "Pestaña Activa",
+      "kind": "chip",
+      "refersTo": "tab-active",
+      "description": "Pestaña de panel en su estado activo: bloque sólido de tinta directa.",
+      "html": "<button class=\"ds-tab\">Biblioteca</button>",
+      "css": ".ds-tab { border:0; border-radius:0; background:var(--color-accent); color:var(--color-on-accent); padding:6px 12px; font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; } .ds-tab:focus-visible { outline:3px solid var(--color-rule); outline-offset:2px; }"
+    },
+    {
+      "name": "Fila de Partitura",
+      "kind": "custom",
+      "refersTo": "score-bar",
+      "description": "Fila de cola: numeral mono, título, barra proporcional a la duración y tiempo.",
+      "html": "<div class=\"ds-score-row\"><span class=\"ds-score-index\">01</span><span class=\"ds-score-title\">Nocturno en Re<small>Trío Ámbar</small></span><span class=\"ds-score-bar\"></span><span class=\"ds-score-time\">4:07</span></div>",
+      "css": ".ds-score-row { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--color-border); background:var(--color-surface); color:var(--color-ink); } .ds-score-index, .ds-score-time { font-family:var(--font-mono); font-size:11px; color:var(--color-ink-muted); } .ds-score-title { flex:1; min-width:0; font-weight:600; } .ds-score-title small { display:block; font-weight:400; color:var(--color-ink-muted); } .ds-score-bar { height:12px; width:88px; border:2px solid var(--color-rule); background:var(--color-surface-2); }"
+    },
+    {
+      "name": "Banda de Letra",
+      "kind": "custom",
+      "refersTo": "lyric-band",
+      "description": "Línea activa de la letra sobre un pentagrama grabado; el cuerpo va en tinta directa.",
+      "html": "<div class=\"ds-lyric\"><span class=\"ds-lyric-line\">La aguja cae sobre el mar quieto</span></div>",
+      "css": ".ds-lyric { padding:12px 0; } .ds-lyric-line { display:inline-block; background:var(--color-accent); color:var(--color-on-accent); padding:8px 16px; font-family:var(--font-display); font-weight:900; font-size:28px; line-height:1.1; text-transform:uppercase; }"
+    },
+    {
+      "name": "Vinilo de Dos Tintas",
+      "kind": "custom",
+      "refersTo": "disc",
+      "description": "Disco completo con la portada dentro, campo de tinta directa detrás y giro continuo.",
+      "html": "<div class=\"ds-disc-stage\"><span class=\"ds-disc-field\"></span><div class=\"ds-disc\"><span class=\"ds-disc-label\">N-04</span></div></div>",
+      "css": ".ds-disc-stage { position:relative; width:420px; height:220px; overflow:hidden; } .ds-disc-field { position:absolute; left:50%; top:-80px; transform:translateX(-50%); width:480px; height:330px; background:var(--color-accent); box-shadow:8px 8px 0 var(--color-rule); } .ds-disc { position:absolute; left:50%; top:-190px; transform:translateX(-50%); width:420px; height:420px; border:2px solid var(--color-rule); border-radius:9999px; background:var(--color-surface-2); box-shadow:10px 10px 0 var(--color-rule); animation:ds-disc 6s linear infinite; } .ds-disc-label { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; place-items:center; width:19%; height:19%; border:2px solid var(--color-rule); border-radius:9999px; background:var(--color-surface); font-family:var(--font-mono); font-size:12px; color:var(--color-ink); } @keyframes ds-disc { to { transform:translateX(-50%) rotate(360deg); } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Disco de Dos Tintas",
+    "overview": "Legato se diseña como una publicación musical impresa: papel hueso, tinta negra y una sola tinta directa. La interfaz no imita un reproductor oscuro de tarjetas: se comporta como una hoja grabada donde la portada que suena manda. La densidad es de partitura (mono para datos, versalitas para rótulos) y la expresividad es tipográfica (el eje de ancho de Archivo mezcla titulares expandidos y condensados en la misma frase). Toda la paleta se deriva de la portada en reproducción: papel, tinta y tinta directa salen del álbum con contraste AA garantizado, y el modo oscuro es una inversión opcional, nunca la vista por defecto. El movimiento es material, no decorativo: el disco gira, las ondas son líneas que salen del borde y el resto permanece quieto.",
+    "keyCharacteristics": [
+      "Una sola tinta directa derivada de la portada, usada en campos grandes y selección.",
+      "Radios en cero; el círculo pertenece al vinilo y al disco de reproducción.",
+      "Sombras duras con offset, sin desenfoque; los bordes hacen el trabajo.",
+      "Pentagramas, barras de duración y códigos de nodo como lenguaje de datos.",
+      "Claro por defecto; oscuro conmutable; alto contraste gana sobre el tema."
+    ],
+    "rules": [
+      {
+        "name": "The Two-Ink Rule",
+        "body": "La interfaz usa papel, tinta y exactamente una tinta directa. Cualquier cuarto color es un estado (éxito/peligro) o la portada misma.",
+        "section": "colors"
+      },
+      {
+        "name": "The Field-vs-Ink Rule",
+        "body": "La tinta directa vívida nunca escribe texto pequeño. Los campos usan la tinta vívida; las letras pequeñas usan la tinta directa oscura (spot-ink, AA 4.5).",
+        "section": "colors"
+      },
+      {
+        "name": "The Width-Mix Rule",
+        "body": "Un titular puede combinar una palabra expandida con una condensada; esa mezcla es la firma tipográfica, no un capricho.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono-Data Rule",
+        "body": "Tiempos, códigos de nodo, tamaños y matrices se escriben en JetBrains Mono; nunca en la display.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard-Offset Rule",
+        "body": "Si algo se eleva, proyecta una sombra sólida desplazada; nunca se difumina.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No-Glow Rule",
+        "body": "Prohibido box-shadow con blur, gradientes de resplandor y backdrop-filter.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do posicionar el disco completo fuera de pantalla para la media luna; el giro siempre es real.",
+      "Do derivar papel, tinta y tinta directa de la portada con contraste AA.",
+      "Do usar spot-ink para texto pequeño y spot solo en campos y cuerpos grandes.",
+      "Do mantener una sola barra de reproducción por vista y reservar la costura escenario/panel para el panel de músicos.",
+      "Do escribir tiempos, nodos y métricas en mono."
+    ],
+    "donts": [
+      "Don't recortar el disco con clip-path ni tapar la portada.",
+      "Don't usar radios decorativos, sombras difuminadas, glows ni gradientes de fondo.",
+      "Don't escribir texto pequeño en la tinta directa vívida.",
+      "Don't apilar dos barras ni superponer el panel de músicos a los controles.",
+      "Don't usar el tema oscuro por defecto."
+    ]
+  }
+}

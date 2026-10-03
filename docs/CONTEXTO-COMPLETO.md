@@ -381,3 +381,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Documentar cada tanda** en `docs/ESTADO.md` y en este archivo.
 - La **key de OpenAI** de `.bashrc` está vencida; si se quiere volver a generar comps con IA, hay que reemplazarla. No es necesaria para el plan.
 - No desplegar hasta que la autora lo pida; rotar la access key antes de terminar la entrega.
+
+### Cierre del rediseño (misma sesión 3)
+
+- **F0–F10 cerradas**: tokens Duotono, shell/barra, héroe con media luna, vinilo con portada completa, ondas de líneas, panel + partitura slide-over, barras móvil, playlists estrella, letras diseñadas (bandera `legato.lyrics.demo`), responsive 390/768/1024/1280/1440, oscuro conmutable, vacíos y accesibilidad.
+- **Verificación final:** 154 unit + 4 E2E en verde, typecheck/lint/build OK, **axe 0 violaciones** (claro/oscuro/390/legales) y `impeccable detect` en `[]`.
+- **Documentación de diseño:** `DESIGN.md` en la raíz (spec con frontmatter de tokens) y `.impeccable/design.json`.
+- **Pendiente inmediato:** F11 Cápsula nostálgica (nueva funcionalidad) y F12 conexión de letras (LRCLIB + etiquetas/.lrc). Día 4 (deploy + rotar key) sigue en pausa hasta pedido explícito.
+- Commits de la sesión: `032a310` (tema), `40ca44b` (UI), `acc2e8e` (detector) y el cierre F6/F9/F10.

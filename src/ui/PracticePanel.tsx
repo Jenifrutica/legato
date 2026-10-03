@@ -38,7 +38,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
               className={` border px-2 py-1.5 font-mono text-xs font-semibold transition-colors ${
                 rate === value
                   ? 'border-accent bg-accent-soft text-ink'
-                  : 'border-border text-ink-muted hover:border-accent hover:text-accent'
+                  : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
               }`}
               disabled={!hasTrack}
               key={value}
@@ -55,7 +55,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
         <p className="text-xs font-medium text-ink-muted">{t('practice.abLoop')}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <button
-            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!hasTrack}
             onClick={setLoopPointA}
             type="button"
@@ -63,7 +63,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
             {t('practice.markA')}
           </button>
           <button
-            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!hasTrack || loopPointA === null}
             onClick={setLoopPointB}
             type="button"
@@ -101,7 +101,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
           className={`w-full  border px-3 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
             karaoke
               ? 'border-accent bg-accent-soft text-ink'
-              : 'border-border text-ink-muted hover:border-accent hover:text-accent'
+              : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
           }`}
           disabled={!hasTrack}
           onClick={() => setKaraoke(!karaoke)}

@@ -134,7 +134,7 @@ export function A11yPanel() {
           </label>
 
           <button
-            className="self-start  border border-border px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+            className="self-start  border border-border px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
             onClick={reset}
             type="button"
           >

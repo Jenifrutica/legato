@@ -48,7 +48,7 @@ const ERROR_KEYS = {
 function TrackMeta({ index, track }: { index: number; track: LibraryTrack }) {
   return (
     <>
-      <span className="w-6 text-right text-xs tabular-nums text-ink-muted">{index + 1}</span>
+      <span className="w-7 font-mono text-[0.6875rem] text-accent-ink">{index + 1}</span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">{track.title}</span>
         <span className="block truncate text-xs text-ink-muted">
@@ -219,7 +219,7 @@ export function LibraryPanel() {
   return (
     <section
       aria-labelledby="biblioteca-titulo"
-      className="flex min-w-0 flex-col  border border-border bg-surface shadow-soft"
+      className="flex min-w-0 flex-col  border-2 border-rule/40 bg-surface shadow-soft"
       onDragOver={(event) => {
         event.preventDefault()
       }}
@@ -230,12 +230,12 @@ export function LibraryPanel() {
         }
       }}
     >
-      <header className="flex flex-col gap-4 border-b border-border p-5">
+      <header className="flex flex-col gap-4 border-b-2 border-rule p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           {isPlaylistView ? (
             <div className="min-w-0 flex-1">
               <button
-                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent"
+                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent-ink-ink"
                 onClick={() => selectPlaylist(null)}
                 type="button"
               >
@@ -246,14 +246,17 @@ export function LibraryPanel() {
                 <form onSubmit={submitRename}>
                   <input
                     autoFocus
-                    className="w-full max-w-sm  border border-border bg-bg px-3 py-1.5 font-display text-xl font-semibold focus:border-accent focus:outline-none"
+                    className="w-full max-w-sm  border-2 border-rule/30 bg-surface px-3 py-1.5 font-display text-2xl font-black uppercase tracking-[0.02em] focus:border-accent focus:outline-none"
                     onBlur={() => setIsRenaming(false)}
                     onChange={(event) => setRenameDraft(event.target.value)}
                     value={renameDraft}
                   />
                 </form>
               ) : (
-                <h2 className="truncate font-display text-xl font-semibold" id="biblioteca-titulo">
+                <h2
+                  className="truncate font-display text-2xl font-black uppercase tracking-[0.02em]"
+                  id="biblioteca-titulo"
+                >
                   {selectedPlaylist.name}
                 </h2>
               )}
@@ -263,7 +266,10 @@ export function LibraryPanel() {
             </div>
           ) : (
             <div>
-              <h2 className="font-display text-xl font-semibold" id="biblioteca-titulo">
+              <h2
+                className="font-display text-2xl font-black uppercase tracking-[0.02em]"
+                id="biblioteca-titulo"
+              >
                 {t('library.title')}
               </h2>
               <p className="mt-1 text-sm text-ink-muted">{t('library.subtitle')}</p>
@@ -278,7 +284,7 @@ export function LibraryPanel() {
                 className={` border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   showStructure
                     ? 'border-accent bg-accent-soft text-ink'
-                    : 'border-border text-ink-muted hover:border-accent hover:text-accent'
+                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink-ink'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
@@ -286,7 +292,7 @@ export function LibraryPanel() {
                 {t('playlists.structure')}
               </button>
               <button
-                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink-ink"
                 onClick={() => {
                   setRenameDraft(selectedPlaylist.name)
                   setIsRenaming(true)
@@ -296,14 +302,14 @@ export function LibraryPanel() {
                 {t('playlists.rename')}
               </button>
               <button
-                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink-ink"
                 onClick={() => duplicatePlaylist(selectedPlaylist.id)}
                 type="button"
               >
                 {t('playlists.duplicate')}
               </button>
               <button
-                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
+                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
                 onClick={() => {
                   if (
                     window.confirm(t('playlists.confirmDelete', { name: selectedPlaylist.name }))
@@ -324,7 +330,7 @@ export function LibraryPanel() {
                 className={` border px-3 py-2 text-xs font-semibold transition-colors ${
                   showStructure
                     ? 'border-accent bg-accent-soft text-ink'
-                    : 'border-border text-ink-muted hover:border-accent hover:text-accent'
+                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink-ink'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
@@ -332,7 +338,7 @@ export function LibraryPanel() {
                 {t('playlists.structure')}
               </button>
               <button
-                className="inline-flex items-center gap-2  bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+                className="inline-flex items-center gap-2  bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={isImporting}
                 onClick={() => inputRef.current?.click()}
                 type="button"
@@ -360,7 +366,7 @@ export function LibraryPanel() {
           <span className="sr-only">{t('library.search')}</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted" />
           <input
-            className="w-full  border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-accent focus:outline-none"
+            className="w-full  border-2 border-rule/30 bg-surface py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-accent focus:outline-none"
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('library.searchPlaceholder')}
             type="search"
@@ -371,7 +377,7 @@ export function LibraryPanel() {
 
       {notice !== null && (
         <p
-          className="border-b border-border bg-accent-soft px-5 py-2 text-sm text-ink"
+          className="border-b-2 border-rule bg-accent-soft px-5 py-2 text-sm text-ink"
           role="status"
         >
           {notice}
@@ -379,7 +385,7 @@ export function LibraryPanel() {
       )}
 
       {lastErrors.length > 0 && !isPlaylistView && (
-        <ul className="border-b border-border bg-accent-soft px-5 py-2 text-xs text-ink">
+        <ul className="border-b-2 border-rule bg-accent-soft px-5 py-2 text-xs text-ink">
           {lastErrors.slice(0, 3).map((error) => (
             <li key={`${error.fileName}-${error.code}`}>
               {error.fileName}: {t(ERROR_KEYS[error.code])}
@@ -403,7 +409,7 @@ export function LibraryPanel() {
       ) : viewTracks.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
           <div className="max-w-sm text-center">
-            <span className="mx-auto grid size-14 place-items-center  bg-accent-soft text-accent">
+            <span className="mx-auto grid size-14 place-items-center  bg-accent-soft text-accent-ink">
               <ListMusicIcon className="size-7" />
             </span>
             <h3 className="mt-4 font-display text-lg font-semibold">
@@ -440,7 +446,7 @@ export function LibraryPanel() {
                     >
                       <button
                         aria-label={t('library.playTrack', { title: track.title })}
-                        className=" p-2 text-ink-muted transition-colors hover:text-accent"
+                        className=" p-2 text-ink-muted transition-colors hover:text-accent-ink-ink"
                         onClick={() => playTracks(viewTracks, track.id, selectedPlaylist.id)}
                         type="button"
                       >
@@ -473,7 +479,7 @@ export function LibraryPanel() {
                 >
                   <button
                     aria-label={t('library.playTrack', { title: track.title })}
-                    className=" p-2 text-ink-muted transition-colors hover:text-accent"
+                    className=" p-2 text-ink-muted transition-colors hover:text-accent-ink-ink"
                     onClick={() => playTracks(viewTracks, track.id, null)}
                     type="button"
                   >
@@ -483,7 +489,7 @@ export function LibraryPanel() {
                   {playlists.length > 0 && (
                     <select
                       aria-label={t('library.addToLabel', { title: track.title })}
-                      className="max-w-32  border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
+                      className="max-w-32  border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
                       defaultValue=""
                       onChange={(event) => {
                         const playlistId = event.target.value

@@ -47,7 +47,7 @@ export function TimerPanel({ onClose }: { onClose: () => void }) {
           <div className="mt-3 grid grid-cols-3 gap-2">
             {MINUTE_PRESETS.map((minutes) => (
               <button
-                className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                 key={minutes}
                 onClick={() => {
                   startTimerMinutes(minutes)
@@ -61,7 +61,7 @@ export function TimerPanel({ onClose }: { onClose: () => void }) {
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
             <button
-              className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+              className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
               onClick={() => {
                 startTimerEndOfTrack()
                 onClose()
@@ -71,7 +71,7 @@ export function TimerPanel({ onClose }: { onClose: () => void }) {
               {t('timer.endOfTrack')}
             </button>
             <button
-              className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+              className=" border border-border px-2 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
               onClick={() => {
                 startTimerAfterTracks(3)
                 onClose()

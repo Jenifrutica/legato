@@ -244,7 +244,7 @@ export function SearchTab() {
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}
-              className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+              className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
               disabled={track.streamUrl === null}
               onClick={() => play(track)}
               type="button"
@@ -273,7 +273,7 @@ export function SearchTab() {
             {track.downloadable && (
               <button
                 aria-label={`${t('search.save')} ${track.title}`}
-                className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent disabled:opacity-40"
+                className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent-ink disabled:opacity-40"
                 disabled={status !== 'idle'}
                 onClick={() => void download(track)}
                 type="button"

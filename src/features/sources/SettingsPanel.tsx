@@ -121,7 +121,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                 {row.id === 'spotify' && row.configured && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
-                      className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                      className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                       onClick={() => {
                         if (spotifyConnected) {
                           useSpotifyStore.getState().disconnect()
@@ -137,7 +137,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                     </button>
                     {spotifyConnected && (
                       <button
-                        className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
+                        className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                         onClick={() => void testConnection()}
                         type="button"
                       >

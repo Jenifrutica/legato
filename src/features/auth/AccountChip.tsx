@@ -8,7 +8,7 @@ export function AccountChip() {
   if (user === null) {
     return (
       <button
-        className="w-full border-2 border-bg/50 px-3 py-2 text-sm font-semibold text-bg transition-colors hover:border-accent hover:text-accent"
+        className="w-full border-2 border-bg/50 px-3 py-2 text-sm font-semibold text-bg transition-colors hover:border-accent hover:text-accent-ink"
         onClick={() => void signIn()}
         type="button"
       >
@@ -34,7 +34,7 @@ export function AccountChip() {
         </span>
       </span>
       <button
-        className="shrink-0 px-1 py-1 text-xs font-medium text-bg/60 transition-colors hover:text-accent"
+        className="shrink-0 px-1 py-1 text-xs font-medium text-bg/60 transition-colors hover:text-accent-ink"
         onClick={() => void signOut()}
         type="button"
       >
