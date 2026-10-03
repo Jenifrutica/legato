@@ -320,3 +320,38 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Footer movido al final real de la página** (después del grid, antes de la barra fija); ya no aparece a mitad de página robando espacio.
 - **Héroe más compacto** (sin min-height en móvil) y contenido xl limitado con `xl:max-w-[calc(100%_-_35rem)]` para no desbordar sobre el panel.
 - **Panel con `pb-52`** en móvil para que la barra fija + navegación no tapen resultados ni el botón de playlists; estado vacío de Playlists ahora con botón "Nueva playlist".
+
+---
+
+# ⚠️ PRIORIDAD NÚMERO 1 PARA LA NUEVA SESIÓN: REDISEÑAR TODA LA INTERFAZ
+
+> El usuario considera que **la interfaz actual está fea**. No es un ajuste: es un **rediseño completo**. Todo lo funcional se conserva; la capa visual se rehace.
+
+## Estado al cierre de la sesión 2
+
+- **Funcionalidad completa y estable**: 154 tests unitarios + 4 E2E en verde, typecheck/lint/build OK.
+- **Reproductor**: local (Web Audio con balance/karaoke/analizador) y streaming (elemento directo para Spotify/Audius/Jamendo). Spotify: PKCE + previews + SDK Premium; tema dinámico por portada (incluye Spotify).
+- **Listas dobles**: núcleo, playlists, DnD, undo/redo, modo Estructura — todo funcionando.
+- **Pendientes funcionales**: nueva funcionalidad que el usuario aún no especificó; Día 4 (deploy S3+CloudFront + rotar access key); verificación fina del SDK de Spotify; músicos (docs/MUSICOS.md); login Cognito/Google (docs/AUTH.md).
+- **Servidor de desarrollo**: `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` (Spotify exige 127.0.0.1). Tras agregar archivos: reiniciar y borrar `node_modules/.vite` (caché HMR de Vite).
+
+## Qué está feo (feedback concreto acumulado del usuario)
+
+1. **Composición general pobre**: mucho espacio desperdiciado, secciones que no dialogan, footer que aparecía a mitad de página (ya movido al final, pero la sensación general sigue).
+2. **Vinilo**: el recorte a media circunferencia en móvil se veía mal (se volvió a disco completo); el sangrado/posición y el tamaño no convencen; el giro y el brazo son básicos.
+3. **Ondas**: recortes, se salían de la sección o quedaban tapadas; color y ritmo aún no sorprenden. Deben rodear el disco, usar la paleta del álbum y sentirse musicales.
+4. **Barras duplicadas y superposiciones** en responsive (se iteró mucho: una barra por vista, panel con `z-20`, `pb-52`, contenido xl acotado — pero la sensación sigue siendo frágil).
+5. **Slider de volumen**: posición y aspecto poco intuitivos.
+6. **Botones**: poco claros/jerarquía débil (se agrandó el play, tooltips, hover — insuficiente).
+7. **Tema por portada**: funciona pero es sutil; el usuario quiere un cambio **mucho más notorio** con detalles (halo, superficies, tipografía, texturas).
+8. **Paleta violeta/teal actual**: no convence; el usuario sugirió antes "otra paleta" y aceptó modo oscuro opcional.
+9. **Playlists** deben sentirse como la funcionalidad estrella (listas dobles): agregar desde búsqueda, crear, drag & drop, visualización de la estructura.
+
+## Cómo atacarlo en la nueva sesión (recomendado)
+
+1. **Usar impeccable como manda su flujo** (no solo el detector): `impeccable context` → leer `reference/new-work.md` → **ronda de dirección con el usuario** (el usuario elige entre 2-3 direcciones con composición, no solo color) → escribir el *direction contract* en el surface brief → construir → `impeccable detect` → revisión final con capturas (Playwright ya está instalado).
+2. Apoyarse en las skills instaladas: `high-end-visual-design`, `design-taste-frontend`, `emil-design-eng`, `animate`, `review-animations`, `minimalist-ui`, `apple-design`, `break-ui`.
+3. **Preguntar antes de construir**: mostrar 2-3 direcciones visuales concretas (con paleta, tipografía, composición del héroe, estilo del vinilo/ondas) y que el usuario elija. No volver a iterar a ciegas.
+4. **Checklist de pantallas a rediseñar**: héroe (vinilo + título + controles), barra superior, barra inferior/móvil, panel derecho (Biblioteca/Buscar/Playlists/Cola/Audio), páginas legales, paneles de Ajustes/Accesibilidad, estado vacío, responsive 390/768/1024/1280/1440.
+5. Mantener: tokens en CSS variables, contraste AA, i18n ES/EN/PT, a11y (axe sin violaciones), una sola barra por vista, sin superposiciones, rendimiento (canvas a 30fps, sin blur costoso).
+6. **No romper los tests**: 154 unit + 4 E2E deben seguir en verde; los E2E usan selectores por `aria-label` (Reproducir/Pausar/Siguiente, Reordenar X, Agregar X a una playlist, pestañas, etc.). Si se renombran controles, actualizar `tests/e2e`.

@@ -68,3 +68,7 @@ Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a cone
 ## Nota de desarrollo
 
 Si tras agregar archivos nuevos la interfaz queda en blanco con un error de módulo en consola, es caché de Vite: reiniciar el servidor (`Ctrl+C`, `bun run dev`) o borrar `node_modules/.vite`. No afecta al build de producción.
+
+## ⚠️ Pendiente #1: REDISEÑO COMPLETO DE LA INTERFAZ
+
+El usuario considera la interfaz actual **fea**. Todo lo funcional está estable (154 unit + 4 E2E); la capa visual debe rehacerse: composición del héroe, vinilo, ondas, paleta (la violeta/teal no convence), jerarquía de botones, barras y responsive. Ver el detalle y el plan recomendado al final de `docs/CONTEXTO-COMPLETO.md`. Usar el flujo de dirección de **impeccable** (elegir dirección con el usuario ANTES de construir) y las skills de diseño instaladas.
