@@ -387,5 +387,6 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **F0–F10 cerradas**: tokens Duotono, shell/barra, héroe con media luna, vinilo con portada completa, ondas de líneas, panel + partitura slide-over, barras móvil, playlists estrella, letras diseñadas (bandera `legato.lyrics.demo`), responsive 390/768/1024/1280/1440, oscuro conmutable, vacíos y accesibilidad.
 - **Verificación final:** 154 unit + 4 E2E en verde, typecheck/lint/build OK, **axe 0 violaciones** (claro/oscuro/390/legales) y `impeccable detect` en `[]`.
 - **Documentación de diseño:** `DESIGN.md` en la raíz (spec con frontmatter de tokens) y `.impeccable/design.json`.
-- **Pendiente inmediato:** F11 Cápsula nostálgica (nueva funcionalidad) y F12 conexión de letras (LRCLIB + etiquetas/.lrc). Día 4 (deploy + rotar key) sigue en pausa hasta pedido explícito.
-- Commits de la sesión: `032a310` (tema), `40ca44b` (UI), `acc2e8e` (detector) y el cierre F6/F9/F10.
+- **Pendiente inmediato:** F12 conexión de letras (LRCLIB + etiquetas/.lrc). Día 4 (deploy + rotar key) sigue en pausa hasta pedido explícito.
+- **F11 Cápsula nostálgica cerrada** (issue #49): carrusel diario tipo historias en el héroe; DTOs, registro local de escuchas, generador determinista, visor con 15 s por tarjeta, fragmento desde ~30 s, mantener para pausar, teclado, «Escuchar completa» y «Guardar en Favoritos» (playlist automática). 161 unit + 4 E2E, axe 0 y detector 0.
+- Commits de la sesión: `032a310` (tema), `40ca44b` (UI), `acc2e8e` (detector), `b1f8960` (cierre del rediseño + DESIGN.md) y el cierre de la cápsula.

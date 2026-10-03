@@ -8,6 +8,7 @@ import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
 import { VinylVisual } from './VinylVisual'
 import { Lyrics, useDemoLyrics } from './Lyrics'
+import { NostalgiaCapsule } from './NostalgiaCapsule'
 import {
   FlagIcon,
   PauseIcon,
@@ -19,8 +20,6 @@ import {
   TimerIcon,
   VolumeIcon,
 } from './icons'
-
-const CAPSULE_TILES = ['var(--color-accent)', 'var(--color-ink)', 'var(--color-accent-soft)']
 
 export function Hero() {
   const { t } = useTranslation()
@@ -105,14 +104,8 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden px-5 pb-16 pt-0 lg:px-10 lg:pb-20">
-      <div aria-hidden="true" className="absolute right-4 top-3 z-10 hidden gap-2 sm:flex">
-        {CAPSULE_TILES.map((fill, index) => (
-          <span
-            className="size-11 border-2 border-rule shadow-[3px_3px_0_var(--color-rule)]"
-            key={index}
-            style={{ background: fill }}
-          />
-        ))}
+      <div className="absolute top-3 right-4 z-10 hidden sm:block">
+        <NostalgiaCapsule />
       </div>
 
       <div className="relative mx-auto w-full max-w-[110rem]">
@@ -200,7 +193,7 @@ export function Hero() {
                 <span className="relative grid place-items-center">
                   <RepeatIcon className="size-4" />
                   {loopMode === 'one' && (
-                    <span className="absolute -right-1.5 -bottom-1.5 border border-rule bg-accent px-1 font-mono text-[0.5rem] leading-3 font-bold text-on-accent">
+                    <span className="absolute -right-1.5 -bottom-1.5 border border-rule bg-accent px-1 font-mono text-[0.6875rem] leading-3 font-bold text-on-accent">
                       1
                     </span>
                   )}

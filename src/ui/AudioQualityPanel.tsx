@@ -62,7 +62,9 @@ export function AudioQualityPanel() {
       <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {quality.map((item) => (
           <div className=" border border-border bg-bg px-3 py-2" key={item.label}>
-            <dt className="text-[0.625rem] uppercase tracking-wide text-ink-muted">{item.label}</dt>
+            <dt className="text-[0.6875rem] uppercase tracking-wide text-ink-muted">
+              {item.label}
+            </dt>
             <dd className="font-mono text-sm text-ink">{item.value}</dd>
           </div>
         ))}

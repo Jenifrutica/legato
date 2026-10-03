@@ -97,7 +97,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
 
       {playlists.length === 0 ? (
         <div className="flex flex-col items-start gap-3 border-2 border-rule bg-surface p-4 shadow-[3px_3px_0_var(--color-rule)]">
-          <p className="font-mono text-[0.625rem] tracking-[0.16em] text-accent-ink uppercase">
+          <p className="font-mono text-[0.6875rem] tracking-[0.16em] text-accent-ink uppercase">
             {t('nav.playlists')}
           </p>
           <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
@@ -171,7 +171,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                   </form>
                 ) : (
                   <div className="flex min-w-0 flex-1 items-center gap-1">
-                    <span className="w-6 shrink-0 font-mono text-[0.75rem] text-accent-ink">
+                    <span className="w-6 shrink-0 font-mono text-[0.6875rem] text-accent-ink">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <button
@@ -238,7 +238,7 @@ function QueueTab() {
   if (queue.length === 0) {
     return (
       <div className="m-4 border-2 border-rule bg-surface p-4 shadow-[3px_3px_0_var(--color-rule)]">
-        <p className="font-mono text-[0.625rem] tracking-[0.16em] text-accent-ink uppercase">
+        <p className="font-mono text-[0.6875rem] tracking-[0.16em] text-accent-ink uppercase">
           {t('tabs.queue')}
         </p>
         <p className="mt-2 text-sm text-ink-muted">{t('queue.empty')}</p>
@@ -280,7 +280,7 @@ function QueueTab() {
               className={`h-3 shrink-0 border-2 border-rule ${active ? 'bg-accent' : 'bg-surface-2'}`}
               style={{ width: barWidth }}
             />
-            <span className="shrink-0 font-mono text-[0.625rem] text-ink-muted">
+            <span className="shrink-0 font-mono text-[0.6875rem] text-ink-muted">
               {formatDuration(seconds)}
             </span>
           </li>

@@ -207,7 +207,7 @@ export function SearchTab() {
               }
             }}
           >
-            <span className="grid size-10 shrink-0 place-items-center overflow-hidden  bg-surface-2 text-[0.625rem] font-semibold uppercase text-ink-muted">
+            <span className="grid size-10 shrink-0 place-items-center overflow-hidden  bg-surface-2 text-[0.6875rem] font-semibold uppercase text-ink-muted">
               {track.artworkUrl === null ? (
                 track.sourceId.slice(0, 2)
               ) : (
@@ -225,7 +225,7 @@ export function SearchTab() {
             {track.downloadable && playlists.length >= 0 && (
               <select
                 aria-label={t('search.addToPlaylist')}
-                className="max-w-24  border border-border bg-bg px-1.5 py-1 text-[0.625rem] text-ink-muted focus:border-accent focus:outline-none"
+                className="max-w-24  border border-border bg-bg px-1.5 py-1 text-[0.6875rem] text-ink-muted focus:border-accent focus:outline-none"
                 defaultValue=""
                 onChange={(event) => {
                   void addToPlaylist(track, event.target.value)

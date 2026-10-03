@@ -159,7 +159,7 @@ export function PlayerBar() {
             <span className="relative grid place-items-center">
               <RepeatIcon className="size-4" />
               {loopMode === 'one' && (
-                <span className="absolute -bottom-1 -right-1  bg-primary-strong px-1 text-[0.5rem] font-bold leading-3 text-on-primary">
+                <span className="absolute -bottom-1 -right-1  bg-primary-strong px-1 text-[0.6875rem] font-bold leading-3 text-on-primary">
                   1
                 </span>
               )}
@@ -172,7 +172,7 @@ export function PlayerBar() {
       </div>
 
       <div className="flex items-center gap-2 px-3 pb-2">
-        <span className="w-9 text-right text-[0.625rem] tabular-nums text-ink-muted">
+        <span className="w-9 text-right text-[0.6875rem] tabular-nums text-ink-muted">
           {formatDuration(progressTime)}
         </span>
         <input
@@ -193,7 +193,7 @@ export function PlayerBar() {
           type="range"
           value={Math.min(progressTime, maxProgress)}
         />
-        <span className="w-9 text-[0.625rem] tabular-nums text-ink-muted">
+        <span className="w-9 text-[0.6875rem] tabular-nums text-ink-muted">
           {formatDuration(progressDuration)}
         </span>
       </div>

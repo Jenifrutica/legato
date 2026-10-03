@@ -105,7 +105,7 @@ export function MusiciansPanel() {
     <>
       <button
         aria-expanded={open}
-        className="fixed right-0 z-40 hidden cursor-grab border-2 border-r-0 border-rule bg-surface px-1.5 py-4 font-mono text-[0.625rem] tracking-[0.24em] text-ink uppercase shadow-[-3px_3px_0_var(--color-rule)] select-none active:cursor-grabbing lg:right-[25rem] lg:block xl:right-[27rem]"
+        className="fixed right-0 z-40 hidden cursor-grab border-2 border-r-0 border-rule bg-surface px-1.5 py-4 font-mono text-[0.6875rem] tracking-[0.24em] text-ink uppercase shadow-[-3px_3px_0_var(--color-rule)] select-none active:cursor-grabbing lg:right-[25rem] lg:block xl:right-[27rem]"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -136,7 +136,7 @@ export function MusiciansPanel() {
                 <h2 className="font-display text-lg font-black tracking-[0.06em] uppercase">
                   {t('playlists.structure')}
                 </h2>
-                <p className="font-mono text-[0.625rem] tracking-[0.16em] text-ink-muted uppercase">
+                <p className="font-mono text-[0.6875rem] tracking-[0.16em] text-ink-muted uppercase">
                   {queueStructure.length} nodos · doble enlace
                 </p>
               </div>

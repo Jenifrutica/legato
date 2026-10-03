@@ -72,7 +72,7 @@ export function StructureView({
                 tabIndex={0}
               >
                 <span
-                  className={`block font-mono text-[0.625rem] tracking-[0.14em] uppercase ${
+                  className={`block font-mono text-[0.6875rem] tracking-[0.14em] uppercase ${
                     active ? 'text-on-accent/80' : 'text-ink-muted'
                   }`}
                 >
@@ -81,7 +81,7 @@ export function StructureView({
                 </span>
                 <span className="mt-0.5 block truncate text-sm font-semibold">{node.title}</span>
                 <span
-                  className={`mt-1 flex flex-col font-mono text-[0.625rem] ${
+                  className={`mt-1 flex flex-col font-mono text-[0.6875rem] ${
                     active ? 'text-on-accent/80' : 'text-ink-muted'
                   }`}
                 >

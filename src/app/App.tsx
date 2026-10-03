@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthContextProvider } from '../features/auth'
+import { usePlayTracker } from '../features/capsule'
 import { useHistoryStore } from '../features/history'
 import { CookieConsent, LegalPage } from '../features/legal'
 import { SpotifyBanner } from '../features/sources'
@@ -23,6 +24,7 @@ export default function App() {
 function AppShell() {
   const { t } = useTranslation()
   useAlbumTheme()
+  usePlayTracker()
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
