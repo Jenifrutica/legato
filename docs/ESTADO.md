@@ -65,6 +65,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 68 | **Detección de golpes sensible**: sin umbral fijo sobre el promedio (cualquier subida del bajo cuenta), ganancia ×5 con envolvente rápida (decaimiento 0.82), analizador más reactivo (smoothing 0.68) y **el golpe multiplica toda la línea** (hasta ×2.6), la opacidad y un **pop radial** de la ronda | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 | 69 | **Ondas en el estado correcto**: reposo dibuja un anillo quieto (0% de variación), al sonar late (42–52% medido) y al pausar vuelve exactamente al reposo; el modo sintético (Spotify) solo se usa **mientras suena y sin señal real** | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
 | 70 | **Import de playlists de Spotify arreglado**: Spotify renombró `track`/`tracks` a `item`/`items`; se leen ambas formas, se cae de `/tracks` a `/items` en 400/404 y el mapeo es defensivo (álbum, artistas, URL externa) | Cerrada: 190 unit (3 tests nuevos del parser) |
+| 71 | **Ondas sincronizadas al golpe**: detector por **flujo espectral** de la banda del bombo con umbral adaptativo y periodo refractario (180 ms), envolvente de vida media 130 ms medida en milisegundos y el golpe dominando largo/opacidad/pop. Medido con bombo a 500 ms: picos cada 497 ms y 57% de variación | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

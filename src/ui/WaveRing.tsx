@@ -66,8 +66,12 @@ export function WaveRing({
     let last = 0
     let inkTick = 0
     let inks = readInks()
-    let bassAverage = 0
-    let energy = 0
+    let prevBass = 0
+    let fluxAverage = 0.02
+    let beatEnergy = 0
+    let lastBeatAt = -1000
+    let lastDrawAt = 0
+    const segmentSmooth: number[] = []
 
     const reduced =
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
@@ -104,31 +108,41 @@ export function WaveRing({
       let bass = 0
       let beat = 0
       let pulse = 1
+      const dtMs = lastDrawAt === 0 ? 33 : Math.min(200, Math.max(8, time - lastDrawAt))
+      lastDrawAt = time
 
       if (active && hasSignal) {
-        const bassBins = Math.max(1, Math.floor(levels.length * 0.06))
+        // Banda del bombo (primeros bins, ~0–500 Hz según muestreo).
+        const bassBins = Math.max(1, Math.min(3, levels.length))
         for (let index = 0; index < bassBins; index++) {
           bass += levels[index] ?? 0
         }
         bass = bass / (bassBins * 255)
 
-        // Promedio móvil del bajo + detección de golpes sensible: la onda late con la música.
-        bassAverage = bassAverage * 0.96 + bass * 0.04
-        const deviation = bass > 0.03 ? Math.max(0, bass - bassAverage) : 0
-        const onset = Math.min(1, deviation * 5)
-        energy = Math.max(energy * 0.82, onset)
-        beat = Math.min(1, energy * 2.6)
-        pulse = Math.min(2.6, 1 + bass * 0.5 + energy * 3.5)
+        // Flujo espectral de la banda del bombo: detecta el ataque de cada golpe.
+        const flux = Math.max(0, bass - prevBass)
+        prevBass = bass
+        fluxAverage = fluxAverage * 0.9 + flux * 0.1
+        if (flux > 0.05 && flux > fluxAverage * 1.6 && time - lastBeatAt > 180) {
+          beatEnergy = 1
+          lastBeatAt = time
+        }
+
+        // Envolvente con vida media ~130 ms, medida en milisegundos.
+        beatEnergy *= Math.pow(0.5, dtMs / 130)
+        beat = beatEnergy
+        pulse = 1 + beatEnergy * 2.4
       } else if (active) {
         // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
-        const phase = (seconds * 2) % 1
-        const kick = Math.pow(1 - phase, 7)
-        energy = Math.max(energy * 0.82, kick)
+        const phase = ((time / 1000) * 2) % 1
+        const kick = Math.pow(1 - phase, 8)
+        beatEnergy = kick
         beat = kick
-        pulse = Math.min(2.6, 1 + kick * 2.2)
+        pulse = 1 + kick * 2.2
       } else {
         // En reposo: líneas cortas y quietas (sin movimiento por tiempo).
-        energy *= 0.9
+        prevBass = 0
+        beatEnergy *= 0.9
         bass = 0
         beat = 0
         pulse = 1
@@ -157,9 +171,11 @@ export function WaveRing({
             : active
               ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
               : 0.24 + 0.08 * Math.sin(index * 0.7)
-        const intensity = Math.max(0.1, Math.min(1, Math.sqrt(raw)))
+        const smoothed = (segmentSmooth[index] ?? 0) * 0.6 + raw * 0.4
+        segmentSmooth[index] = smoothed
+        const intensity = Math.max(0.1, Math.min(1, Math.sqrt(smoothed)))
         const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.7
-        const wavePart = active ? 0.18 : 0.06
+        const wavePart = active ? 0.05 : 0.02
         const length = (8 + intensity * size * wavePart) * pulse * downScale
         const radius = base + beat * size * 0.035
         const x0 = center + Math.cos(angle) * radius
@@ -181,7 +197,7 @@ export function WaveRing({
       const paint = (color: (segment: Segment) => string, curveColor: string) => {
         context.lineCap = 'butt'
         for (const segment of drawn) {
-          context.globalAlpha = 0.2 + segment.intensity * 0.35 + beat * 0.45
+          context.globalAlpha = 0.2 + segment.intensity * 0.2 + beat * 0.6
           context.strokeStyle = color(segment)
           context.lineWidth = segment.width
           context.beginPath()
