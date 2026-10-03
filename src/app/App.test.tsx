@@ -27,7 +27,7 @@ describe('App', () => {
 
     expect(screen.getByRole('tab', { name: 'Biblioteca' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Playlists' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Cola' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Lista' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Audio' })).toBeInTheDocument()
   })
 })

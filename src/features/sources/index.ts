@@ -8,7 +8,6 @@ export {
   handleSpotifyRedirect,
   isSpotifyConfigured,
   isSpotifyConnected,
-  queueSpotifyTrack,
   searchSpotify,
 } from './spotify'
 export { SettingsPanel } from './SettingsPanel'

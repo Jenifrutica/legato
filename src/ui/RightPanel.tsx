@@ -382,7 +382,7 @@ function QueueTab() {
     <div>
       <div className="flex items-center justify-between border-b border-border px-4 py-2">
         <span className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
-          {t('queue.count', { count: queue.length })}
+          {t('queue.count', { count: queue.length })} · {t('queue.structure')}
         </span>
         <button
           className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase transition-colors hover:text-danger"

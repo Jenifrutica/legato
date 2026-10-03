@@ -204,29 +204,6 @@ export async function getSpotifyProfile(): Promise<{ name: string } | null> {
   return { name: data.display_name ?? 'Spotify' }
 }
 
-/** Encola una pista en el reproductor de Spotify (requiere Premium y dispositivo). */
-export async function queueSpotifyTrack(
-  uri: string,
-  deviceId?: string | null,
-): Promise<{ ok: boolean; status: number }> {
-  const token = await getAccessToken()
-  if (token === null) {
-    return { ok: false, status: 401 }
-  }
-
-  const params = new URLSearchParams({ uri })
-  if (typeof deviceId === 'string' && deviceId !== '') {
-    params.set('device_id', deviceId)
-  }
-
-  const response = await fetch(`${API}/me/player/queue?${params.toString()}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-
-  return { ok: response.ok, status: response.status }
-}
-
 async function describeError(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { error?: { message?: string } }

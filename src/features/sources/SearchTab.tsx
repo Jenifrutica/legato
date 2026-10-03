@@ -11,7 +11,7 @@ import { useProvidersStore } from './providers-store'
 import { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 import { searchAll } from './search'
 import type { SourceSearchError } from './search'
-import { isSpotifyConnected, queueSpotifyTrack } from './spotify'
+import { isSpotifyConnected } from './spotify'
 import { useSpotifyStore } from './spotify-store'
 import type { SourceId, SourceTrack } from './types'
 
@@ -92,39 +92,6 @@ export function SearchTab() {
   }
 
   async function addToQueue(track: SourceTrack) {
-    if (track.sourceId === 'spotify') {
-      if (!isSpotifyConnected()) {
-        setMessage(t('search.spotifyHint'))
-        return
-      }
-
-      const uri = `spotify:track:${track.id}`
-      let deviceId = useSpotifyStore.getState().deviceId
-      let result = await queueSpotifyTrack(uri, deviceId)
-
-      // Sin dispositivo activo: inicializa el reproductor del SDK y reintenta.
-      if (!result.ok && deviceId === null && result.status !== 401) {
-        const connected = await useSpotifyStore.getState().connect()
-        if (connected) {
-          deviceId = useSpotifyStore.getState().deviceId
-          result = await queueSpotifyTrack(uri, deviceId)
-        }
-      }
-
-      if (result.ok) {
-        setMessage(t('search.queuedSpotify'))
-      } else if (result.status === 403) {
-        setMessage(t('search.queuePremium'))
-      } else if (result.status === 401) {
-        setMessage(t('search.spotifyHint'))
-      } else if (result.status === 404) {
-        setMessage(t('search.queueNoDevice'))
-      } else {
-        setMessage(t('search.queueError', { error: `HTTP ${result.status}` }))
-      }
-      return
-    }
-
     if (!track.downloadable) {
       return
     }
@@ -287,15 +254,17 @@ export function SearchTab() {
               />
             )}
 
-            <button
-              aria-label={t('queue.addToEndLabel', { title: track.title })}
-              className="grid size-8 shrink-0 place-items-center text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
-              disabled={status !== 'idle'}
-              onClick={() => void addToQueue(track)}
-              type="button"
-            >
-              <ListMusicIcon className="size-4" />
-            </button>
+            {track.downloadable && (
+              <button
+                aria-label={t('queue.addToEndLabel', { title: track.title })}
+                className="grid size-8 shrink-0 place-items-center text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={status !== 'idle'}
+                onClick={() => void addToQueue(track)}
+                type="button"
+              >
+                <ListMusicIcon className="size-4" />
+              </button>
+            )}
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}

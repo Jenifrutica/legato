@@ -22,24 +22,24 @@ test('cola: añadir al final, reproducir siguiente, quitar y reordenar sin cambi
 
   // B al final y C como siguiente → [A, C, B]
   await page.getByRole('tab', { name: 'Biblioteca' }).click()
-  await page.getByRole('button', { name: 'Opciones de cola para B' }).click()
+  await page.getByRole('button', { name: 'Opciones de lista para B' }).click()
   await page.getByRole('menuitem', { name: 'Añadir al final' }).click()
-  await page.getByRole('button', { name: 'Opciones de cola para C' }).click()
+  await page.getByRole('button', { name: 'Opciones de lista para C' }).click()
   await page.getByRole('menuitem', { name: 'Reproducir siguiente' }).click()
 
-  await page.getByRole('tab', { name: 'Cola' }).click()
-  const rows = page.getByRole('list', { name: 'Cola' }).getByRole('listitem')
+  await page.getByRole('tab', { name: 'Lista' }).click()
+  const rows = page.getByRole('list', { name: 'Lista' }).getByRole('listitem')
 
   await expect(rows).toHaveCount(3)
   await expect(rows.nth(0)).toContainText('A')
   await expect(rows.nth(1)).toContainText('C')
   await expect(rows.nth(2)).toContainText('B')
 
-  await page.getByRole('button', { name: 'Quitar C de la cola' }).click()
+  await page.getByRole('button', { name: 'Quitar C de la lista' }).click()
   await expect(rows).toHaveCount(2)
   await expect(rows.nth(1)).toContainText('B')
 
-  await dragHandle(page, 'Reordenar en la cola B', 'Reordenar en la cola A')
+  await dragHandle(page, 'Reordenar en la lista B', 'Reordenar en la lista A')
   await expect(rows.nth(0)).toContainText('B')
   await expect(rows.nth(1)).toContainText('A')
 

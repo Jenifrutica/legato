@@ -56,6 +56,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 59 | **Ajustes de feedback**: íconos de anterior/siguiente corregidos (estaban espejados), ondas de líneas más grandes y rítmicas (tinta + agujas de acento), mini reproductor por encima de cualquier pantalla (widget, z-60), botón «＋» de playlists con lista desplegable en filas de biblioteca y resultados descargables | Cerrada: 183 unit + 6 E2E, axe 0, detector 0 |
 | 60 | **Cola desde búsqueda y mini flotante real (F21)**: botón de cola en cada resultado (guardar+`enqueue` en la DLL para Audius/Jamendo; cola de Spotify vía API si hay sesión), `PlaylistPicker` también en las filas de la cola, y **Picture-in-Picture de documento** para el mini reproductor (ventana siempre encima, fuera del navegador) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0, PiP verificado en Chromium |
 | 61 | **Cola de Spotify arreglada**: la API exige dispositivo; ahora se envía el `device_id` del SDK, y si no existe se inicializa el reproductor y se reintenta; mensajes específicos (Premium, sesión, sin dispositivo) | Cerrada: 183 unit + 6 E2E + build |
+| 62 | **La cola es «Lista» (DLL local)**: Spotify solo reproduce la canción (sin cola de Spotify); la pestaña se renombra a Lista con leyenda «doble enlace», y solo se alimenta de tus estructuras (biblioteca guardada, Audius/Jamendo, arrastres) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 
