@@ -20,7 +20,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 12 | UI vinilo + ondas + mini player | Cerrado |
 | 13 | Modo estructura (visualizador DLL) | Cerrado |
 | 14 | i18n ES/EN/PT | Cerrado |
-| 15 | IndexedDB + sesión persistente | En curso |
+| 15 | IndexedDB + sesión persistente | Cerrado |
 | 16 | Timer + shuffle/bucles + scroll | Pendiente |
 | 17 | Accesibilidad WCAG 2.2 AA | Pendiente |
 | 18 | Páginas legales + cookies | Pendiente |
@@ -28,6 +28,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 22 | E2E smoke + regresión #12 | Pendiente |
 | 23–27 | Día 4: pulido, responsive, deploy S3+CloudFront, docs, rotar key | Pendiente |
 | 28–33 | Post-entrega | Pendiente |
+| 34 | Calidad de audio premium + balance/aislamiento L-R | Cerrado |
 
 ## Estado técnico
 

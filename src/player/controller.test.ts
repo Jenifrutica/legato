@@ -139,6 +139,63 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().rate).toBe(1)
   })
 
+  it('balance y aislamiento de canales en el snapshot', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a')])
+
+    controller.setBalance(-0.5)
+    controller.setChannelMode('left')
+
+    const snapshot = controller.getSnapshot()
+    expect(snapshot.balance).toBe(-0.5)
+    expect(snapshot.channelMode).toBe('left')
+  })
+
+  it('restoreSession recupera posicion, balance y canal', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+
+    controller.restoreSession([track('a'), track('b')], {
+      trackIds: ['a', 'b'],
+      currentId: 'b',
+      currentTime: 30,
+      loopMode: 'all',
+      shuffle: false,
+      volume: 0.4,
+      rate: 0.75,
+      balance: 0.5,
+      channelMode: 'right',
+    })
+
+    const snapshot = controller.getSnapshot()
+    expect(snapshot.currentTrack?.id).toBe('b')
+    expect(snapshot.currentTime).toBe(30)
+    expect(snapshot.volume).toBe(0.4)
+    expect(snapshot.rate).toBe(0.75)
+    expect(snapshot.balance).toBe(0.5)
+    expect(snapshot.channelMode).toBe('right')
+  })
+
+  it('restoreSession sin balance usa valores por defecto', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+
+    controller.restoreSession([track('a')], {
+      trackIds: ['a'],
+      currentId: 'a',
+      currentTime: 0,
+      loopMode: 'none',
+      shuffle: false,
+      volume: 1,
+      rate: 1,
+    })
+
+    const snapshot = controller.getSnapshot()
+    expect(snapshot.balance).toBe(0)
+    expect(snapshot.channelMode).toBe('stereo')
+  })
+
   it('playTracks sin canciones deja el reproductor quieto', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

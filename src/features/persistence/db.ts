@@ -2,7 +2,7 @@ import Dexie from 'dexie'
 import type { Table } from 'dexie'
 import type { LibraryTrack } from '../library'
 import type { PlaylistRestoreRecord } from '../playlists'
-import type { LoopMode } from '../../player'
+import type { ChannelMode, LoopMode } from '../../player'
 
 export type SongRecord = Omit<LibraryTrack, 'sourceUrl' | 'artworkUrl' | 'artworkBlob' | 'blob'> & {
   blob: Blob
@@ -20,6 +20,8 @@ export type SessionRecord = {
   shuffle: boolean
   volume: number
   rate: number
+  balance?: number
+  channelMode?: ChannelMode
 }
 
 class LegatoDatabase extends Dexie {

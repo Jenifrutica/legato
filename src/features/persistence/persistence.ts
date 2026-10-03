@@ -123,6 +123,8 @@ export async function saveCurrentSession(): Promise<void> {
     shuffle: snapshot.shuffle,
     volume: snapshot.volume,
     rate: snapshot.rate,
+    balance: snapshot.balance,
+    channelMode: snapshot.channelMode,
   }
 
   await db.session.put(record)

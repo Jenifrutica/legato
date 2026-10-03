@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getAnalyser, usePlayerStore } from '../player'
+import { AudioQualityPanel } from './AudioQualityPanel'
 import { DiscMark } from './icons'
 import { WaveRing } from './WaveRing'
 
@@ -8,6 +10,7 @@ export function VinylStage() {
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
   const toggle = usePlayerStore((state) => state.toggle)
+  const [showAudio, setShowAudio] = useState(false)
   const isPlaying = status === 'playing'
 
   return (
@@ -80,6 +83,23 @@ export function VinylStage() {
           {currentTrack?.artist ?? t('vinyl.idleHint')}
         </p>
       </div>
+
+      <div className="mt-4 flex justify-center">
+        <button
+          aria-expanded={showAudio}
+          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+            showAudio
+              ? 'border-primary bg-primary-soft text-primary-strong'
+              : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+          }`}
+          onClick={() => setShowAudio((value) => !value)}
+          type="button"
+        >
+          {t('audio.toggle')}
+        </button>
+      </div>
+
+      {showAudio && <AudioQualityPanel />}
     </section>
   )
 }

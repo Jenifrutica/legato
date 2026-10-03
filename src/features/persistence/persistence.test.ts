@@ -91,6 +91,8 @@ describe('persistence database', () => {
       shuffle: true,
       volume: 0.5,
       rate: 0.9,
+      balance: -0.3,
+      channelMode: 'left',
     })
 
     const playlist = await db.playlists.get('p1')
@@ -100,5 +102,7 @@ describe('persistence database', () => {
     expect(session?.currentTime).toBe(12)
     expect(session?.loopMode).toBe('all')
     expect(session?.shuffle).toBe(true)
+    expect(session?.balance).toBe(-0.3)
+    expect(session?.channelMode).toBe('left')
   })
 })

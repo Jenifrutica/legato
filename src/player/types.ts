@@ -1,5 +1,7 @@
 export type LoopMode = 'none' | 'one' | 'all'
 
+export type ChannelMode = 'stereo' | 'left' | 'right' | 'mono'
+
 export type QueueTrack = {
   id: string
   title: string

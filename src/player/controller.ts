@@ -1,7 +1,7 @@
 import type { AudioLike, EngineStatus } from './engine'
 import { PlayerEngine } from './engine'
 import { PlaybackQueue } from './queue'
-import type { LoopMode, QueueTrack, StructureNode } from './types'
+import type { ChannelMode, LoopMode, QueueTrack, StructureNode } from './types'
 
 export type PlayerSnapshot = {
   currentTrack: QueueTrack | null
@@ -10,6 +10,8 @@ export type PlayerSnapshot = {
   duration: number
   volume: number
   rate: number
+  balance: number
+  channelMode: ChannelMode
   loopMode: LoopMode
   shuffle: boolean
   queue: QueueTrack[]
@@ -25,6 +27,8 @@ export type RestoreState = {
   shuffle: boolean
   volume: number
   rate: number
+  balance?: number
+  channelMode?: ChannelMode
 }
 
 export class PlayerController {
@@ -33,6 +37,8 @@ export class PlayerController {
   #listeners = new Set<(snapshot: PlayerSnapshot) => void>()
   #volume = 1
   #rate = 1
+  #balance = 0
+  #channelMode: ChannelMode = 'stereo'
   #sourcePlaylistId: string | null = null
 
   constructor(audio?: AudioLike) {
@@ -121,6 +127,16 @@ export class PlayerController {
     this.#notify()
   }
 
+  setBalance(value: number): void {
+    this.#balance = Math.min(1, Math.max(-1, value))
+    this.#notify()
+  }
+
+  setChannelMode(mode: ChannelMode): void {
+    this.#channelMode = mode
+    this.#notify()
+  }
+
   cycleRate(): void {
     const presets = [1, 0.9, 0.75, 0.5]
     const index = presets.indexOf(this.#rate)
@@ -159,6 +175,8 @@ export class PlayerController {
 
     this.#volume = Math.min(1, Math.max(0, state.volume))
     this.#rate = state.rate
+    this.#balance = Math.min(1, Math.max(-1, state.balance ?? 0))
+    this.#channelMode = state.channelMode ?? 'stereo'
 
     const current = this.#queue.currentTrack
     if (current !== null) {
@@ -179,6 +197,8 @@ export class PlayerController {
       duration: this.#engine.duration,
       volume: this.#volume,
       rate: this.#rate,
+      balance: this.#balance,
+      channelMode: this.#channelMode,
       loopMode: this.#queue.loopMode,
       shuffle: this.#queue.shuffle,
       queue: this.#queue.tracks,

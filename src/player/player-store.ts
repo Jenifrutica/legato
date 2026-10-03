@@ -1,18 +1,18 @@
 import { create } from 'zustand'
 import { useLibraryStore } from '../features/library'
-import { WebAudioAnalyser } from './analyser'
+import { AudioGraph } from './audio-graph'
 import { PlayerController } from './controller'
 import type { PlayerSnapshot, RestoreState } from './controller'
-import type { QueueTrack } from './types'
+import type { ChannelMode, QueueTrack } from './types'
 
 const audio = new Audio()
 audio.preload = 'metadata'
 
 const controller = new PlayerController(audio)
-const analyser = new WebAudioAnalyser(audio)
+const graph = new AudioGraph(audio)
 
-export function getAnalyser(): WebAudioAnalyser {
-  return analyser
+export function getAnalyser(): AudioGraph {
+  return graph
 }
 
 type PlayerState = PlayerSnapshot & {
@@ -27,6 +27,8 @@ type PlayerState = PlayerSnapshot & {
   cycleLoopMode: () => void
   reorder: (trackId: string, targetIndex: number, playlistId: string) => void
   restoreSession: (record: RestoreState) => void
+  setBalance: (value: number) => void
+  setChannelMode: (mode: ChannelMode) => void
 }
 
 export const usePlayerStore = create<PlayerState>(() => ({
@@ -34,10 +36,10 @@ export const usePlayerStore = create<PlayerState>(() => ({
 
   playTracks: (tracks, startId, sourcePlaylistId = null) => {
     controller.playTracks(tracks, startId, sourcePlaylistId)
-    void analyser.resume()
+    void graph.resume()
   },
   toggle: () => {
-    void analyser.resume()
+    void graph.resume()
     void controller.toggle()
   },
   next: () => controller.next(),
@@ -52,6 +54,17 @@ export const usePlayerStore = create<PlayerState>(() => ({
   restoreSession: (record) => {
     const tracks = useLibraryStore.getState().tracks
     controller.restoreSession(tracks, record)
+    const snapshot = controller.getSnapshot()
+    graph.setBalance(snapshot.balance)
+    graph.setChannelMode(snapshot.channelMode)
+  },
+  setBalance: (value) => {
+    controller.setBalance(value)
+    graph.setBalance(value)
+  },
+  setChannelMode: (mode) => {
+    controller.setChannelMode(mode)
+    graph.setChannelMode(mode)
   },
 }))
 
