@@ -259,3 +259,11 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Spotify diagnóstico**: `searchSpotify` ahora lanza errores (no los traga); `searchAll` devuelve `{ tracks, errors }` con timeout por proveedor; la pestaña Buscar muestra el error por proveedor; Ajustes tiene **Probar conexión** (`getSpotifyProfile` → `/v1/me` con nombre y plan). Si el usuario "conectó pero no ve canciones", ahora verá el motivo exacto (401/403/timeout/sin sesión).
 - **Búsqueda → playlists**: selector "Agregar a…" en cada resultado descargable (guarda y agrega), opción "＋ Nueva playlist…" (prompt de nombre) y **drag & drop nativo** de resultados Audius/Jamendo sobre las playlists (pestaña Playlists). Helper: `src/features/sources/save-track.ts`.
 - Todo verificado: 154 unit + 4 E2E + build. Dev server: reiniciar limpio tras agregar archivos (`rm -rf node_modules/.vite`).
+
+### Corrección importante de Spotify (misma sesión)
+
+- **HTTP 400 en búsqueda**: Spotify cambió en feb 2026 el máximo de `limit` en `GET /v1/search` de 50 a **10**. Enviábamos `limit=20` → 400. Corregido a `limit=10`.
+- Los errores de la API ahora incluyen el **mensaje del cuerpo** (`HTTP <status>: <message>`) y se muestran por proveedor en la pestaña Buscar.
+- `GET /me` ya no devuelve `product` (cambio feb 2026); "Probar conexión" muestra solo el nombre.
+- Vinilo: ahora **~3/4 visible** (lg: `-left-[11rem] w-[44rem]`, xl: `-left-[12rem] w-[48rem]`), contenido desplazado a `ml-[34rem]/ml-[37rem]`.
+- Ondas: reaccionan a los **bajos** (pulso global calculado con los primeros bins) y al espectro; alrededor del disco visible; sintéticas cuando no hay datos del analizador.

@@ -186,7 +186,7 @@ export async function getSpotifyAccessToken(): Promise<string | null> {
   return getAccessToken()
 }
 
-export async function getSpotifyProfile(): Promise<{ name: string; product: string } | null> {
+export async function getSpotifyProfile(): Promise<{ name: string } | null> {
   const token = await getAccessToken()
   if (token === null) {
     return null
@@ -197,11 +197,21 @@ export async function getSpotifyProfile(): Promise<{ name: string; product: stri
   })
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
+    throw new Error(await describeError(response))
   }
 
-  const data = (await response.json()) as { display_name?: string; product?: string }
-  return { name: data.display_name ?? 'Spotify', product: data.product ?? 'unknown' }
+  const data = (await response.json()) as { display_name?: string }
+  return { name: data.display_name ?? 'Spotify' }
+}
+
+async function describeError(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as { error?: { message?: string } }
+    const message = body.error?.message
+    return message === undefined ? `HTTP ${response.status}` : `HTTP ${response.status}: ${message}`
+  } catch {
+    return `HTTP ${response.status}`
+  }
 }
 
 type SpotifyTrack = {
@@ -220,13 +230,13 @@ export async function searchSpotify(query: string): Promise<SourceTrack[]> {
     throw new Error('not-connected')
   }
 
-  const params = new URLSearchParams({ q: query, type: 'track', limit: '20' })
+  const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
   const response = await fetch(`${API}/search?${params.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
+    throw new Error(await describeError(response))
   }
 
   const data = (await response.json()) as { tracks?: { items: SpotifyTrack[] } }

@@ -26,7 +26,7 @@ export const pt: typeof es = {
     close: 'Fechar configurações',
     testConnection: 'Testar conexão',
     testing: 'Testando…',
-    testOk: 'Conectado como {{name}} ({{product}})',
+    testOk: 'Conectado como {{name}}',
     testError: 'Erro de conexão: {{error}}',
   },
   testConnection: 'Testar conexão',

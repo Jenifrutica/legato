@@ -24,7 +24,7 @@ export const es = {
     close: 'Cerrar ajustes',
     testConnection: 'Probar conexión',
     testing: 'Probando…',
-    testOk: 'Conectado como {{name}} ({{product}})',
+    testOk: 'Conectado como {{name}}',
     testError: 'Error de conexión: {{error}}',
   },
   testConnection: 'Probar conexión',

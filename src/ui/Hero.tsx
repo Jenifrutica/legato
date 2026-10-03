@@ -54,11 +54,11 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-[70vh] flex-col items-center justify-center gap-6 overflow-hidden px-5 py-10 lg:block lg:min-h-[calc(100dvh-9rem)]">
-      <div className="relative z-0 w-64 sm:w-80 lg:pointer-events-none lg:absolute lg:-left-[34rem] lg:top-1/2 lg:w-[54rem] lg:-translate-y-1/2 xl:-left-[36rem] xl:w-[58rem]">
+      <div className="relative z-0 w-64 sm:w-80 lg:pointer-events-none lg:absolute lg:-left-[11rem] lg:top-1/2 lg:w-[44rem] lg:-translate-y-1/2 xl:-left-[12rem] xl:w-[48rem]">
         <VinylVisual />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-2xl flex-col items-center gap-5 text-center lg:ml-[30%] lg:mr-0 lg:items-start lg:gap-6 lg:pl-6 lg:text-left xl:ml-[32%]">
+      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-2xl flex-col items-center gap-5 text-center lg:ml-[34rem] lg:mr-0 lg:items-start lg:gap-6 lg:text-left xl:ml-[37rem]">
         <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl xl:text-6xl">
           {currentTrack?.title ?? t('vinyl.idleTitle')}
         </h2>

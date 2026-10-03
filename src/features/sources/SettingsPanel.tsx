@@ -28,7 +28,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
       setTestResult(
         profile === null
           ? t('settings.testError', { error: 'sin sesión' })
-          : t('settings.testOk', { name: profile.name, product: profile.product }),
+          : t('settings.testOk', { name: profile.name }),
       )
     } catch (error) {
       setTestResult(

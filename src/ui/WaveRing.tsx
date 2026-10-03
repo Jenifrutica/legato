@@ -40,6 +40,18 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       const baseRadius = size * 0.49
       const seconds = time / 1000
 
+      let bass = 0
+      if (levels.length > 0) {
+        const bassBins = Math.max(1, Math.floor(levels.length * 0.06))
+        for (let index = 0; index < bassBins; index++) {
+          bass += levels[index] ?? 0
+        }
+        bass = bass / (bassBins * 255)
+      } else {
+        bass = 0.45 + 0.45 * Math.sin(seconds * 3.1)
+      }
+      const pulse = 1 + bass * 0.65
+
       for (let index = 0; index < bars; index++) {
         const raw =
           levels.length === 0
@@ -47,7 +59,7 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
             : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.04, Math.min(1, raw))
         const angle = (index / bars) * Math.PI * 2
-        const length = 4 + intensity * size * (activeRef.current ? 0.09 : 0.05)
+        const length = 4 + intensity * size * (activeRef.current ? 0.11 : 0.05) * pulse
         const startX = center + Math.cos(angle) * baseRadius
         const startY = center + Math.sin(angle) * baseRadius
         const endX = center + Math.cos(angle) * (baseRadius + length)

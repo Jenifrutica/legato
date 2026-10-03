@@ -41,6 +41,18 @@ export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; 
       const barWidth = Math.max(1, width / bars - gap)
       const seconds = time / 1000
 
+      let bass = 0
+      if (levels.length > 0) {
+        const bassBins = Math.max(1, Math.floor(levels.length * 0.08))
+        for (let index = 0; index < bassBins; index++) {
+          bass += levels[index] ?? 0
+        }
+        bass = bass / (bassBins * 255)
+      } else {
+        bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
+      }
+      const pulse = 0.75 + bass * 0.9
+
       for (let index = 0; index < bars; index++) {
         const raw =
           levels.length === 0
@@ -49,7 +61,7 @@ export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; 
               0.08 * Math.sin(seconds * 5 + index)
             : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.06, Math.min(1, raw))
-        const barHeight = Math.max(3, intensity * height * (activeRef.current ? 1 : 0.75))
+        const barHeight = Math.max(3, intensity * height * (activeRef.current ? 1 : 0.75) * pulse)
         const x = index * (barWidth + gap)
         const y = (height - barHeight) / 2
         const gradient = context.createLinearGradient(0, y, 0, y + barHeight)
