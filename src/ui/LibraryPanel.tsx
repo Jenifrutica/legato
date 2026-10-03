@@ -25,7 +25,16 @@ import {
 } from '../features/library'
 import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
-import { GripIcon, ListMusicIcon, SearchIcon, TrashIcon, UploadIcon, XIcon } from './icons'
+import { usePlayerStore } from '../player'
+import {
+  GripIcon,
+  ListMusicIcon,
+  PlayIcon,
+  SearchIcon,
+  TrashIcon,
+  UploadIcon,
+  XIcon,
+} from './icons'
 
 function TrackMeta({ index, track }: { index: number; track: LibraryTrack }) {
   return (
@@ -107,6 +116,9 @@ export function LibraryPanel() {
   const removeTrackFromPlaylist = usePlaylistsStore((state) => state.removeTrackFromPlaylist)
   const moveTrackInPlaylist = usePlaylistsStore((state) => state.moveTrackInPlaylist)
 
+  const playTracks = usePlayerStore((state) => state.playTracks)
+  const reorderInQueue = usePlayerStore((state) => state.reorder)
+
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
@@ -177,6 +189,7 @@ export function LibraryPanel() {
     }
 
     moveTrackInPlaylist(selectedPlaylist.id, String(active.id), newIndex)
+    reorderInQueue(String(active.id), newIndex, selectedPlaylist.id)
   }
 
   function submitRename(event: FormEvent) {
@@ -375,6 +388,14 @@ export function LibraryPanel() {
                       track={track}
                     >
                       <button
+                        aria-label={`Reproducir ${track.title}`}
+                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
+                        onClick={() => playTracks(viewTracks, track.id, selectedPlaylist.id)}
+                        type="button"
+                      >
+                        <PlayIcon className="size-4" />
+                      </button>
+                      <button
                         aria-label={`Quitar ${track.title} de la playlist`}
                         className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
                         onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
@@ -391,6 +412,14 @@ export function LibraryPanel() {
             <ul className="divide-y divide-border">
               {filtered.map((track, index) => (
                 <li className="flex items-center gap-3 px-5 py-3" key={track.id}>
+                  <button
+                    aria-label={`Reproducir ${track.title}`}
+                    className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
+                    onClick={() => playTracks(viewTracks, track.id, null)}
+                    type="button"
+                  >
+                    <PlayIcon className="size-4" />
+                  </button>
                   <TrackMeta index={index} track={track} />
                   {playlists.length > 0 && (
                     <select

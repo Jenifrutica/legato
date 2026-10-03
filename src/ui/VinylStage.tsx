@@ -1,31 +1,59 @@
+import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
+import { WaveRing } from './WaveRing'
 
 export function VinylStage() {
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const status = usePlayerStore((state) => state.status)
+  const toggle = usePlayerStore((state) => state.toggle)
+  const isPlaying = status === 'playing'
+
   return (
     <section
       aria-label="Escenario de reproducción"
       className="rounded-lg border border-border bg-surface p-6 shadow-soft sm:p-8"
     >
       <div className="relative mx-auto aspect-square w-full max-w-80">
-        <div className="absolute -inset-5 rounded-full border border-wood/50 sm:-inset-7" />
-        <div className="absolute -inset-10 rounded-full border border-wood/25 sm:-inset-14" />
+        <WaveRing active={isPlaying} analyser={getAnalyser()} />
 
-        <div
-          className="absolute inset-0 rounded-full shadow-disc"
-          style={{
-            background:
-              'repeating-radial-gradient(circle at center, #221e1b 0 2px, #2f2a26 2px 5px)',
-          }}
-        />
-
-        <div className="absolute inset-[31%] grid place-items-center rounded-full bg-primary-soft">
-          <DiscMark className="size-10 text-primary-strong sm:size-12" />
-        </div>
+        <button
+          aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+          className="absolute inset-0 rounded-full shadow-disc disabled:cursor-not-allowed"
+          disabled={currentTrack === null}
+          onClick={() => void toggle()}
+          type="button"
+        >
+          <span
+            className="absolute inset-0 rounded-full motion-reduce:animate-none animate-disc"
+            style={{
+              animationPlayState: isPlaying ? 'running' : 'paused',
+              background:
+                'repeating-radial-gradient(circle at center, #221e1b 0 2px, #2f2a26 2px 5px)',
+            }}
+          >
+            {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
+              <img
+                alt={`Portada de ${currentTrack.title}`}
+                className="absolute inset-[17%] rounded-full object-cover"
+                src={currentTrack.artworkUrl}
+              />
+            ) : (
+              <span className="absolute inset-[31%] grid place-items-center rounded-full bg-primary-soft">
+                <DiscMark className="size-10 text-primary-strong sm:size-12" />
+              </span>
+            )}
+            <span className="absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bg" />
+          </span>
+        </button>
 
         <svg
           aria-hidden="true"
-          className="absolute -right-3 -top-2 w-24 text-wood sm:-right-5 sm:w-28"
+          className="absolute -right-3 -top-2 w-24 text-wood transition-transform duration-700 sm:-right-5 sm:w-28"
           fill="none"
+          style={{
+            transform: isPlaying ? 'rotate(9deg)' : 'rotate(0deg)',
+            transformOrigin: '85% 15%',
+          }}
           viewBox="0 0 96 96"
         >
           <circle cx="78" cy="16" fill="currentColor" r="8" />
@@ -43,8 +71,12 @@ export function VinylStage() {
       </div>
 
       <div className="mt-8 text-center sm:mt-10">
-        <p className="font-display text-lg font-semibold">Sin reproducción</p>
-        <p className="mt-1 text-sm text-ink-muted">Importa una canción y pulsa reproducir.</p>
+        <p className="truncate font-display text-lg font-semibold">
+          {currentTrack?.title ?? 'Sin reproducción'}
+        </p>
+        <p className="mt-1 truncate text-sm text-ink-muted">
+          {currentTrack?.artist ?? 'Importa una canción y pulsa reproducir.'}
+        </p>
       </div>
     </section>
   )

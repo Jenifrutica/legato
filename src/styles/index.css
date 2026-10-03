@@ -29,6 +29,14 @@
   --shadow-soft: 0 6px 24px rgb(43 38 34 / 0.08);
   --shadow-disc: 0 24px 60px rgb(43 38 34 / 0.18);
   --shadow-bar: 0 -8px 30px rgb(43 38 34 / 0.06);
+
+  --animate-disc: legato-disc 6s linear infinite;
+}
+
+@keyframes legato-disc {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @layer base {
