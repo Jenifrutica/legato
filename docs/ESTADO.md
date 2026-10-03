@@ -23,8 +23,8 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 15 | IndexedDB + sesión persistente | Cerrado |
 | 16 | Timer + shuffle/bucles + scroll | Cerrado |
 | 17 | Accesibilidad WCAG 2.2 AA | Cerrado |
-| 18 | Páginas legales + cookies | En curso |
-| 19–21 | Extras: ensayo, undo/redo, karaoke M/S | Pendiente |
+| 18 | Páginas legales + cookies | Cerrado |
+| 19–21 | Extras: ensayo, undo/redo, karaoke M/S | En curso (siguiente: #19) |
 | 22 | E2E smoke + regresión #12 | Pendiente |
 | 23–27 | Día 4: pulido, responsive, deploy S3+CloudFront, docs, rotar key | Pendiente |
 | 28–33 | Post-entrega | Pendiente |
