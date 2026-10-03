@@ -53,12 +53,12 @@ export function Hero() {
         : t('player.repeatOne')
 
   return (
-    <section className="relative flex min-h-[70vh] flex-col items-center justify-center gap-8 overflow-hidden px-5 py-10 lg:grid lg:min-h-[calc(100dvh-9rem)] lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:gap-12 lg:px-10 xl:grid-cols-[minmax(0,32rem)_minmax(0,1fr)]">
-      <div className="w-60 sm:w-72 lg:w-full lg:max-w-[26rem] lg:justify-self-end xl:max-w-[30rem]">
+    <section className="relative flex min-h-[70vh] flex-col items-center justify-center gap-6 overflow-hidden px-5 py-10 lg:block lg:min-h-[calc(100dvh-9rem)]">
+      <div className="relative z-0 w-64 sm:w-80 lg:pointer-events-none lg:absolute lg:-left-[34rem] lg:top-1/2 lg:w-[54rem] lg:-translate-y-1/2 xl:-left-[36rem] xl:w-[58rem]">
         <VinylVisual />
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col items-center gap-5 text-center lg:items-start lg:gap-6 lg:text-left">
+      <div className="relative z-10 mx-auto flex w-full min-w-0 max-w-2xl flex-col items-center gap-5 text-center lg:ml-[30%] lg:mr-0 lg:items-start lg:gap-6 lg:pl-6 lg:text-left xl:ml-[32%]">
         <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl xl:text-6xl">
           {currentTrack?.title ?? t('vinyl.idleTitle')}
         </h2>
@@ -95,7 +95,7 @@ export function Hero() {
           </span>
         </div>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden max-w-full flex-wrap items-center gap-2 lg:flex">
           <TransportButton
             disabled={!hasTrack}
             icon={<ShuffleIcon className="size-4" />}
@@ -181,7 +181,7 @@ export function Hero() {
             <VolumeIcon className="size-4 text-ink-muted" />
             <input
               aria-label={t('player.volume')}
-              className="h-1.5 w-24 cursor-pointer accent-primary"
+              className="h-1.5 w-20 cursor-pointer"
               max={100}
               min={0}
               onChange={(event) => setVolume(Number(event.target.value) / 100)}

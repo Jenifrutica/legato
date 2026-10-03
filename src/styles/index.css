@@ -4,20 +4,20 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-bg: #faf6f0;
+  --color-bg: #f1f3f9;
   --color-surface: #ffffff;
-  --color-surface-2: #f3ece3;
-  --color-ink: #2b2622;
-  --color-ink-muted: #6e645d;
-  --color-border: #e6ddd2;
-  --color-primary: #e4572e;
-  --color-primary-strong: #a93a19;
-  --color-primary-soft: #fbe4dc;
-  --color-accent: #1f7a8c;
-  --color-accent-soft: #dceef1;
-  --color-wood: #d9b382;
+  --color-surface-2: #e7eaf3;
+  --color-ink: #0f1222;
+  --color-ink-muted: #5c6178;
+  --color-border: #d8dce8;
+  --color-primary: #6c4cff;
+  --color-primary-strong: #4b2fd6;
+  --color-primary-soft: #e9e4ff;
+  --color-accent: #00a8b5;
+  --color-accent-soft: #d9f4f6;
+  --color-wood: #aeb6cc;
   --color-success: #3e8e5a;
-  --color-danger: #c0392b;
+  --color-danger: #d93a4a;
 
   --font-display: 'Fraunces Variable', Fraunces, ui-serif, Georgia, serif;
   --font-body: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -156,6 +156,36 @@ html.album-theme {
   --color-primary-soft: var(--album-primary-soft);
   --color-accent: var(--album-accent);
   --color-accent-soft: var(--album-accent-soft);
+}
+
+html.theme-dark {
+  --color-bg: #0b0e17;
+  --color-surface: #131828;
+  --color-surface-2: #1c2233;
+  --color-ink: #eef1f8;
+  --color-ink-muted: #a2a9be;
+  --color-border: #2a3145;
+  --color-primary: #7c5cff;
+  --color-primary-strong: #6c4cff;
+  --color-primary-soft: #241f45;
+  --color-accent: #3fd6c9;
+  --color-accent-soft: #123a3b;
+  --color-wood: #6e7899;
+  --shadow-soft: 0 6px 24px rgb(0 0 0 / 0.45);
+  --shadow-disc: 0 24px 60px rgb(0 0 0 / 0.6);
+  --shadow-bar: 0 -8px 30px rgb(0 0 0 / 0.35);
+}
+
+html.theme-dark.album-theme {
+  --color-primary: var(--album-dark-primary, #7c5cff);
+  --color-primary-strong: var(--album-dark-primary-strong, #6c4cff);
+  --color-primary-soft: var(--album-dark-primary-soft, #241f45);
+  --color-accent: var(--album-dark-accent, #3fd6c9);
+  --color-accent-soft: var(--album-dark-accent-soft, #123a3b);
+}
+
+html.theme-dark body {
+  background-image: none;
 }
 
 html,

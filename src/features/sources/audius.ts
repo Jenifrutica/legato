@@ -27,7 +27,7 @@ export async function searchAudius(query: string): Promise<SourceTrack[]> {
   )
 
   if (!response.ok) {
-    return []
+    throw new Error(`Audius ${response.status}`)
   }
 
   const data = (await response.json()) as { data: AudiusTrack[] }

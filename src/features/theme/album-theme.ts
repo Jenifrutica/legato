@@ -14,9 +14,15 @@ export type AlbumTheme = {
   accent: string
   accentSoft: string
   glow: string
+  darkPrimary: string
+  darkPrimaryStrong: string
+  darkPrimarySoft: string
+  darkAccent: string
+  darkAccentSoft: string
 }
 
 const INK_BASE: Rgb = { r: 34, g: 30, b: 28 }
+const DARK_BASE: Rgb = { r: 11, g: 14, b: 23 }
 
 export function deriveTheme(palette: AlbumPalette): AlbumTheme {
   const background = mix(WHITE, palette.dominant, 0.12)
@@ -36,6 +42,12 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
     darken(palette.vibrant, contrastRatio(palette.vibrant, WHITE) > 4.5 ? 0.1 : 0),
   )
 
+  const darkPrimary = ensureContrast(palette.vibrant, DARK_BASE, 4.5)
+  const darkPrimaryStrong = ensureContrast(palette.vibrant, WHITE, 4.5)
+  const darkPrimarySoft = mix(DARK_BASE, palette.vibrant, 0.3)
+  const darkAccent = ensureContrast(palette.muted, DARK_BASE, 4.5)
+  const darkAccentSoft = mix(DARK_BASE, palette.muted, 0.32)
+
   return {
     background: rgbToHex(background),
     surface: rgbToHex(surface),
@@ -49,6 +61,11 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
     accent: rgbToHex(accent),
     accentSoft: rgbToHex(accentSoft),
     glow: glow,
+    darkPrimary: rgbToHex(darkPrimary),
+    darkPrimaryStrong: rgbToHex(darkPrimaryStrong),
+    darkPrimarySoft: rgbToHex(darkPrimarySoft),
+    darkAccent: rgbToHex(darkAccent),
+    darkAccentSoft: rgbToHex(darkAccentSoft),
   }
 }
 
@@ -65,6 +82,11 @@ const THEME_VARIABLES: Array<[keyof AlbumTheme, string]> = [
   ['accent', '--album-accent'],
   ['accentSoft', '--album-accent-soft'],
   ['glow', '--album-glow'],
+  ['darkPrimary', '--album-dark-primary'],
+  ['darkPrimaryStrong', '--album-dark-primary-strong'],
+  ['darkPrimarySoft', '--album-dark-primary-soft'],
+  ['darkAccent', '--album-dark-accent'],
+  ['darkAccentSoft', '--album-dark-accent-soft'],
 ]
 
 export function applyAlbumTheme(theme: AlbumTheme): void {

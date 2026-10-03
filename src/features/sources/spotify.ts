@@ -186,6 +186,24 @@ export async function getSpotifyAccessToken(): Promise<string | null> {
   return getAccessToken()
 }
 
+export async function getSpotifyProfile(): Promise<{ name: string; product: string } | null> {
+  const token = await getAccessToken()
+  if (token === null) {
+    return null
+  }
+
+  const response = await fetch(`${API}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`)
+  }
+
+  const data = (await response.json()) as { display_name?: string; product?: string }
+  return { name: data.display_name ?? 'Spotify', product: data.product ?? 'unknown' }
+}
+
 type SpotifyTrack = {
   id: string
   name: string
@@ -199,7 +217,7 @@ type SpotifyTrack = {
 export async function searchSpotify(query: string): Promise<SourceTrack[]> {
   const token = await getAccessToken()
   if (token === null) {
-    return []
+    throw new Error('not-connected')
   }
 
   const params = new URLSearchParams({ q: query, type: 'track', limit: '20' })
@@ -208,7 +226,7 @@ export async function searchSpotify(query: string): Promise<SourceTrack[]> {
   })
 
   if (!response.ok) {
-    return []
+    throw new Error(`HTTP ${response.status}`)
   }
 
   const data = (await response.json()) as { tracks?: { items: SpotifyTrack[] } }

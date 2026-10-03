@@ -12,6 +12,7 @@ export {
 } from './spotify'
 export { SettingsPanel } from './SettingsPanel'
 export { SearchTab } from './SearchTab'
+export { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 export { SpotifyBanner } from './SpotifyBanner'
 export { useSpotifyStore } from './spotify-store'
 export type { SourceId, SourceTrack } from './types'

@@ -37,11 +37,19 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | Cerrado |
 | 41 | Integración de pistas online con listas dobles | Cerrado (reproducir desde la búsqueda y guardar Audius/Jamendo en biblioteca) |
 | 42 | Web Playback SDK de Spotify (reproducción completa Premium) | Cerrado (banner de control; el audio lo maneja Spotify, no pasa por nuestro DSP) |
+| 43 | Nueva paleta violeta/teal + modo oscuro opcional | Cerrado |
+| 44 | Vinilo grande mostrando ~1/4 sangrando por la izquierda | Cerrado |
+| 45 | Ondas gráficas siempre vivas (sintéticas sin datos, reales al reproducir) | Cerrado |
+| 46 | Diagnóstico de Spotify (errores visibles + probar conexión) | Cerrado |
+| 47 | Agregar a playlist desde la búsqueda + crear playlist + drag & drop | Cerrado |
 
 ## Estado técnico
 
 - **Tests:** 154 unitarios + 4 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
+- **Diseño:** paleta nueva **violeta/teal** (ya no crema/terracota) con **modo oscuro opcional** (botón sol/luna en la barra, persistido, el tema por portada se adapta a oscuro). Vinilo 2D grande con la portada completa, **mostrando ~1/4 sangrando por la izquierda**; ondas de barras y anillo **siempre animadas** (sintéticas sin datos del analizador, reales al reproducir local); controles del héroe con `flex-wrap` para no superponerse al panel derecho.
+- **Fuentes:** Spotify (PKCE + previews + SDK Premium con banner), Audius y Jamendo con toggles; por defecto solo Spotify. **Errores de búsqueda visibles por proveedor** + botón "Probar conexión" en Ajustes. En resultados: agregar a playlist (guardar+agregar), crear playlist inline y **drag & drop** de resultados (Audius/Jamendo) sobre las playlists.
+- **Pendiente:** verificación final de Spotify (el usuario reportó que conectó pero no veía canciones; ahora la UI muestra el error exacto), posible silencio CORS en streams externos, nueva funcionalidad del usuario, Día 4 (deploy).
 - **Rediseño:** top bar sticky, vinilo 2D con la portada como disco completo (sin recorte, sin 3D), tema dinámico por portada en toda la interfaz con contraste AA, panel derecho con pestañas Biblioteca/Buscar/Playlists/Cola/Audio, controles de escenario en el héroe y mini reproductor móvil.
 - **Fuentes:** Spotify (OAuth PKCE + búsqueda + previews 30 s + reproducción completa con Web Playback SDK), Audius (streaming completo gratis) y Jamendo (CC, client_id), con interruptores en Ajustes; por defecto solo Spotify activo.
 - **Credenciales:** Spotify y Jamendo Client ID configurados en `.env.local`.

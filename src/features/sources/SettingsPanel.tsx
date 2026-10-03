@@ -6,6 +6,7 @@ import { useProvidersStore } from './providers-store'
 import {
   connectSpotify,
   disconnectSpotify,
+  getSpotifyProfile,
   handleSpotifyRedirect,
   isSpotifyConfigured,
   isSpotifyConnected,
@@ -17,6 +18,24 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const enabled = useProvidersStore((state) => state.enabled)
   const setEnabled = useProvidersStore((state) => state.setEnabled)
   const [spotifyConnected, setSpotifyConnected] = useState(isSpotifyConnected())
+  const [testResult, setTestResult] = useState<string | null>(null)
+
+  async function testConnection() {
+    setTestResult(t('settings.testing'))
+
+    try {
+      const profile = await getSpotifyProfile()
+      setTestResult(
+        profile === null
+          ? t('settings.testError', { error: 'sin sesión' })
+          : t('settings.testOk', { name: profile.name, product: profile.product }),
+      )
+    } catch (error) {
+      setTestResult(
+        t('settings.testError', { error: error instanceof Error ? error.message : 'error' }),
+      )
+    }
+  }
 
   useEffect(() => {
     if (open) {
@@ -99,20 +118,35 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                 <p className="mt-1 text-xs text-ink-muted">{row.note}</p>
 
                 {row.id === 'spotify' && row.configured && (
-                  <button
-                    className="mt-2 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
-                    onClick={() => {
-                      if (spotifyConnected) {
-                        disconnectSpotify()
-                        setSpotifyConnected(false)
-                      } else {
-                        void connectSpotify()
-                      }
-                    }}
-                    type="button"
-                  >
-                    {spotifyConnected ? t('sources.disconnect') : t('sources.connectSpotify')}
-                  </button>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                      onClick={() => {
+                        if (spotifyConnected) {
+                          disconnectSpotify()
+                          setSpotifyConnected(false)
+                        } else {
+                          void connectSpotify()
+                        }
+                      }}
+                      type="button"
+                    >
+                      {spotifyConnected ? t('sources.disconnect') : t('sources.connectSpotify')}
+                    </button>
+                    {spotifyConnected && (
+                      <button
+                        className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                        onClick={() => void testConnection()}
+                        type="button"
+                      >
+                        {t('settings.testConnection')}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {row.id === 'spotify' && testResult !== null && (
+                  <p className="mt-2 text-xs text-ink-muted">{testResult}</p>
                 )}
               </div>
             ))}

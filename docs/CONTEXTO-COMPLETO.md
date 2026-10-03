@@ -245,3 +245,17 @@ docs/                           # ver §19
 ## 20. Prompt listo para una sesión nueva
 
 Ver `docs/PROMPT-NUEVA-SESION.md` (copiar y pegar tal cual). Resumen: pedirle que lea este archivo, verifique el estado (tests/build), arranque el dev server en `127.0.0.1`, y pregunte por la nueva funcionalidad antes de planificar; recordar las reglas (commits en inglés sin co-authored, nada oscuro, portada en el vinilo, validar todo, documentar).
+
+---
+
+## Actualización — sesión 2 (misma fecha, tarde)
+
+Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
+
+- **Paleta nueva**: violeta `#6c4cff` + teal `#00a8b5` sobre fondo frío `#f1f3f9` (adiós crema/terracota). **Modo oscuro opcional** (botón sol/luna en la barra; clase `theme-dark`; persistido en `legato.theme`; el tema por portada tiene variantes oscuras `--album-dark-*`).
+- **Vinilo**: 2D, más grande, sangrando por la izquierda y mostrando ~1/4 del círculo; la portada sigue siendo el disco completo.
+- **Ondas**: barras con gradiente violeta→teal y anillo más grueso; **siempre animadas** (movimiento sintético cuando el analizador no tiene datos, p. ej. Spotify; reales al reproducir local). 30 fps, se detienen con la pestaña oculta.
+- **Layout**: fila de controles del héroe con `flex-wrap` y anchos contenidos; panel derecho con `relative z-20 bg-bg` para que nunca se superponga.
+- **Spotify diagnóstico**: `searchSpotify` ahora lanza errores (no los traga); `searchAll` devuelve `{ tracks, errors }` con timeout por proveedor; la pestaña Buscar muestra el error por proveedor; Ajustes tiene **Probar conexión** (`getSpotifyProfile` → `/v1/me` con nombre y plan). Si el usuario "conectó pero no ve canciones", ahora verá el motivo exacto (401/403/timeout/sin sesión).
+- **Búsqueda → playlists**: selector "Agregar a…" en cada resultado descargable (guarda y agrega), opción "＋ Nueva playlist…" (prompt de nombre) y **drag & drop nativo** de resultados Audius/Jamendo sobre las playlists (pestaña Playlists). Helper: `src/features/sources/save-track.ts`.
+- Todo verificado: 154 unit + 4 E2E + build. Dev server: reiniciar limpio tras agregar archivos (`rm -rf node_modules/.vite`).

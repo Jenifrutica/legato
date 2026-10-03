@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { importAudioFiles, useLibraryStore } from '../library'
+import { useLibraryStore } from '../library'
+import { usePlaylistsStore } from '../playlists'
 import { usePlayerStore } from '../../player'
 import type { QueueTrack } from '../../player'
 import { DownloadIcon, DiscMark, PlayIcon, SearchIcon } from '../../ui/icons'
 import { useProvidersStore } from './providers-store'
+import { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 import { searchAll } from './search'
+import type { SourceSearchError } from './search'
 import { useSpotifyStore } from './spotify-store'
 import type { SourceId, SourceTrack } from './types'
 
@@ -35,8 +38,11 @@ export function SearchTab() {
   const playSpotifyUris = useSpotifyStore((state) => state.playUris)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
+  const playlists = usePlaylistsStore((state) => state.playlists)
+  const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SourceTrack[]>([])
+  const [errors, setErrors] = useState<SourceSearchError[]>([])
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving'>('idle')
   const [message, setMessage] = useState<string | null>(null)
   const [searched, setSearched] = useState(false)
@@ -52,8 +58,10 @@ export function SearchTab() {
 
     setStatus('loading')
     setMessage(null)
-    const found = await searchAll(query, enabled)
-    setResults(found)
+    setErrors([])
+    const result = await searchAll(query, enabled)
+    setResults(result.tracks)
+    setErrors(result.errors)
     setSearched(true)
     setStatus('idle')
   }
@@ -67,8 +75,27 @@ export function SearchTab() {
     playTracks(queue, `${track.sourceId}:${track.id}`, null)
   }
 
-  async function save(track: SourceTrack) {
-    if (track.streamUrl === null || !track.downloadable) {
+  async function download(track: SourceTrack) {
+    setStatus('saving')
+    setMessage(null)
+
+    try {
+      const saved = await saveSourceTrack(track, existingDedupeKeys())
+      if (saved === null) {
+        setMessage(t('search.cannotSave'))
+      } else {
+        addTracks([saved])
+        setMessage(t('search.saved'))
+      }
+    } catch {
+      setMessage(t('search.saveError'))
+    }
+
+    setStatus('idle')
+  }
+
+  async function addToPlaylist(track: SourceTrack, value: string) {
+    if (value === '') {
       return
     }
 
@@ -76,15 +103,18 @@ export function SearchTab() {
     setMessage(null)
 
     try {
-      const response = await fetch(track.streamUrl)
-      const blob = await response.blob()
-      const extension = blob.type.includes('wav') ? 'wav' : 'mp3'
-      const file = new File([blob], `${track.artist} - ${track.title}.${extension}`, {
-        type: blob.type === '' ? 'audio/mpeg' : blob.type,
-      })
-      const result = await importAudioFiles([file], existingDedupeKeys())
-      addTracks(result.tracks)
-      setMessage(result.tracks.length > 0 ? t('search.saved') : t('search.duplicate'))
+      let playlistId = value
+      if (value === '__new__') {
+        const name = window.prompt(t('playlists.namePlaceholder'), track.title)
+        if (name === null || name.trim() === '') {
+          setStatus('idle')
+          return
+        }
+        playlistId = createPlaylist(name)
+      }
+
+      const added = await importSourceTrackToPlaylist(track, playlistId)
+      setMessage(added ? t('search.addedToPlaylist') : t('search.cannotSave'))
     } catch {
       setMessage(t('search.saveError'))
     }
@@ -129,7 +159,20 @@ export function SearchTab() {
         </p>
       )}
 
-      {status === 'idle' && searched && results.length === 0 && (
+      {errors.length > 0 && (
+        <ul className="rounded-lg bg-primary-soft px-3 py-2 text-xs text-ink">
+          {errors.map((error) => (
+            <li key={error.sourceId}>
+              <strong>{SOURCE_LABELS[error.sourceId]}:</strong> {error.message}
+              {error.sourceId === 'spotify' && (
+                <span className="block">{t('spotify.reconnect')}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {status === 'idle' && searched && results.length === 0 && errors.length === 0 && (
         <div className="py-4 text-center text-sm text-ink-muted">
           <p>{t('search.empty')}</p>
           {enabled.spotify && <p className="mt-1 text-xs">{t('search.spotifyHint')}</p>}
@@ -140,7 +183,14 @@ export function SearchTab() {
         {results.map((track) => (
           <li
             className="flex items-center gap-2 rounded-xl border border-border bg-surface/60 p-2"
+            draggable={track.downloadable}
             key={`${track.sourceId}:${track.id}`}
+            onDragStart={(event) => {
+              if (track.downloadable) {
+                event.dataTransfer.setData('application/x-legato-track', JSON.stringify(track))
+                event.dataTransfer.effectAllowed = 'copy'
+              }
+            }}
           >
             <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-surface-2 text-[0.625rem] font-semibold uppercase text-ink-muted">
               {track.artworkUrl === null ? (
@@ -156,6 +206,26 @@ export function SearchTab() {
                 {track.artist} · {SOURCE_LABELS[track.sourceId]}
               </span>
             </span>
+
+            {track.downloadable && playlists.length >= 0 && (
+              <select
+                aria-label={t('search.addToPlaylist')}
+                className="max-w-24 rounded-md border border-border bg-bg px-1.5 py-1 text-[0.625rem] text-ink-muted focus:border-primary focus:outline-none"
+                defaultValue=""
+                onChange={(event) => {
+                  void addToPlaylist(track, event.target.value)
+                  event.target.value = ''
+                }}
+              >
+                <option value="">{t('search.addToPlaylist')}</option>
+                {playlists.map((playlist) => (
+                  <option key={playlist.id} value={playlist.id}>
+                    {playlist.name}
+                  </option>
+                ))}
+                <option value="__new__">{t('search.newPlaylist')}</option>
+              </select>
+            )}
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}
@@ -190,7 +260,7 @@ export function SearchTab() {
                 aria-label={`${t('search.save')} ${track.title}`}
                 className="grid size-8 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:text-primary-strong disabled:opacity-40"
                 disabled={status !== 'idle'}
-                onClick={() => void save(track)}
+                onClick={() => void download(track)}
                 type="button"
               >
                 <DownloadIcon className="size-4" />

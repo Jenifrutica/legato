@@ -5,7 +5,8 @@ import { AccountChip } from '../features/auth'
 import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import { SettingsPanel } from '../features/sources'
-import { AccessibilityIcon, DiscMark, SettingsIcon } from './icons'
+import { useThemeStore } from '../features/theme'
+import { AccessibilityIcon, DiscMark, MoonIcon, SettingsIcon, SunIcon } from './icons'
 
 export function TopBar() {
   const { t } = useTranslation()
@@ -13,6 +14,8 @@ export function TopBar() {
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
   const openA11yPanel = useA11yStore((state) => state.openPanel)
+  const themeMode = useThemeStore((state) => state.mode)
+  const toggleTheme = useThemeStore((state) => state.toggle)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
@@ -52,6 +55,14 @@ export function TopBar() {
           type="button"
         >
           <AccessibilityIcon className="size-5" />
+        </button>
+        <button
+          aria-label={t('theme.toggle')}
+          className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink"
+          onClick={toggleTheme}
+          type="button"
+        >
+          {themeMode === 'dark' ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}
         </button>
         <button
           aria-label={t('settings.title')}

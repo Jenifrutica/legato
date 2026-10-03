@@ -35,7 +35,7 @@ export async function searchJamendo(query: string): Promise<SourceTrack[]> {
   const response = await fetch(`https://api.jamendo.com/v3.0/tracks/?${params.toString()}`)
 
   if (!response.ok) {
-    return []
+    throw new Error(`Jamendo ${response.status}`)
   }
 
   const data = (await response.json()) as { results: JamendoTrack[] }

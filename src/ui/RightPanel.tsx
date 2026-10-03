@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaylistsStore } from '../features/playlists'
-import { SearchTab } from '../features/sources'
+import { importSourceTrackToPlaylist, SearchTab } from '../features/sources'
+import type { SourceTrack } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
 import { LibraryPanel } from './LibraryPanel'
@@ -33,6 +34,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [draft, setDraft] = useState('')
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameDraft, setRenameDraft] = useState('')
+  const [dropMessage, setDropMessage] = useState<string | null>(null)
 
   function submitCreate(event: FormEvent) {
     event.preventDefault()
@@ -84,6 +86,12 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
         </form>
       )}
 
+      {dropMessage !== null && (
+        <p className="rounded-lg bg-accent-soft px-3 py-2 text-xs text-ink" role="status">
+          {dropMessage}
+        </p>
+      )}
+
       {playlists.length === 0 ? (
         <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
       ) : (
@@ -96,6 +104,27 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                   selected ? 'border-primary/70 bg-primary-soft/70' : 'border-border bg-surface/60'
                 }`}
                 key={playlist.id}
+                onDragOver={(event) => {
+                  if (event.dataTransfer.types.includes('application/x-legato-track')) {
+                    event.preventDefault()
+                    event.dataTransfer.dropEffect = 'copy'
+                  }
+                }}
+                onDrop={(event) => {
+                  const raw = event.dataTransfer.getData('application/x-legato-track')
+                  if (raw === '') {
+                    return
+                  }
+                  event.preventDefault()
+                  try {
+                    const track = JSON.parse(raw) as SourceTrack
+                    void importSourceTrackToPlaylist(track, playlist.id).then((added) => {
+                      setDropMessage(added ? t('search.addedToPlaylist') : t('search.cannotSave'))
+                    })
+                  } catch {
+                    setDropMessage(t('search.saveError'))
+                  }
+                }}
               >
                 {renamingId === playlist.id ? (
                   <form onSubmit={submitRename}>
@@ -202,7 +231,7 @@ export function RightPanel() {
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
 
   return (
-    <aside className="flex min-h-0 flex-col border-t border-border/70 pb-40 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
+    <aside className="relative z-20 flex min-h-0 flex-col border-t border-border/70 bg-bg pb-40 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
       <div
         aria-label={t('tabs.label')}
         className="flex items-center gap-1 border-b border-border/70 px-3 py-2"

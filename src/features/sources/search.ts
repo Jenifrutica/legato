@@ -5,35 +5,71 @@ import type { SourceId, SourceTrack } from './types'
 
 const PROVIDER_TIMEOUT_MS = 8000
 
-function withTimeout<T>(promise: Promise<T>, fallback: T): Promise<T> {
-  return Promise.race([
-    promise.catch(() => fallback),
-    new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallback), PROVIDER_TIMEOUT_MS)
-    }),
-  ])
+export type SourceSearchError = {
+  sourceId: SourceId
+  message: string
+}
+
+export type SearchResult = {
+  tracks: SourceTrack[]
+  errors: SourceSearchError[]
+}
+
+function withTimeout<T>(promise: Promise<T>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timeout')), PROVIDER_TIMEOUT_MS)
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error instanceof Error ? error : new Error('error'))
+      },
+    )
+  })
 }
 
 export async function searchAll(
   query: string,
   enabled: Record<SourceId, boolean>,
-): Promise<SourceTrack[]> {
+): Promise<SearchResult> {
   const trimmed = query.trim()
   if (trimmed === '') {
-    return []
+    return { tracks: [], errors: [] }
   }
 
-  const tasks: Array<Promise<SourceTrack[]>> = []
+  const providers: Array<{ id: SourceId; run: () => Promise<SourceTrack[]> }> = []
   if (enabled.audius) {
-    tasks.push(withTimeout(searchAudius(trimmed), []))
+    providers.push({ id: 'audius', run: () => searchAudius(trimmed) })
   }
   if (enabled.jamendo) {
-    tasks.push(withTimeout(searchJamendo(trimmed), []))
+    providers.push({ id: 'jamendo', run: () => searchJamendo(trimmed) })
   }
   if (enabled.spotify) {
-    tasks.push(withTimeout(searchSpotify(trimmed), []))
+    providers.push({ id: 'spotify', run: () => searchSpotify(trimmed) })
   }
 
-  const results = await Promise.all(tasks)
-  return results.flat()
+  const settled = await Promise.all(
+    providers.map(async (provider) => {
+      try {
+        const tracks = await withTimeout(provider.run())
+        return { id: provider.id, tracks, error: null as string | null }
+      } catch (error) {
+        return {
+          id: provider.id,
+          tracks: [] as SourceTrack[],
+          error: error instanceof Error ? error.message : 'error',
+        }
+      }
+    }),
+  )
+
+  return {
+    tracks: settled.flatMap((entry) => entry.tracks),
+    errors: settled
+      .filter((entry) => entry.error !== null)
+      .map((entry) => ({ sourceId: entry.id, message: entry.error as string })),
+  }
 }
