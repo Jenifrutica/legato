@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { A11yPanel, useA11yStore } from '../features/a11y'
 import { AccountChip, AuthContextProvider } from '../features/auth'
 import { LanguageSelector } from '../features/i18n'
+import { CookieConsent, LegalPage } from '../features/legal'
 import { LibraryPanel } from '../ui/LibraryPanel'
 import { MobileNav } from '../ui/MobileNav'
 import { PlayerBar } from '../ui/PlayerBar'
@@ -60,6 +61,35 @@ function AppShell() {
               <VinylStage />
               <LibraryPanel />
             </div>
+
+            <footer className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs text-ink-muted">
+              <a
+                className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+                href="#/legal/privacy"
+              >
+                {t('legal.links.privacy')}
+              </a>
+              <a
+                className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+                href="#/legal/terms"
+              >
+                {t('legal.links.terms')}
+              </a>
+              <a
+                className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+                href="#/legal/cookies"
+              >
+                {t('legal.links.cookies')}
+              </a>
+              <a
+                className="underline underline-offset-2 transition-colors hover:text-primary-strong"
+                href="#/legal/accessibility"
+              >
+                {t('legal.links.accessibility')}
+              </a>
+              <span aria-hidden="true">·</span>
+              <span>{t('academic')}</span>
+            </footer>
           </main>
         </div>
       </div>
@@ -70,6 +100,8 @@ function AppShell() {
       </div>
 
       <A11yPanel />
+      <CookieConsent />
+      <LegalPage />
     </div>
   )
 }

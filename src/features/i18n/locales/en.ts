@@ -120,6 +120,31 @@ export const en: typeof es = {
     explain:
       'Real doubly linked list nodes: each card knows its prev and next. The highlighted node is playing and keeps its identity even if you move or remove others (bug #12 fix).',
   },
+  legal: {
+    back: 'Back to the app',
+    updated: 'Updated: {{date}}',
+    links: {
+      privacy: 'Privacy',
+      terms: 'Terms',
+      cookies: 'Cookies',
+      accessibility: 'Accessibility',
+    },
+  },
+  cookies: {
+    title: 'Cookies',
+    message:
+      'We only use essential cookies for your session and preferences. There is no analytics or third-party tracking.',
+    accept: 'Accept',
+    essentialOnly: 'Essential only',
+    preferences: 'Preferences',
+    dialogTitle: 'Cookie preferences',
+    essentialTitle: 'Essential (always active)',
+    essentialText: 'Session and preferences (language, accessibility, consent).',
+    optionalTitle: 'Optional',
+    optionalText: 'We do not use optional or third-party cookies.',
+    save: 'Save preferences',
+    close: 'Close',
+  },
   a11y: {
     title: 'Accessibility',
     close: 'Close accessibility panel',

@@ -119,6 +119,31 @@ export const es = {
     explain:
       'Nodos reales de la lista doblemente enlazada: cada tarjeta conoce su prev y su next. El nodo resaltado es el que está sonando y conserva su identidad aunque muevas o elimines otros (fix #12).',
   },
+  legal: {
+    back: 'Volver a la app',
+    updated: 'Actualizado: {{date}}',
+    links: {
+      privacy: 'Privacidad',
+      terms: 'Términos',
+      cookies: 'Cookies',
+      accessibility: 'Accesibilidad',
+    },
+  },
+  cookies: {
+    title: 'Cookies',
+    message:
+      'Usamos solo cookies esenciales para la sesión y tus preferencias. No hay analítica ni rastreadores de terceros.',
+    accept: 'Aceptar',
+    essentialOnly: 'Solo esenciales',
+    preferences: 'Preferencias',
+    dialogTitle: 'Preferencias de cookies',
+    essentialTitle: 'Esenciales (siempre activas)',
+    essentialText: 'Sesión y preferencias (idioma, accesibilidad, consentimiento).',
+    optionalTitle: 'Opcionales',
+    optionalText: 'No usamos cookies opcionales ni de terceros.',
+    save: 'Guardar preferencias',
+    close: 'Cerrar',
+  },
   a11y: {
     title: 'Accesibilidad',
     close: 'Cerrar panel de accesibilidad',

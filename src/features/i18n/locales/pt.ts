@@ -120,6 +120,31 @@ export const pt: typeof es = {
     explain:
       'Nós reais da lista duplamente encadeada: cada cartão conhece seu prev e next. O nó destacado está tocando e mantém sua identidade mesmo que você mova ou remova outros (correção do bug #12).',
   },
+  legal: {
+    back: 'Voltar ao app',
+    updated: 'Atualizado: {{date}}',
+    links: {
+      privacy: 'Privacidade',
+      terms: 'Termos',
+      cookies: 'Cookies',
+      accessibility: 'Acessibilidade',
+    },
+  },
+  cookies: {
+    title: 'Cookies',
+    message:
+      'Usamos apenas cookies essenciais para a sessão e suas preferências. Não há análise nem rastreadores de terceiros.',
+    accept: 'Aceitar',
+    essentialOnly: 'Apenas essenciais',
+    preferences: 'Preferências',
+    dialogTitle: 'Preferências de cookies',
+    essentialTitle: 'Essenciais (sempre ativas)',
+    essentialText: 'Sessão e preferências (idioma, acessibilidade, consentimento).',
+    optionalTitle: 'Opcionais',
+    optionalText: 'Não usamos cookies opcionais ou de terceiros.',
+    save: 'Salvar preferências',
+    close: 'Fechar',
+  },
   a11y: {
     title: 'Acessibilidade',
     close: 'Fechar painel de acessibilidade',
