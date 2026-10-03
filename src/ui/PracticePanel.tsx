@@ -16,6 +16,8 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
   const clearAbLoop = usePlayerStore((state) => state.clearAbLoop)
   const karaoke = usePlayerStore((state) => state.karaoke)
   const setKaraoke = usePlayerStore((state) => state.setKaraoke)
+  const crossfadeSeconds = usePlayerStore((state) => state.crossfadeSeconds)
+  const setCrossfade = usePlayerStore((state) => state.setCrossfade)
 
   const loopActive = abLoop !== null
 
@@ -112,6 +114,23 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
           {t('practice.karaoke')}
         </button>
         <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('practice.karaokeHint')}</p>
+      </div>
+
+      <div className="mt-4">
+        <label className="text-xs font-medium text-ink-muted" htmlFor="practice-crossfade">
+          {t('practice.crossfade')}{' '}
+          <span className="font-mono text-ink">{crossfadeSeconds.toFixed(1)}s</span>
+        </label>
+        <input
+          className="mt-1 h-1.5 w-full cursor-pointer accent-primary"
+          id="practice-crossfade"
+          max={8}
+          min={0}
+          onChange={(event) => setCrossfade(Number(event.target.value))}
+          step={0.5}
+          type="range"
+          value={crossfadeSeconds}
+        />
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('practice.hint')}</p>

@@ -22,6 +22,7 @@ export type SessionRecord = {
   rate: number
   balance?: number
   channelMode?: ChannelMode
+  crossfadeSeconds?: number
 }
 
 class LegatoDatabase extends Dexie {

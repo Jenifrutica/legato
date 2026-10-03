@@ -42,6 +42,7 @@ type PlayerState = PlayerSnapshot & {
   setLoopPointB: () => void
   clearAbLoop: () => void
   setKaraoke: (enabled: boolean) => void
+  setCrossfade: (seconds: number) => void
   startTimerMinutes: (minutes: number) => void
   startTimerEndOfTrack: () => void
   startTimerAfterTracks: (count: number) => void
@@ -92,6 +93,7 @@ export const usePlayerStore = create<PlayerState>(() => ({
     controller.setKaraoke(enabled)
     graph.setKaraoke(enabled)
   },
+  setCrossfade: (seconds) => controller.setCrossfade(seconds),
   startTimerMinutes: (minutes) => sleepTimer.startMinutes(minutes),
   startTimerEndOfTrack: () => sleepTimer.startEndOfTrack(),
   startTimerAfterTracks: (count) => sleepTimer.startAfterTracks(count),

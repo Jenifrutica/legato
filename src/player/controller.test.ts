@@ -293,6 +293,52 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().karaoke).toBe(false)
   })
 
+  it('crossfade: por defecto 2s, se limita y se aplica al cambiar', async () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    expect(controller.getSnapshot().crossfadeSeconds).toBe(2)
+
+    controller.setCrossfade(20)
+    expect(controller.getSnapshot().crossfadeSeconds).toBe(12)
+    controller.setCrossfade(-3)
+    expect(controller.getSnapshot().crossfadeSeconds).toBe(0)
+
+    controller.playTracks([track('a'), track('b')])
+    controller.next()
+    expect(audio.src).toBe('blob:b')
+  })
+
+  it('crossfade con duracion hace la transicion y restaura el volumen', async () => {
+    vi.useFakeTimers()
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.setCrossfade(0.1)
+    controller.playTracks([track('a'), track('b')])
+    controller.next()
+    await vi.runAllTimersAsync()
+
+    expect(audio.src).toBe('blob:b')
+    expect(audio.volume).toBe(1)
+    expect(controller.getSnapshot().currentTrack?.id).toBe('b')
+  })
+
+  it('restoreSession recupera el crossfade', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.restoreSession([track('a')], {
+      trackIds: ['a'],
+      currentId: 'a',
+      currentTime: 0,
+      loopMode: 'none',
+      shuffle: false,
+      volume: 1,
+      rate: 1,
+      crossfadeSeconds: 4,
+    })
+
+    expect(controller.getSnapshot().crossfadeSeconds).toBe(4)
+  })
+
   it('playTracks sin canciones deja el reproductor quieto', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

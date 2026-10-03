@@ -60,7 +60,8 @@ export const en: typeof es = {
     karaoke: 'Remove vocals (karaoke)',
     karaokeHint:
       'Cancels the center channel; works best when the voice sits in the center of the mix.',
-    hint: 'Speed keeps the pitch and the A–B loop lets you practice a passage.',
+    crossfade: 'Track transition',
+    hint: 'Speed keeps the pitch, the A–B loop lets you practice a passage and the transition smooths track changes.',
   },
   vinyl: {
     region: 'Playback stage',

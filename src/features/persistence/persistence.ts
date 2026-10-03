@@ -125,6 +125,7 @@ export async function saveCurrentSession(): Promise<void> {
     rate: snapshot.rate,
     balance: snapshot.balance,
     channelMode: snapshot.channelMode,
+    crossfadeSeconds: snapshot.crossfadeSeconds,
   }
 
   await db.session.put(record)

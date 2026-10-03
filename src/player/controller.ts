@@ -17,6 +17,7 @@ export type PlayerSnapshot = {
   abLoop: { a: number; b: number } | null
   loopPointA: number | null
   karaoke: boolean
+  crossfadeSeconds: number
   queue: QueueTrack[]
   queueStructure: StructureNode[]
   sourcePlaylistId: string | null
@@ -32,6 +33,7 @@ export type RestoreState = {
   rate: number
   balance?: number
   channelMode?: ChannelMode
+  crossfadeSeconds?: number
 }
 
 export class PlayerController {
@@ -46,6 +48,8 @@ export class PlayerController {
   #abLoop: { a: number; b: number } | null = null
   #loopPointA: number | null = null
   #karaoke = false
+  #crossfadeSeconds = 2
+  #transitionToken = 0
   #sourcePlaylistId: string | null = null
 
   constructor(audio?: AudioLike) {
@@ -77,13 +81,11 @@ export class PlayerController {
     const current = this.#queue.currentTrack
     if (current !== null) {
       this.#resetAbLoop()
-      this.#engine.load(current)
-      this.#engine.setVolume(this.#volume)
-      this.#engine.setRate(this.#rate)
-      void this.#engine.play()
+      this.#notify()
+      void this.#transitionTo(current, true)
+    } else {
+      this.#notify()
     }
-
-    this.#notify()
   }
 
   async toggle(): Promise<void> {
@@ -104,9 +106,8 @@ export class PlayerController {
     }
 
     this.#resetAbLoop()
-    this.#engine.load(track)
-    void this.#engine.play()
     this.#notify()
+    void this.#transitionTo(track, true)
   }
 
   previous(): void {
@@ -116,9 +117,8 @@ export class PlayerController {
     }
 
     this.#resetAbLoop()
-    this.#engine.load(track)
-    void this.#engine.play()
     this.#notify()
+    void this.#transitionTo(track, true)
   }
 
   pause(): void {
@@ -127,17 +127,14 @@ export class PlayerController {
   }
 
   async fadeOutAndPause(durationMs = 2500): Promise<void> {
-    const steps = 25
-    const stepMs = durationMs / steps
-    const startVolume = this.#volume
-
-    for (let step = 1; step <= steps; step++) {
-      this.#engine.setVolume(startVolume * (1 - step / steps))
-      await new Promise((resolve) => setTimeout(resolve, stepMs))
-    }
-
+    await this.#rampVolume(1, 0, durationMs)
     this.#engine.pause()
-    this.#engine.setVolume(startVolume)
+    this.#engine.setVolume(this.#volume)
+    this.#notify()
+  }
+
+  setCrossfade(seconds: number): void {
+    this.#crossfadeSeconds = Math.min(12, Math.max(0, seconds))
     this.#notify()
   }
 
@@ -247,6 +244,7 @@ export class PlayerController {
     this.#rate = state.rate
     this.#balance = Math.min(1, Math.max(-1, state.balance ?? 0))
     this.#channelMode = state.channelMode ?? 'stereo'
+    this.#crossfadeSeconds = Math.min(12, Math.max(0, state.crossfadeSeconds ?? 2))
 
     const current = this.#queue.currentTrack
     if (current !== null) {
@@ -275,6 +273,7 @@ export class PlayerController {
       abLoop: this.#abLoop === null ? null : { ...this.#abLoop },
       loopPointA: this.#loopPointA,
       karaoke: this.#karaoke,
+      crossfadeSeconds: this.#crossfadeSeconds,
       queue: this.#queue.tracks,
       queueStructure: this.#queue.structure(),
       sourcePlaylistId: this.#sourcePlaylistId,
@@ -320,12 +319,64 @@ export class PlayerController {
 
     const track = this.#queue.next()
     if (track !== null) {
-      this.#resetAbLoop()
-      this.#engine.load(track)
-      void this.#engine.play()
+      this.#notify()
+      void this.#transitionTo(track, false)
+      return
     }
 
     this.#notify()
+  }
+
+  async #transitionTo(track: QueueTrack, fadeOutCurrent: boolean): Promise<void> {
+    const token = ++this.#transitionToken
+    const crossfade = this.#crossfadeSeconds
+    const shouldFade = fadeOutCurrent && crossfade > 0 && !this.#engine.paused
+
+    if (shouldFade) {
+      await this.#rampVolume(1, 0, crossfade * 1000)
+      if (token !== this.#transitionToken) {
+        return
+      }
+    }
+
+    this.#resetAbLoop()
+    this.#engine.load(track)
+    this.#engine.setRate(this.#rate)
+    this.#engine.setVolume(shouldFade ? 0 : this.#volume)
+    await this.#engine.play()
+
+    if (token !== this.#transitionToken) {
+      return
+    }
+
+    if (shouldFade) {
+      await this.#rampVolume(0, 1, crossfade * 1000)
+      if (token !== this.#transitionToken) {
+        return
+      }
+    }
+
+    this.#engine.setVolume(this.#volume)
+    this.#notify()
+  }
+
+  #rampVolume(fromFactor: number, toFactor: number, durationMs: number): Promise<void> {
+    const steps = Math.max(1, Math.round(durationMs / 50))
+    const stepMs = durationMs / steps
+
+    return new Promise((resolve) => {
+      let step = 0
+      const timer = setInterval(() => {
+        step++
+        const factor = fromFactor + ((toFactor - fromFactor) * step) / steps
+        this.#engine.setVolume(Math.min(1, Math.max(0, this.#volume * factor)))
+
+        if (step >= steps) {
+          clearInterval(timer)
+          resolve()
+        }
+      }, stepMs)
+    })
   }
 
   #notify(): void {

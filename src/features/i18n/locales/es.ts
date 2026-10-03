@@ -58,7 +58,8 @@ export const es = {
     karaoke: 'Quitar voz (karaoke)',
     karaokeHint:
       'Cancela el canal central; funciona mejor cuando la voz está al centro de la mezcla.',
-    hint: 'La velocidad mantiene el tono y el bucle A–B te deja practicar un pasaje.',
+    crossfade: 'Transición entre canciones',
+    hint: 'La velocidad mantiene el tono, el bucle A–B te deja practicar un pasaje y la transición suaviza el cambio de canción.',
   },
   vinyl: {
     region: 'Escenario de reproducción',
