@@ -305,3 +305,10 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Tema por portada también con Spotify**: `useAlbumTheme` ahora usa la portada del playback del SDK cuando está activo (antes solo miraba el reproductor local y Spotify nunca teñía la UI).
 - **Ondas**: leen la paleta del álbum (`--color-primary`/`--color-accent`) y usan un pulso de **beat** sintético cuando no hay datos del analizador (Spotify no pasa por el grafo), para que se sienta rítmico.
 - **Documentación nueva**: `docs/MUSICOS.md` (funciones para músicos, estado y especificación completa) y `docs/AUTH.md` (login: perfil local activo, Cognito/Google pendientes y pasos para activarlos).
+
+### Responsive fino (sesión 2, tanda 8)
+
+- **Disco en móvil/tablet**: ahora se ve la **mitad inferior** (`clipPath: inset(50% 0 0 0)` en el disco, con margen negativo para alinear); las **ondas no se recortan** (el clip es solo al disco, el anillo se dibuja por encima de la sección).
+- **Título**: `break-words` + tamaños responsivos (`text-3xl sm:text-4xl 2xl:text-5xl`) para que no se corte contra el panel.
+- **Responsive por secciones**: móvil (disco mitad inferior + sin controles en héroe), `lg` (disco completo centrado, controles visibles), `xl` (disco grande sangrando con arco derecho de ondas).
+- **Barra móvil**: padding inferior del héroe a `pb-48` para que la barra + nav fija no tape el panel.

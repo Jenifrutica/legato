@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { useSpotifyStore } from '../features/sources'
@@ -46,6 +46,14 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
+  const [compact, setCompact] = useState(false)
+
+  useEffect(() => {
+    const update = () => setCompact(window.innerWidth < 1024)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
@@ -96,16 +104,16 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[52vh] px-5 pb-40 pt-4 lg:pb-28 xl:min-h-[calc(100dvh-9rem)] xl:overflow-x-hidden">
+    <section className="relative min-h-[52vh] px-5 pb-48 pt-2 lg:pb-28 xl:min-h-[calc(100dvh-9rem)] xl:overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-4 xl:block">
-        <div className="relative z-0 h-40 w-full overflow-hidden sm:h-52 lg:h-auto lg:overflow-visible xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
-          <div className="mx-auto w-64 sm:w-80 lg:w-full">
-            <VinylVisual />
+        <div className="relative z-0 h-36 w-full sm:h-44 lg:h-auto xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
+          <div className="mx-auto w-64 -mt-28 sm:w-80 sm:-mt-36 lg:mt-0 lg:w-80 xl:w-full">
+            <VinylVisual cropBottom={compact} />
           </div>
         </div>
 
-        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[37rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
-          <h2 className="max-w-full font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[36rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
+          <h2 className="w-full max-w-full break-words font-display text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl 2xl:text-5xl">
             {displayTitle}
           </h2>
 

@@ -5,7 +5,7 @@ import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
 import { WaveRing } from './WaveRing'
 
-export function VinylVisual() {
+export function VinylVisual({ cropBottom = false }: { cropBottom?: boolean }) {
   const { t } = useTranslation()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
@@ -46,6 +46,7 @@ export function VinylVisual() {
             animationPlayState: isPlaying ? 'running' : 'paused',
             boxShadow:
               '0 24px 60px rgb(0 0 0 / 0.2), 0 0 110px var(--album-glow-soft, transparent)',
+            clipPath: cropBottom ? 'inset(50% 0 0 0)' : undefined,
           }}
         >
           {artworkUrl !== null ? (
