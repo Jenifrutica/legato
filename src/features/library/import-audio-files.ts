@@ -17,6 +17,8 @@ const AUDIO_EXTENSIONS = [
   'aif',
 ]
 
+const VIDEO_EXTENSIONS = ['mp4', 'm4v', 'mov']
+
 export type ImportErrorCode = 'unsupported' | 'tooLarge' | 'duplicate'
 
 export type ImportError = {
@@ -42,12 +44,21 @@ type ParsedMetadata = {
 }
 
 export function isAudioFile(file: File): boolean {
-  if (file.type.startsWith('audio/')) {
+  if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
     return true
   }
 
   const extension = file.name.split('.').pop()?.toLowerCase() ?? ''
-  return AUDIO_EXTENSIONS.includes(extension)
+  return AUDIO_EXTENSIONS.includes(extension) || VIDEO_EXTENSIONS.includes(extension)
+}
+
+export function isVideoFile(file: File): boolean {
+  if (file.type.startsWith('video/')) {
+    return true
+  }
+
+  const extension = file.name.split('.').pop()?.toLowerCase() ?? ''
+  return VIDEO_EXTENSIONS.includes(extension) && !file.type.startsWith('audio/')
 }
 
 export function createDedupeKey(file: File): string {
@@ -82,6 +93,7 @@ export async function importAudioFiles(
     seen.add(dedupeKey)
     const metadata = await readMetadata(file)
     const artworkUrl = metadata.artwork === null ? null : URL.createObjectURL(metadata.artwork)
+    const mediaType = isVideoFile(file) ? 'video' : 'audio'
 
     tracks.push({
       id: crypto.randomUUID(),
@@ -95,7 +107,8 @@ export async function importAudioFiles(
       blob: file,
       fileName: file.name,
       fileSize: file.size,
-      mimeType: file.type === '' ? 'audio/desconocido' : file.type,
+      mimeType: file.type === '' ? `${mediaType}/desconocido` : file.type,
+      mediaType,
       dedupeKey,
       addedAt: Date.now(),
       sampleRate: metadata.sampleRate,

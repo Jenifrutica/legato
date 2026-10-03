@@ -9,11 +9,21 @@ import { SleepTimer } from './sleep-timer'
 import type { TimerSnapshot } from './sleep-timer'
 import type { ChannelMode, QueueTrack } from './types'
 
-const audio = new Audio()
-audio.preload = 'metadata'
+function createLocalMedia(): HTMLVideoElement {
+  const element = document.createElement('video')
+  element.preload = 'metadata'
+  element.playsInline = true
+  return element
+}
+
+const audio = createLocalMedia()
 
 const streamAudio = new Audio()
 streamAudio.preload = 'metadata'
+
+export function getMediaElement(): HTMLMediaElement {
+  return audio
+}
 
 const controller = new PlayerController(audio, streamAudio)
 const graph = new AudioGraph(audio)

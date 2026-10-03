@@ -111,6 +111,8 @@ export const es = {
     speed: 'Velocidad de reproducción',
     timer: 'Temporizador',
     volume: 'Volumen',
+    showVideo: 'Ver video',
+    hideVideo: 'Ocultar video',
     progress: 'Progreso de la canción',
   },
   timer: {

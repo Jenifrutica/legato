@@ -113,6 +113,8 @@ export const en: typeof es = {
     speed: 'Playback speed',
     timer: 'Sleep timer',
     volume: 'Volume',
+    showVideo: 'Show video',
+    hideVideo: 'Hide video',
     progress: 'Song progress',
   },
   timer: {

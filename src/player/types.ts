@@ -10,6 +10,7 @@ export type QueueTrack = {
   durationSeconds: number | null
   sourceUrl: string
   artworkUrl: string | null
+  mediaType?: 'audio' | 'video'
 }
 
 export type QueueState = {

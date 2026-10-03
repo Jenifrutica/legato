@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { useSpotifyStore } from '../features/sources'
@@ -6,6 +7,7 @@ import { usePlayerStore } from '../player'
 import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
+import { VideoOverlay } from './VideoOverlay'
 import { VinylVisual } from './VinylVisual'
 import { useLyrics, useLyricsStore } from '../features/lyrics'
 import { Lyrics, useDemoLyrics } from './Lyrics'
@@ -50,7 +52,12 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
+  const [videoOpen, setVideoOpen] = useState(false)
   const demoLyrics = useDemoLyrics()
+
+  useEffect(() => {
+    setVideoOpen(false)
+  }, [currentTrack?.id])
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
@@ -295,10 +302,33 @@ export function Hero() {
               >
                 {t('lyrics.toggle')}
               </button>
+
+              {currentTrack?.mediaType === 'video' && (
+                <button
+                  aria-pressed={videoOpen}
+                  className={`h-11 border-2 border-rule px-3 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-transform hover:-translate-y-0.5 ${
+                    videoOpen
+                      ? 'bg-accent text-on-accent shadow-[3px_3px_0_var(--color-rule)]'
+                      : 'bg-surface text-ink-muted'
+                  }`}
+                  onClick={() => setVideoOpen((value) => !value)}
+                  type="button"
+                >
+                  {videoOpen ? t('player.hideVideo') : t('player.showVideo')}
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {videoOpen &&
+        currentTrack !== null &&
+        currentTrack.mediaType === 'video' &&
+        createPortal(
+          <VideoOverlay onClose={() => setVideoOpen(false)} src={currentTrack.sourceUrl} />,
+          document.body,
+        )}
     </section>
   )
 }

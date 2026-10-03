@@ -113,6 +113,8 @@ export const pt: typeof es = {
     speed: 'Velocidade de reprodução',
     timer: 'Temporizador',
     volume: 'Volume',
+    showVideo: 'Ver vídeo',
+    hideVideo: 'Ocultar vídeo',
     progress: 'Progresso da música',
   },
   timer: {

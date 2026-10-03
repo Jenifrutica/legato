@@ -11,6 +11,8 @@ export type LibraryTrack = {
   fileName: string
   fileSize: number
   mimeType: string
+  /** Presente en pistas importadas; ausente en registros antiguos = audio. */
+  mediaType?: 'audio' | 'video'
   dedupeKey: string
   addedAt: number
   sampleRate: number | null
