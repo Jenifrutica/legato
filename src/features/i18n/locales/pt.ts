@@ -81,6 +81,7 @@ export const pt: typeof es = {
     removeLabel: 'Remover {{title}} da fila',
     clear: 'Esvaziar fila',
     reorder: 'Reordenar na fila {{title}}',
+    nowPlaying: 'Tocando',
     count_one: '{{count}} nó',
     count: '{{count}} nós',
   },
@@ -242,6 +243,7 @@ export const pt: typeof es = {
   lyrics: {
     region: 'Letra da música',
     source: 'Letra via LRCLIB',
+    toggle: 'Letra',
   },
   structure: {
     region: 'Estrutura da lista duplamente encadeada',

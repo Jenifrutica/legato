@@ -48,9 +48,7 @@ export function MiniPlayer() {
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const title = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? null)
-  const artworkUrl = spotifyActive
-    ? spotifyPlayback.artworkUrl
-    : (currentTrack?.artworkUrl ?? null)
+  const artworkUrl = spotifyActive ? spotifyPlayback.artworkUrl : (currentTrack?.artworkUrl ?? null)
   const hasTrack = spotifyActive || currentTrack !== null
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 export { activeLineIndex, parseLrc } from './lrc'
 export type { LyricLine } from './lrc'
+export { useLyricsStore } from './lyrics-store'
 export { fetchLyrics } from './provider'
 export type { LyricsQuery } from './provider'
 export { useLyrics } from './use-lyrics'

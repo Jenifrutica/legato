@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLyricsStore } from '../features/lyrics'
 import { usePlayerStore } from '../player'
 import { XIcon } from './icons'
 import { StructureView } from './StructureView'
@@ -46,6 +47,8 @@ export function MusiciansPanel() {
 
   const queueStructure = usePlayerStore((state) => state.queueStructure)
   const currentTrackId = usePlayerStore((state) => state.currentTrack?.id ?? null)
+  const lyricsEnabled = useLyricsStore((state) => state.enabled)
+  const toggleLyrics = useLyricsStore((state) => state.toggle)
 
   useEffect(() => {
     try {
@@ -140,6 +143,16 @@ export function MusiciansPanel() {
                   {queueStructure.length} nodos · doble enlace
                 </p>
               </div>
+              <button
+                aria-pressed={lyricsEnabled}
+                className={`border-2 border-rule px-3 py-2 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-transform hover:-translate-y-0.5 ${
+                  lyricsEnabled ? 'bg-accent text-on-accent' : 'bg-surface text-ink-muted'
+                }`}
+                onClick={toggleLyrics}
+                type="button"
+              >
+                {t('lyrics.toggle')}
+              </button>
               <button
                 aria-label={t('cookies.close')}
                 className="border-2 border-rule bg-surface p-2 text-ink transition-transform hover:-translate-y-0.5 active:translate-y-0.5"

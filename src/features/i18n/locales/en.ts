@@ -81,6 +81,7 @@ export const en: typeof es = {
     removeLabel: 'Remove {{title}} from the queue',
     clear: 'Clear queue',
     reorder: 'Reorder in queue {{title}}',
+    nowPlaying: 'Now playing',
     count_one: '{{count}} node',
     count: '{{count}} nodes',
   },
@@ -243,6 +244,7 @@ export const en: typeof es = {
   lyrics: {
     region: 'Song lyrics',
     source: 'Lyrics via LRCLIB',
+    toggle: 'Lyrics',
   },
   structure: {
     region: 'Doubly linked list structure',

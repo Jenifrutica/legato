@@ -79,6 +79,7 @@ export const es = {
     removeLabel: 'Quitar {{title}} de la cola',
     clear: 'Vaciar cola',
     reorder: 'Reordenar en la cola {{title}}',
+    nowPlaying: 'Sonando',
     count_one: '{{count}} nodo',
     count: '{{count}} nodos',
   },
@@ -242,6 +243,7 @@ export const es = {
   lyrics: {
     region: 'Letra de la canción',
     source: 'Letra vía LRCLIB',
+    toggle: 'Letra',
   },
   structure: {
     region: 'Estructura de la lista doble',
