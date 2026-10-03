@@ -1,3 +1,4 @@
+import { AccountChip, AuthContextProvider } from '../features/auth'
 import { LibraryPanel } from '../ui/LibraryPanel'
 import { MobileNav } from '../ui/MobileNav'
 import { PlayerBar } from '../ui/PlayerBar'
@@ -6,6 +7,14 @@ import { VinylStage } from '../ui/VinylStage'
 import { DiscMark } from '../ui/icons'
 
 export default function App() {
+  return (
+    <AuthContextProvider>
+      <AppShell />
+    </AuthContextProvider>
+  )
+}
+
+function AppShell() {
   return (
     <div className="min-h-dvh bg-bg text-ink">
       <a
@@ -24,6 +33,9 @@ export default function App() {
               <DiscMark className="size-5" />
             </span>
             <h1 className="font-display text-2xl font-semibold tracking-tight">Legato</h1>
+            <div className="ml-auto min-w-0 max-w-44">
+              <AccountChip />
+            </div>
           </header>
 
           <main className="px-4 pb-48 pt-5 sm:px-6 lg:px-8 lg:pb-36 lg:pt-8" id="contenido">

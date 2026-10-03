@@ -55,6 +55,8 @@ Nota: el template actual de Vite 8 usa **oxlint** en lugar de ESLint; se mantien
 aws sts get-caller-identity   # debe mostrar la cuenta 793452510776 y el usuario reproo
 ```
 
+**Restricciones de la cuenta (SCP):** bloqueados Cognito, Amplify, Lambda y DynamoDB. Disponibles S3, CloudFront, ACM, Route 53, EC2 e IAM. Ver `docs/DESPLIEGUE.md`.
+
 ## Variables de entorno (previsto)
 
 ```bash

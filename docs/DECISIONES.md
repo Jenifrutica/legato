@@ -61,3 +61,11 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D33 | Rotar/desactivar la access key compartida al terminar la entrega | La llave quedó expuesta en el chat |
 | D34 | Validación con Zod en formularios, API e importaciones | Robustez |
 | D35 | Rate limits y cuotas (post-entrega en la nube) | Evitar abuso y costos |
+
+## Descubrimientos de infraestructura (3 oct 2026)
+
+| # | Decisión | Razón |
+|---|---|---|
+| D36 | La cuenta AWS está en una organización con **SCP** que bloquea Cognito, Amplify, Lambda y DynamoDB | Verificado con errores `AccessDeniedException` explícitos; disponibles S3, CloudFront, ACM, Route 53, EC2 e IAM |
+| D37 | Login del MVP: **perfil local**; `CognitoAuthProvider` implementado y listo para una cuenta sin SCP | Cumple el fallback del timebox sin bloquear el MVP |
+| D38 | Despliegue del Día 4 cambia a **S3 + CloudFront + ACM** en vez de Amplify | Amplify está bloqueado; S3/CloudFront/ACM están permitidos |

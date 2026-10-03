@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { AccountChip } from '../features/auth'
 import {
   AccessibilityIcon,
   DiscMark,
@@ -49,6 +50,7 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-4 border-t border-border pt-5">
+        <AccountChip />
         <ul className="flex flex-col gap-1">
           <NavItem icon={<AccessibilityIcon className="size-5 shrink-0" />} label="Accesibilidad" />
           <NavItem icon={<SettingsIcon className="size-5 shrink-0" />} label="Ajustes" />
