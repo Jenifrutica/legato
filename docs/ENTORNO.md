@@ -4,12 +4,13 @@
 
 | Herramienta | Versión / ubicación | Notas |
 |---|---|---|
-| Bun | `~/.bun/bin/bun` | Gestor de paquetes y runtime de scripts |
-| AWS CLI v2 | `~/.local/aws-cli` (bin en `~/.local/bin/aws`) | Instalación sin sudo |
-| Credenciales AWS | `~/.aws/credentials` (chmod 600) | Usuario IAM `reproo`, región `us-east-1` |
+| Bun | 1.4.2 · `~/.bun/bin/bun` | Gestor de paquetes y runtime de scripts |
+| AWS CLI v2 | 2.37.9 · `~/.local/aws-cli` (bin en `~/.local/bin/aws`) | Instalación sin sudo |
+| Credenciales AWS | `~/.aws/credentials` (chmod 600) | Usuario IAM `reproo`, cuenta `793452510776`, región `us-east-1` (verificado con `sts get-caller-identity`) |
 | git | ya instalado | Usuario: JeniFedora · jenifer.urbano@campusucc.edu.co |
-| gh | ya instalado y autenticado | Cuenta: Jenifrutica |
-| Skills | `~/.agents/skills` + symlinks a `~/.config/opencode/skills` y `~/.claude/skills` | Ver lista abajo |
+| gh | 2.97.0, autenticado | Cuenta: Jenifrutica |
+| Skills | `~/.agents/skills` + symlinks a `~/.config/opencode/skills` y `~/.claude/skills` | Instaladas con `npx skills` (paquete `skills` 1.7.x) |
+| impeccable | 4.5.0 | Actualizado desde `pbakaus/impeccable`; comando en `~/.config/opencode/command/impeccable.md` |
 
 ## Skills instaladas (set curado)
 
@@ -19,12 +20,12 @@
 - `find-animation-opportunities`, `improve-animations`, `review-animations`
 - `apple-design`, `pick-ui-library`, `prototype`, `break-ui`
 
-**Leonxlnx/taste-skill** (dirección estética anti-genérica):
+**Leonxlnx/taste-skill** (dirección estética anti-genérica; nombres reales de las skills):
 
-- `taste-skill`, `redesign-skill`, `imagegen-frontend-web`
-- `minimalist-skill`, `soft-skill`
+- `design-taste-frontend`, `redesign-existing-projects`
+- `imagegen-frontend-web`, `minimalist-ui`, `high-end-visual-design`
 
-**impeccable** (`pbakaus/impeccable`): actualizado a la última versión.
+**impeccable** (`pbakaus/impeccable`): actualizado a **4.5.0** en `~/.agents/skills`, `~/.config/opencode/skills` y `~/.claude/skills`.
 
 Actualizar en el futuro:
 

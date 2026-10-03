@@ -118,6 +118,6 @@ Tipografía: `Fraunces` (display, cálida) + `Inter` (cuerpo) + mono para el mod
 
 ## Skills de diseño a usar
 
-- `impeccable` — auditoría y pulido de UI.
-- `emilkowalski/animate`, `improve-animations`, `review-animations` — calidad de animaciones.
-- `Leonxlnx/taste-skill`, `soft-skill`, `minimalist-skill` — dirección estética anti-genérica.
+- `impeccable` (4.5.0) — auditoría y pulido de UI.
+- `animate`, `improve-animations`, `review-animations`, `apple-design`, `animation-vocabulary` — calidad de animaciones.
+- `design-taste-frontend`, `high-end-visual-design`, `minimalist-ui` — dirección estética anti-genérica.
