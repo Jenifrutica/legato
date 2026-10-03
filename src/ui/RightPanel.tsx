@@ -58,14 +58,16 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-semibold">{t('nav.playlists')}</h2>
-        <button
-          aria-label={t('playlists.newPlaylist')}
-          className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
-          onClick={() => setIsCreating(true)}
-          type="button"
-        >
-          <PlusIcon className="size-4" />
-        </button>
+        {playlists.length > 0 && (
+          <button
+            aria-label={t('playlists.newPlaylist')}
+            className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+            onClick={() => setIsCreating(true)}
+            type="button"
+          >
+            <PlusIcon className="size-4" />
+          </button>
+        )}
       </div>
 
       {isCreating && (
