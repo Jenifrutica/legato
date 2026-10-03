@@ -96,13 +96,13 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[62vh] overflow-x-hidden px-5 py-8 xl:min-h-[calc(100dvh-9rem)]">
+    <section className="relative min-h-[62vh] overflow-x-hidden px-5 pb-44 pt-8 lg:pb-10 xl:min-h-[calc(100dvh-9rem)]">
       <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-5 xl:block">
-        <div className="relative z-0 w-64 shrink-0 sm:w-80 xl:pointer-events-none xl:absolute xl:-left-[min(11rem,18dvh)] xl:top-1/2 xl:w-[min(44rem,70dvh)] xl:-translate-y-1/2">
+        <div className="relative z-0 w-64 shrink-0 sm:w-80 xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
           <VinylVisual />
         </div>
 
-        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[36rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
+        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[37rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
           <h2 className="max-w-full font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
             {displayTitle}
           </h2>

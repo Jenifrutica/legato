@@ -14,6 +14,7 @@ export type AlbumTheme = {
   accent: string
   accentSoft: string
   glow: string
+  glowSoft: string
   darkPrimary: string
   darkPrimaryStrong: string
   darkPrimarySoft: string
@@ -25,10 +26,10 @@ const INK_BASE: Rgb = { r: 34, g: 30, b: 28 }
 const DARK_BASE: Rgb = { r: 11, g: 14, b: 23 }
 
 export function deriveTheme(palette: AlbumPalette): AlbumTheme {
-  const background = mix(WHITE, palette.dominant, 0.12)
-  const surface = mix(WHITE, palette.dominant, 0.04)
-  const surface2 = mix(WHITE, palette.dominant, 0.18)
-  const border = mix(WHITE, palette.muted, 0.38)
+  const background = mix(WHITE, palette.dominant, 0.2)
+  const surface = mix(WHITE, palette.dominant, 0.06)
+  const surface2 = mix(WHITE, palette.dominant, 0.24)
+  const border = mix(WHITE, palette.muted, 0.42)
 
   const ink = ensureContrast(INK_BASE, background, 7)
   const inkMuted = ensureContrast(mix(ink, background, 0.4), background, 4.5)
@@ -47,6 +48,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
   const darkPrimarySoft = mix(DARK_BASE, palette.vibrant, 0.3)
   const darkAccent = ensureContrast(palette.muted, DARK_BASE, 4.5)
   const darkAccentSoft = mix(DARK_BASE, palette.muted, 0.32)
+  const glowSoft = `rgba(${Math.round(palette.vibrant.r)}, ${Math.round(palette.vibrant.g)}, ${Math.round(palette.vibrant.b)}, 0.32)`
 
   return {
     background: rgbToHex(background),
@@ -61,6 +63,7 @@ export function deriveTheme(palette: AlbumPalette): AlbumTheme {
     accent: rgbToHex(accent),
     accentSoft: rgbToHex(accentSoft),
     glow: glow,
+    glowSoft: glowSoft,
     darkPrimary: rgbToHex(darkPrimary),
     darkPrimaryStrong: rgbToHex(darkPrimaryStrong),
     darkPrimarySoft: rgbToHex(darkPrimarySoft),
@@ -82,6 +85,7 @@ const THEME_VARIABLES: Array<[keyof AlbumTheme, string]> = [
   ['accent', '--album-accent'],
   ['accentSoft', '--album-accent-soft'],
   ['glow', '--album-glow'],
+  ['glowSoft', '--album-glow-soft'],
   ['darkPrimary', '--album-dark-primary'],
   ['darkPrimaryStrong', '--album-dark-primary-strong'],
   ['darkPrimarySoft', '--album-dark-primary-soft'],

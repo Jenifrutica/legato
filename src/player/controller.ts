@@ -38,6 +38,8 @@ export type RestoreState = {
 }
 
 export class PlayerController {
+  #localEngine: PlayerEngine
+  #streamEngine: PlayerEngine
   #engine: PlayerEngine
   #queue = new PlaybackQueue()
   #listeners = new Set<(snapshot: PlayerSnapshot) => void>()
@@ -54,20 +56,70 @@ export class PlayerController {
   #lastError: string | null = null
   #sourcePlaylistId: string | null = null
 
-  constructor(audio?: AudioLike) {
-    this.#engine = new PlayerEngine(audio)
-    this.#engine.on('status', () => {
-      this.#notify()
-    })
-    this.#engine.on('time', () => {
-      this.#enforceAbLoop()
-      this.#notify()
-    })
-    this.#engine.on('ended', this.#handleEnded)
-    this.#engine.on('error', (message) => {
-      this.#lastError = message
-      this.#notify()
-    })
+  constructor(audio?: AudioLike, streamAudio?: AudioLike) {
+    this.#localEngine = new PlayerEngine(audio)
+    this.#streamEngine =
+      streamAudio === undefined ? this.#localEngine : new PlayerEngine(streamAudio)
+    this.#engine = this.#localEngine
+
+    const engines = new Set([this.#localEngine, this.#streamEngine])
+    for (const engine of engines) {
+      engine.on('status', () => {
+        if (engine === this.#engine) {
+          this.#notify()
+        }
+      })
+      engine.on('time', () => {
+        if (engine === this.#engine) {
+          this.#enforceAbLoop()
+          this.#notify()
+        }
+      })
+      engine.on('ended', () => {
+        if (engine === this.#engine) {
+          this.#handleEnded()
+        }
+      })
+      engine.on('error', (message) => {
+        if (engine === this.#engine) {
+          this.#lastError = message
+          this.#notify()
+        }
+      })
+    }
+  }
+
+  #engineFor(track: QueueTrack): PlayerEngine {
+    if (this.#streamEngine === this.#localEngine) {
+      return this.#localEngine
+    }
+
+    if (track.sourceUrl.startsWith('blob:')) {
+      return this.#localEngine
+    }
+
+    try {
+      return new URL(track.sourceUrl, window.location.href).origin === window.location.origin
+        ? this.#localEngine
+        : this.#streamEngine
+    } catch {
+      return this.#streamEngine
+    }
+  }
+
+  #selectEngine(track: QueueTrack): void {
+    const engine = this.#engineFor(track)
+    if (engine === this.#engine) {
+      return
+    }
+
+    for (const candidate of new Set([this.#localEngine, this.#streamEngine])) {
+      if (candidate !== engine) {
+        candidate.pause()
+      }
+    }
+
+    this.#engine = engine
   }
 
   playTracks(tracks: QueueTrack[], startId?: string, sourcePlaylistId: string | null = null): void {
@@ -255,6 +307,7 @@ export class PlayerController {
     const current = this.#queue.currentTrack
     if (current !== null) {
       this.#resetAbLoop()
+      this.#selectEngine(current)
       this.#engine.load(current)
       this.#engine.setVolume(this.#volume)
       this.#engine.setRate(this.#rate)
@@ -351,6 +404,7 @@ export class PlayerController {
 
     this.#resetAbLoop()
     this.#lastError = null
+    this.#selectEngine(track)
     this.#engine.load(track)
     this.#engine.setRate(this.#rate)
     this.#engine.setVolume(shouldFade ? 0 : this.#volume)

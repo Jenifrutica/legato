@@ -11,9 +11,11 @@ import type { ChannelMode, QueueTrack } from './types'
 
 const audio = new Audio()
 audio.preload = 'metadata'
-audio.crossOrigin = 'anonymous'
 
-const controller = new PlayerController(audio)
+const streamAudio = new Audio()
+streamAudio.preload = 'metadata'
+
+const controller = new PlayerController(audio, streamAudio)
 const graph = new AudioGraph(audio)
 const sleepTimer = new SleepTimer(() => {
   void controller.fadeOutAndPause()

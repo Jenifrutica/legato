@@ -483,7 +483,7 @@ export function LibraryPanel() {
                   {playlists.length > 0 && (
                     <select
                       aria-label={t('library.addToLabel', { title: track.title })}
-                      className="max-w-32 rounded-md border border-border bg-bg px-2 py-1 text-xs text-ink-muted focus:border-primary focus:outline-none"
+                      className="max-w-32 rounded-full border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary focus:border-primary focus:outline-none"
                       defaultValue=""
                       onChange={(event) => {
                         const playlistId = event.target.value
@@ -493,7 +493,7 @@ export function LibraryPanel() {
                         }
                       }}
                     >
-                      <option value="">{t('library.addTo')}</option>
+                      <option value="">＋ {t('library.addTo')}</option>
                       {playlists.map((playlist) => (
                         <option key={playlist.id} value={playlist.id}>
                           {playlist.name}

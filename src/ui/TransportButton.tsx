@@ -19,13 +19,18 @@ export function TransportButton({
     <button
       aria-label={label}
       aria-pressed={pressed}
-      className={`grid place-items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`grid place-items-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
         primary
-          ? 'size-11 bg-primary-strong text-white hover:opacity-90'
-          : `size-9 ${pressed === true ? 'bg-primary-soft text-primary-strong' : 'text-ink-muted hover:text-ink'}`
+          ? 'size-14 bg-primary-strong text-white shadow-soft hover:scale-105'
+          : `size-10 ${
+              pressed === true
+                ? 'bg-primary-soft text-primary-strong'
+                : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+            }`
       }`}
       disabled={disabled}
       onClick={onClick}
+      title={label}
       type="button"
     >
       {icon}

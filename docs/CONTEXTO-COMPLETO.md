@@ -284,3 +284,9 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Ondas más exageradas y de color**: anillo con longitud ×1.6, grosor 4 y color HSL rotando en el tiempo + pulso de bajos.
 - **Controles en dos filas**: transporte arriba; velocidad/ensayo/timer/volumen abajo → el volumen ya no se sale ni se superpone.
 - **E2E ampliado**: se verifica play → "Pausar" → pausa → "Reproducir" con una pista importada (los 4 E2E en verde).
+
+### Audio de streaming con dos elementos (sesión 2, tanda 5)
+
+- **Causa raíz de "No se pudo reproducir el audio"**: el audio externo (previews de Spotify, streams Audius/Jamendo) no manda CORS, y un elemento enrutado por `MediaElementSource` no puede sonar en esas condiciones. Solución: **dos elementos de audio** en `player-store`: `audio` (local, pasa por `AudioGraph` con balance/karaoke/analizador) y `streamAudio` (directo, sin grafo). `PlayerController` elige motor por canción (`blob:`/mismo origen → local; externo → stream) y pausa el otro. Tests siguen pasando (con un solo audio, ambos motores son el mismo).
+- El analizador solo recibe audio local; para streaming las ondas usan movimiento sintético.
+- Disco más grande (`xl:w-[min(48rem,78dvh)]`, sin cortarse) y con glow del color del álbum; tema mucho más notorio (fondo/paneles teñidos + halo en `body` con `--album-glow-soft`); ondas con glow y color HSL rotando; botones más grandes/obvios (play 56px, resto 40px, tooltips); héroe con padding inferior para que la barra fija no tape contenido.

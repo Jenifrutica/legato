@@ -185,7 +185,11 @@ html.theme-dark.album-theme {
 }
 
 html.theme-dark body {
-  background-image: none;
+  background-image: radial-gradient(
+    900px 520px at 8% 6%,
+    var(--album-glow-soft, transparent),
+    transparent 70%
+  );
 }
 
 html,
@@ -197,11 +201,9 @@ body {
 
 body {
   background-attachment: fixed;
-  background-image: radial-gradient(
-    1200px 640px at 12% -12%,
-    rgb(255 255 255 / 0.75),
-    transparent 62%
-  );
+  background-image:
+    radial-gradient(1200px 640px at 12% -12%, rgb(255 255 255 / 0.7), transparent 62%),
+    radial-gradient(900px 520px at 8% 6%, var(--album-glow-soft, transparent), transparent 70%);
 }
 
 html.a11y-dyslexia {

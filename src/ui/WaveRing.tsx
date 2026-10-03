@@ -66,7 +66,9 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
         const endY = center + Math.sin(angle) * (baseRadius + length)
 
         const hue = Math.round((seconds * 40 + index * 4) % 360)
-        context.strokeStyle = `hsla(${hue}, 88%, 62%, ${0.3 + intensity * 0.65})`
+        context.shadowBlur = 12
+        context.shadowColor = `hsla(${hue}, 90%, 62%, 0.85)`
+        context.strokeStyle = `hsla(${hue}, 90%, 62%, ${0.5 + intensity * 0.5})`
         context.lineWidth = 4
         context.lineCap = 'round'
         context.beginPath()

@@ -23,13 +23,17 @@ test('regresion #12: reordenar la playlist no cambia la cancion en curso', async
 
   const heroControls = page.locator('main')
   await panel.getByRole('button', { name: 'Reproducir A' }).click()
-  await expect(heroControls.getByRole('button', { name: 'Pausar', exact: true }).last()).toBeVisible()
+  await expect(
+    heroControls.getByRole('button', { name: 'Pausar', exact: true }).last(),
+  ).toBeVisible()
   await heroControls.getByRole('button', { name: 'Pausar', exact: true }).last().click()
   await expect(
     heroControls.getByRole('button', { name: 'Reproducir', exact: true }).last(),
   ).toBeVisible()
   await panel.getByRole('button', { name: 'Reproducir A' }).click()
-  await expect(heroControls.getByRole('button', { name: 'Pausar', exact: true }).last()).toBeVisible()
+  await expect(
+    heroControls.getByRole('button', { name: 'Pausar', exact: true }).last(),
+  ).toBeVisible()
   await expect(page.getByText('A', { exact: true }).first()).toBeVisible()
 
   await dragHandle(page, 'Reordenar C', 'Reordenar A')
