@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { A11yPanel, useA11yStore } from '../features/a11y'
 import { AccountChip } from '../features/auth'
 import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
-import { AccessibilityIcon, DiscMark } from './icons'
+import { SettingsPanel } from '../features/sources'
+import { AccessibilityIcon, DiscMark, SettingsIcon } from './icons'
 
 export function TopBar() {
   const { t } = useTranslation()
@@ -11,6 +13,7 @@ export function TopBar() {
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
   const openA11yPanel = useA11yStore((state) => state.openPanel)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/70 backdrop-blur-xl">
@@ -50,12 +53,21 @@ export function TopBar() {
         >
           <AccessibilityIcon className="size-5" />
         </button>
+        <button
+          aria-label={t('settings.title')}
+          className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink"
+          onClick={() => setSettingsOpen(true)}
+          type="button"
+        >
+          <SettingsIcon className="size-5" />
+        </button>
         <LanguageSelector compact />
         <div className="hidden min-w-0 max-w-44 sm:block">
           <AccountChip />
         </div>
       </div>
       <A11yPanel />
+      <SettingsPanel onClose={() => setSettingsOpen(false)} open={settingsOpen} />
     </header>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePlaylistsStore } from '../features/playlists'
+import { SearchTab } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
 import { LibraryPanel } from './LibraryPanel'
@@ -9,13 +10,14 @@ import { CopyIcon, PencilIcon, PlusIcon, TrashIcon } from './icons'
 
 const TAB_KEYS = {
   library: 'tabs.library',
+  search: 'tabs.search',
   playlists: 'tabs.playlists',
   queue: 'tabs.queue',
   audio: 'tabs.audio',
 } as const
 
 type Tab = keyof typeof TAB_KEYS
-const TABS: Tab[] = ['library', 'playlists', 'queue', 'audio']
+const TABS: Tab[] = ['library', 'search', 'playlists', 'queue', 'audio']
 
 function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const { t } = useTranslation()
@@ -231,6 +233,7 @@ export function RightPanel() {
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {tab === 'library' && <LibraryPanel />}
+        {tab === 'search' && <SearchTab />}
         {tab === 'playlists' && <PlaylistsTab onOpen={() => setTab('library')} />}
         {tab === 'queue' && <QueueTab />}
         {tab === 'audio' && (

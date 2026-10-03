@@ -33,17 +33,20 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 36 | Jam en tiempo real y playlists compartidas | Post-entrega (diseñado en docs/JAM.md) |
 | 37 | Modo offline (PWA) | Cerrado |
 | 38 | Crossfade configurable | Cerrado |
-| 39 | Rediseño Hi-Fi vivo + vinilo 3D + tema por portada | Cerrado |
-| 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | En curso |
+| 39 | Rediseño Hi-Fi vivo + vinilo 3D + tema por portada | Cerrado (vinilo ahora 2D con portada completa, sin recorte) |
+| 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | Cerrado (búsqueda + previews; SDK Premium pendiente) |
+| 41 | Integración de pistas online con listas dobles | Cerrado (reproducir desde la búsqueda y guardar Audius/Jamendo en biblioteca) |
 
 ## Estado técnico
 
-- **Tests:** 149 unitarios + 4 E2E (Playwright) en verde.
+- **Tests:** 153 unitarios + 4 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
-- **Rediseño:** top bar sticky, vinilo 3D sangrando por la izquierda (R3F lazy, 242 kB gzip, fallback CSS y reduced-motion), tema dinámico por portada en toda la interfaz con contraste AA, panel derecho con pestañas Biblioteca/Playlists/Cola/Audio, controles de escenario en el héroe y mini reproductor móvil.
+- **Rediseño:** top bar sticky, vinilo 2D con la portada como disco completo (sin recorte, sin 3D), tema dinámico por portada en toda la interfaz con contraste AA, panel derecho con pestañas Biblioteca/Buscar/Playlists/Cola/Audio, controles de escenario en el héroe y mini reproductor móvil.
+- **Fuentes:** Spotify (OAuth PKCE + búsqueda + previews 30 s), Audius (streaming completo gratis) y Jamendo (CC, client_id), cada una con interruptor en Ajustes y activadas por defecto; guardar Audius/Jamendo en la biblioteca.
+- **Credenciales:** Spotify y Jamendo Client ID configurados en `.env.local`.
+- **Pendiente Bloque B:** Web Playback SDK de Spotify (reproducción completa Premium) — el audio lo maneja Spotify y no pasa por nuestro grafo.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
-- **Credenciales listas:** Spotify Client ID + Jamendo Client ID en `.env.local` (se crearán al ejecutar el Bloque B).
 
 ## Próximo paso
 
-Bloque B: proveedores de música conmutables. `MusicSource` + Ajustes (Spotify activado por defecto, Audius y Jamendo), OAuth PKCE de Spotify (búsqueda + previews + Web Playback SDK Premium), Audius sin credenciales, Jamendo con client_id. Luego Bloque C (integrar pistas online con las listas dobles) y cierre local. Despliegue: Día 4.
+Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a conectar Spotify). Después: Web Playback SDK, pulido final y Día 4 (deploy S3 + CloudFront).
