@@ -60,6 +60,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 63 | **Referencias de Spotify en tus estructuras**: los botones «＋ playlist» y «Lista» aparecen también en resultados de Spotify; la pista se guarda como referencia externa (metadatos + URI, sin audio) en biblioteca/playlists/Lista, y al sonar la reproduce el SDK con la Lista mandando el orden y avanzando al terminar | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 | 64 | **Ajustes finos**: «Nueva playlist» abre una ventanita para escribir el nombre (no auto-crea), la canción pulsada en Spotify suena primero (no la primera de la búsqueda), crossfade visible en el panel de Audio (0–12 s) y ondas más grandes (líneas de hasta 9 px, longitud ×2.2, zona más alta) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 | 65 | **Arreglos de reproducción**: el avance automático reanuda el AudioContext (antes podía avanzar en silencio), el slider de progreso ya no se traba (estado local de arrastre en héroe y barra móvil) y las ondas pasan a **líneas finas y largas** (1.4–3.2 px, papel sobre el campo naranja, tinta fuera) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
+| 66 | **Ondas v5 y disco más grande**: disco `min(46rem, 80vw, 72dvh)`, zona 0.72, lienas hasta 0.19× con respuesta suavizada (raíz) y una **curva fina que envuelve las puntas** (trazada con curvas cuadráticas), en papel sobre el campo y tinta fuera | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

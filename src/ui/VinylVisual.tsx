@@ -34,7 +34,7 @@ export function VinylVisual() {
 
   return (
     <section aria-label={t('vinyl.region')} className="relative">
-      <div className="disc-zone" style={{ '--disc': 'min(42rem, 78vw, 70dvh)' } as CSSProperties}>
+      <div className="disc-zone" style={{ '--disc': 'min(46rem, 80vw, 72dvh)' } as CSSProperties}>
         <span aria-hidden="true" className="disc-field" />
 
         <div className="disc-wrap">

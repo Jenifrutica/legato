@@ -92,7 +92,7 @@ export function WaveRing({
         ? (analyser?.getLevels() ?? new Uint8Array(0))
         : new Uint8Array(0)
       const center = size / 2
-      const base = size * 0.348
+      const base = size * 0.314
       const seconds = time / 1000
       const segments = 110
 
@@ -107,7 +107,7 @@ export function WaveRing({
         bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
       }
       const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
-      const pulse = Math.min(2.2, 1 + bass * 0.9 + beat * 1.1)
+      const pulse = Math.min(2.3, 1 + bass * 0.9 + beat * 1.1)
 
       type Segment = {
         x0: number
@@ -130,10 +130,10 @@ export function WaveRing({
           levels.length === 0
             ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.22 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
-        const intensity = Math.max(0.05, Math.min(1, raw))
-        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.6
+        const intensity = Math.max(0.12, Math.min(1, Math.sqrt(raw)))
+        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.64
         const length =
-          (8 + intensity * size * (activeRef.current ? 0.16 : 0.05) * pulse) * downScale
+          (10 + intensity * size * (activeRef.current ? 0.19 : 0.06) * pulse) * downScale
         const x0 = center + Math.cos(angle) * base
         const y0 = center + Math.sin(angle) * base
         const x1 = center + Math.cos(angle) * (base + length)
@@ -150,7 +150,7 @@ export function WaveRing({
         })
       }
 
-      const paint = (color: (segment: Segment) => string) => {
+      const paint = (color: (segment: Segment) => string, curveColor: string) => {
         context.lineCap = 'butt'
         for (const segment of drawn) {
           context.globalAlpha = 0.35 + segment.intensity * 0.6
@@ -161,18 +161,37 @@ export function WaveRing({
           context.lineTo(segment.x1, segment.y1)
           context.stroke()
         }
-        context.globalAlpha = 1
+
+        // Línea fina que envuelve las puntas y dibuja la curva de la onda.
+        if (drawn.length > 2) {
+          context.globalAlpha = 0.55
+          context.strokeStyle = curveColor
+          context.lineWidth = 1.2
+          context.lineJoin = 'round'
+          context.beginPath()
+          const first = drawn[0]
+          const last = drawn[drawn.length - 1]
+          context.moveTo((first.x1 + last.x1) / 2, (first.y1 + last.y1) / 2)
+          for (let index = 0; index < drawn.length; index++) {
+            const tip = drawn[index]
+            const next = drawn[(index + 1) % drawn.length]
+            context.quadraticCurveTo(tip.x1, tip.y1, (tip.x1 + next.x1) / 2, (tip.y1 + next.y1) / 2)
+          }
+          context.closePath()
+          context.stroke()
+          context.globalAlpha = 1
+        }
       }
 
       // Sobre el campo de tinta directa las líneas van en papel; fuera, en tinta/acento.
-      const fieldHalfWidth = size * 0.3867
-      const fieldBottom = center + size * 0.2667
+      const fieldHalfWidth = size * 0.341
+      const fieldBottom = center + size * 0.235
 
       context.save()
       context.beginPath()
       context.rect(center - fieldHalfWidth, -size, fieldHalfWidth * 2, fieldBottom + size)
       context.clip()
-      paint(() => inks.paper)
+      paint(() => inks.paper, inks.paper)
       context.restore()
 
       context.save()
@@ -180,7 +199,7 @@ export function WaveRing({
       context.rect(0, 0, size, size)
       context.rect(center - fieldHalfWidth, -size, fieldHalfWidth * 2, fieldBottom + size)
       context.clip('evenodd')
-      paint((segment) => (segment.index % 5 === 0 ? inks.accent : inks.ink))
+      paint((segment) => (segment.index % 5 === 0 ? inks.accent : inks.ink), inks.ink)
       context.restore()
     }
 
@@ -210,7 +229,7 @@ export function WaveRing({
   return (
     <canvas
       aria-hidden="true"
-      className="pointer-events-none absolute -inset-[25%] h-[150%] w-[150%]"
+      className="pointer-events-none absolute -inset-[35%] h-[170%] w-[170%]"
       ref={canvasRef}
     />
   )
