@@ -31,6 +31,7 @@ export function Hero() {
   const shuffle = usePlayerStore((state) => state.shuffle)
   const abLoop = usePlayerStore((state) => state.abLoop)
   const timer = usePlayerStore((state) => state.timer)
+  const playerError = usePlayerStore((state) => state.error)
   const toggle = usePlayerStore((state) => state.toggle)
   const next = usePlayerStore((state) => state.next)
   const previous = usePlayerStore((state) => state.previous)
@@ -95,18 +96,24 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[70vh] overflow-x-hidden px-5 py-8 xl:min-h-[calc(100dvh-9rem)]">
-      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-6 xl:block">
+    <section className="relative min-h-[62vh] overflow-x-hidden px-5 py-8 xl:min-h-[calc(100dvh-9rem)]">
+      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-5 xl:block">
         <div className="relative z-0 w-64 shrink-0 sm:w-80 xl:pointer-events-none xl:absolute xl:-left-[min(11rem,18dvh)] xl:top-1/2 xl:w-[min(44rem,70dvh)] xl:-translate-y-1/2">
           <VinylVisual />
         </div>
 
-        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-5 text-center xl:ml-[36rem] xl:mr-0 xl:items-start xl:gap-6 xl:text-left">
+        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[36rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
           <h2 className="max-w-full font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
             {displayTitle}
           </h2>
 
           <p className="max-w-full text-base text-ink-muted sm:text-lg">{displaySubtitle}</p>
+
+          {!spotifyActive && playerError !== null && (
+            <p className="max-w-full rounded-lg bg-primary-soft px-3 py-2 text-xs text-ink">
+              {playerError}
+            </p>
+          )}
 
           <div className="flex w-full max-w-xl items-center gap-3">
             <span className="w-10 text-right text-xs tabular-nums text-ink-muted">
@@ -135,7 +142,7 @@ export function Hero() {
             </span>
           </div>
 
-          <div className="flex max-w-full flex-wrap items-center justify-center gap-2 xl:justify-start">
+          <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-2 xl:justify-start">
             <TransportButton
               disabled={!hasPlayable}
               icon={<ShuffleIcon className="size-4" />}
@@ -178,9 +185,9 @@ export function Hero() {
               onClick={cycleLoopMode}
               pressed={loopMode !== 'none'}
             />
+          </div>
 
-            <span aria-hidden="true" className="mx-1 h-6 w-px bg-border" />
-
+          <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3 xl:justify-start">
             <button
               aria-label={t('player.speed')}
               className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-50"
@@ -217,11 +224,11 @@ export function Hero() {
               {timerOpen && <TimerPanel onClose={() => setTimerOpen(false)} />}
             </div>
 
-            <span className="flex items-center gap-2 pl-1">
+            <span className="flex shrink-0 items-center gap-2">
               <VolumeIcon className="size-4 text-ink-muted" />
               <input
                 aria-label={t('player.volume')}
-                className="h-1.5 w-20 cursor-pointer"
+                className="h-1.5 w-24 cursor-pointer"
                 max={100}
                 min={0}
                 onChange={(event) => setVolume(Number(event.target.value) / 100)}

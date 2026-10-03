@@ -59,15 +59,15 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
             : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.04, Math.min(1, raw))
         const angle = (index / bars) * Math.PI * 2
-        const length = 4 + intensity * size * (activeRef.current ? 0.11 : 0.05) * pulse
+        const length = 6 + intensity * size * (activeRef.current ? 0.18 : 0.08) * pulse
         const startX = center + Math.cos(angle) * baseRadius
         const startY = center + Math.sin(angle) * baseRadius
         const endX = center + Math.cos(angle) * (baseRadius + length)
         const endY = center + Math.sin(angle) * (baseRadius + length)
 
-        const hue = index % 2 === 0 ? '124, 92, 255' : '0, 168, 181'
-        context.strokeStyle = `rgba(${hue}, ${0.25 + intensity * 0.6})`
-        context.lineWidth = 3
+        const hue = Math.round((seconds * 40 + index * 4) % 360)
+        context.strokeStyle = `hsla(${hue}, 88%, 62%, ${0.3 + intensity * 0.65})`
+        context.lineWidth = 4
         context.lineCap = 'round'
         context.beginPath()
         context.moveTo(startX, startY)

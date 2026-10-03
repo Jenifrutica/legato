@@ -11,6 +11,7 @@ import type { ChannelMode, QueueTrack } from './types'
 
 const audio = new Audio()
 audio.preload = 'metadata'
+audio.crossOrigin = 'anonymous'
 
 const controller = new PlayerController(audio)
 const graph = new AudioGraph(audio)

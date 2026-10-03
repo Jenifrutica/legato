@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useSpotifyStore } from '../features/sources'
 import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
 import { WaveRing } from './WaveRing'
@@ -8,7 +9,22 @@ export function VinylVisual() {
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
   const toggle = usePlayerStore((state) => state.toggle)
-  const isPlaying = status === 'playing'
+  const spotifyPlayback = useSpotifyStore((state) => state.playback)
+  const spotifyToggle = useSpotifyStore((state) => state.toggle)
+
+  const spotifyActive = spotifyPlayback !== null
+  const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
+  const artworkUrl = spotifyActive ? spotifyPlayback.artworkUrl : (currentTrack?.artworkUrl ?? null)
+  const title = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? '')
+  const hasTrack = spotifyActive || currentTrack !== null
+
+  function handleToggle() {
+    if (spotifyActive) {
+      void spotifyToggle()
+    } else {
+      void toggle()
+    }
+  }
 
   return (
     <section aria-label={t('vinyl.region')} className="relative">
@@ -19,11 +35,11 @@ export function VinylVisual() {
           className="motion-reduce:animate-none absolute inset-0 animate-disc overflow-hidden rounded-full shadow-disc will-change-transform"
           style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}
         >
-          {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
+          {artworkUrl !== null ? (
             <img
-              alt={t('vinyl.coverAlt', { title: currentTrack.title })}
+              alt={t('vinyl.coverAlt', { title })}
               className="absolute inset-0 size-full rounded-full object-cover"
-              src={currentTrack.artworkUrl}
+              src={artworkUrl}
             />
           ) : (
             <span className="absolute inset-0 grid place-items-center rounded-full bg-ink">
@@ -50,8 +66,8 @@ export function VinylVisual() {
         <button
           aria-label={isPlaying ? t('player.pause') : t('player.play')}
           className="absolute inset-0 rounded-full disabled:cursor-not-allowed"
-          disabled={currentTrack === null}
-          onClick={() => void toggle()}
+          disabled={!hasTrack}
+          onClick={handleToggle}
           type="button"
         />
       </div>

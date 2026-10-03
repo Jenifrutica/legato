@@ -18,6 +18,7 @@ export type PlayerSnapshot = {
   loopPointA: number | null
   karaoke: boolean
   crossfadeSeconds: number
+  error: string | null
   queue: QueueTrack[]
   queueStructure: StructureNode[]
   sourcePlaylistId: string | null
@@ -50,6 +51,7 @@ export class PlayerController {
   #karaoke = false
   #crossfadeSeconds = 2
   #transitionToken = 0
+  #lastError: string | null = null
   #sourcePlaylistId: string | null = null
 
   constructor(audio?: AudioLike) {
@@ -62,6 +64,10 @@ export class PlayerController {
       this.#notify()
     })
     this.#engine.on('ended', this.#handleEnded)
+    this.#engine.on('error', (message) => {
+      this.#lastError = message
+      this.#notify()
+    })
   }
 
   playTracks(tracks: QueueTrack[], startId?: string, sourcePlaylistId: string | null = null): void {
@@ -277,6 +283,7 @@ export class PlayerController {
       loopPointA: this.#loopPointA,
       karaoke: this.#karaoke,
       crossfadeSeconds: this.#crossfadeSeconds,
+      error: this.#lastError,
       queue: this.#queue.tracks,
       queueStructure: this.#queue.structure(),
       sourcePlaylistId: this.#sourcePlaylistId,
@@ -343,6 +350,7 @@ export class PlayerController {
     }
 
     this.#resetAbLoop()
+    this.#lastError = null
     this.#engine.load(track)
     this.#engine.setRate(this.#rate)
     this.#engine.setVolume(shouldFade ? 0 : this.#volume)

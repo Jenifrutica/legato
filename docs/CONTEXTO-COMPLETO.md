@@ -276,3 +276,11 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Tema por portada también para pistas online**: `useAlbumTheme` ahora usa `currentTrack.artworkUrl` (antes buscaba en la biblioteca y Spotify/Audius/Jamendo no tenían tema).
 - **Controles conscientes de Spotify**: con playback del SDK activo, play/pausa, anterior/siguiente, progreso y seek en héroe y barra móvil controlan Spotify.
 - **Agregar a playlists / listas dobles**: filas de la biblioteca arrastrables a las playlists; resultados de búsqueda con "Agregar a…", "＋ Nueva playlist…" y drag & drop. Todo pasa por `PlaylistCollection` (append/moveNode sobre la DLL). El modo Estructura visualiza los nodos.
+
+### Correcciones de UI/UX y audio (sesión 2, tanda 4)
+
+- **Audio cross-origin**: `audio.crossOrigin = 'anonymous'` para que previews de Spotify y streams de Audius/Jamendo suenen a través del grafo Web Audio (causa probable de botones "muertos": el elemento sonaba en silencio o `play()` fallaba). Los errores del motor ahora se guardan en el snapshot (`error`) y se muestran en el héroe.
+- **Giro del disco**: `VinylVisual` ahora escucha el playback del SDK de Spotify; gira también con Spotify y usa su portada.
+- **Ondas más exageradas y de color**: anillo con longitud ×1.6, grosor 4 y color HSL rotando en el tiempo + pulso de bajos.
+- **Controles en dos filas**: transporte arriba; velocidad/ensayo/timer/volumen abajo → el volumen ya no se sale ni se superpone.
+- **E2E ampliado**: se verifica play → "Pausar" → pausa → "Reproducir" con una pista importada (los 4 E2E en verde).
