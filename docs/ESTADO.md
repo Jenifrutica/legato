@@ -33,14 +33,17 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 36 | Jam en tiempo real y playlists compartidas | Post-entrega (diseñado en docs/JAM.md) |
 | 37 | Modo offline (PWA) | Cerrado |
 | 38 | Crossfade configurable | Cerrado |
+| 39 | Rediseño Hi-Fi vivo + vinilo 3D + tema por portada | Cerrado |
+| 40 | Fuentes conmutables (Spotify por defecto, Jamendo, Audius) + Ajustes | En curso |
 
 ## Estado técnico
 
-- **Tests:** 139 unitarios + 4 E2E (Playwright) en verde.
+- **Tests:** 149 unitarios + 4 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
+- **Rediseño:** top bar sticky, vinilo 3D sangrando por la izquierda (R3F lazy, 242 kB gzip, fallback CSS y reduced-motion), tema dinámico por portada en toda la interfaz con contraste AA, panel derecho con pestañas Biblioteca/Playlists/Cola/Audio, controles de escenario en el héroe y mini reproductor móvil.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
-- **Login:** perfil local activo; Cognito implementado y listo.
+- **Credenciales listas:** Spotify Client ID + Jamendo Client ID en `.env.local` (se crearán al ejecutar el Bloque B).
 
 ## Próximo paso
 
-Día 4: #23 pulido de UI con impeccable, #24 responsive PC/móvil y PWA, #25 deploy a S3 + CloudFront con `app.jenilarper.dev`, #26 README/docs finales y demo, #27 rotar la access key. Prueba local antes del despliegue: `bun run dev`, `bun run test`, `bun run test:e2e`.
+Bloque B: proveedores de música conmutables. `MusicSource` + Ajustes (Spotify activado por defecto, Audius y Jamendo), OAuth PKCE de Spotify (búsqueda + previews + Web Playback SDK Premium), Audius sin credenciales, Jamendo con client_id. Luego Bloque C (integrar pistas online con las listas dobles) y cierre local. Despliegue: Día 4.

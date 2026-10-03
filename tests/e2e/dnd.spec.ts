@@ -9,27 +9,28 @@ test('regresion #12: reordenar la playlist no cambia la cancion en curso', async
   await expect(page.getByText('3 canción(es) importada(s)')).toBeVisible()
 
   await createPlaylist(page, 'Set')
-  await page.getByRole('button', { name: 'Biblioteca', exact: true }).click()
+  await page.getByRole('tab', { name: 'Biblioteca' }).click()
 
   for (const name of ['A', 'B', 'C']) {
     await page.getByLabel(`Agregar ${name} a una playlist`).selectOption({ label: 'Set' })
   }
 
-  await page.getByRole('button', { name: 'Set' }).click()
+  await page.getByRole('tab', { name: 'Playlists' }).click()
+  await page.getByRole('button', { name: /^Set/ }).click()
+
   const panel = page.getByRole('region', { name: 'Set' })
   await expect(panel.getByLabel('Reordenar C')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Reproducir A' }).click()
-  const stage = page.getByRole('region', { name: 'Escenario de reproducción' })
-  await expect(stage.getByText('A', { exact: true })).toBeVisible()
+  await panel.getByRole('button', { name: 'Reproducir A' }).click()
+  await expect(page.getByText('A', { exact: true }).first()).toBeVisible()
 
   await dragHandle(page, 'Reordenar C', 'Reordenar A')
 
   await expect(panel.locator('li').first()).toContainText('C')
-  await expect(stage.getByText('A', { exact: true })).toBeVisible()
+  await expect(panel.getByRole('button', { name: 'Reproducir A' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Siguiente' }).click()
-  await expect(stage.getByText('B', { exact: true })).toBeVisible()
+  await expect(page.getByText('B', { exact: true }).first()).toBeVisible()
 })
 
 test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ page }) => {
@@ -40,12 +41,15 @@ test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ pa
   await expect(page.getByText('1 canción(es) importada(s)')).toBeVisible()
 
   await createPlaylist(page, 'Persistente')
-  await page.getByRole('button', { name: 'Biblioteca', exact: true }).click()
+  await page.getByRole('tab', { name: 'Biblioteca' }).click()
   await page.getByLabel('Agregar A a una playlist').selectOption({ label: 'Persistente' })
 
   await page.waitForTimeout(800)
   await page.reload()
 
-  await expect(page.getByRole('button', { name: 'Persistente' })).toBeVisible()
-  await expect(page.getByText('A', { exact: true })).toBeVisible()
+  await page.getByRole('tab', { name: 'Playlists' }).click()
+  await expect(page.getByRole('button', { name: /^Persistente/ })).toBeVisible()
+
+  await page.getByRole('tab', { name: 'Biblioteca' }).click()
+  await expect(page.getByText('A', { exact: true }).first()).toBeVisible()
 })

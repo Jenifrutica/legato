@@ -85,8 +85,53 @@
   }
 }
 
+@layer components {
+  .panel {
+    @apply rounded-2xl border border-border/80 bg-surface/85 shadow-soft backdrop-blur-md;
+  }
+
+  .panel-inset {
+    @apply rounded-xl border border-border/70 bg-surface-2/60;
+  }
+
+  .metal-line {
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    height: 1px;
+  }
+}
+
 html {
   font-size: calc(100% * var(--a11y-text-scale, 1));
+}
+
+html.album-theme {
+  --color-bg: var(--album-bg);
+  --color-surface: var(--album-surface);
+  --color-surface-2: var(--album-surface-2);
+  --color-border: var(--album-border);
+  --color-ink: var(--album-ink);
+  --color-ink-muted: var(--album-ink-muted);
+  --color-primary: var(--album-primary);
+  --color-primary-strong: var(--album-primary-strong);
+  --color-primary-soft: var(--album-primary-soft);
+  --color-accent: var(--album-accent);
+  --color-accent-soft: var(--album-accent-soft);
+}
+
+html,
+body {
+  transition:
+    background-color 500ms ease,
+    color 500ms ease;
+}
+
+body {
+  background-attachment: fixed;
+  background-image: radial-gradient(
+    1200px 640px at 12% -12%,
+    rgb(255 255 255 / 0.75),
+    transparent 62%
+  );
 }
 
 html.a11y-dyslexia {

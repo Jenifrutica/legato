@@ -32,6 +32,7 @@ export async function acceptCookies(page: Page): Promise<void> {
 }
 
 export async function createPlaylist(page: Page, name: string): Promise<void> {
+  await page.getByRole('tab', { name: 'Playlists' }).click()
   await page.getByRole('button', { name: 'Nueva playlist' }).click()
   const input = page.getByPlaceholder('Nombre de la playlist')
   await input.fill(name)

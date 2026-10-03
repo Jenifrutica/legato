@@ -2,6 +2,19 @@ export const es = {
   app: {
     skipToContent: 'Saltar al contenido',
   },
+  tabs: {
+    label: 'Secciones',
+    library: 'Biblioteca',
+    playlists: 'Playlists',
+    queue: 'Cola',
+    audio: 'Audio',
+  },
+  topbar: {
+    collection: 'Colección',
+  },
+  queue: {
+    empty: 'La cola está vacía. Reproduce algo desde tu biblioteca o una playlist.',
+  },
   nav: {
     library: 'Biblioteca',
     playlists: 'Playlists',
@@ -104,6 +117,8 @@ export const es = {
     trackCountPlain: '{{count}} canción(es) en la playlist.',
     emptyTitle: 'Esta playlist está vacía',
     emptyText: 'Agrega canciones desde la biblioteca con el selector «Agregar a…».',
+    emptyList: 'Aún no hay playlists. Crea una con +.',
+    tracksShort: 'pistas',
     removeTrack: 'Quitar {{title}} de la playlist',
     reorder: 'Reordenar {{title}}',
     structure: 'Estructura',

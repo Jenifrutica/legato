@@ -236,3 +236,21 @@ export function RedoIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function PencilIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </Icon>
+  )
+}
+
+export function CopyIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <rect height="13" rx="2" width="13" x="8" y="8" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </Icon>
+  )
+}

@@ -1,0 +1,244 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { usePlaylistsStore } from '../features/playlists'
+import { usePlayerStore } from '../player'
+import { AudioQualityPanel } from './AudioQualityPanel'
+import { LibraryPanel } from './LibraryPanel'
+import { CopyIcon, PencilIcon, PlusIcon, TrashIcon } from './icons'
+
+const TAB_KEYS = {
+  library: 'tabs.library',
+  playlists: 'tabs.playlists',
+  queue: 'tabs.queue',
+  audio: 'tabs.audio',
+} as const
+
+type Tab = keyof typeof TAB_KEYS
+const TABS: Tab[] = ['library', 'playlists', 'queue', 'audio']
+
+function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation()
+  const playlists = usePlaylistsStore((state) => state.playlists)
+  const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
+  const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+  const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
+  const renamePlaylist = usePlaylistsStore((state) => state.renamePlaylist)
+  const duplicatePlaylist = usePlaylistsStore((state) => state.duplicatePlaylist)
+  const removePlaylist = usePlaylistsStore((state) => state.removePlaylist)
+
+  const [isCreating, setIsCreating] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameDraft, setRenameDraft] = useState('')
+
+  function submitCreate(event: FormEvent) {
+    event.preventDefault()
+    if (draft.trim() !== '') {
+      createPlaylist(draft)
+    }
+    setDraft('')
+    setIsCreating(false)
+  }
+
+  function submitRename(event: FormEvent) {
+    event.preventDefault()
+    if (renamingId !== null && renameDraft.trim() !== '') {
+      renamePlaylist(renamingId, renameDraft)
+    }
+    setRenamingId(null)
+  }
+
+  return (
+    <div className="flex flex-col gap-3 p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-base font-semibold">{t('nav.playlists')}</h2>
+        <button
+          aria-label={t('playlists.newPlaylist')}
+          className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+          onClick={() => setIsCreating(true)}
+          type="button"
+        >
+          <PlusIcon className="size-4" />
+        </button>
+      </div>
+
+      {isCreating && (
+        <form onSubmit={submitCreate}>
+          <input
+            autoFocus
+            className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            onBlur={() => {
+              if (draft.trim() !== '') {
+                createPlaylist(draft)
+              }
+              setDraft('')
+              setIsCreating(false)
+            }}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder={t('playlists.namePlaceholder')}
+            value={draft}
+          />
+        </form>
+      )}
+
+      {playlists.length === 0 ? (
+        <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {playlists.map((playlist) => {
+            const selected = playlist.id === selectedPlaylistId
+            return (
+              <li
+                className={`rounded-xl border px-3 py-2 transition-colors ${
+                  selected ? 'border-primary/70 bg-primary-soft/70' : 'border-border bg-surface/60'
+                }`}
+                key={playlist.id}
+              >
+                {renamingId === playlist.id ? (
+                  <form onSubmit={submitRename}>
+                    <input
+                      autoFocus
+                      className="w-full rounded-md border border-border bg-bg px-2 py-1.5 text-sm focus:border-primary focus:outline-none"
+                      onBlur={() => setRenamingId(null)}
+                      onChange={(event) => setRenameDraft(event.target.value)}
+                      value={renameDraft}
+                    />
+                  </form>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <button
+                      className="min-w-0 flex-1 text-left"
+                      onClick={() => {
+                        selectPlaylist(playlist.id)
+                        onOpen()
+                      }}
+                      type="button"
+                    >
+                      <span className="block truncate text-sm font-medium">{playlist.name}</span>
+                      <span className="text-xs text-ink-muted">
+                        {playlist.trackIds.length} {t('playlists.tracksShort')}
+                      </span>
+                    </button>
+                    <button
+                      aria-label={`${t('playlists.rename')} ${playlist.name}`}
+                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+                      onClick={() => {
+                        setRenameDraft(playlist.name)
+                        setRenamingId(playlist.id)
+                      }}
+                      type="button"
+                    >
+                      <PencilIcon className="size-3.5" />
+                    </button>
+                    <button
+                      aria-label={`${t('playlists.duplicate')} ${playlist.name}`}
+                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+                      onClick={() => duplicatePlaylist(playlist.id)}
+                      type="button"
+                    >
+                      <CopyIcon className="size-3.5" />
+                    </button>
+                    <button
+                      aria-label={`${t('playlists.delete')} ${playlist.name}`}
+                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-danger"
+                      onClick={() => {
+                        if (window.confirm(t('playlists.confirmDelete', { name: playlist.name }))) {
+                          removePlaylist(playlist.id)
+                        }
+                      }}
+                      type="button"
+                    >
+                      <TrashIcon className="size-3.5" />
+                    </button>
+                  </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function QueueTab() {
+  const { t } = useTranslation()
+  const queue = usePlayerStore((state) => state.queue)
+  const currentId = usePlayerStore((state) => state.currentTrack?.id ?? null)
+  const playTracks = usePlayerStore((state) => state.playTracks)
+
+  if (queue.length === 0) {
+    return <p className="p-5 text-sm text-ink-muted">{t('queue.empty')}</p>
+  }
+
+  return (
+    <ul className="divide-y divide-border/70">
+      {queue.map((track, index) => (
+        <li
+          className={`flex items-center gap-3 px-4 py-3 ${track.id === currentId ? 'bg-primary-soft/60' : ''}`}
+          key={`${track.id}-${index}`}
+        >
+          <span className="w-5 text-right text-xs tabular-nums text-ink-muted">{index + 1}</span>
+          <button
+            className="min-w-0 flex-1 text-left"
+            onClick={() => playTracks(queue, track.id, null)}
+            type="button"
+          >
+            <span className="block truncate text-sm font-medium">{track.title}</span>
+            <span className="block truncate text-xs text-ink-muted">{track.artist}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function RightPanel() {
+  const { t } = useTranslation()
+  const [tab, setTab] = useState<Tab>('library')
+  const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+
+  return (
+    <aside className="flex min-h-0 flex-col border-t border-border/70 pb-40 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
+      <div
+        aria-label={t('tabs.label')}
+        className="flex items-center gap-1 border-b border-border/70 px-3 py-2"
+        role="tablist"
+      >
+        {TABS.map((candidate) => (
+          <button
+            aria-selected={tab === candidate}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+              tab === candidate
+                ? 'bg-primary-soft text-primary-strong'
+                : 'text-ink-muted hover:text-ink'
+            }`}
+            key={candidate}
+            onClick={() => {
+              if (candidate === 'library') {
+                selectPlaylist(null)
+              }
+              setTab(candidate)
+            }}
+            role="tab"
+            type="button"
+          >
+            {t(TAB_KEYS[candidate])}
+          </button>
+        ))}
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {tab === 'library' && <LibraryPanel />}
+        {tab === 'playlists' && <PlaylistsTab onOpen={() => setTab('library')} />}
+        {tab === 'queue' && <QueueTab />}
+        {tab === 'audio' && (
+          <div className="p-4">
+            <AudioQualityPanel />
+          </div>
+        )}
+      </div>
+    </aside>
+  )
+}

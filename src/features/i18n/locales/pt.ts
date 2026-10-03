@@ -4,6 +4,19 @@ export const pt: typeof es = {
   app: {
     skipToContent: 'Ir para o conteúdo',
   },
+  tabs: {
+    label: 'Seções',
+    library: 'Biblioteca',
+    playlists: 'Playlists',
+    queue: 'Fila',
+    audio: 'Áudio',
+  },
+  topbar: {
+    collection: 'Coleção',
+  },
+  queue: {
+    empty: 'A fila está vazia. Reproduza algo da sua biblioteca ou de uma playlist.',
+  },
   nav: {
     library: 'Biblioteca',
     playlists: 'Playlists',
@@ -104,6 +117,8 @@ export const pt: typeof es = {
     trackCountPlain: '{{count}} faixa(s) na playlist.',
     emptyTitle: 'Esta playlist está vazia',
     emptyText: 'Adicione músicas da biblioteca com o seletor “Adicionar a…”.',
+    emptyList: 'Ainda não há playlists. Crie uma com +.',
+    tracksShort: 'faixas',
     removeTrack: 'Remover {{title}} da playlist',
     reorder: 'Reordenar {{title}}',
     structure: 'Estrutura',

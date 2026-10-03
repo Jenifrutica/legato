@@ -4,6 +4,19 @@ export const en: typeof es = {
   app: {
     skipToContent: 'Skip to content',
   },
+  tabs: {
+    label: 'Sections',
+    library: 'Library',
+    playlists: 'Playlists',
+    queue: 'Queue',
+    audio: 'Audio',
+  },
+  topbar: {
+    collection: 'Collection',
+  },
+  queue: {
+    empty: 'The queue is empty. Play something from your library or a playlist.',
+  },
   nav: {
     library: 'Library',
     playlists: 'Playlists',
@@ -105,6 +118,8 @@ export const en: typeof es = {
     trackCountPlain: '{{count}} track(s) in the playlist.',
     emptyTitle: 'This playlist is empty',
     emptyText: 'Add songs from the library with the “Add to…” selector.',
+    emptyList: 'No playlists yet. Create one with +.',
+    tracksShort: 'tracks',
     removeTrack: 'Remove {{title}} from playlist',
     reorder: 'Reorder {{title}}',
     structure: 'Structure',
