@@ -40,6 +40,10 @@ export const es = {
     tracksLeft: 'Quedan {{count}} canciones',
     untilEndOfTrack: 'Se detiene al terminar la canción',
   },
+  history: {
+    undo: 'Deshacer',
+    redo: 'Rehacer',
+  },
   practice: {
     title: 'Herramientas de ensayo',
     speed: 'Velocidad',

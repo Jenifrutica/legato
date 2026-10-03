@@ -1,9 +1,33 @@
 import { create } from 'zustand'
+import { useHistoryStore } from '../history'
+import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
 import { PlaylistCollection } from './playlist-collection'
 import type { PlaylistRestoreRecord, PlaylistSnapshot, PlaylistStructureNode } from './types'
 
 const collection = new PlaylistCollection()
+
+function registerHistory(
+  label: string,
+  before: PlaylistSnapshot[],
+  beforeSelected: string | null,
+  after: PlaylistSnapshot[],
+  afterSelected: string | null,
+): void {
+  const restore = (snapshots: PlaylistSnapshot[], selected: string | null): void => {
+    collection.restore(snapshots, useLibraryStore.getState().tracks)
+    usePlaylistsStore.setState({
+      playlists: collection.toSnapshots(),
+      selectedPlaylistId: selected,
+    })
+  }
+
+  useHistoryStore.getState().push({
+    label,
+    undo: () => restore(before, beforeSelected),
+    redo: () => restore(after, afterSelected),
+  })
+}
 
 type PlaylistsState = {
   playlists: PlaylistSnapshot[]
@@ -29,53 +53,85 @@ export const usePlaylistsStore = create<PlaylistsState>((set, get) => ({
   },
 
   createPlaylist: (name) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
     const playlist = collection.create(name)
-    set({ playlists: collection.toSnapshots(), selectedPlaylistId: playlist.id })
+    const after = collection.toSnapshots()
+    set({ playlists: after, selectedPlaylistId: playlist.id })
+    registerHistory('create', before, beforeSelected, after, playlist.id)
     return playlist.id
   },
 
   renamePlaylist: (id, name) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+
     if (collection.rename(id, name)) {
-      set({ playlists: collection.toSnapshots() })
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('rename', before, beforeSelected, after, beforeSelected)
     }
   },
 
   duplicatePlaylist: (id) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
     const copy = collection.duplicate(id)
+
     if (copy !== null) {
-      set({ playlists: collection.toSnapshots(), selectedPlaylistId: copy.id })
+      const after = collection.toSnapshots()
+      set({ playlists: after, selectedPlaylistId: copy.id })
+      registerHistory('duplicate', before, beforeSelected, after, copy.id)
     }
   },
 
   removePlaylist: (id) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+
     if (collection.remove(id)) {
-      const selected = get().selectedPlaylistId
-      set({
-        playlists: collection.toSnapshots(),
-        selectedPlaylistId: selected === id ? null : selected,
-      })
+      const after = collection.toSnapshots()
+      const selected = beforeSelected === id ? null : beforeSelected
+      set({ playlists: after, selectedPlaylistId: selected })
+      registerHistory('remove', before, beforeSelected, after, selected)
     }
   },
 
   selectPlaylist: (id) => set({ selectedPlaylistId: id }),
 
   addTrackToPlaylist: (playlistId, track) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
     const added = collection.addTrack(playlistId, track)
+
     if (added) {
-      set({ playlists: collection.toSnapshots() })
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('add-track', before, beforeSelected, after, beforeSelected)
     }
+
     return added
   },
 
   removeTrackFromPlaylist: (playlistId, trackId) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+
     if (collection.removeTrack(playlistId, trackId)) {
-      set({ playlists: collection.toSnapshots() })
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('remove-track', before, beforeSelected, after, beforeSelected)
     }
   },
 
   moveTrackInPlaylist: (playlistId, trackId, targetIndex) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+
     if (collection.moveTrack(playlistId, trackId, targetIndex)) {
-      set({ playlists: collection.toSnapshots() })
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('move-track', before, beforeSelected, after, beforeSelected)
     }
   },
 }))

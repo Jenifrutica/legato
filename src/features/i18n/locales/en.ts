@@ -42,6 +42,10 @@ export const en: typeof es = {
     tracksLeft: '{{count}} songs left',
     untilEndOfTrack: 'Stops at the end of the song',
   },
+  history: {
+    undo: 'Undo',
+    redo: 'Redo',
+  },
   practice: {
     title: 'Practice tools',
     speed: 'Speed',

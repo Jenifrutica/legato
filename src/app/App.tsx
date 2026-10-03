@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { A11yPanel, useA11yStore } from '../features/a11y'
 import { AccountChip, AuthContextProvider } from '../features/auth'
+import { useHistoryStore } from '../features/history'
 import { LanguageSelector } from '../features/i18n'
 import { CookieConsent, LegalPage } from '../features/legal'
 import { LibraryPanel } from '../ui/LibraryPanel'
@@ -21,6 +23,33 @@ export default function App() {
 function AppShell() {
   const { t } = useTranslation()
   const openA11yPanel = useA11yStore((state) => state.openPanel)
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const modifier = event.metaKey || event.ctrlKey
+      if (!modifier || event.key.toLowerCase() !== 'z') {
+        return
+      }
+
+      const target = event.target as HTMLElement | null
+      if (
+        target !== null &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      ) {
+        return
+      }
+
+      event.preventDefault()
+      if (event.shiftKey) {
+        useHistoryStore.getState().redo()
+      } else {
+        useHistoryStore.getState().undo()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   return (
     <div className="min-h-dvh bg-bg text-ink">

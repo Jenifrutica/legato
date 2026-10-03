@@ -218,3 +218,21 @@ export function FlagIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function UndoIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+    </Icon>
+  )
+}
+
+export function RedoIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="m15 14 5-5-5-5" />
+      <path d="M20 9H10a6 6 0 0 0 0 12h3" />
+    </Icon>
+  )
+}

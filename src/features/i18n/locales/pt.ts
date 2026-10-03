@@ -42,6 +42,10 @@ export const pt: typeof es = {
     tracksLeft: 'Restam {{count}} músicas',
     untilEndOfTrack: 'Para no fim da música',
   },
+  history: {
+    undo: 'Desfazer',
+    redo: 'Refazer',
+  },
   practice: {
     title: 'Ferramentas de ensaio',
     speed: 'Velocidade',
