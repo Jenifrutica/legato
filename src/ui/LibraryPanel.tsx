@@ -275,7 +275,7 @@ export function LibraryPanel() {
           {isPlaylistView ? (
             <div className="min-w-0 flex-1">
               <button
-                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent-ink-ink"
+                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent-ink"
                 onClick={() => selectPlaylist(null)}
                 type="button"
               >
@@ -324,7 +324,7 @@ export function LibraryPanel() {
                 className={` border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   showStructure
                     ? 'border-accent bg-accent-soft text-ink'
-                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink-ink'
+                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
@@ -332,7 +332,7 @@ export function LibraryPanel() {
                 {t('playlists.structure')}
               </button>
               <button
-                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink-ink"
+                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                 onClick={() => {
                   setRenameDraft(selectedPlaylist.name)
                   setIsRenaming(true)
@@ -342,7 +342,7 @@ export function LibraryPanel() {
                 {t('playlists.rename')}
               </button>
               <button
-                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink-ink"
+                className=" border-2 border-rule/40 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent-ink"
                 onClick={() => duplicatePlaylist(selectedPlaylist.id)}
                 type="button"
               >
@@ -370,7 +370,7 @@ export function LibraryPanel() {
                 className={` border px-3 py-2 text-xs font-semibold transition-colors ${
                   showStructure
                     ? 'border-accent bg-accent-soft text-ink'
-                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink-ink'
+                    : 'border-rule/40 text-ink-muted hover:border-accent hover:text-accent-ink'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"

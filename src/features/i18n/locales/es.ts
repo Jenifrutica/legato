@@ -18,6 +18,12 @@ export const es = {
     notConnected: 'Conecta Spotify en Ajustes para reproducir completo.',
     exit: 'Salir de Spotify',
     reconnect: 'Reconecta Spotify en Ajustes (⚙).',
+    importPlaylists: 'Importar de Spotify',
+    loadingPlaylists: 'Cargando tus playlists…',
+    importing: 'Importando pistas…',
+    imported: '{{count}} pistas importadas',
+    importError: 'No se pudieron traer tus playlists de Spotify.',
+    emptyPlaylists: 'No tienes playlists en Spotify.',
   },
   settings: {
     title: 'Ajustes',

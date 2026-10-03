@@ -61,6 +61,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 64 | **Ajustes finos**: «Nueva playlist» abre una ventanita para escribir el nombre (no auto-crea), la canción pulsada en Spotify suena primero (no la primera de la búsqueda), crossfade visible en el panel de Audio (0–12 s) y ondas más grandes (líneas de hasta 9 px, longitud ×2.2, zona más alta) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 | 65 | **Arreglos de reproducción**: el avance automático reanuda el AudioContext (antes podía avanzar en silencio), el slider de progreso ya no se traba (estado local de arrastre en héroe y barra móvil) y las ondas pasan a **líneas finas y largas** (1.4–3.2 px, papel sobre el campo naranja, tinta fuera) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 | 66 | **Ondas v5 y disco más grande**: disco `min(46rem, 80vw, 72dvh)`, zona 0.72, lienas hasta 0.19× con respuesta suavizada (raíz) y una **curva fina que envuelve las puntas** (trazada con curvas cuadráticas), en papel sobre el campo y tinta fuera | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
+| 67 | **Playlists de Spotify + ritmo real**: botón «Importar de Spotify» en Playlists (trae tus playlists de la cuenta como referencias externas, tope 100 pistas), rótulo «Lado A · 33⅓» eliminado y ondas dirigidas por **detección de golpes** (audio local) o **pulso a 120 BPM** (streaming) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

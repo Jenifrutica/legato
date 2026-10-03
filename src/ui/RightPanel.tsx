@@ -20,8 +20,15 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration, useLibraryStore } from '../features/library'
 import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
-import { importSourceTrackToPlaylist, SearchTab } from '../features/sources'
-import type { SourceTrack } from '../features/sources'
+import {
+  fetchSpotifyPlaylistTracks,
+  fetchSpotifyPlaylists,
+  importSourceTrackToPlaylist,
+  isSpotifyConnected,
+  saveSourceTrack,
+  SearchTab,
+} from '../features/sources'
+import type { SourceTrack, SpotifyPlaylistSummary } from '../features/sources'
 import { usePlayerStore } from '../player'
 import type { QueueTrack } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
@@ -56,6 +63,55 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [renameDraft, setRenameDraft] = useState('')
   const [dropMessage, setDropMessage] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [spotifyOpen, setSpotifyOpen] = useState(false)
+  const [spotifyPlaylists, setSpotifyPlaylists] = useState<SpotifyPlaylistSummary[]>([])
+  const [spotifyStatus, setSpotifyStatus] = useState<'idle' | 'loading' | 'importing' | 'error'>(
+    'idle',
+  )
+  const [spotifyMessage, setSpotifyMessage] = useState<string | null>(null)
+  const addTracks = useLibraryStore((state) => state.addTracks)
+  const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
+  const spotifyConnected = isSpotifyConnected()
+
+  async function openSpotifyImport() {
+    setSpotifyOpen(true)
+    setSpotifyStatus('loading')
+    setSpotifyMessage(null)
+
+    try {
+      setSpotifyPlaylists(await fetchSpotifyPlaylists())
+      setSpotifyStatus('idle')
+    } catch {
+      setSpotifyStatus('error')
+      setSpotifyMessage(t('spotify.importError'))
+    }
+  }
+
+  async function importSpotifyPlaylist(playlist: SpotifyPlaylistSummary) {
+    setSpotifyStatus('importing')
+    setSpotifyMessage(null)
+
+    try {
+      const tracks = await fetchSpotifyPlaylistTracks(playlist.id)
+      const localId = createPlaylist(playlist.name)
+      let imported = 0
+
+      for (const track of tracks) {
+        const saved = await saveSourceTrack(track, existingDedupeKeys())
+        if (saved !== null) {
+          addTracks([saved])
+          usePlaylistsStore.getState().addTrackToPlaylist(localId, saved)
+          imported++
+        }
+      }
+
+      setSpotifyMessage(t('spotify.imported', { count: imported }))
+      setSpotifyStatus('idle')
+    } catch {
+      setSpotifyStatus('error')
+      setSpotifyMessage(t('spotify.importError'))
+    }
+  }
 
   function submitCreate(event: FormEvent) {
     event.preventDefault()
@@ -78,17 +134,82 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-semibold">{t('nav.playlists')}</h2>
-        {playlists.length > 0 && (
-          <button
-            aria-label={t('playlists.newPlaylist')}
-            className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink-ink"
-            onClick={() => setIsCreating(true)}
-            type="button"
-          >
-            <PlusIcon className="size-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {spotifyConnected && (
+            <button
+              className="border-2 border-rule/40 px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+              onClick={() => void openSpotifyImport()}
+              type="button"
+            >
+              {t('spotify.importPlaylists')}
+            </button>
+          )}
+          {playlists.length > 0 && (
+            <button
+              aria-label={t('playlists.newPlaylist')}
+              className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink"
+              onClick={() => setIsCreating(true)}
+              type="button"
+            >
+              <PlusIcon className="size-4" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {spotifyOpen && (
+        <div className="border-2 border-rule bg-surface p-3 shadow-[3px_3px_0_var(--color-rule)]">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-mono text-[0.6875rem] tracking-[0.12em] text-accent-ink uppercase">
+              {t('spotify.importPlaylists')}
+            </span>
+            <button
+              aria-label={t('cookies.close')}
+              className="p-1 text-ink-muted hover:text-ink"
+              onClick={() => setSpotifyOpen(false)}
+              type="button"
+            >
+              <XIcon className="size-3.5" />
+            </button>
+          </div>
+
+          {spotifyStatus === 'loading' && (
+            <p className="mt-2 text-xs text-ink-muted">{t('spotify.loadingPlaylists')}</p>
+          )}
+          {spotifyStatus === 'importing' && (
+            <p className="mt-2 text-xs text-ink-muted">{t('spotify.importing')}</p>
+          )}
+          {spotifyMessage !== null && (
+            <p className="mt-2 text-xs text-ink-muted" role="status">
+              {spotifyMessage}
+            </p>
+          )}
+
+          {spotifyStatus !== 'loading' &&
+            spotifyPlaylists.length === 0 &&
+            spotifyMessage === null && (
+              <p className="mt-2 text-xs text-ink-muted">{t('spotify.emptyPlaylists')}</p>
+            )}
+
+          <ul className="mt-2 flex flex-col">
+            {spotifyPlaylists.map((playlist) => (
+              <li key={playlist.id}>
+                <button
+                  className="flex w-full items-center gap-2 border-b border-border py-2 text-left text-sm transition-colors hover:text-accent-ink disabled:opacity-50"
+                  disabled={spotifyStatus === 'importing'}
+                  onClick={() => void importSpotifyPlaylist(playlist)}
+                  type="button"
+                >
+                  <span className="min-w-0 flex-1 truncate">{playlist.name}</span>
+                  <span className="shrink-0 font-mono text-[0.6875rem] text-ink-muted">
+                    {playlist.trackCount}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {isCreating && (
         <form onSubmit={submitCreate}>
@@ -214,7 +335,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     </button>
                     <button
                       aria-label={`${t('playlists.rename')} ${playlist.name}`}
-                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink-ink"
+                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink"
                       onClick={() => {
                         setRenameDraft(playlist.name)
                         setRenamingId(playlist.id)
@@ -225,7 +346,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     </button>
                     <button
                       aria-label={`${t('playlists.duplicate')} ${playlist.name}`}
-                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink-ink"
+                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent-ink"
                       onClick={() => duplicatePlaylist(playlist.id)}
                       type="button"
                     >

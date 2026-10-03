@@ -224,6 +224,21 @@ type SpotifyTrack = {
   external_urls: { spotify: string }
 }
 
+export function mapSpotifyTrack(track: SpotifyTrack): SourceTrack {
+  return {
+    id: track.id,
+    sourceId: 'spotify',
+    title: track.name,
+    artist: track.artists.map((artist) => artist.name).join(', '),
+    album: track.album.name,
+    durationSeconds: track.duration_ms / 1000,
+    streamUrl: track.preview_url,
+    artworkUrl: track.album.images[0]?.url ?? null,
+    downloadable: false,
+    externalUrl: track.external_urls.spotify,
+  }
+}
+
 export async function searchSpotify(query: string): Promise<SourceTrack[]> {
   const token = await getAccessToken()
   if (token === null) {
@@ -241,16 +256,91 @@ export async function searchSpotify(query: string): Promise<SourceTrack[]> {
 
   const data = (await response.json()) as { tracks?: { items: SpotifyTrack[] } }
 
-  return (data.tracks?.items ?? []).map((track) => ({
-    id: track.id,
-    sourceId: 'spotify',
-    title: track.name,
-    artist: track.artists.map((artist) => artist.name).join(', '),
-    album: track.album.name,
-    durationSeconds: track.duration_ms / 1000,
-    streamUrl: track.preview_url,
-    artworkUrl: track.album.images[0]?.url ?? null,
-    downloadable: false,
-    externalUrl: track.external_urls.spotify,
-  }))
+  return (data.tracks?.items ?? []).map(mapSpotifyTrack)
+}
+
+export type SpotifyPlaylistSummary = {
+  id: string
+  name: string
+  trackCount: number
+  artworkUrl: string | null
+}
+
+type SpotifyPlaylistItem = {
+  id: string
+  name: string
+  images?: Array<{ url: string }>
+  tracks?: { total?: number }
+}
+
+/** Playlists de la cuenta conectada (requiere scope playlist-read-private). */
+export async function fetchSpotifyPlaylists(): Promise<SpotifyPlaylistSummary[]> {
+  const token = await getAccessToken()
+  if (token === null) {
+    throw new Error('not-connected')
+  }
+
+  const response = await fetch(`${API}/me/playlists?limit=50`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+  if (!response.ok) {
+    throw new Error(await describeError(response))
+  }
+
+  const data = (await response.json()) as { items?: Array<SpotifyPlaylistItem | null> }
+
+  return (data.items ?? [])
+    .filter((item): item is SpotifyPlaylistItem => item !== null)
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      trackCount: item.tracks?.total ?? 0,
+      artworkUrl: item.images?.[0]?.url ?? null,
+    }))
+}
+
+/** Pistas de una playlist de Spotify como referencias externas (con tope). */
+export async function fetchSpotifyPlaylistTracks(
+  playlistId: string,
+  limit = 100,
+): Promise<SourceTrack[]> {
+  const token = await getAccessToken()
+  if (token === null) {
+    throw new Error('not-connected')
+  }
+
+  const tracks: SourceTrack[] = []
+  let offset = 0
+
+  while (tracks.length < limit) {
+    const response = await fetch(
+      `${API}/playlists/${playlistId}/tracks?limit=50&offset=${offset}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    )
+
+    if (!response.ok) {
+      throw new Error(await describeError(response))
+    }
+
+    const data = (await response.json()) as {
+      items?: Array<{ track?: (SpotifyTrack & { is_local?: boolean }) | null } | null>
+      next?: string | null
+    }
+
+    for (const item of data.items ?? []) {
+      const track = item?.track
+      if (track === null || track === undefined || track.is_local === true || track.id === '') {
+        continue
+      }
+      tracks.push(mapSpotifyTrack(track))
+    }
+
+    if (data.next === null || data.next === undefined) {
+      break
+    }
+    offset += 50
+  }
+
+  return tracks.slice(0, limit)
 }

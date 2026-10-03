@@ -5,6 +5,8 @@ export { searchAll } from './search'
 export {
   connectSpotify,
   disconnectSpotify,
+  fetchSpotifyPlaylists,
+  fetchSpotifyPlaylistTracks,
   handleSpotifyRedirect,
   isSpotifyConfigured,
   isSpotifyConnected,
@@ -16,4 +18,5 @@ export { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 export { SpotifyBanner } from './SpotifyBanner'
 export { useSpotifyStore } from './spotify-store'
 export { useExternalPlayback } from './use-external-playback'
+export type { SpotifyPlaylistSummary } from './spotify'
 export type { SourceId, SourceTrack } from './types'

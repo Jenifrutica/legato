@@ -66,6 +66,8 @@ export function WaveRing({
     let last = 0
     let inkTick = 0
     let inks = readInks()
+    let bassAverage = 0
+    let energy = 0
 
     const reduced =
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
@@ -97,17 +99,30 @@ export function WaveRing({
       const segments = 110
 
       let bass = 0
+      let beat = 0
+      let pulse = 1
+
       if (levels.length > 0) {
         const bassBins = Math.max(1, Math.floor(levels.length * 0.06))
         for (let index = 0; index < bassBins; index++) {
           bass += levels[index] ?? 0
         }
         bass = bass / (bassBins * 255)
+
+        // Promedio móvil del bajo + detección de golpes: la onda late con la música.
+        bassAverage = bassAverage * 0.94 + bass * 0.06
+        const onset = Math.max(0, bass - bassAverage * 1.25)
+        energy = Math.max(energy * 0.86, onset)
+        beat = Math.min(1, energy * 2.2)
+        pulse = Math.min(2.8, 1 + bass * 0.45 + energy * 3.2)
       } else {
-        bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
+        // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
+        const phase = (seconds * 2) % 1
+        const kick = Math.pow(1 - phase, 7)
+        energy = Math.max(energy * 0.88, kick)
+        beat = kick
+        pulse = 1 + kick * 1.6 + energy * 0.6
       }
-      const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
-      const pulse = Math.min(2.3, 1 + bass * 0.9 + beat * 1.1)
 
       type Segment = {
         x0: number
@@ -128,7 +143,7 @@ export function WaveRing({
 
         const raw =
           levels.length === 0
-            ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.22 * beat
+            ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.12, Math.min(1, Math.sqrt(raw)))
         const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.64

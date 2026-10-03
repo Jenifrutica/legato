@@ -14,7 +14,7 @@ export function buildExternalTrack(track: SourceTrack): LibraryTrack | null {
     artist: track.artist,
     album: track.album,
     durationSeconds: track.durationSeconds,
-    sourceUrl: track.externalUrl,
+    sourceUrl: `spotify:track:${track.id}`,
     artworkUrl: track.artworkUrl,
     artworkBlob: null,
     blob: new Blob([]),

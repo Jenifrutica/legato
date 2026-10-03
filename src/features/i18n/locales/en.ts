@@ -20,6 +20,12 @@ export const en: typeof es = {
     notConnected: 'Connect Spotify in Settings for full playback.',
     exit: 'Exit Spotify',
     reconnect: 'Reconnect Spotify in Settings (⚙).',
+    importPlaylists: 'Import from Spotify',
+    loadingPlaylists: 'Loading your playlists…',
+    importing: 'Importing tracks…',
+    imported: '{{count}} tracks imported',
+    importError: 'Could not fetch your Spotify playlists.',
+    emptyPlaylists: 'You have no playlists on Spotify.',
   },
   settings: {
     title: 'Settings',

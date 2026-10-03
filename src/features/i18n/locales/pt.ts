@@ -20,6 +20,12 @@ export const pt: typeof es = {
     notConnected: 'Conecte o Spotify em Configurações para reprodução completa.',
     exit: 'Sair do Spotify',
     reconnect: 'Reconecte o Spotify em Configurações (⚙).',
+    importPlaylists: 'Importar do Spotify',
+    loadingPlaylists: 'Carregando suas playlists…',
+    importing: 'Importando faixas…',
+    imported: '{{count}} faixas importadas',
+    importError: 'Não foi possível buscar suas playlists do Spotify.',
+    emptyPlaylists: 'Você não tem playlists no Spotify.',
   },
   settings: {
     title: 'Configurações',
