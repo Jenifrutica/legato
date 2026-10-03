@@ -92,3 +92,12 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D54 | El «fondo degradado dinámico» de la cápsula se traduce a **banda dura de tinta directa** detrás de la tarjeta | La regla del mundo prohíbe gradientes decorativos; se conserva el efecto dinámico con dos tintas |
 | D55 | Letras con **LRCLIB siempre activo** (título, artista y álbum al reproducir), declarado en la política de privacidad en ES/EN/PT; parser LRC propio y solo letras **sincronizadas** | Decisión de la autora; LRCLIB responde con CORS abierto y no requiere clave |
 | D56 | Atribución visible «Letra vía LRCLIB» junto a la línea activa | Respeto al servicio y transparencia para el usuario |
+
+## Cola y playlists (4 oct 2026, sesión 4)
+
+| # | Decisión | Razón |
+|---|---|---|
+| D57 | Cola con acciones explícitas: `enqueue` (`append`), `playNext` (`insertAt` después del nodo actual), `remove`, `move` y `clear`, todo sobre la lista doble a mano; `currentNode` sigue siendo puntero | El bug #12 no se toca y la cola deja de ser un efecto secundario de reproducir |
+| D58 | Se permiten **duplicados** en la cola (encolar una pista ya presente la agrega otra vez) | Comportamiento estándar de una cola de reproducción |
+| D59 | Soltar una pista de la biblioteca sobre la pestaña **Cola** encola y abre la pestaña | Gesto directo, sin digitar posiciones |
+| D60 | Al quitar la pista que suena, la reproducción salta a la siguiente; si la cola queda vacía, se pausa | Evita que el motor siga con un nodo que ya no está en la lista |

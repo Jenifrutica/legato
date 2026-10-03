@@ -318,6 +318,18 @@ export function NostalgiaCapsule() {
                         >
                           {savedId === slide.trackId ? t('capsule.saved') : t('capsule.save')}
                         </button>
+                        <button
+                          className="border-2 border-rule bg-surface px-4 py-2 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5"
+                          onClick={() => {
+                            const track = tracks.find((item) => item.id === slide.trackId)
+                            if (track !== undefined) {
+                              usePlayerStore.getState().enqueue(track)
+                            }
+                          }}
+                          type="button"
+                        >
+                          {t('queue.addToEnd')}
+                        </button>
                       </div>
                     </div>
                   </article>

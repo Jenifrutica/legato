@@ -71,6 +71,18 @@ export const pt: typeof es = {
   },
   queue: {
     empty: 'A fila está vazia. Reproduza algo da sua biblioteca ou de uma playlist.',
+    add: 'Fila',
+    actionsLabel: 'Opções de fila para {{title}}',
+    addToEnd: 'Adicionar ao final',
+    playNext: 'Reproduzir a seguir',
+    addedToEnd: 'Adicionada ao final da fila',
+    addedNext: 'Soará a seguir',
+    remove: 'Remover da fila',
+    removeLabel: 'Remover {{title}} da fila',
+    clear: 'Esvaziar fila',
+    reorder: 'Reordenar na fila {{title}}',
+    count_one: '{{count}} nó',
+    count: '{{count}} nós',
   },
   nav: {
     library: 'Biblioteca',

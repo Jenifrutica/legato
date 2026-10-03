@@ -126,7 +126,7 @@ export class PlayerController {
     this.#queue.clear()
 
     for (const track of tracks) {
-      this.#queue.add(track)
+      this.#queue.enqueue(track)
     }
 
     this.#sourcePlaylistId = sourcePlaylistId
@@ -279,7 +279,6 @@ export class PlayerController {
     this.#queue.setLoopMode(order[(index + 1) % order.length])
     this.#notify()
   }
-
   reorder(trackId: string, targetIndex: number, playlistId: string): void {
     if (this.#sourcePlaylistId !== playlistId) {
       return
@@ -288,6 +287,49 @@ export class PlayerController {
     if (this.#queue.move(trackId, targetIndex)) {
       this.#notify()
     }
+  }
+
+  moveInQueue(trackId: string, targetIndex: number): void {
+    if (this.#queue.move(trackId, targetIndex)) {
+      this.#notify()
+    }
+  }
+
+  enqueue(track: QueueTrack): void {
+    this.#queue.enqueue(track)
+    this.#notify()
+  }
+
+  playNext(track: QueueTrack): void {
+    this.#queue.insertAfterCurrent(track)
+    this.#notify()
+  }
+
+  removeFromQueue(trackId: string): void {
+    const wasCurrent = this.#queue.currentTrack?.id === trackId
+    if (!this.#queue.remove(trackId)) {
+      return
+    }
+
+    if (wasCurrent) {
+      this.#engine.pause()
+      const current = this.#queue.currentTrack
+      if (current !== null) {
+        void this.#transitionTo(current, true)
+      } else {
+        this.#notify()
+      }
+      return
+    }
+
+    this.#notify()
+  }
+
+  clearQueue(): void {
+    this.#queue.clear()
+    this.#engine.pause()
+    this.#sourcePlaylistId = null
+    this.#notify()
   }
 
   restoreSession(tracks: QueueTrack[], state: RestoreState): void {

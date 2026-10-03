@@ -71,6 +71,18 @@ export const en: typeof es = {
   },
   queue: {
     empty: 'The queue is empty. Play something from your library or a playlist.',
+    add: 'Queue',
+    actionsLabel: 'Queue options for {{title}}',
+    addToEnd: 'Add to end',
+    playNext: 'Play next',
+    addedToEnd: 'Added to the end of the queue',
+    addedNext: 'Playing next',
+    remove: 'Remove from queue',
+    removeLabel: 'Remove {{title}} from the queue',
+    clear: 'Clear queue',
+    reorder: 'Reorder in queue {{title}}',
+    count_one: '{{count}} node',
+    count: '{{count}} nodes',
   },
   nav: {
     library: 'Library',

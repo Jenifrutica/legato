@@ -63,7 +63,7 @@ export class PlaybackQueue {
     this.#loopMode = mode
   }
 
-  add(track: QueueTrack): void {
+  enqueue(track: QueueTrack): void {
     const node = this.#list.append(track)
 
     if (this.#playOrder !== null) {
@@ -72,6 +72,32 @@ export class PlaybackQueue {
 
     if (this.#current === null) {
       this.#current = node
+    }
+  }
+
+  /** Alias de compatibilidad con llamadas y pruebas anteriores. */
+  add(track: QueueTrack): void {
+    this.enqueue(track)
+  }
+
+  /** Inserta justo después del nodo que está sonando (o al final si no hay). */
+  insertAfterCurrent(track: QueueTrack): void {
+    if (this.#current === null) {
+      this.enqueue(track)
+      return
+    }
+
+    const index = this.#list.indexOf(this.#current)
+    this.#list.insertAt(index + 1, track)
+
+    if (this.#playOrder !== null) {
+      const orderIndex =
+        this.#shuffleNode === null ? -1 : this.#playOrder.indexOf(this.#shuffleNode)
+      if (orderIndex === -1) {
+        this.#playOrder.append(track)
+      } else {
+        this.#playOrder.insertAt(orderIndex + 1, track)
+      }
     }
   }
 

@@ -44,6 +44,11 @@ type PlayerState = PlayerSnapshot & {
   toggleShuffle: () => void
   cycleLoopMode: () => void
   reorder: (trackId: string, targetIndex: number, playlistId: string) => void
+  enqueue: (track: QueueTrack) => void
+  playNext: (track: QueueTrack) => void
+  removeFromQueue: (trackId: string) => void
+  clearQueue: () => void
+  moveInQueue: (trackId: string, targetIndex: number) => void
   restoreSession: (record: RestoreState) => void
   setBalance: (value: number) => void
   setChannelMode: (mode: ChannelMode) => void
@@ -99,6 +104,11 @@ export const usePlayerStore = create<PlayerState>(() => ({
   cycleLoopMode: () => controller.cycleLoopMode(),
   reorder: (trackId, targetIndex, playlistId) =>
     controller.reorder(trackId, targetIndex, playlistId),
+  enqueue: (track) => controller.enqueue(track),
+  playNext: (track) => controller.playNext(track),
+  removeFromQueue: (trackId) => controller.removeFromQueue(trackId),
+  clearQueue: () => controller.clearQueue(),
+  moveInQueue: (trackId, targetIndex) => controller.moveInQueue(trackId, targetIndex),
   restoreSession: (record) => {
     const tracks = useLibraryStore.getState().tracks
     controller.restoreSession(tracks, record)

@@ -28,6 +28,7 @@ import type { ImportErrorCode, LibraryTrack } from '../features/library'
 import { getPlaylistStructure, usePlaylistsStore } from '../features/playlists'
 import { usePlayerStore } from '../player'
 import { HistoryButtons } from './HistoryButtons'
+import { QueueActions } from './QueueActions'
 import {
   GripIcon,
   ListMusicIcon,
@@ -56,7 +57,7 @@ function TrackMeta({ index, track }: { index: number; track: LibraryTrack }) {
           {track.album === null ? '' : ` · ${track.album}`}
         </span>
       </span>
-      <span className="hidden text-xs tabular-nums text-ink-muted sm:block">
+      <span className="hidden text-xs tabular-nums text-ink-muted xl:block">
         {formatFileSize(track.fileSize)}
       </span>
       <span className="text-xs tabular-nums text-ink-muted">
@@ -446,12 +447,13 @@ export function LibraryPanel() {
                     >
                       <button
                         aria-label={t('library.playTrack', { title: track.title })}
-                        className=" p-2 text-ink-muted transition-colors hover:text-accent-ink-ink"
+                        className=" p-2 text-ink-muted transition-colors hover:text-accent-ink"
                         onClick={() => playTracks(viewTracks, track.id, selectedPlaylist.id)}
                         type="button"
                       >
                         <PlayIcon className="size-4" />
                       </button>
+                      <QueueActions track={track} />
                       <button
                         aria-label={t('playlists.removeTrack', { title: track.title })}
                         className=" p-2 text-ink-muted transition-colors hover:text-danger"
@@ -479,17 +481,18 @@ export function LibraryPanel() {
                 >
                   <button
                     aria-label={t('library.playTrack', { title: track.title })}
-                    className=" p-2 text-ink-muted transition-colors hover:text-accent-ink-ink"
+                    className=" p-2 text-ink-muted transition-colors hover:text-accent-ink"
                     onClick={() => playTracks(viewTracks, track.id, null)}
                     type="button"
                   >
                     <PlayIcon className="size-4" />
                   </button>
+                  <QueueActions track={track} />
                   <TrackMeta index={index} track={track} />
                   {playlists.length > 0 && (
                     <select
                       aria-label={t('library.addToLabel', { title: track.title })}
-                      className="max-w-32  border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
+                      className="max-w-24 border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
                       defaultValue=""
                       onChange={(event) => {
                         const playlistId = event.target.value

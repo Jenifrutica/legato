@@ -69,6 +69,18 @@ export const es = {
   },
   queue: {
     empty: 'La cola está vacía. Reproduce algo desde tu biblioteca o una playlist.',
+    add: 'Cola',
+    actionsLabel: 'Opciones de cola para {{title}}',
+    addToEnd: 'Añadir al final',
+    playNext: 'Reproducir siguiente',
+    addedToEnd: 'Añadida al final de la cola',
+    addedNext: 'Sonará a continuación',
+    remove: 'Quitar de la cola',
+    removeLabel: 'Quitar {{title}} de la cola',
+    clear: 'Vaciar cola',
+    reorder: 'Reordenar en la cola {{title}}',
+    count_one: '{{count}} nodo',
+    count: '{{count}} nodos',
   },
   nav: {
     library: 'Biblioteca',

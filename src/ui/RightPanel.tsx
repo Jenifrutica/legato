@@ -1,14 +1,31 @@
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { DragEvent, FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration, useLibraryStore } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
 import { importSourceTrackToPlaylist, SearchTab } from '../features/sources'
 import type { SourceTrack } from '../features/sources'
 import { usePlayerStore } from '../player'
+import type { QueueTrack } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
 import { LibraryPanel } from './LibraryPanel'
-import { CopyIcon, PencilIcon, PlusIcon, TrashIcon } from './icons'
+import { CopyIcon, GripIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from './icons'
 
 const TAB_KEYS = {
   library: 'tabs.library',
@@ -229,11 +246,90 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   )
 }
 
+function SortableQueueRow({
+  track,
+  index,
+  active,
+  barWidth,
+  onPlay,
+  onRemove,
+}: {
+  track: QueueTrack
+  index: number
+  active: boolean
+  barWidth: number
+  onPlay: () => void
+  onRemove: () => void
+}) {
+  const { t } = useTranslation()
+  const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
+    id: track.id,
+  })
+  const style = { transform: CSS.Transform.toString(transform), transition }
+
+  return (
+    <li
+      className={`flex items-center gap-2 px-3 py-2 ${
+        active ? 'bg-accent-soft' : ''
+      } ${isDragging ? 'relative z-10 bg-surface-2' : ''}`}
+      ref={setNodeRef}
+      style={style}
+    >
+      <button
+        aria-label={t('queue.reorder', { title: track.title })}
+        className="cursor-grab touch-none p-1 text-ink-muted transition-colors hover:text-ink"
+        type="button"
+        {...attributes}
+        {...listeners}
+      >
+        <GripIcon className="size-4" />
+      </button>
+      <span
+        className={`w-6 shrink-0 font-mono text-[0.6875rem] ${
+          active ? 'text-accent-ink' : 'text-ink-muted'
+        }`}
+      >
+        {String(index + 1).padStart(2, '0')}
+      </span>
+      <button className="min-w-0 flex-1 text-left" onClick={onPlay} type="button">
+        <span className="block truncate text-sm font-semibold">{track.title}</span>
+        <span className="block truncate text-xs text-ink-muted">{track.artist}</span>
+      </button>
+      <span
+        aria-hidden="true"
+        className={`hidden h-3 shrink-0 border-2 border-rule sm:block ${
+          active ? 'bg-accent' : 'bg-surface-2'
+        }`}
+        style={{ width: barWidth }}
+      />
+      <span className="shrink-0 font-mono text-[0.6875rem] text-ink-muted">
+        {formatDuration(track.durationSeconds ?? 0)}
+      </span>
+      <button
+        aria-label={t('queue.removeLabel', { title: track.title })}
+        className="shrink-0 p-1.5 text-ink-muted transition-colors hover:text-danger"
+        onClick={onRemove}
+        type="button"
+      >
+        <XIcon className="size-4" />
+      </button>
+    </li>
+  )
+}
+
 function QueueTab() {
   const { t } = useTranslation()
   const queue = usePlayerStore((state) => state.queue)
   const currentId = usePlayerStore((state) => state.currentTrack?.id ?? null)
   const playTracks = usePlayerStore((state) => state.playTracks)
+  const removeFromQueue = usePlayerStore((state) => state.removeFromQueue)
+  const clearQueue = usePlayerStore((state) => state.clearQueue)
+  const moveInQueue = usePlayerStore((state) => state.moveInQueue)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
 
   if (queue.length === 0) {
     return (
@@ -248,52 +344,74 @@ function QueueTab() {
 
   const maxDuration = Math.max(1, ...queue.map((track) => track.durationSeconds ?? 0))
 
-  return (
-    <ol className="divide-y divide-border">
-      {queue.map((track, index) => {
-        const active = track.id === currentId
-        const seconds = track.durationSeconds ?? 0
-        const barWidth = seconds > 0 ? Math.max(18, Math.round((seconds / maxDuration) * 88)) : 24
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (over === null || active.id === over.id) {
+      return
+    }
 
-        return (
-          <li
-            className={`flex items-center gap-3 px-4 py-3 ${active ? 'bg-accent-soft' : ''}`}
-            key={`${track.id}-${index}`}
-          >
-            <span
-              className={`w-7 shrink-0 font-mono text-[0.6875rem] ${
-                active ? 'text-accent-ink' : 'text-ink-muted'
-              }`}
-            >
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <button
-              className="min-w-0 flex-1 text-left"
-              onClick={() => playTracks(queue, track.id, null)}
-              type="button"
-            >
-              <span className="block truncate text-sm font-semibold">{track.title}</span>
-              <span className="block truncate text-xs text-ink-muted">{track.artist}</span>
-            </button>
-            <span
-              aria-hidden="true"
-              className={`h-3 shrink-0 border-2 border-rule ${active ? 'bg-accent' : 'bg-surface-2'}`}
-              style={{ width: barWidth }}
-            />
-            <span className="shrink-0 font-mono text-[0.6875rem] text-ink-muted">
-              {formatDuration(seconds)}
-            </span>
-          </li>
-        )
-      })}
-    </ol>
+    const newIndex = queue.findIndex((track) => track.id === over.id)
+    if (newIndex === -1) {
+      return
+    }
+
+    moveInQueue(String(active.id), newIndex)
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between border-b border-border px-4 py-2">
+        <span className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+          {t('queue.count', { count: queue.length })}
+        </span>
+        <button
+          className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase transition-colors hover:text-danger"
+          onClick={clearQueue}
+          type="button"
+        >
+          {t('queue.clear')}
+        </button>
+      </div>
+
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} sensors={sensors}>
+        <SortableContext
+          items={queue.map((track) => track.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <ol aria-label={t('tabs.queue')} className="divide-y divide-border">
+            {queue.map((track, index) => {
+              const seconds = track.durationSeconds ?? 0
+              const barWidth =
+                seconds > 0 ? Math.max(18, Math.round((seconds / maxDuration) * 72)) : 24
+
+              return (
+                <SortableQueueRow
+                  active={track.id === currentId}
+                  barWidth={barWidth}
+                  index={index}
+                  key={track.id}
+                  onPlay={() => playTracks(queue, track.id, null)}
+                  onRemove={() => removeFromQueue(track.id)}
+                  track={track}
+                />
+              )
+            })}
+          </ol>
+        </SortableContext>
+      </DndContext>
+    </div>
   )
 }
 
 export function RightPanel() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('library')
+  const [queueDragOver, setQueueDragOver] = useState(false)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+
+  function acceptsLibraryDrop(event: DragEvent<HTMLButtonElement>): boolean {
+    return event.dataTransfer.types.includes('application/x-legato-library-track')
+  }
 
   return (
     <aside className="relative z-20 flex min-h-0 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0">
@@ -306,7 +424,11 @@ export function RightPanel() {
           <button
             aria-selected={tab === candidate}
             className={`px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
-              tab === candidate ? 'bg-accent text-on-accent' : 'text-ink-muted hover:text-ink'
+              candidate === 'queue' && queueDragOver
+                ? 'bg-accent text-on-accent'
+                : tab === candidate
+                  ? 'bg-accent text-on-accent'
+                  : 'text-ink-muted hover:text-ink'
             }`}
             key={candidate}
             onClick={() => {
@@ -315,6 +437,45 @@ export function RightPanel() {
               }
               setTab(candidate)
             }}
+            onDragEnter={
+              candidate === 'queue'
+                ? (event) => {
+                    if (acceptsLibraryDrop(event)) {
+                      setQueueDragOver(true)
+                    }
+                  }
+                : undefined
+            }
+            onDragLeave={candidate === 'queue' ? () => setQueueDragOver(false) : undefined}
+            onDragOver={
+              candidate === 'queue'
+                ? (event) => {
+                    if (acceptsLibraryDrop(event)) {
+                      event.preventDefault()
+                      event.dataTransfer.dropEffect = 'copy'
+                    }
+                  }
+                : undefined
+            }
+            onDrop={
+              candidate === 'queue'
+                ? (event) => {
+                    setQueueDragOver(false)
+                    const trackId = event.dataTransfer.getData('application/x-legato-library-track')
+                    if (trackId === '') {
+                      return
+                    }
+                    event.preventDefault()
+                    const track = useLibraryStore
+                      .getState()
+                      .tracks.find((item) => item.id === trackId)
+                    if (track !== undefined) {
+                      usePlayerStore.getState().enqueue(track)
+                      setTab('queue')
+                    }
+                  }
+                : undefined
+            }
             role="tab"
             type="button"
           >
