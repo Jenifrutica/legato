@@ -13,7 +13,8 @@ test('cola: añadir al final, reproducir siguiente, quitar y reordenar sin cambi
   // Contexto limpio: playlist con A, se reproduce desde ahí → cola [A].
   await createPlaylist(page, 'Cola')
   await page.getByRole('tab', { name: 'Biblioteca' }).click()
-  await page.getByLabel('Agregar A a una playlist').selectOption({ label: 'Cola' })
+  await page.getByLabel('Agregar A a una playlist').click()
+  await page.getByRole('menuitem', { name: 'Cola' }).click()
   await page.getByRole('tab', { name: 'Playlists' }).click()
   await page.getByRole('button', { name: /^Cola/ }).click()
   await page.getByRole('button', { name: 'Reproducir A' }).click()

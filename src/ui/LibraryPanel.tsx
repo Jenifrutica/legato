@@ -30,6 +30,7 @@ import { importSourceTrackToPlaylist } from '../features/sources'
 import type { SourceTrack } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { HistoryButtons } from './HistoryButtons'
+import { PlaylistPicker } from './PlaylistPicker'
 import { QueueActions } from './QueueActions'
 import {
   GripIcon,
@@ -123,7 +124,6 @@ export function LibraryPanel() {
   const playlists = usePlaylistsStore((state) => state.playlists)
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
-  const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
   const renamePlaylist = usePlaylistsStore((state) => state.renamePlaylist)
   const duplicatePlaylist = usePlaylistsStore((state) => state.duplicatePlaylist)
   const removePlaylist = usePlaylistsStore((state) => state.removePlaylist)
@@ -528,38 +528,13 @@ export function LibraryPanel() {
                   </button>
                   <QueueActions track={track} />
                   <TrackMeta index={index} track={track} />
-                  <select
-                    aria-label={t('library.addToLabel', { title: track.title })}
-                    className="max-w-24 border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
-                    defaultValue=""
-                    onChange={(event) => {
-                      const value = event.target.value
-                      event.target.value = ''
-                      if (value === '') {
-                        return
-                      }
-                      if (value === '__new__') {
-                        const base = t('playlists.defaultName')
-                        const existing = playlists.filter(
-                          (playlist) => playlist.name === base,
-                        ).length
-                        const name = existing === 0 ? base : `${base} ${existing + 1}`
-                        const id = createPlaylist(name)
-                        addTrackToPlaylist(id, track)
-                        setNotice(t('library.addedToPlaylist'))
-                        return
-                      }
-                      addTrackToPlaylist(value, track)
+                  <PlaylistPicker
+                    label={t('library.addToLabel', { title: track.title })}
+                    onPick={(playlistId) => {
+                      addTrackToPlaylist(playlistId, track)
+                      setNotice(t('library.addedToPlaylist'))
                     }}
-                  >
-                    <option value="">＋ {t('library.addTo')}</option>
-                    {playlists.map((playlist) => (
-                      <option key={playlist.id} value={playlist.id}>
-                        {playlist.name}
-                      </option>
-                    ))}
-                    <option value="__new__">＋ {t('playlists.newPlaylist')}</option>
-                  </select>
+                  />
                   <button
                     aria-label={t('library.removeFromLibrary', { title: track.title })}
                     className=" p-2 text-ink-muted transition-colors hover:text-danger"

@@ -6,6 +6,7 @@ import { usePlaylistsStore } from '../playlists'
 import { usePlayerStore } from '../../player'
 import type { QueueTrack } from '../../player'
 import { DownloadIcon, DiscMark, PlayIcon, SearchIcon } from '../../ui/icons'
+import { PlaylistPicker } from '../../ui/PlaylistPicker'
 import { useProvidersStore } from './providers-store'
 import { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 import { searchAll } from './search'
@@ -39,7 +40,6 @@ export function SearchTab() {
   const playSpotifyUris = useSpotifyStore((state) => state.playUris)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
-  const playlists = usePlaylistsStore((state) => state.playlists)
   const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SourceTrack[]>([])
@@ -222,24 +222,11 @@ export function SearchTab() {
               </span>
             </span>
 
-            {track.downloadable && playlists.length >= 0 && (
-              <select
-                aria-label={t('search.addToPlaylist')}
-                className="max-w-24  border border-border bg-bg px-1.5 py-1 text-[0.6875rem] text-ink-muted focus:border-accent focus:outline-none"
-                defaultValue=""
-                onChange={(event) => {
-                  void addToPlaylist(track, event.target.value)
-                  event.target.value = ''
-                }}
-              >
-                <option value="">{t('search.addToPlaylist')}</option>
-                {playlists.map((playlist) => (
-                  <option key={playlist.id} value={playlist.id}>
-                    {playlist.name}
-                  </option>
-                ))}
-                <option value="__new__">{t('search.newPlaylist')}</option>
-              </select>
+            {track.downloadable && (
+              <PlaylistPicker
+                label={`${t('search.addToPlaylist')} ${track.title}`}
+                onPick={(playlistId) => void addToPlaylist(track, playlistId)}
+              />
             )}
 
             <button

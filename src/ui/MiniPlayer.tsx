@@ -104,7 +104,7 @@ export function MiniPlayer() {
   return (
     <button
       aria-label={`${isPlaying ? t('player.pause') : t('player.play')} · ${title ?? ''}`}
-      className="fixed z-40 hidden size-16 cursor-grab touch-none overflow-hidden rounded-full border-2 border-rule bg-surface shadow-[5px_5px_0_var(--color-rule)] active:cursor-grabbing lg:block"
+      className="fixed z-[60] hidden size-16 cursor-grab touch-none overflow-hidden rounded-full border-2 border-rule bg-surface shadow-[5px_5px_0_var(--color-rule)] active:cursor-grabbing lg:block"
       onClick={(event) => {
         if (event.detail === 0) {
           if (spotifyActive) {

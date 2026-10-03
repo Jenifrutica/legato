@@ -12,7 +12,8 @@ test('regresion #12: reordenar la playlist no cambia la cancion en curso', async
   await page.getByRole('tab', { name: 'Biblioteca' }).click()
 
   for (const name of ['A', 'B', 'C']) {
-    await page.getByLabel(`Agregar ${name} a una playlist`).selectOption({ label: 'Set' })
+    await page.getByLabel(`Agregar ${name} a una playlist`).click()
+    await page.getByRole('menuitem', { name: 'Set' }).click()
   }
 
   await page.getByRole('tab', { name: 'Playlists' }).click()
@@ -54,7 +55,8 @@ test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ pa
 
   await createPlaylist(page, 'Persistente')
   await page.getByRole('tab', { name: 'Biblioteca' }).click()
-  await page.getByLabel('Agregar A a una playlist').selectOption({ label: 'Persistente' })
+  await page.getByLabel('Agregar A a una playlist').click()
+  await page.getByRole('menuitem', { name: 'Persistente' }).click()
 
   await page.waitForTimeout(800)
   await page.reload()
@@ -73,7 +75,8 @@ test('crear playlist desde Agregar a… cuando aún no hay ninguna', async ({ pa
   await importWavFiles(page, ['A'])
   await expect(page.getByText('1 canción(es) importada(s)')).toBeVisible()
 
-  await page.getByLabel('Agregar A a una playlist').selectOption({ label: '＋ Nueva playlist' })
+  await page.getByLabel('Agregar A a una playlist').click()
+  await page.getByRole('menuitem', { name: /Nueva playlist/ }).click()
   await expect(page.getByText('Agregada a la playlist.')).toBeVisible()
 
   await page.getByRole('tab', { name: 'Playlists' }).click()

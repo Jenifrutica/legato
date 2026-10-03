@@ -90,9 +90,9 @@ export function WaveRing({
         ? (analyser?.getLevels() ?? new Uint8Array(0))
         : new Uint8Array(0)
       const center = size / 2
-      const base = size * 0.4
+      const base = size * 0.348
       const seconds = time / 1000
-      const segments = 84
+      const segments = 110
 
       let bass = 0
       if (levels.length > 0) {
@@ -105,7 +105,7 @@ export function WaveRing({
         bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
       }
       const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
-      const pulse = 1 + bass * 0.5 + beat * 0.7
+      const pulse = Math.min(1.9, 1 + bass * 0.8 + beat * 1)
 
       for (let index = 0; index < segments; index++) {
         const angle = (index / segments) * Math.PI * 2 - Math.PI / 2
@@ -115,18 +115,20 @@ export function WaveRing({
 
         const raw =
           levels.length === 0
-            ? 0.16 + 0.13 * Math.sin(seconds * 1.5 + index * 0.42)
+            ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.22 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.05, Math.min(1, raw))
-        const length = 3 + intensity * size * (activeRef.current ? 0.07 : 0.028) * pulse
+        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.6
+        const length =
+          (6 + intensity * size * (activeRef.current ? 0.09 : 0.03) * pulse) * downScale
         const x0 = center + Math.cos(angle) * base
         const y0 = center + Math.sin(angle) * base
         const x1 = center + Math.cos(angle) * (base + length)
         const y1 = center + Math.sin(angle) * (base + length)
 
-        context.globalAlpha = 0.9
-        context.strokeStyle = index % 2 === 0 ? inks.accent : inks.ink
-        context.lineWidth = index % 7 === 0 ? 4 : index % 3 === 0 ? 2.5 : 1.25
+        context.globalAlpha = 0.95
+        context.strokeStyle = index % 5 === 0 ? inks.accent : inks.ink
+        context.lineWidth = index % 10 === 0 ? 7 : index % 3 === 0 ? 4 : 2
         context.lineCap = 'butt'
         context.beginPath()
         context.moveTo(x0, y0)
@@ -134,11 +136,11 @@ export function WaveRing({
         context.stroke()
       }
 
-      context.globalAlpha = 0.35
+      context.globalAlpha = 0.3
       context.strokeStyle = inks.ink
       context.lineWidth = 1
       context.beginPath()
-      context.arc(center, center, base + size * 0.035, 0, Math.PI * 2)
+      context.arc(center, center, base + size * 0.02, 0, Math.PI * 2)
       context.stroke()
       context.globalAlpha = 1
     }
@@ -169,7 +171,7 @@ export function WaveRing({
   return (
     <canvas
       aria-hidden="true"
-      className="pointer-events-none absolute -inset-[12%] h-[124%] w-[124%]"
+      className="pointer-events-none absolute -inset-[25%] h-[150%] w-[150%]"
       ref={canvasRef}
     />
   )

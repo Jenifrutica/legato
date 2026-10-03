@@ -50,8 +50,8 @@ export function PauseIcon({ className }: IconProps) {
 export function SkipBackIcon({ className }: IconProps) {
   return (
     <Icon className={className}>
-      <path d="M18 5v14" />
-      <path d="M15 12 6 7v10l9-5Z" />
+      <path d="M6 5v14" />
+      <path d="M9 12 18 7v10l-9-5Z" />
     </Icon>
   )
 }
@@ -59,8 +59,8 @@ export function SkipBackIcon({ className }: IconProps) {
 export function SkipForwardIcon({ className }: IconProps) {
   return (
     <Icon className={className}>
-      <path d="M6 5v14" />
-      <path d="m9 12 9-5v10l-9-5Z" />
+      <path d="M18 5v14" />
+      <path d="m15 12-9-5v10l9-5Z" />
     </Icon>
   )
 }
