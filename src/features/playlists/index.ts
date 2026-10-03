@@ -1,3 +1,3 @@
 export { PlaylistCollection } from './playlist-collection'
-export { getPlaylistTracks, usePlaylistsStore } from './playlist-store'
-export type { Playlist, PlaylistSnapshot } from './types'
+export { getPlaylistStructure, getPlaylistTracks, usePlaylistsStore } from './playlist-store'
+export type { Playlist, PlaylistSnapshot, PlaylistStructureNode } from './types'

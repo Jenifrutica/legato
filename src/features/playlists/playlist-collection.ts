@@ -1,7 +1,7 @@
 import { DoublyLinkedList } from '../../core/doubly-linked-list'
 import type { DoublyLinkedListNode } from '../../core/doubly-linked-list'
 import type { LibraryTrack } from '../library'
-import type { Playlist, PlaylistSnapshot } from './types'
+import type { Playlist, PlaylistSnapshot, PlaylistStructureNode } from './types'
 
 export class PlaylistCollection {
   #playlists = new DoublyLinkedList<Playlist>()
@@ -124,6 +124,25 @@ export class PlaylistCollection {
 
   tracksOf(playlistId: string): LibraryTrack[] {
     return this.#tracks.get(playlistId)?.toArray() ?? []
+  }
+
+  structureOf(playlistId: string): PlaylistStructureNode[] {
+    const list = this.#tracks.get(playlistId)
+    if (list === undefined) {
+      return []
+    }
+
+    const nodes: PlaylistStructureNode[] = []
+    for (const node of list.nodes()) {
+      nodes.push({
+        id: node.value.id,
+        title: node.value.title,
+        prevId: node.prev?.value.id ?? null,
+        nextId: node.next?.value.id ?? null,
+      })
+    }
+
+    return nodes
   }
 
   trackCount(playlistId: string): number {

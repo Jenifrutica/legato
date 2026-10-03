@@ -24,8 +24,9 @@ import {
   useLibraryStore,
 } from '../features/library'
 import type { LibraryTrack } from '../features/library'
-import { usePlaylistsStore } from '../features/playlists'
+import { usePlaylistsStore, getPlaylistStructure } from '../features/playlists'
 import { usePlayerStore } from '../player'
+import { StructureView } from './StructureView'
 import {
   GripIcon,
   ListMusicIcon,
@@ -118,6 +119,10 @@ export function LibraryPanel() {
 
   const playTracks = usePlayerStore((state) => state.playTracks)
   const reorderInQueue = usePlayerStore((state) => state.reorder)
+  const queueStructure = usePlayerStore((state) => state.queueStructure)
+  const currentTrackId = usePlayerStore((state) => state.currentTrack?.id ?? null)
+
+  const [showStructure, setShowStructure] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
@@ -260,6 +265,18 @@ export function LibraryPanel() {
           {isPlaylistView ? (
             <div className="flex flex-wrap items-center gap-2">
               <button
+                aria-pressed={showStructure}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  showStructure
+                    ? 'border-primary bg-primary-soft text-primary-strong'
+                    : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                }`}
+                onClick={() => setShowStructure((value) => !value)}
+                type="button"
+              >
+                Estructura
+              </button>
+              <button
                 className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
                 onClick={() => {
                   setRenameDraft(selectedPlaylist.name)
@@ -290,6 +307,18 @@ export function LibraryPanel() {
             </div>
           ) : (
             <>
+              <button
+                aria-pressed={showStructure}
+                className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
+                  showStructure
+                    ? 'border-primary bg-primary-soft text-primary-strong'
+                    : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                }`}
+                onClick={() => setShowStructure((value) => !value)}
+                type="button"
+              >
+                Estructura
+              </button>
               <button
                 className="inline-flex items-center gap-2 rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={isImporting}
@@ -347,7 +376,16 @@ export function LibraryPanel() {
         </ul>
       )}
 
-      {viewTracks.length === 0 ? (
+      {showStructure ? (
+        <StructureView
+          currentId={currentTrackId}
+          nodes={
+            isPlaylistView && selectedPlaylist !== null
+              ? getPlaylistStructure(selectedPlaylist.id)
+              : queueStructure
+          }
+        />
+      ) : viewTracks.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
           <div className="max-w-sm text-center">
             <span className="mx-auto grid size-14 place-items-center rounded-full bg-accent-soft text-accent">

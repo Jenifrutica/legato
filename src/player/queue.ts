@@ -1,6 +1,6 @@
 import { DoublyLinkedList } from '../core/doubly-linked-list'
 import type { DoublyLinkedListNode } from '../core/doubly-linked-list'
-import type { LoopMode, QueueState, QueueTrack } from './types'
+import type { LoopMode, QueueState, QueueTrack, StructureNode } from './types'
 
 function shuffleValues<T>(values: T[]): T[] {
   for (let i = values.length - 1; i > 0; i--) {
@@ -42,6 +42,21 @@ export class PlaybackQueue {
 
   get tracks(): QueueTrack[] {
     return this.#list.toArray()
+  }
+
+  structure(): StructureNode[] {
+    const nodes: StructureNode[] = []
+
+    for (const node of this.#list.nodes()) {
+      nodes.push({
+        id: node.value.id,
+        title: node.value.title,
+        prevId: node.prev?.value.id ?? null,
+        nextId: node.next?.value.id ?? null,
+      })
+    }
+
+    return nodes
   }
 
   setLoopMode(mode: LoopMode): void {

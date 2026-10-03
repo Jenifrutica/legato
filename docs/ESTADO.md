@@ -18,8 +18,8 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 10 | CRUD canciones y playlists | Cerrado |
 | 11 | Drag & drop con fix #12 + teclado | Cerrado |
 | 12 | UI vinilo + ondas + mini player | Cerrado |
-| 13 | Modo estructura (visualizador DLL) | En curso |
-| 14 | i18n ES/EN/PT | Pendiente |
+| 13 | Modo estructura (visualizador DLL) | Cerrado |
+| 14 | i18n ES/EN/PT | En curso |
 | 15 | IndexedDB + sesión persistente | Pendiente |
 | 16 | Timer + shuffle/bucles + scroll | Pendiente |
 | 17 | Accesibilidad WCAG 2.2 AA | Pendiente |
@@ -31,11 +31,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 88 en verde (núcleo, player, biblioteca, playlists y controlador).
+- **Tests:** 90 en verde (núcleo, player, biblioteca, playlists y estructura).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #13: modo estructura — visualizador en vivo de la lista doble (nodos, punteros prev/next y nodo actual) con animaciones y navegación por teclado.
+Issue #14: i18n ES/EN/PT con i18next, selector de idioma persistente y extracción de textos de la interfaz.

@@ -8,3 +8,10 @@ export type Playlist = {
 export type PlaylistSnapshot = Playlist & {
   trackIds: string[]
 }
+
+export type PlaylistStructureNode = {
+  id: string
+  title: string
+  prevId: string | null
+  nextId: string | null
+}

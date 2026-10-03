@@ -1,7 +1,7 @@
 import type { AudioLike, EngineStatus } from './engine'
 import { PlayerEngine } from './engine'
 import { PlaybackQueue } from './queue'
-import type { LoopMode, QueueTrack } from './types'
+import type { LoopMode, QueueTrack, StructureNode } from './types'
 
 export type PlayerSnapshot = {
   currentTrack: QueueTrack | null
@@ -13,6 +13,7 @@ export type PlayerSnapshot = {
   loopMode: LoopMode
   shuffle: boolean
   queue: QueueTrack[]
+  queueStructure: StructureNode[]
   sourcePlaylistId: string | null
 }
 
@@ -149,6 +150,7 @@ export class PlayerController {
       loopMode: this.#queue.loopMode,
       shuffle: this.#queue.shuffle,
       queue: this.#queue.tracks,
+      queueStructure: this.#queue.structure(),
       sourcePlaylistId: this.#sourcePlaylistId,
     }
   }

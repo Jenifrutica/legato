@@ -211,6 +211,23 @@ describe('PlaybackQueue', () => {
     expect(queue.tracks.map((t) => t.id)).toEqual(['c', 'a', 'b'])
   })
 
+  it('expone la estructura de la cola y la actualiza al mover', () => {
+    const queue = new PlaybackQueue()
+    for (const id of ['a', 'b', 'c']) {
+      queue.add(track(id))
+    }
+
+    expect(queue.structure().map((node) => node.id)).toEqual(['a', 'b', 'c'])
+    expect(queue.structure()[0]).toMatchObject({ prevId: null, nextId: 'b' })
+
+    queue.move('c', 0)
+
+    const structure = queue.structure()
+    expect(structure.map((node) => node.id)).toEqual(['c', 'a', 'b'])
+    expect(structure[0]).toMatchObject({ prevId: null, nextId: 'a' })
+    expect(structure[2]).toMatchObject({ prevId: 'a', nextId: null })
+  })
+
   it('serializa y restaura el estado', () => {
     const queue = new PlaybackQueue()
     queue.add(track('a'))

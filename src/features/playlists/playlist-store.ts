@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { LibraryTrack } from '../library'
 import { PlaylistCollection } from './playlist-collection'
-import type { PlaylistSnapshot } from './types'
+import type { PlaylistSnapshot, PlaylistStructureNode } from './types'
 
 const collection = new PlaylistCollection()
 
@@ -76,4 +76,8 @@ export const usePlaylistsStore = create<PlaylistsState>((set, get) => ({
 
 export function getPlaylistTracks(playlistId: string): LibraryTrack[] {
   return collection.tracksOf(playlistId)
+}
+
+export function getPlaylistStructure(playlistId: string): PlaylistStructureNode[] {
+  return collection.structureOf(playlistId)
 }

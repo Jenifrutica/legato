@@ -114,6 +114,22 @@ describe('PlaylistCollection', () => {
     expect(collection.moveTrack('nope', 'a', 0)).toBe(false)
   })
 
+  it('expone la estructura real de la lista doble', () => {
+    const collection = new PlaylistCollection()
+    const playlist = collection.create('Set')
+    for (const id of ['a', 'b', 'c']) {
+      collection.addTrack(playlist.id, track(id))
+    }
+
+    const structure = collection.structureOf(playlist.id)
+
+    expect(structure.map((node) => node.id)).toEqual(['a', 'b', 'c'])
+    expect(structure[0]).toMatchObject({ prevId: null, nextId: 'b' })
+    expect(structure[1]).toMatchObject({ prevId: 'a', nextId: 'c' })
+    expect(structure[2]).toMatchObject({ prevId: 'b', nextId: null })
+    expect(collection.structureOf('nope')).toEqual([])
+  })
+
   it('genera snapshots con los ids de las canciones', () => {
     const collection = new PlaylistCollection()
     const playlist = collection.create('Set')

@@ -16,3 +16,10 @@ export type QueueState = {
   loopMode: LoopMode
   shuffle: boolean
 }
+
+export type StructureNode = {
+  id: string
+  title: string
+  prevId: string | null
+  nextId: string | null
+}
