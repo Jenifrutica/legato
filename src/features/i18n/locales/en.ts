@@ -37,6 +37,9 @@ export const en: typeof es = {
     saved: 'Saved to your library.',
     duplicate: 'Already in your library.',
     saveError: 'Could not save the track.',
+    activeSources: 'Active sources: {{sources}}',
+    noProviders: 'No active sources. Enable them in Settings (⚙).',
+    spotifyHint: 'To search Spotify, connect it in Settings (⚙) → Connect Spotify.',
   },
   topbar: {
     collection: 'Collection',

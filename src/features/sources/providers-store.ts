@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import type { SourceId } from './types'
 
-const STORAGE_KEY = 'legato.sources'
+const STORAGE_KEY = 'legato.sources.v2'
 
 const DEFAULT_ENABLED: Record<SourceId, boolean> = {
   spotify: true,
-  audius: true,
-  jamendo: true,
+  audius: false,
+  jamendo: false,
 }
 
 function readEnabled(): Record<SourceId, boolean> {

@@ -4,10 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { importAudioFiles, useLibraryStore } from '../library'
 import { usePlayerStore } from '../../player'
 import type { QueueTrack } from '../../player'
-import { SearchIcon } from '../../ui/icons'
+import { DownloadIcon, PlayIcon, SearchIcon } from '../../ui/icons'
 import { useProvidersStore } from './providers-store'
 import { searchAll } from './search'
-import type { SourceTrack } from './types'
+import type { SourceId, SourceTrack } from './types'
+
+const SOURCE_LABELS: Record<SourceId, string> = {
+  spotify: 'Spotify',
+  audius: 'Audius',
+  jamendo: 'Jamendo',
+}
 
 function toQueueTrack(track: SourceTrack): QueueTrack {
   return {
@@ -33,9 +39,12 @@ export function SearchTab() {
   const [message, setMessage] = useState<string | null>(null)
   const [searched, setSearched] = useState(false)
 
+  const activeSources = (Object.keys(enabled) as SourceId[]).filter((id) => enabled[id])
+  const hasProviders = activeSources.length > 0
+
   async function submit(event: FormEvent) {
     event.preventDefault()
-    if (query.trim() === '') {
+    if (query.trim() === '' || !hasProviders) {
       return
     }
 
@@ -83,6 +92,14 @@ export function SearchTab() {
 
   return (
     <div className="flex flex-col gap-3 p-4">
+      <p className="text-xs text-ink-muted">
+        {hasProviders
+          ? t('search.activeSources', {
+              sources: activeSources.map((id) => SOURCE_LABELS[id]).join(' · '),
+            })
+          : t('search.noProviders')}
+      </p>
+
       <form className="flex items-center gap-2" onSubmit={submit}>
         <label className="relative block flex-1">
           <span className="sr-only">{t('search.label')}</span>
@@ -97,7 +114,7 @@ export function SearchTab() {
         </label>
         <button
           className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
-          disabled={status !== 'idle'}
+          disabled={status !== 'idle' || !hasProviders}
           type="submit"
         >
           {status === 'loading' ? t('search.searching') : t('search.button')}
@@ -111,18 +128,21 @@ export function SearchTab() {
       )}
 
       {status === 'idle' && searched && results.length === 0 && (
-        <p className="py-6 text-center text-sm text-ink-muted">{t('search.empty')}</p>
+        <div className="py-4 text-center text-sm text-ink-muted">
+          <p>{t('search.empty')}</p>
+          {enabled.spotify && <p className="mt-1 text-xs">{t('search.spotifyHint')}</p>}
+        </div>
       )}
 
       <ul className="flex flex-col gap-2">
         {results.map((track) => (
           <li
-            className="flex items-center gap-3 rounded-xl border border-border bg-surface/60 p-2"
+            className="flex items-center gap-2 rounded-xl border border-border bg-surface/60 p-2"
             key={`${track.sourceId}:${track.id}`}
           >
             <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-surface-2 text-[0.625rem] font-semibold uppercase text-ink-muted">
               {track.artworkUrl === null ? (
-                track.sourceId
+                track.sourceId.slice(0, 2)
               ) : (
                 <img alt="" className="size-full object-cover" src={track.artworkUrl} />
               )}
@@ -131,29 +151,29 @@ export function SearchTab() {
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-medium">{track.title}</span>
               <span className="block truncate text-xs text-ink-muted">
-                {track.artist} · {track.sourceId}
+                {track.artist} · {SOURCE_LABELS[track.sourceId]}
               </span>
             </span>
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}
-              className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-40"
+              className="grid size-8 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-40"
               disabled={track.streamUrl === null}
               onClick={() => play(track)}
               type="button"
             >
-              {t('search.play')}
+              <PlayIcon className="size-4" />
             </button>
 
             {track.downloadable && (
               <button
                 aria-label={`${t('search.save')} ${track.title}`}
-                className="rounded-full border border-border px-2 py-1 text-[0.625rem] font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:opacity-40"
+                className="grid size-8 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:text-primary-strong disabled:opacity-40"
                 disabled={status !== 'idle'}
                 onClick={() => void save(track)}
                 type="button"
               >
-                {t('search.save')}
+                <DownloadIcon className="size-4" />
               </button>
             )}
           </li>

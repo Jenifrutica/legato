@@ -50,7 +50,7 @@ export function PlayerBar() {
   return (
     <section
       aria-label={t('player.region')}
-      className="border-t border-border bg-surface/95 shadow-bar backdrop-blur-md lg:hidden"
+      className="border-t border-border bg-surface shadow-bar lg:hidden"
     >
       <div className="flex items-center gap-2 px-3 pb-1 pt-2">
         <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-bg">

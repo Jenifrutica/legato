@@ -259,11 +259,14 @@ export class PlayerController {
   }
 
   getSnapshot(): PlayerSnapshot {
+    const current = this.#queue.currentTrack
+    const engineDuration = this.#engine.duration
+
     return {
-      currentTrack: this.#queue.currentTrack,
+      currentTrack: current,
       status: this.#engine.status,
       currentTime: this.#engine.currentTime,
-      duration: this.#engine.duration,
+      duration: engineDuration > 0 ? engineDuration : (current?.durationSeconds ?? 0),
       volume: this.#volume,
       rate: this.#rate,
       balance: this.#balance,

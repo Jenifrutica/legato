@@ -3,8 +3,6 @@ import type { AnalyserLike } from '../player'
 
 export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; active: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const activeRef = useRef(active)
-  activeRef.current = active
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -18,9 +16,9 @@ export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; 
     }
 
     let frame = 0
+    let last = 0
 
-    const render = () => {
-      frame = requestAnimationFrame(render)
+    const draw = () => {
       const width = canvas.clientWidth
       const height = canvas.clientHeight
       if (width === 0 || height === 0) {
@@ -33,7 +31,7 @@ export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; 
       }
 
       context.clearRect(0, 0, width, height)
-      const levels = analyser?.getLevels() ?? new Uint8Array(0)
+      const levels = active ? (analyser?.getLevels() ?? new Uint8Array(0)) : new Uint8Array(0)
       const bars = 42
       const gap = 2
       const barWidth = Math.max(1, width / bars - gap)
@@ -41,24 +39,42 @@ export function WaveBars({ analyser, active }: { analyser: AnalyserLike | null; 
       for (let index = 0; index < bars; index++) {
         const raw =
           levels.length === 0 ? 0 : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
-        const intensity = activeRef.current ? raw : raw * 0.2
-        const barHeight = Math.max(2, intensity * height)
+        const barHeight = active ? Math.max(2, raw * height) : 2
         const x = index * (barWidth + gap)
         const y = (height - barHeight) / 2
 
         context.fillStyle =
           index % 5 === 0
-            ? `rgba(228, 87, 46, ${0.35 + intensity * 0.5})`
-            : `rgba(31, 122, 140, ${0.3 + intensity * 0.5})`
+            ? `rgba(228, 87, 46, ${active ? 0.35 + raw * 0.5 : 0.25})`
+            : `rgba(31, 122, 140, ${active ? 0.3 + raw * 0.5 : 0.22})`
         context.beginPath()
         context.roundRect(x, y, barWidth, barHeight, barWidth / 2)
         context.fill()
       }
     }
 
-    render()
+    const loop = (time: number) => {
+      frame = requestAnimationFrame(loop)
+      if (time - last < 33) {
+        return
+      }
+      last = time
+
+      if (document.hidden || canvas.offsetParent === null) {
+        return
+      }
+
+      draw()
+    }
+
+    if (active) {
+      frame = requestAnimationFrame(loop)
+    } else {
+      draw()
+    }
+
     return () => cancelAnimationFrame(frame)
-  }, [analyser])
+  }, [analyser, active])
 
   return <canvas aria-hidden="true" className="h-8 w-full max-w-xl" ref={canvasRef} />
 }

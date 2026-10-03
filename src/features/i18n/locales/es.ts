@@ -35,6 +35,9 @@ export const es = {
     saved: 'Guardada en tu biblioteca.',
     duplicate: 'Ya estaba en tu biblioteca.',
     saveError: 'No se pudo guardar la pista.',
+    activeSources: 'Fuentes activas: {{sources}}',
+    noProviders: 'No hay fuentes activas. Actívalas en Ajustes (⚙).',
+    spotifyHint: 'Para buscar en Spotify, conéctalo en Ajustes (⚙) → Conectar Spotify.',
   },
   topbar: {
     collection: 'Colección',

@@ -3,8 +3,6 @@ import type { AnalyserLike } from '../player'
 
 export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; active: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const activeRef = useRef(active)
-  activeRef.current = active
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -18,9 +16,9 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
     }
 
     let frame = 0
+    let last = 0
 
-    const render = () => {
-      frame = requestAnimationFrame(render)
+    const draw = () => {
       const size = canvas.clientWidth
       if (size === 0) {
         return
@@ -32,7 +30,7 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       }
 
       context.clearRect(0, 0, size, size)
-      const levels = analyser?.getLevels() ?? new Uint8Array(0)
+      const levels = active ? (analyser?.getLevels() ?? new Uint8Array(0)) : new Uint8Array(0)
       const bars = 72
       const center = size / 2
       const baseRadius = size * 0.485
@@ -40,7 +38,7 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       for (let index = 0; index < bars; index++) {
         const raw =
           levels.length === 0 ? 0 : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
-        const intensity = activeRef.current ? raw : raw * 0.25
+        const intensity = active ? raw : 0
         const angle = (index / bars) * Math.PI * 2
         const length = 3 + intensity * size * 0.07
         const startX = center + Math.cos(angle) * baseRadius
@@ -48,7 +46,7 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
         const endX = center + Math.cos(angle) * (baseRadius + length)
         const endY = center + Math.sin(angle) * (baseRadius + length)
 
-        context.strokeStyle = `rgba(31, 122, 140, ${0.22 + intensity * 0.55})`
+        context.strokeStyle = `rgba(31, 122, 140, ${active ? 0.22 + intensity * 0.55 : 0.16})`
         context.lineWidth = 2
         context.lineCap = 'round'
         context.beginPath()
@@ -58,9 +56,28 @@ export function WaveRing({ analyser, active }: { analyser: AnalyserLike | null; 
       }
     }
 
-    render()
+    const loop = (time: number) => {
+      frame = requestAnimationFrame(loop)
+      if (time - last < 33) {
+        return
+      }
+      last = time
+
+      if (document.hidden || canvas.offsetParent === null) {
+        return
+      }
+
+      draw()
+    }
+
+    if (active) {
+      frame = requestAnimationFrame(loop)
+    } else {
+      draw()
+    }
+
     return () => cancelAnimationFrame(frame)
-  }, [analyser])
+  }, [analyser, active])
 
   return (
     <canvas

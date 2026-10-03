@@ -87,7 +87,7 @@
 
 @layer components {
   .panel {
-    @apply rounded-2xl border border-border/80 bg-surface/85 shadow-soft backdrop-blur-md;
+    @apply rounded-2xl border border-border/80 bg-surface/95 shadow-soft;
   }
 
   .panel-inset {
@@ -98,6 +98,46 @@
     background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
     height: 1px;
   }
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--color-primary-strong);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-primary-strong);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+
+input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+}
+
+input[type='range']:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 html {
@@ -179,8 +219,16 @@ html.a11y-reduced-motion *::after {
 
 html.a11y-large-controls button,
 html.a11y-large-controls select,
-html.a11y-large-controls input[type='range'],
 html.a11y-large-controls a[href] {
   min-height: 44px;
   min-width: 44px;
+}
+
+html.a11y-large-controls input[type='range'] {
+  height: 10px;
+}
+
+html.a11y-large-controls input[type='range']::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
 }

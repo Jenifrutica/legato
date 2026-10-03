@@ -37,6 +37,9 @@ export const pt: typeof es = {
     saved: 'Salva na sua biblioteca.',
     duplicate: 'Já estava na sua biblioteca.',
     saveError: 'Não foi possível salvar a faixa.',
+    activeSources: 'Fontes ativas: {{sources}}',
+    noProviders: 'Nenhuma fonte ativa. Ative em Configurações (⚙).',
+    spotifyHint: 'Para buscar no Spotify, conecte em Configurações (⚙) → Conectar Spotify.',
   },
   topbar: {
     collection: 'Coleção',

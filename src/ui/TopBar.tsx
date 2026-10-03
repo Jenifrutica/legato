@@ -16,7 +16,7 @@ export function TopBar() {
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/95">
       <div className="mx-auto flex max-w-[110rem] items-center gap-3 px-4 py-3 sm:px-6">
         <span className="grid size-9 place-items-center rounded-full bg-ink text-bg">
           <DiscMark className="size-5" />

@@ -16,7 +16,7 @@ export function VinylVisual() {
         <WaveRing active={isPlaying} analyser={getAnalyser()} />
 
         <span
-          className="motion-reduce:animate-none absolute inset-0 animate-disc overflow-hidden rounded-full shadow-disc"
+          className="motion-reduce:animate-none absolute inset-0 animate-disc overflow-hidden rounded-full shadow-disc will-change-transform"
           style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}
         >
           {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
