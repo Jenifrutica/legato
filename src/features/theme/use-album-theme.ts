@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { usePlayerStore } from '../../player'
+import { useSpotifyStore } from '../sources/spotify-store'
 import { applyAlbumTheme, clearAlbumTheme, deriveTheme } from './album-theme'
 import { extractPaletteFromUrl } from './palette'
 
 export function useAlbumTheme(): void {
-  const artworkUrl = usePlayerStore((state) => state.currentTrack?.artworkUrl ?? null)
+  const currentArtwork = usePlayerStore((state) => state.currentTrack?.artworkUrl ?? null)
+  const spotifyArtwork = useSpotifyStore((state) => state.playback?.artworkUrl ?? null)
+  const artworkUrl = spotifyArtwork ?? currentArtwork
 
   useEffect(() => {
     if (artworkUrl === null) {

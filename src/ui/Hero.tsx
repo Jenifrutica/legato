@@ -96,10 +96,12 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[62vh] overflow-x-hidden px-5 pb-40 pt-8 lg:pb-28 xl:min-h-[calc(100dvh-9rem)]">
-      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-5 xl:block">
-        <div className="relative z-0 w-64 shrink-0 sm:w-80 xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
-          <VinylVisual />
+    <section className="relative min-h-[52vh] px-5 pb-40 pt-4 lg:pb-28 xl:min-h-[calc(100dvh-9rem)] xl:overflow-x-hidden">
+      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-4 xl:block">
+        <div className="relative z-0 h-40 w-full overflow-hidden sm:h-52 lg:h-auto lg:overflow-visible xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2">
+          <div className="mx-auto w-64 sm:w-80 lg:w-full">
+            <VinylVisual />
+          </div>
         </div>
 
         <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[37rem] xl:mr-0 xl:items-start xl:gap-5 xl:text-left">
@@ -115,7 +117,7 @@ export function Hero() {
             </p>
           )}
 
-          <div className="flex w-full max-w-xl items-center gap-3">
+          <div className="hidden w-full max-w-xl items-center gap-3 lg:flex">
             <span className="w-10 text-right text-xs tabular-nums text-ink-muted">
               {formatDuration(progressTime)}
             </span>
@@ -142,7 +144,7 @@ export function Hero() {
             </span>
           </div>
 
-          <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-2 xl:justify-start">
+          <div className="hidden w-full max-w-full flex-wrap items-center justify-center gap-2 lg:flex xl:justify-start">
             <TransportButton
               disabled={!hasPlayable}
               icon={<ShuffleIcon className="size-4" />}
@@ -187,7 +189,7 @@ export function Hero() {
             />
           </div>
 
-          <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3 xl:justify-start">
+          <div className="hidden w-full max-w-full flex-wrap items-center justify-center gap-3 lg:flex xl:justify-start">
             <button
               aria-label={t('player.speed')}
               className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-50"

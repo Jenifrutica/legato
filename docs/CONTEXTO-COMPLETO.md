@@ -297,3 +297,11 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - **Ondas con la paleta del álbum**: `WaveRing` lee `--color-primary` y `--color-accent` (ya teñidos por la portada) cada ~1s y pinta alternando esos colores con glow. Ya no rota el tono libre.
 - **Ondas sin corte**: en `xl` (disco sangrando) se dibuja solo el arco derecho visible (`arc="right"`); en pantallas menores el anillo completo.
 - **Barra**: padding inferior del héroe aumentado (`pb-40 lg:pb-28`) para que nada quede bajo la barra fija.
+
+### Responsive, tema con Spotify y documentación (sesión 2, tanda 7)
+
+- **Una sola barra de reproducción por vista**: en móvil el héroe ya no muestra progreso ni controles (los maneja la barra inferior); el **banner de Spotify** solo aparece en estados `connecting`/`error` (la reproducción se controla desde el héroe en escritorio y la barra en móvil). Antes había hasta tres barras duplicadas.
+- **Disco a media pantalla en móvil/responsive**: el vinilo se recorta mostrando su mitad superior (contenedor `h-40/52` con `overflow-hidden`); en `xl` vuelve el disco grande con sangrado y arco de ondas derecho.
+- **Tema por portada también con Spotify**: `useAlbumTheme` ahora usa la portada del playback del SDK cuando está activo (antes solo miraba el reproductor local y Spotify nunca teñía la UI).
+- **Ondas**: leen la paleta del álbum (`--color-primary`/`--color-accent`) y usan un pulso de **beat** sintético cuando no hay datos del analizador (Spotify no pasa por el grafo), para que se sienta rítmico.
+- **Documentación nueva**: `docs/MUSICOS.md` (funciones para músicos, estado y especificación completa) y `docs/AUTH.md` (login: perfil local activo, Cognito/Google pendientes y pasos para activarlos).

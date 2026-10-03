@@ -11,6 +11,7 @@ import {
   isSpotifyConfigured,
   isSpotifyConnected,
 } from './spotify'
+import { useSpotifyStore } from './spotify-store'
 import type { SourceId } from './types'
 
 export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -123,6 +124,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                       className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
                       onClick={() => {
                         if (spotifyConnected) {
+                          useSpotifyStore.getState().disconnect()
                           disconnectSpotify()
                           setSpotifyConnected(false)
                         } else {

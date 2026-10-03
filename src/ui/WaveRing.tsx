@@ -96,7 +96,8 @@ export function WaveRing({
       } else {
         bass = 0.45 + 0.45 * Math.sin(seconds * 3.1)
       }
-      const pulse = 1 + bass * 0.65
+      const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.4)), 6)
+      const pulse = 1 + bass * 0.6 + beat * 0.9
 
       for (let index = 0; index < bars; index++) {
         const angle = (index / bars) * Math.PI * 2
