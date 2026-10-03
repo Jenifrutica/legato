@@ -24,7 +24,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 16 | Timer + shuffle/bucles + scroll | Cerrado |
 | 17 | Accesibilidad WCAG 2.2 AA | Cerrado |
 | 18 | Páginas legales + cookies | Cerrado |
-| 19–21 | Extras: ensayo, undo/redo, karaoke M/S | En curso (siguiente: #19) |
+| 19–21 | Extras: ensayo, undo/redo, karaoke M/S | Cerrado |
 | 22 | E2E smoke + regresión #12 | Pendiente |
 | 23–27 | Día 4: pulido, responsive, deploy S3+CloudFront, docs, rotar key | Pendiente |
 | 28–33 | Post-entrega | Pendiente |
@@ -32,11 +32,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 119 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer, accesibilidad y legal).
+- **Tests:** 133 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer, accesibilidad, legal, historial y ensayo).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Extras del Día 3: #19 herramientas de ensayo (loop A–B + velocidad), #20 undo/redo con pila de comandos, #21 karaoke M/S. Después #22 E2E y Día 4 (pulido, responsive, deploy S3+CloudFront, rotar key).
+Issue #22: pruebas E2E con Playwright (login local, importar, CRUD, drag & drop con regresión del bug #12, timer, recarga de sesión, idioma) y axe en pantallas principales. Después, Día 4: pulido, responsive, deploy S3+CloudFront, docs y rotar la access key.
