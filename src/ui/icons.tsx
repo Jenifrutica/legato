@@ -164,3 +164,24 @@ export function AccessibilityIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function UploadIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M12 16V4" />
+      <path d="m7 9 5-5 5 5" />
+      <path d="M4 20h16" />
+    </Icon>
+  )
+}
+
+export function TrashIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+      <path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+    </Icon>
+  )
+}
