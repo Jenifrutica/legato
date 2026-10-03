@@ -201,6 +201,9 @@ export const en: typeof es = {
     },
     hint: 'Adjust the balance or isolate one channel to rehearse with part of the mix. Saved in your session.',
   },
+  lyrics: {
+    region: 'Song lyrics',
+  },
   structure: {
     region: 'Doubly linked list structure',
     summary: 'length: {{length}} · head: {{head}} · tail: {{tail}}',

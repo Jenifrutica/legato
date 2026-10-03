@@ -13,7 +13,7 @@ export function HistoryButtons() {
     <div className="flex items-center gap-1">
       <button
         aria-label={t('history.undo')}
-        className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+        className=" p-2 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
         disabled={!canUndo}
         onClick={undo}
         type="button"
@@ -22,7 +22,7 @@ export function HistoryButtons() {
       </button>
       <button
         aria-label={t('history.redo')}
-        className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+        className=" p-2 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
         disabled={!canRedo}
         onClick={redo}
         type="button"

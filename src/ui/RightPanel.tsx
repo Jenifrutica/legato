@@ -61,7 +61,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
         {playlists.length > 0 && (
           <button
             aria-label={t('playlists.newPlaylist')}
-            className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+            className=" p-1.5 text-ink-muted transition-colors hover:text-accent"
             onClick={() => setIsCreating(true)}
             type="button"
           >
@@ -74,7 +74,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
         <form onSubmit={submitCreate}>
           <input
             autoFocus
-            className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="w-full  border border-border bg-bg px-3 py-2 text-sm focus:border-accent focus:outline-none"
             onBlur={() => {
               if (draft.trim() !== '') {
                 createPlaylist(draft)
@@ -90,7 +90,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       )}
 
       {dropMessage !== null && (
-        <p className="rounded-lg bg-accent-soft px-3 py-2 text-xs text-ink" role="status">
+        <p className=" bg-accent-soft px-3 py-2 text-xs text-ink" role="status">
           {dropMessage}
         </p>
       )}
@@ -99,7 +99,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
         <div className="flex flex-col items-start gap-2">
           <p className="text-sm text-ink-muted">{t('playlists.emptyList')}</p>
           <button
-            className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className=" bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
             onClick={() => setIsCreating(true)}
             type="button"
           >
@@ -112,8 +112,8 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
             const selected = playlist.id === selectedPlaylistId
             return (
               <li
-                className={`rounded-xl border px-3 py-2 transition-colors ${
-                  selected ? 'border-primary/70 bg-primary-soft/70' : 'border-border bg-surface/60'
+                className={` border px-3 py-2 transition-colors ${
+                  selected ? 'border-accent/70 bg-accent-soft/70' : 'border-border bg-surface/60'
                 }`}
                 key={playlist.id}
                 onDragOver={(event) => {
@@ -160,7 +160,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                   <form onSubmit={submitRename}>
                     <input
                       autoFocus
-                      className="w-full rounded-md border border-border bg-bg px-2 py-1.5 text-sm focus:border-primary focus:outline-none"
+                      className="w-full  border border-border bg-bg px-2 py-1.5 text-sm focus:border-accent focus:outline-none"
                       onBlur={() => setRenamingId(null)}
                       onChange={(event) => setRenameDraft(event.target.value)}
                       value={renameDraft}
@@ -183,7 +183,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     </button>
                     <button
                       aria-label={`${t('playlists.rename')} ${playlist.name}`}
-                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent"
                       onClick={() => {
                         setRenameDraft(playlist.name)
                         setRenamingId(playlist.id)
@@ -194,7 +194,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     </button>
                     <button
                       aria-label={`${t('playlists.duplicate')} ${playlist.name}`}
-                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-primary-strong"
+                      className=" p-1.5 text-ink-muted transition-colors hover:text-accent"
                       onClick={() => duplicatePlaylist(playlist.id)}
                       type="button"
                     >
@@ -202,7 +202,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     </button>
                     <button
                       aria-label={`${t('playlists.delete')} ${playlist.name}`}
-                      className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-danger"
+                      className=" p-1.5 text-ink-muted transition-colors hover:text-danger"
                       onClick={() => {
                         if (window.confirm(t('playlists.confirmDelete', { name: playlist.name }))) {
                           removePlaylist(playlist.id)
@@ -234,13 +234,17 @@ function QueueTab() {
   }
 
   return (
-    <ul className="divide-y divide-border/70">
+    <ul className="divide-y divide-border">
       {queue.map((track, index) => (
         <li
-          className={`flex items-center gap-3 px-4 py-3 ${track.id === currentId ? 'bg-primary-soft/60' : ''}`}
+          className={`flex items-center gap-3 px-4 py-3 ${
+            track.id === currentId ? 'border-l-4 border-accent bg-accent-soft' : ''
+          }`}
           key={`${track.id}-${index}`}
         >
-          <span className="w-5 text-right text-xs tabular-nums text-ink-muted">{index + 1}</span>
+          <span className="w-7 font-mono text-[0.6875rem] text-accent">
+            {String(index + 1).padStart(2, '0')}
+          </span>
           <button
             className="min-w-0 flex-1 text-left"
             onClick={() => playTracks(queue, track.id, null)}
@@ -261,19 +265,17 @@ export function RightPanel() {
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
 
   return (
-    <aside className="relative z-20 flex min-h-0 flex-col border-t border-border/70 bg-bg pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-l lg:border-t-0 lg:pb-0">
+    <aside className="relative z-20 flex min-h-0 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0">
       <div
         aria-label={t('tabs.label')}
-        className="flex items-center gap-1 border-b border-border/70 px-3 py-2"
+        className="flex items-center gap-1 border-b-2 border-rule px-3 py-2"
         role="tablist"
       >
         {TABS.map((candidate) => (
           <button
             aria-selected={tab === candidate}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-              tab === candidate
-                ? 'bg-primary-soft text-primary-strong'
-                : 'text-ink-muted hover:text-ink'
+            className={`px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
+              tab === candidate ? 'bg-accent text-on-accent' : 'text-ink-muted hover:text-ink'
             }`}
             key={candidate}
             onClick={() => {

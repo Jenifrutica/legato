@@ -71,7 +71,7 @@ export function A11yPanel() {
           <h2 className="font-display text-lg font-semibold">{t('a11y.title')}</h2>
           <button
             aria-label={t('a11y.close')}
-            className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink"
+            className=" p-2 text-ink-muted transition-colors hover:text-ink"
             onClick={closePanel}
             ref={closeRef}
             type="button"
@@ -121,7 +121,7 @@ export function A11yPanel() {
           <label className="flex flex-col gap-2 text-sm">
             <span className="font-medium">{t('a11y.colorBlind')}</span>
             <select
-              className="rounded-md border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              className=" border border-border bg-bg px-3 py-2 text-sm focus:border-accent focus:outline-none"
               onChange={(event) =>
                 setPreference('colorBlind', event.target.value as ColorBlindMode)
               }
@@ -134,7 +134,7 @@ export function A11yPanel() {
           </label>
 
           <button
-            className="self-start rounded-full border border-border px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+            className="self-start  border border-border px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
             onClick={reset}
             type="button"
           >
@@ -147,7 +147,7 @@ export function A11yPanel() {
             </h3>
             <p className="mt-2">{t('a11y.statement')}</p>
             <a
-              className="mt-2 inline-block font-medium text-primary-strong underline underline-offset-2"
+              className="mt-2 inline-block font-medium text-ink underline underline-offset-2"
               href="mailto:jenifer.urbano@campusucc.edu.co"
             >
               jenifer.urbano@campusucc.edu.co

@@ -50,7 +50,7 @@ export function LegalPage() {
     >
       <div className="mx-auto max-w-3xl px-5 py-8">
         <a
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary-strong underline underline-offset-2"
+          className="inline-flex items-center gap-1 text-sm font-medium text-ink underline underline-offset-2"
           href="#/"
         >
           {t('legal.back')}

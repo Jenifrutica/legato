@@ -147,7 +147,13 @@
         height: 48px;
         border-radius: 50%;
         padding: 3px;
-        background: conic-gradient(from 210deg, var(--spot), var(--ink), var(--paper-2), var(--spot));
+        background: conic-gradient(
+          from 210deg,
+          var(--spot),
+          var(--ink),
+          var(--paper-2),
+          var(--spot)
+        );
       }
       .bubble i {
         display: block;
@@ -583,13 +589,17 @@
       <button class="iconbtn" title="Ajustes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="12" r="3" />
-          <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1" />
+          <path
+            d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1"
+          />
         </svg>
       </button>
       <button class="iconbtn" title="Idioma">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21" />
+          <path
+            d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21"
+          />
         </svg>
       </button>
       <span class="account"><span class="dot"></span>Daniela</span>
@@ -617,7 +627,9 @@
           <div class="lyrics">
             <span class="staff" aria-hidden="true"></span>
             <span class="on">La aguja cae sobre el mar quieto</span>
-            <span class="after">y el cuarto entero aprende a respirar, cada surco guarda un verano entero.</span>
+            <span class="after"
+              >y el cuarto entero aprende a respirar, cada surco guarda un verano entero.</span
+            >
           </div>
 
           <div class="progress">
@@ -633,17 +645,25 @@
               </svg>
             </button>
             <button class="tbtn" title="Anterior">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 5h2v14H6zM20 5v14L9 12z" />
+              </svg>
             </button>
             <button class="tbtn play" title="Pausa">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+              </svg>
             </button>
             <button class="tbtn" title="Siguiente">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 5h2v14h-2zM4 5v14l11-7z" />
+              </svg>
             </button>
             <button class="tbtn" title="Repetir">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" />
+                <path
+                  d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3"
+                />
               </svg>
             </button>
           </div>
@@ -653,7 +673,14 @@
             <span class="chip">A–B</span>
             <span class="chip">Timer</span>
             <span class="vol">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+              >
                 <path d="M11 5 6 9H2v6h4l5 4zM15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
               </svg>
               <span class="bar"><i></i></span>
@@ -664,7 +691,8 @@
 
       <aside class="panel">
         <nav class="tabs">
-          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a><a class="on" href="#">Cola</a><a href="#">Audio</a>
+          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a
+          ><a class="on" href="#">Cola</a><a href="#">Audio</a>
         </nav>
         <div class="panel-head"><b>Cola · partitura</b><span>7 nodos · doble enlace</span></div>
         <ul class="score">

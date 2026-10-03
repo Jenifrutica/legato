@@ -94,3 +94,10 @@ Superpuesto como una **hoja deslizante con pestaña arrastrable**: minimizar, ma
 ## 9. Fuera de este rediseño
 
 Cápsula nostálgica (F11), letras funcionales con LRCLIB/.lrc (F12), deploy del Día 4 y rotación de la access key. Nada toca el despliegue hasta que la autora lo pida.
+
+## 10. Bitácora
+
+| Fecha | Fase | Cambios | Verificación |
+|---|---|---|---|
+| 3 oct 2026 | Docs + F0 | Dirección Duotono 62 documentada (este archivo, ESTADO, DECISIONES D43–D52, CONTEXTO sesión 3). Tokens reescritos a papel/tinta/tinta directa con `rule`, `on-primary`, `on-accent`; fuentes Archivo (eje de ancho), Source Serif 4 y JetBrains Mono; fuera Fraunces/Inter; motor de tema deriva el trío con AA y variantes oscuras; mocks y comp aprobado versionados. | typecheck + lint + 154 unit + build |
+| 3 oct 2026 | F1–F4 + F7 visual | Shell y TopBar de tinta; héroe con media luna (círculo completo fuera de pantalla, sin `clip-path`), titular Archivo mezclando anchos, letra activa en banda de tinta directa sobre pentagrama y pentagrama grabado; vinilo con etiqueta de nodo y ondas de líneas planas estilo tipográfico; panel con pestañas bloque naranja, cola con numerales y fila activa; pestaña «Estructura» arrastrable que abre el panel de músicos como hoja deslizante (Escape, foco, estado persistido); barra móvil y nav con bordes duros. Letra diseñada con bandera de demo local `legato.lyrics.demo` (nunca por defecto). | typecheck + lint + 154 unit + 4 E2E + build + capturas 1440/390 |

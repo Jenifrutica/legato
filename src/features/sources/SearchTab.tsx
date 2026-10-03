@@ -152,7 +152,7 @@ export function SearchTab() {
           <span className="sr-only">{t('search.label')}</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted" />
           <input
-            className="w-full rounded-full border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-primary focus:outline-none"
+            className="w-full  border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-accent focus:outline-none"
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('search.placeholder')}
             type="search"
@@ -160,7 +160,7 @@ export function SearchTab() {
           />
         </label>
         <button
-          className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+          className=" bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
           disabled={status !== 'idle' || !hasProviders}
           type="submit"
         >
@@ -169,13 +169,13 @@ export function SearchTab() {
       </form>
 
       {message !== null && (
-        <p className="rounded-lg bg-accent-soft px-3 py-2 text-xs text-ink" role="status">
+        <p className=" bg-accent-soft px-3 py-2 text-xs text-ink" role="status">
           {message}
         </p>
       )}
 
       {errors.length > 0 && (
-        <ul className="rounded-lg bg-primary-soft px-3 py-2 text-xs text-ink">
+        <ul className=" bg-accent-soft px-3 py-2 text-xs text-ink">
           {errors.map((error) => (
             <li key={error.sourceId}>
               <strong>{SOURCE_LABELS[error.sourceId]}:</strong> {error.message}
@@ -197,7 +197,7 @@ export function SearchTab() {
       <ul className="flex flex-col gap-2">
         {results.map((track) => (
           <li
-            className="flex items-center gap-2 rounded-xl border border-border bg-surface/60 p-2"
+            className="flex items-center gap-2  border border-border bg-surface/60 p-2"
             draggable={track.downloadable}
             key={`${track.sourceId}:${track.id}`}
             onDragStart={(event) => {
@@ -207,7 +207,7 @@ export function SearchTab() {
               }
             }}
           >
-            <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-surface-2 text-[0.625rem] font-semibold uppercase text-ink-muted">
+            <span className="grid size-10 shrink-0 place-items-center overflow-hidden  bg-surface-2 text-[0.625rem] font-semibold uppercase text-ink-muted">
               {track.artworkUrl === null ? (
                 track.sourceId.slice(0, 2)
               ) : (
@@ -225,7 +225,7 @@ export function SearchTab() {
             {track.downloadable && playlists.length >= 0 && (
               <select
                 aria-label={t('search.addToPlaylist')}
-                className="max-w-24 rounded-md border border-border bg-bg px-1.5 py-1 text-[0.625rem] text-ink-muted focus:border-primary focus:outline-none"
+                className="max-w-24  border border-border bg-bg px-1.5 py-1 text-[0.625rem] text-ink-muted focus:border-accent focus:outline-none"
                 defaultValue=""
                 onChange={(event) => {
                   void addToPlaylist(track, event.target.value)
@@ -244,7 +244,7 @@ export function SearchTab() {
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}
-              className="grid size-8 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-40"
+              className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
               disabled={track.streamUrl === null}
               onClick={() => play(track)}
               type="button"
@@ -255,7 +255,7 @@ export function SearchTab() {
             {track.sourceId === 'spotify' && (
               <button
                 aria-label={`${t('search.playFull')} ${track.title}`}
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-[#1db954] text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                className="grid size-8 shrink-0 place-items-center  bg-[#1db954] text-on-primary transition-opacity hover:opacity-90 disabled:opacity-40"
                 disabled={status !== 'idle'}
                 onClick={() =>
                   void playSpotifyUris(
@@ -273,7 +273,7 @@ export function SearchTab() {
             {track.downloadable && (
               <button
                 aria-label={`${t('search.save')} ${track.title}`}
-                className="grid size-8 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:text-primary-strong disabled:opacity-40"
+                className="grid size-8 shrink-0 place-items-center  text-ink-muted transition-colors hover:text-accent disabled:opacity-40"
                 disabled={status !== 'idle'}
                 onClick={() => void download(track)}
                 type="button"

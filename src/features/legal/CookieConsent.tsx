@@ -19,27 +19,27 @@ export function CookieConsent() {
       {status === 'pending' && (
         <div
           aria-label={t('cookies.title')}
-          className="fixed inset-x-3 bottom-28 z-40 mx-auto max-w-3xl rounded-lg border border-border bg-surface p-4 shadow-soft lg:bottom-24"
+          className="fixed inset-x-3 bottom-28 z-40 mx-auto max-w-3xl  border border-border bg-surface p-4 shadow-soft lg:bottom-24"
           role="region"
         >
           <p className="text-sm text-ink">{t('cookies.message')}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <button
-              className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className=" bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
               onClick={acceptAll}
               type="button"
             >
               {t('cookies.accept')}
             </button>
             <button
-              className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+              className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
               onClick={acceptEssentialOnly}
               type="button"
             >
               {t('cookies.essentialOnly')}
             </button>
             <button
-              className="text-sm font-medium text-primary-strong underline underline-offset-2"
+              className="text-sm font-medium text-ink underline underline-offset-2"
               onClick={openPreferences}
               type="button"
             >
@@ -64,7 +64,7 @@ export function CookieConsent() {
           <div
             aria-label={t('cookies.dialogTitle')}
             aria-modal="true"
-            className="w-full max-w-md rounded-lg border border-border bg-surface p-5 shadow-soft"
+            className="w-full max-w-md  border border-border bg-surface p-5 shadow-soft"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
           >
@@ -95,14 +95,14 @@ export function CookieConsent() {
 
             <div className="mt-5 flex justify-end gap-2">
               <button
-                className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                className=" border border-border px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
                 onClick={closePreferences}
                 type="button"
               >
                 {t('cookies.close')}
               </button>
               <button
-                className="rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className=" bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
                 onClick={acceptEssentialOnly}
                 type="button"
               >

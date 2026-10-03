@@ -200,6 +200,9 @@ export const es = {
     },
     hint: 'Ajusta el balance o aísla un canal para ensayar con una parte de la mezcla. Se guarda en tu sesión.',
   },
+  lyrics: {
+    region: 'Letra de la canción',
+  },
   structure: {
     region: 'Estructura de la lista doble',
     summary: 'length: {{length}} · head: {{head}} · tail: {{tail}}',

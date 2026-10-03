@@ -61,7 +61,7 @@ export function AudioQualityPanel() {
 
       <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {quality.map((item) => (
-          <div className="rounded-md border border-border bg-bg px-3 py-2" key={item.label}>
+          <div className=" border border-border bg-bg px-3 py-2" key={item.label}>
             <dt className="text-[0.625rem] uppercase tracking-wide text-ink-muted">{item.label}</dt>
             <dd className="font-mono text-sm text-ink">{item.value}</dd>
           </div>
@@ -96,10 +96,10 @@ export function AudioQualityPanel() {
           {CHANNEL_MODES.map((mode) => (
             <button
               aria-pressed={channelMode === mode}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={` border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 channelMode === mode
-                  ? 'border-primary bg-primary-soft text-primary-strong'
-                  : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                  ? 'border-accent bg-accent-soft text-ink'
+                  : 'border-border text-ink-muted hover:border-accent hover:text-accent'
               }`}
               key={mode}
               onClick={() => setChannelMode(mode)}
@@ -117,7 +117,7 @@ export function AudioQualityPanel() {
             {t('audio.output')}
           </label>
           <select
-            className="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="mt-1 w-full  border border-border bg-bg px-3 py-2 text-sm focus:border-accent focus:outline-none"
             id="audio-output"
             onChange={(event) => void setOutputDevice(event.target.value)}
             value={outputDeviceId}

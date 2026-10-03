@@ -200,6 +200,9 @@ export const pt: typeof es = {
     },
     hint: 'Ajuste o balanço ou isole um canal para ensaiar com parte da mixagem. Salvo na sua sessão.',
   },
+  lyrics: {
+    region: 'Letra da música',
+  },
   structure: {
     region: 'Estrutura da lista duplamente encadeada',
     summary: 'length: {{length}} · head: {{head}} · tail: {{tail}}',

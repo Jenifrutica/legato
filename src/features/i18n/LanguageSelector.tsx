@@ -14,7 +14,7 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
   return (
     <select
       aria-label={t('language.label')}
-      className="rounded-full border border-border bg-bg px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary focus:border-primary focus:outline-none"
+      className="cursor-pointer appearance-none border-2 border-bg/40 bg-transparent px-2.5 py-1 text-xs font-semibold text-bg transition-colors hover:border-bg/70 focus:border-accent focus:outline-none"
       onChange={(event) => setLanguage(event.target.value as Language)}
       value={i18n.language}
     >

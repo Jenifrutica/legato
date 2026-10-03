@@ -123,6 +123,79 @@
     @apply font-mono text-[0.6875rem] uppercase;
     letter-spacing: 0.16em;
   }
+
+  /* Escenario del vinilo: media luna (el círculo completo queda posicionado
+     fuera de pantalla; nunca se recorta con clip-path para que el giro sea real) */
+  .disc-zone {
+    position: relative;
+    overflow: hidden;
+    height: calc(var(--disc) * 0.46);
+  }
+
+  .disc-field {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--disc) * -0.54);
+    width: calc(var(--disc) * 1.16);
+    height: calc(var(--disc) * 0.94);
+    transform: translateX(-50%);
+    background: var(--color-accent);
+    box-shadow: 8px 8px 0 var(--color-rule);
+  }
+
+  .disc-wrap {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--disc) * -0.54);
+    width: var(--disc);
+    height: var(--disc);
+    transform: translateX(-50%);
+  }
+
+  .disc-plate {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border: 2px solid var(--color-rule);
+    border-radius: 9999px;
+    background: var(--color-ink);
+    box-shadow: var(--shadow-disc);
+    animation: legato-disc 6s linear infinite;
+    animation-play-state: paused;
+    will-change: transform;
+  }
+
+  .disc-grooves {
+    position: absolute;
+    inset: 0;
+    background: repeating-radial-gradient(
+      circle at center,
+      rgb(0 0 0 / 0.26) 0 1px,
+      transparent 1px 6px
+    );
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .disc-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 19%;
+    height: 19%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--color-rule);
+    border-radius: 9999px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* Pentagrama grabado detrás de la letra activa */
+  .staff-lines {
+    background: repeating-linear-gradient(180deg, var(--color-border) 0 1px, transparent 1px 14px);
+  }
 }
 
 input[type='range'] {

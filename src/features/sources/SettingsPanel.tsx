@@ -89,7 +89,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
           <h2 className="font-display text-lg font-semibold">{t('settings.title')}</h2>
           <button
             aria-label={t('settings.close')}
-            className="rounded-full p-2 text-ink-muted transition-colors hover:text-ink"
+            className=" p-2 text-ink-muted transition-colors hover:text-ink"
             onClick={onClose}
             type="button"
           >
@@ -104,7 +104,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
 
           <div className="mt-3 flex flex-col gap-3">
             {rows.map((row) => (
-              <div className="rounded-xl border border-border bg-bg/50 p-3" key={row.id}>
+              <div className=" border border-border bg-bg/50 p-3" key={row.id}>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-medium">{row.label}</span>
                   <input
@@ -121,7 +121,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                 {row.id === 'spotify' && row.configured && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
-                      className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                      className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
                       onClick={() => {
                         if (spotifyConnected) {
                           useSpotifyStore.getState().disconnect()
@@ -137,7 +137,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                     </button>
                     {spotifyConnected && (
                       <button
-                        className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                        className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
                         onClick={() => void testConnection()}
                         type="button"
                       >

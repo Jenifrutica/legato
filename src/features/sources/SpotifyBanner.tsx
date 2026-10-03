@@ -18,7 +18,7 @@ export function SpotifyBanner() {
 
   if (status === 'error' && error !== null) {
     return (
-      <div className="flex items-center gap-3 border-b border-border/70 bg-primary-soft px-4 py-2 text-xs text-ink">
+      <div className="flex items-center gap-3 border-b border-border/70 bg-accent-soft px-4 py-2 text-xs text-ink">
         <span className="min-w-0 flex-1">
           {error === 'not-connected'
             ? t('spotify.notConnected')
@@ -26,7 +26,7 @@ export function SpotifyBanner() {
         </span>
         <button
           aria-label={t('spotify.exit')}
-          className="rounded-full p-1.5 text-ink-muted transition-colors hover:text-ink"
+          className=" p-1.5 text-ink-muted transition-colors hover:text-ink"
           onClick={disconnect}
           type="button"
         >

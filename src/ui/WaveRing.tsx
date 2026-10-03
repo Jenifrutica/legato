@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import type { AnalyserLike } from '../player'
 
-type Palette = {
-  primary: string
+type Inks = {
   accent: string
+  ink: string
 }
 
 function parseHex(value: string): string | null {
@@ -18,18 +18,22 @@ function parseHex(value: string): string | null {
   return Number.isNaN(r + g + b) ? null : `${r}, ${g}, ${b}`
 }
 
-function readPalette(): Palette {
+function readInks(): Inks {
   if (typeof document === 'undefined') {
-    return { primary: '124, 92, 255', accent: '0, 168, 181' }
+    return { accent: '255, 91, 46', ink: '19, 16, 12' }
   }
 
   const styles = getComputedStyle(document.documentElement)
   return {
-    primary: parseHex(styles.getPropertyValue('--color-primary')) ?? '124, 92, 255',
-    accent: parseHex(styles.getPropertyValue('--color-accent')) ?? '0, 168, 181',
+    accent: parseHex(styles.getPropertyValue('--color-accent')) ?? '255, 91, 46',
+    ink: parseHex(styles.getPropertyValue('--color-ink')) ?? '19, 16, 12',
   }
 }
 
+/**
+ * Ondas de líneas planas que salen del disco, en las dos tintas del álbum,
+ * con grosores alternados al estilo de la tipografía. Sin glow ni blur.
+ */
 export function WaveRing({
   analyser,
   active,
@@ -58,8 +62,12 @@ export function WaveRing({
 
     let frame = 0
     let last = 0
-    let paletteTick = 0
-    let palette = readPalette()
+    let inkTick = 0
+    let inks = readInks()
+
+    const reduced =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      document.documentElement.classList.contains('a11y-reduced-motion')
 
     const draw = (time: number) => {
       const size = canvas.clientWidth
@@ -72,19 +80,19 @@ export function WaveRing({
         canvas.height = size
       }
 
-      paletteTick++
-      if (paletteTick % 30 === 0) {
-        palette = readPalette()
+      inkTick++
+      if (inkTick % 30 === 0) {
+        inks = readInks()
       }
 
       context.clearRect(0, 0, size, size)
       const levels = activeRef.current
         ? (analyser?.getLevels() ?? new Uint8Array(0))
         : new Uint8Array(0)
-      const bars = 96
       const center = size / 2
-      const baseRadius = size * 0.49
+      const base = size * 0.42
       const seconds = time / 1000
+      const segments = 84
 
       let bass = 0
       if (levels.length > 0) {
@@ -94,40 +102,50 @@ export function WaveRing({
         }
         bass = bass / (bassBins * 255)
       } else {
-        bass = 0.45 + 0.45 * Math.sin(seconds * 3.1)
+        bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
       }
-      const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.4)), 6)
-      const pulse = 1 + bass * 0.6 + beat * 0.9
+      const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
+      const pulse = 1 + bass * 0.5 + beat * 0.7
 
-      for (let index = 0; index < bars; index++) {
-        const angle = (index / bars) * Math.PI * 2
-        if (arcRef.current === 'right' && Math.cos(angle) < -0.15) {
+      for (let index = 0; index < segments; index++) {
+        const angle = (index / segments) * Math.PI * 2 - Math.PI / 2
+        if (arcRef.current === 'right' && Math.cos(angle) < -0.2) {
           continue
         }
 
         const raw =
           levels.length === 0
-            ? 0.18 + 0.14 * Math.sin(seconds * 1.6 + index * 0.3)
-            : (levels[Math.floor((index / bars) * levels.length)] ?? 0) / 255
-        const intensity = Math.max(0.04, Math.min(1, raw))
-        const length = 6 + intensity * size * (activeRef.current ? 0.18 : 0.08) * pulse
-        const startX = center + Math.cos(angle) * baseRadius
-        const startY = center + Math.sin(angle) * baseRadius
-        const endX = center + Math.cos(angle) * (baseRadius + length)
-        const endY = center + Math.sin(angle) * (baseRadius + length)
+            ? 0.16 + 0.13 * Math.sin(seconds * 1.5 + index * 0.42)
+            : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
+        const intensity = Math.max(0.05, Math.min(1, raw))
+        const length = 3 + intensity * size * (activeRef.current ? 0.1 : 0.035) * pulse
+        const x0 = center + Math.cos(angle) * base
+        const y0 = center + Math.sin(angle) * base
+        const x1 = center + Math.cos(angle) * (base + length)
+        const y1 = center + Math.sin(angle) * (base + length)
 
-        const color = index % 2 === 0 ? palette.primary : palette.accent
-        context.shadowBlur = 12
-        context.shadowColor = `rgba(${color}, 0.85)`
-        context.strokeStyle = `rgba(${color}, ${0.45 + intensity * 0.55})`
-        context.lineWidth = 4
-        context.lineCap = 'round'
+        context.globalAlpha = 0.9
+        context.strokeStyle = index % 2 === 0 ? inks.accent : inks.ink
+        context.lineWidth = index % 7 === 0 ? 4 : index % 3 === 0 ? 2.5 : 1.25
+        context.lineCap = 'butt'
         context.beginPath()
-        context.moveTo(startX, startY)
-        context.lineTo(endX, endY)
+        context.moveTo(x0, y0)
+        context.lineTo(x1, y1)
         context.stroke()
-        context.shadowBlur = 0
       }
+
+      context.globalAlpha = 0.35
+      context.strokeStyle = inks.ink
+      context.lineWidth = 1
+      context.beginPath()
+      context.arc(center, center, base + size * 0.038, 0, Math.PI * 2)
+      context.stroke()
+      context.globalAlpha = 1
+    }
+
+    if (reduced) {
+      draw(1200)
+      return
     }
 
     const loop = (time: number) => {
@@ -151,7 +169,7 @@ export function WaveRing({
   return (
     <canvas
       aria-hidden="true"
-      className="pointer-events-none absolute -inset-8 h-[calc(100%+4rem)] w-[calc(100%+4rem)] sm:-inset-12 sm:h-[calc(100%+6rem)] sm:w-[calc(100%+6rem)]"
+      className="pointer-events-none absolute -inset-[12%] h-[124%] w-[124%]"
       ref={canvasRef}
     />
   )

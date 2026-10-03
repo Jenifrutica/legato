@@ -7,6 +7,7 @@ import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
 import { VinylVisual } from './VinylVisual'
+import { Lyrics, useDemoLyrics } from './Lyrics'
 import {
   FlagIcon,
   PauseIcon,
@@ -18,6 +19,8 @@ import {
   TimerIcon,
   VolumeIcon,
 } from './icons'
+
+const CAPSULE_TILES = ['var(--color-accent)', 'var(--color-ink)', 'var(--color-accent-soft)']
 
 export function Hero() {
   const { t } = useTranslation()
@@ -46,6 +49,7 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
+  const lyrics = useDemoLyrics()
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
@@ -60,6 +64,10 @@ export function Hero() {
       : currentTrack.album === null
         ? currentTrack.artist
         : `${currentTrack.artist} · ${currentTrack.album}`
+
+  const titleWords = displayTitle.trim().split(/\s+/)
+  const titleTail = titleWords.length > 1 ? titleWords[titleWords.length - 1] : null
+  const titleHead = titleTail === null ? displayTitle : titleWords.slice(0, -1).join(' ')
 
   const progressTime = spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime
   const progressDuration = spotifyActive ? spotifyPlayback.durationMs / 1000 : duration
@@ -96,34 +104,49 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-0 px-5 pb-12 pt-2 xl:min-h-[calc(100dvh-9rem)] xl:overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-center gap-4 xl:block">
-        <div className="relative z-0 w-full py-8 xl:pointer-events-none xl:absolute xl:-left-[min(12rem,19.5dvh)] xl:top-1/2 xl:w-[min(48rem,78dvh)] xl:-translate-y-1/2 xl:py-0">
-          <div className="mx-auto w-64 sm:w-80 xl:w-full">
-            <VinylVisual />
-          </div>
-        </div>
+    <section className="relative overflow-hidden px-5 pb-16 pt-0 lg:px-10 lg:pb-20">
+      <div aria-hidden="true" className="absolute right-4 top-3 z-10 hidden gap-2 sm:flex">
+        {CAPSULE_TILES.map((fill, index) => (
+          <span
+            className="size-11 border-2 border-rule shadow-[3px_3px_0_var(--color-rule)]"
+            key={index}
+            style={{ background: fill }}
+          />
+        ))}
+      </div>
 
-        <div className="relative z-10 flex w-full min-w-0 max-w-2xl flex-col items-center gap-4 text-center xl:ml-[34rem] xl:mr-0 xl:max-w-[calc(100%_-_35rem)] xl:items-start xl:gap-5 xl:text-left">
-          <h2 className="w-full max-w-full break-words font-display text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl 2xl:text-5xl">
-            {displayTitle}
-          </h2>
+      <div className="relative mx-auto w-full max-w-[110rem]">
+        <VinylVisual />
 
-          <p className="max-w-full text-base text-ink-muted sm:text-lg">{displaySubtitle}</p>
+        <div className="mt-8 max-w-3xl lg:mt-10">
+          <h1 className="font-display text-[clamp(2.6rem,7.5vw,5.5rem)] leading-[0.9] font-black tracking-[-0.01em] uppercase">
+            {titleTail !== null && <span className="u-display block">{titleHead}</span>}
+            <span
+              className={`block ${titleTail !== null ? 'u-condensed text-accent' : 'u-display'}`}
+            >
+              {titleTail ?? titleHead}
+            </span>
+          </h1>
+
+          <p className="mt-4 font-mono text-xs tracking-[0.2em] text-ink-muted uppercase">
+            {displaySubtitle}
+          </p>
 
           {!spotifyActive && playerError !== null && (
-            <p className="max-w-full rounded-lg bg-primary-soft px-3 py-2 text-xs text-ink">
+            <p className="mt-4 border-2 border-danger bg-surface px-3 py-2 text-xs text-ink">
               {playerError}
             </p>
           )}
 
-          <div className="hidden w-full max-w-xl items-center gap-3 lg:flex">
-            <span className="w-10 text-right text-xs tabular-nums text-ink-muted">
+          <Lyrics lines={lyrics} />
+
+          <div className="mt-8 hidden items-center gap-3 lg:flex">
+            <span className="w-10 text-right font-mono text-[0.6875rem] text-ink-muted">
               {formatDuration(progressTime)}
             </span>
             <input
               aria-label={t('player.progress')}
-              className="h-1.5 min-w-0 flex-1 cursor-pointer disabled:cursor-not-allowed"
+              className="h-3 min-w-0 flex-1 cursor-pointer disabled:cursor-not-allowed"
               disabled={!hasPlayable}
               max={maxProgress}
               min={0}
@@ -139,12 +162,12 @@ export function Hero() {
               type="range"
               value={Math.min(progressTime, maxProgress)}
             />
-            <span className="w-10 text-xs tabular-nums text-ink-muted">
+            <span className="w-10 font-mono text-[0.6875rem] text-ink-muted">
               {formatDuration(progressDuration)}
             </span>
           </div>
 
-          <div className="hidden w-full max-w-full flex-wrap items-center justify-center gap-2 lg:flex xl:justify-start">
+          <div className="mt-5 hidden flex-wrap items-center gap-3 lg:flex">
             <TransportButton
               disabled={!hasPlayable}
               icon={<ShuffleIcon className="size-4" />}
@@ -160,7 +183,7 @@ export function Hero() {
             />
             <TransportButton
               disabled={!hasPlayable}
-              icon={isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
+              icon={isPlaying ? <PauseIcon className="size-6" /> : <PlayIcon className="size-6" />}
               label={isPlaying ? t('player.pause') : t('player.play')}
               onClick={handleToggle}
               primary
@@ -177,7 +200,7 @@ export function Hero() {
                 <span className="relative grid place-items-center">
                   <RepeatIcon className="size-4" />
                   {loopMode === 'one' && (
-                    <span className="absolute -bottom-1 -right-1 rounded-full bg-primary-strong px-1 text-[0.5rem] font-bold leading-3 text-white">
+                    <span className="absolute -right-1.5 -bottom-1.5 border border-rule bg-accent px-1 font-mono text-[0.5rem] leading-3 font-bold text-on-accent">
                       1
                     </span>
                   )}
@@ -187,12 +210,12 @@ export function Hero() {
               onClick={cycleLoopMode}
               pressed={loopMode !== 'none'}
             />
-          </div>
 
-          <div className="hidden w-full max-w-full flex-wrap items-center justify-center gap-3 lg:flex xl:justify-start">
+            <span aria-hidden="true" className="mx-1 h-8 w-0.5 bg-rule/20" />
+
             <button
               aria-label={t('player.speed')}
-              className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-11 border-2 border-rule bg-surface px-4 font-mono text-sm font-semibold text-ink shadow-[3px_3px_0_var(--color-rule)] transition-transform enabled:hover:-translate-y-0.5 enabled:active:translate-y-0.5 enabled:active:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
               disabled={!hasPlayable}
               onClick={cycleRate}
               type="button"
@@ -226,11 +249,11 @@ export function Hero() {
               {timerOpen && <TimerPanel onClose={() => setTimerOpen(false)} />}
             </div>
 
-            <span className="flex shrink-0 items-center gap-2">
+            <span className="ml-2 flex shrink-0 items-center gap-2">
               <VolumeIcon className="size-4 text-ink-muted" />
               <input
                 aria-label={t('player.volume')}
-                className="h-1.5 w-24 cursor-pointer"
+                className="h-3 w-28 cursor-pointer"
                 max={100}
                 min={0}
                 onChange={(event) => setVolume(Number(event.target.value) / 100)}

@@ -219,7 +219,7 @@ export function LibraryPanel() {
   return (
     <section
       aria-labelledby="biblioteca-titulo"
-      className="flex min-w-0 flex-col rounded-lg border border-border bg-surface shadow-soft"
+      className="flex min-w-0 flex-col  border border-border bg-surface shadow-soft"
       onDragOver={(event) => {
         event.preventDefault()
       }}
@@ -235,7 +235,7 @@ export function LibraryPanel() {
           {isPlaylistView ? (
             <div className="min-w-0 flex-1">
               <button
-                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-primary-strong"
+                className="mb-1 inline-flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent"
                 onClick={() => selectPlaylist(null)}
                 type="button"
               >
@@ -246,7 +246,7 @@ export function LibraryPanel() {
                 <form onSubmit={submitRename}>
                   <input
                     autoFocus
-                    className="w-full max-w-sm rounded-md border border-border bg-bg px-3 py-1.5 font-display text-xl font-semibold focus:border-primary focus:outline-none"
+                    className="w-full max-w-sm  border border-border bg-bg px-3 py-1.5 font-display text-xl font-semibold focus:border-accent focus:outline-none"
                     onBlur={() => setIsRenaming(false)}
                     onChange={(event) => setRenameDraft(event.target.value)}
                     value={renameDraft}
@@ -275,10 +275,10 @@ export function LibraryPanel() {
               <HistoryButtons />
               <button
                 aria-pressed={showStructure}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                className={` border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   showStructure
-                    ? 'border-primary bg-primary-soft text-primary-strong'
-                    : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                    ? 'border-accent bg-accent-soft text-ink'
+                    : 'border-border text-ink-muted hover:border-accent hover:text-accent'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
@@ -286,7 +286,7 @@ export function LibraryPanel() {
                 {t('playlists.structure')}
               </button>
               <button
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
                 onClick={() => {
                   setRenameDraft(selectedPlaylist.name)
                   setIsRenaming(true)
@@ -296,14 +296,14 @@ export function LibraryPanel() {
                 {t('playlists.rename')}
               </button>
               <button
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong"
+                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent"
                 onClick={() => duplicatePlaylist(selectedPlaylist.id)}
                 type="button"
               >
                 {t('playlists.duplicate')}
               </button>
               <button
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
+                className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
                 onClick={() => {
                   if (
                     window.confirm(t('playlists.confirmDelete', { name: selectedPlaylist.name }))
@@ -321,10 +321,10 @@ export function LibraryPanel() {
               <HistoryButtons />
               <button
                 aria-pressed={showStructure}
-                className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
+                className={` border px-3 py-2 text-xs font-semibold transition-colors ${
                   showStructure
-                    ? 'border-primary bg-primary-soft text-primary-strong'
-                    : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                    ? 'border-accent bg-accent-soft text-ink'
+                    : 'border-border text-ink-muted hover:border-accent hover:text-accent'
                 }`}
                 onClick={() => setShowStructure((value) => !value)}
                 type="button"
@@ -332,7 +332,7 @@ export function LibraryPanel() {
                 {t('playlists.structure')}
               </button>
               <button
-                className="inline-flex items-center gap-2 rounded-full bg-primary-strong px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+                className="inline-flex items-center gap-2  bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={isImporting}
                 onClick={() => inputRef.current?.click()}
                 type="button"
@@ -360,7 +360,7 @@ export function LibraryPanel() {
           <span className="sr-only">{t('library.search')}</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted" />
           <input
-            className="w-full rounded-full border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-primary focus:outline-none"
+            className="w-full  border border-border bg-bg py-2 pl-9 pr-3 text-sm placeholder:text-ink-muted focus:border-accent focus:outline-none"
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('library.searchPlaceholder')}
             type="search"
@@ -379,7 +379,7 @@ export function LibraryPanel() {
       )}
 
       {lastErrors.length > 0 && !isPlaylistView && (
-        <ul className="border-b border-border bg-primary-soft px-5 py-2 text-xs text-ink">
+        <ul className="border-b border-border bg-accent-soft px-5 py-2 text-xs text-ink">
           {lastErrors.slice(0, 3).map((error) => (
             <li key={`${error.fileName}-${error.code}`}>
               {error.fileName}: {t(ERROR_KEYS[error.code])}
@@ -403,7 +403,7 @@ export function LibraryPanel() {
       ) : viewTracks.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
           <div className="max-w-sm text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-full bg-accent-soft text-accent">
+            <span className="mx-auto grid size-14 place-items-center  bg-accent-soft text-accent">
               <ListMusicIcon className="size-7" />
             </span>
             <h3 className="mt-4 font-display text-lg font-semibold">
@@ -440,7 +440,7 @@ export function LibraryPanel() {
                     >
                       <button
                         aria-label={t('library.playTrack', { title: track.title })}
-                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
+                        className=" p-2 text-ink-muted transition-colors hover:text-accent"
                         onClick={() => playTracks(viewTracks, track.id, selectedPlaylist.id)}
                         type="button"
                       >
@@ -448,7 +448,7 @@ export function LibraryPanel() {
                       </button>
                       <button
                         aria-label={t('playlists.removeTrack', { title: track.title })}
-                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                        className=" p-2 text-ink-muted transition-colors hover:text-danger"
                         onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
                         type="button"
                       >
@@ -473,7 +473,7 @@ export function LibraryPanel() {
                 >
                   <button
                     aria-label={t('library.playTrack', { title: track.title })}
-                    className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"
+                    className=" p-2 text-ink-muted transition-colors hover:text-accent"
                     onClick={() => playTracks(viewTracks, track.id, null)}
                     type="button"
                   >
@@ -483,7 +483,7 @@ export function LibraryPanel() {
                   {playlists.length > 0 && (
                     <select
                       aria-label={t('library.addToLabel', { title: track.title })}
-                      className="max-w-32 rounded-full border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary focus:border-primary focus:outline-none"
+                      className="max-w-32  border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
                       defaultValue=""
                       onChange={(event) => {
                         const playlistId = event.target.value
@@ -503,7 +503,7 @@ export function LibraryPanel() {
                   )}
                   <button
                     aria-label={t('library.removeFromLibrary', { title: track.title })}
-                    className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                    className=" p-2 text-ink-muted transition-colors hover:text-danger"
                     onClick={() => handleRemoveFromLibrary(track.id)}
                     type="button"
                   >

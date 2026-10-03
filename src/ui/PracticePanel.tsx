@@ -24,7 +24,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
   return (
     <div
       aria-label={t('practice.title')}
-      className="absolute bottom-full right-0 z-40 mb-2 w-72 rounded-lg border border-border bg-surface p-4 shadow-soft"
+      className="absolute bottom-full right-0 z-40 mb-2 w-72  border border-border bg-surface p-4 shadow-soft"
       role="dialog"
     >
       <h3 className="font-display text-sm font-semibold">{t('practice.title')}</h3>
@@ -35,10 +35,10 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
           {RATES.map((value) => (
             <button
               aria-pressed={rate === value}
-              className={`rounded-md border px-2 py-1.5 font-mono text-xs font-semibold transition-colors ${
+              className={` border px-2 py-1.5 font-mono text-xs font-semibold transition-colors ${
                 rate === value
-                  ? 'border-primary bg-primary-soft text-primary-strong'
-                  : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+                  ? 'border-accent bg-accent-soft text-ink'
+                  : 'border-border text-ink-muted hover:border-accent hover:text-accent'
               }`}
               disabled={!hasTrack}
               key={value}
@@ -55,7 +55,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
         <p className="text-xs font-medium text-ink-muted">{t('practice.abLoop')}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <button
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-40"
+            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!hasTrack}
             onClick={setLoopPointA}
             type="button"
@@ -63,7 +63,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
             {t('practice.markA')}
           </button>
           <button
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary-strong disabled:cursor-not-allowed disabled:opacity-40"
+            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!hasTrack || loopPointA === null}
             onClick={setLoopPointB}
             type="button"
@@ -71,7 +71,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
             {t('practice.markB')}
           </button>
           <button
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
+            className=" border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger disabled:cursor-not-allowed disabled:opacity-40"
             disabled={abLoop === null && loopPointA === null}
             onClick={() => {
               clearAbLoop()
@@ -90,11 +90,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
           {' · '}
           {t('practice.pointB', { time: abLoop === null ? '--:--' : formatDuration(abLoop.b) })}
         </p>
-        <p
-          className={`mt-1 text-xs font-medium ${
-            loopActive ? 'text-primary-strong' : 'text-ink-muted'
-          }`}
-        >
+        <p className={`mt-1 text-xs font-medium ${loopActive ? 'text-ink' : 'text-ink-muted'}`}>
           {loopActive ? t('practice.loopActive') : t('practice.loopIdle')}
         </p>
       </div>
@@ -102,10 +98,10 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
       <div className="mt-4">
         <button
           aria-pressed={karaoke}
-          className={`w-full rounded-md border px-3 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+          className={`w-full  border px-3 py-2 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
             karaoke
-              ? 'border-primary bg-primary-soft text-primary-strong'
-              : 'border-border text-ink-muted hover:border-primary hover:text-primary-strong'
+              ? 'border-accent bg-accent-soft text-ink'
+              : 'border-border text-ink-muted hover:border-accent hover:text-accent'
           }`}
           disabled={!hasTrack}
           onClick={() => setKaraoke(!karaoke)}

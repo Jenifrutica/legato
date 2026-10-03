@@ -62,8 +62,8 @@ export function StructureView({
                 prev: titleOf(node.prevId),
                 next: titleOf(node.nextId),
               })}
-              className={`w-44 rounded-md border p-3 transition-colors ${
-                node.id === currentId ? 'border-primary bg-primary-soft' : 'border-border bg-bg'
+              className={`w-44  border p-3 transition-colors ${
+                node.id === currentId ? 'border-accent bg-accent-soft' : 'border-border bg-bg'
               }`}
               tabIndex={0}
             >

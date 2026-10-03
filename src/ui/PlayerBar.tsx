@@ -60,10 +60,10 @@ export function PlayerBar() {
   return (
     <section
       aria-label={t('player.region')}
-      className="border-t border-border bg-surface shadow-bar lg:hidden"
+      className="border-t-2 border-rule bg-surface shadow-bar lg:hidden"
     >
       <div className="flex items-center gap-2 px-3 pb-1 pt-2">
-        <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-bg">
+        <span className="grid size-10 shrink-0 place-items-center overflow-hidden  bg-ink text-bg">
           {displayArtwork !== null && displayArtwork !== undefined ? (
             <img
               alt={t('vinyl.coverAlt', { title: displayTitle ?? '' })}
@@ -159,7 +159,7 @@ export function PlayerBar() {
             <span className="relative grid place-items-center">
               <RepeatIcon className="size-4" />
               {loopMode === 'one' && (
-                <span className="absolute -bottom-1 -right-1 rounded-full bg-primary-strong px-1 text-[0.5rem] font-bold leading-3 text-white">
+                <span className="absolute -bottom-1 -right-1  bg-primary-strong px-1 text-[0.5rem] font-bold leading-3 text-on-primary">
                   1
                 </span>
               )}
@@ -177,7 +177,7 @@ export function PlayerBar() {
         </span>
         <input
           aria-label={t('player.progress')}
-          className="h-1 min-w-0 flex-1 cursor-pointer disabled:cursor-not-allowed"
+          className="h-3 min-w-0 flex-1 cursor-pointer disabled:cursor-not-allowed"
           disabled={!hasTrack}
           max={maxProgress}
           min={0}
