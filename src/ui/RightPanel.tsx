@@ -18,6 +18,7 @@ import { useState } from 'react'
 import type { DragEvent, FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration, useLibraryStore } from '../features/library'
+import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
 import { importSourceTrackToPlaylist, SearchTab } from '../features/sources'
 import type { SourceTrack } from '../features/sources'
@@ -25,6 +26,7 @@ import { usePlayerStore } from '../player'
 import type { QueueTrack } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
 import { LibraryPanel } from './LibraryPanel'
+import { PlaylistPicker } from './PlaylistPicker'
 import { CopyIcon, GripIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from './icons'
 
 const TAB_KEYS = {
@@ -257,15 +259,19 @@ function SortableQueueRow({
   index,
   active,
   barWidth,
+  libraryTrack,
   onPlay,
   onRemove,
+  onAddToPlaylist,
 }: {
   track: QueueTrack
   index: number
   active: boolean
   barWidth: number
+  libraryTrack: LibraryTrack | null
   onPlay: () => void
   onRemove: () => void
+  onAddToPlaylist: (playlistId: string) => void
 }) {
   const { t } = useTranslation()
   const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
@@ -311,6 +317,12 @@ function SortableQueueRow({
       <span className="shrink-0 font-mono text-[0.6875rem] text-ink-muted">
         {formatDuration(track.durationSeconds ?? 0)}
       </span>
+      {libraryTrack !== null && (
+        <PlaylistPicker
+          label={t('library.addToLabel', { title: track.title })}
+          onPick={onAddToPlaylist}
+        />
+      )}
       <button
         aria-label={t('queue.removeLabel', { title: track.title })}
         className="shrink-0 p-1.5 text-ink-muted transition-colors hover:text-danger"
@@ -331,6 +343,8 @@ function QueueTab() {
   const removeFromQueue = usePlayerStore((state) => state.removeFromQueue)
   const clearQueue = usePlayerStore((state) => state.clearQueue)
   const moveInQueue = usePlayerStore((state) => state.moveInQueue)
+  const libraryTracks = useLibraryStore((state) => state.tracks)
+  const addTrackToPlaylist = usePlaylistsStore((state) => state.addTrackToPlaylist)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -396,6 +410,13 @@ function QueueTab() {
                   barWidth={barWidth}
                   index={index}
                   key={track.id}
+                  libraryTrack={libraryTracks.find((item) => item.id === track.id) ?? null}
+                  onAddToPlaylist={(playlistId) => {
+                    const libraryTrack = libraryTracks.find((item) => item.id === track.id)
+                    if (libraryTrack !== undefined) {
+                      addTrackToPlaylist(playlistId, libraryTrack)
+                    }
+                  }}
                   onPlay={() => playTracks(queue, track.id, null)}
                   onRemove={() => removeFromQueue(track.id)}
                   track={track}

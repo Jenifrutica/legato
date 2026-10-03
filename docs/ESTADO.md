@@ -54,6 +54,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 57 | **Video mp4 (F19)**: importación con `mediaType`, motor local basado en `<video>`, visor con «Ver/Ocultar video» sincronizado (imagen) y audio por el motor | Cerrada: 183 unit + 6 E2E, axe 0, detector 0, captura con mp4 real |
 | 58 | **Selector de colección (F20)**: dropdown propio con truncado correcto y lista de biblioteca + playlists (reemplaza el select nativo que mostraba «alo») | Cerrada: typecheck + lint + 183 unit + 6 E2E + captura |
 | 59 | **Ajustes de feedback**: íconos de anterior/siguiente corregidos (estaban espejados), ondas de líneas más grandes y rítmicas (tinta + agujas de acento), mini reproductor por encima de cualquier pantalla (widget, z-60), botón «＋» de playlists con lista desplegable en filas de biblioteca y resultados descargables | Cerrada: 183 unit + 6 E2E, axe 0, detector 0 |
+| 60 | **Cola desde búsqueda y mini flotante real (F21)**: botón de cola en cada resultado (guardar+`enqueue` en la DLL para Audius/Jamendo; cola de Spotify vía API si hay sesión), `PlaylistPicker` también en las filas de la cola, y **Picture-in-Picture de documento** para el mini reproductor (ventana siempre encima, fuera del navegador) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0, PiP verificado en Chromium |
 
 ## Estado técnico
 

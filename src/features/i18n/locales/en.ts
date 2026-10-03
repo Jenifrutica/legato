@@ -61,6 +61,7 @@ export const en: typeof es = {
     saveError: 'Could not save the track.',
     activeSources: 'Active sources: {{sources}}',
     noProviders: 'No active sources. Enable them in Settings (⚙).',
+    queuedSpotify: 'Added to the Spotify queue.',
     spotifyHint: 'To search Spotify, connect it in Settings (⚙) → Connect Spotify.',
   },
   theme: {
@@ -73,6 +74,7 @@ export const en: typeof es = {
     empty: 'The queue is empty. Play something from your library or a playlist.',
     add: 'Queue',
     actionsLabel: 'Queue options for {{title}}',
+    addToEndLabel: 'Add {{title}} to the queue',
     addToEnd: 'Add to end',
     playNext: 'Play next',
     addedToEnd: 'Added to the end of the queue',
@@ -115,6 +117,7 @@ export const en: typeof es = {
     volume: 'Volume',
     showVideo: 'Show video',
     hideVideo: 'Hide video',
+    float: 'Float outside the browser',
     progress: 'Song progress',
   },
   timer: {

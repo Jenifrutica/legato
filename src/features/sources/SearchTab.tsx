@@ -5,13 +5,13 @@ import { useLibraryStore } from '../library'
 import { usePlaylistsStore } from '../playlists'
 import { usePlayerStore } from '../../player'
 import type { QueueTrack } from '../../player'
-import { DownloadIcon, DiscMark, PlayIcon, SearchIcon } from '../../ui/icons'
+import { DownloadIcon, DiscMark, ListMusicIcon, PlayIcon, SearchIcon } from '../../ui/icons'
 import { PlaylistPicker } from '../../ui/PlaylistPicker'
 import { useProvidersStore } from './providers-store'
 import { importSourceTrackToPlaylist, saveSourceTrack } from './save-track'
 import { searchAll } from './search'
 import type { SourceSearchError } from './search'
-import { isSpotifyConnected } from './spotify'
+import { isSpotifyConnected, queueSpotifyTrack } from './spotify'
 import { useSpotifyStore } from './spotify-store'
 import type { SourceId, SourceTrack } from './types'
 
@@ -38,6 +38,7 @@ export function SearchTab() {
   const enabled = useProvidersStore((state) => state.enabled)
   const playTracks = usePlayerStore((state) => state.playTracks)
   const playSpotifyUris = useSpotifyStore((state) => state.playUris)
+  const enqueue = usePlayerStore((state) => state.enqueue)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
   const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
@@ -88,6 +89,41 @@ export function SearchTab() {
 
     const queue = results.filter((item) => item.streamUrl !== null).map(toQueueTrack)
     playTracks(queue, `${track.sourceId}:${track.id}`, null)
+  }
+
+  async function addToQueue(track: SourceTrack) {
+    if (track.sourceId === 'spotify') {
+      if (!isSpotifyConnected()) {
+        setMessage(t('search.spotifyHint'))
+        return
+      }
+
+      const queued = await queueSpotifyTrack(`spotify:track:${track.id}`)
+      setMessage(queued ? t('search.queuedSpotify') : t('search.saveError'))
+      return
+    }
+
+    if (!track.downloadable) {
+      return
+    }
+
+    setStatus('saving')
+    setMessage(null)
+
+    try {
+      const saved = await saveSourceTrack(track, existingDedupeKeys())
+      if (saved === null) {
+        setMessage(t('search.cannotSave'))
+      } else {
+        addTracks([saved])
+        enqueue(saved)
+        setMessage(t('queue.addedToEnd'))
+      }
+    } catch {
+      setMessage(t('search.saveError'))
+    }
+
+    setStatus('idle')
   }
 
   async function download(track: SourceTrack) {
@@ -228,6 +264,16 @@ export function SearchTab() {
                 onPick={(playlistId) => void addToPlaylist(track, playlistId)}
               />
             )}
+
+            <button
+              aria-label={t('queue.addToEndLabel', { title: track.title })}
+              className="grid size-8 shrink-0 place-items-center text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={status !== 'idle'}
+              onClick={() => void addToQueue(track)}
+              type="button"
+            >
+              <ListMusicIcon className="size-4" />
+            </button>
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}

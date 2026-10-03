@@ -61,6 +61,7 @@ export const pt: typeof es = {
     saveError: 'Não foi possível salvar a faixa.',
     activeSources: 'Fontes ativas: {{sources}}',
     noProviders: 'Nenhuma fonte ativa. Ative em Configurações (⚙).',
+    queuedSpotify: 'Adicionada à fila do Spotify.',
     spotifyHint: 'Para buscar no Spotify, conecte em Configurações (⚙) → Conectar Spotify.',
   },
   theme: {
@@ -73,6 +74,7 @@ export const pt: typeof es = {
     empty: 'A fila está vazia. Reproduza algo da sua biblioteca ou de uma playlist.',
     add: 'Fila',
     actionsLabel: 'Opções de fila para {{title}}',
+    addToEndLabel: 'Adicionar {{title}} à fila',
     addToEnd: 'Adicionar ao final',
     playNext: 'Reproduzir a seguir',
     addedToEnd: 'Adicionada ao final da fila',
@@ -115,6 +117,7 @@ export const pt: typeof es = {
     volume: 'Volume',
     showVideo: 'Ver vídeo',
     hideVideo: 'Ocultar vídeo',
+    float: 'Flutuar fora do navegador',
     progress: 'Progresso da música',
   },
   timer: {

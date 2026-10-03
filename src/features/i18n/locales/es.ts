@@ -59,6 +59,7 @@ export const es = {
     saveError: 'No se pudo guardar la pista.',
     activeSources: 'Fuentes activas: {{sources}}',
     noProviders: 'No hay fuentes activas. Actívalas en Ajustes (⚙).',
+    queuedSpotify: 'Añadida a la cola de Spotify.',
     spotifyHint: 'Para buscar en Spotify, conéctalo en Ajustes (⚙) → Conectar Spotify.',
   },
   theme: {
@@ -71,6 +72,7 @@ export const es = {
     empty: 'La cola está vacía. Reproduce algo desde tu biblioteca o una playlist.',
     add: 'Cola',
     actionsLabel: 'Opciones de cola para {{title}}',
+    addToEndLabel: 'Añadir {{title}} a la cola',
     addToEnd: 'Añadir al final',
     playNext: 'Reproducir siguiente',
     addedToEnd: 'Añadida al final de la cola',
@@ -113,6 +115,7 @@ export const es = {
     volume: 'Volumen',
     showVideo: 'Ver video',
     hideVideo: 'Ocultar video',
+    float: 'Flotar fuera del navegador',
     progress: 'Progreso de la canción',
   },
   timer: {
