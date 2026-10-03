@@ -7,6 +7,7 @@ import { CookieConsent, LegalPage } from '../features/legal'
 import { SpotifyBanner } from '../features/sources'
 import { useAlbumTheme } from '../features/theme'
 import { Hero } from '../ui/Hero'
+import { MiniPlayer } from '../ui/MiniPlayer'
 import { MobileNav } from '../ui/MobileNav'
 import { MusiciansPanel } from '../ui/MusiciansPanel'
 import { PlayerBar } from '../ui/PlayerBar'
@@ -108,6 +109,7 @@ function AppShell() {
       </div>
 
       <MusiciansPanel />
+      <MiniPlayer />
 
       <CookieConsent />
       <LegalPage />
