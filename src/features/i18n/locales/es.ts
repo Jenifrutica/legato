@@ -161,6 +161,7 @@ export const es = {
     importedCount: '{{count}} canción(es) importada(s)',
     addTo: 'Agregar a…',
     addToLabel: 'Agregar {{title}} a una playlist',
+    addedToPlaylist: 'Agregada a la playlist.',
     removeFromLibrary: 'Eliminar {{title}} de la biblioteca',
     playTrack: 'Reproducir {{title}}',
     errors: {
@@ -173,6 +174,8 @@ export const es = {
   playlists: {
     title: 'Playlists',
     newPlaylist: 'Nueva playlist',
+    defaultName: 'Mi lista',
+    dropHint: 'Suelta aquí para agregar a la playlist',
     namePlaceholder: 'Nombre de la playlist',
     back: 'Volver a la biblioteca',
     rename: 'Renombrar',

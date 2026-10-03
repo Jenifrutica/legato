@@ -65,3 +65,17 @@ test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ pa
   await page.getByRole('tab', { name: 'Biblioteca' }).click()
   await expect(page.getByText('A', { exact: true }).first()).toBeVisible()
 })
+
+test('crear playlist desde Agregar a… cuando aún no hay ninguna', async ({ page }) => {
+  await page.goto('/')
+  await acceptCookies(page)
+
+  await importWavFiles(page, ['A'])
+  await expect(page.getByText('1 canción(es) importada(s)')).toBeVisible()
+
+  await page.getByLabel('Agregar A a una playlist').selectOption({ label: '＋ Nueva playlist' })
+  await expect(page.getByText('Agregada a la playlist.')).toBeVisible()
+
+  await page.getByRole('tab', { name: 'Playlists' }).click()
+  await expect(page.getByRole('button', { name: /^Mi lista/ })).toBeVisible()
+})

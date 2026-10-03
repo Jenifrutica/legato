@@ -162,6 +162,7 @@ export const en: typeof es = {
     importedCount: '{{count}} track(s) imported',
     addTo: 'Add to…',
     addToLabel: 'Add {{title}} to a playlist',
+    addedToPlaylist: 'Added to the playlist.',
     removeFromLibrary: 'Remove {{title}} from library',
     playTrack: 'Play {{title}}',
     errors: {
@@ -174,6 +175,8 @@ export const en: typeof es = {
   playlists: {
     title: 'Playlists',
     newPlaylist: 'New playlist',
+    defaultName: 'My list',
+    dropHint: 'Drop here to add to the playlist',
     namePlaceholder: 'Playlist name',
     back: 'Back to library',
     rename: 'Rename',

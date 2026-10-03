@@ -53,6 +53,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameDraft, setRenameDraft] = useState('')
   const [dropMessage, setDropMessage] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
 
   function submitCreate(event: FormEvent) {
     event.preventDefault()
@@ -133,9 +134,13 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
             return (
               <li
                 className={`flex items-center gap-3 border-2 px-3 py-2 transition-colors ${
-                  selected ? 'border-accent bg-accent-soft' : 'border-rule/30 bg-surface'
+                  selected || dragOverId === playlist.id
+                    ? 'border-accent bg-accent-soft'
+                    : 'border-rule/30 bg-surface'
                 }`}
                 key={playlist.id}
+                onDragEnter={() => setDragOverId(playlist.id)}
+                onDragLeave={() => setDragOverId(null)}
                 onDragOver={(event) => {
                   const types = event.dataTransfer.types
                   if (
@@ -147,6 +152,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                   }
                 }}
                 onDrop={(event) => {
+                  setDragOverId(null)
                   const sourceRaw = event.dataTransfer.getData('application/x-legato-track')
                   if (sourceRaw !== '') {
                     event.preventDefault()
@@ -407,7 +413,11 @@ export function RightPanel() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('library')
   const [queueDragOver, setQueueDragOver] = useState(false)
+  const [playlistsDragOver, setPlaylistsDragOver] = useState(false)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+  const playlists = usePlaylistsStore((state) => state.playlists)
+  const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
+  const addTrackToPlaylist = usePlaylistsStore((state) => state.addTrackToPlaylist)
 
   function acceptsLibraryDrop(event: DragEvent<HTMLButtonElement>): boolean {
     return event.dataTransfer.types.includes('application/x-legato-library-track')
@@ -420,68 +430,101 @@ export function RightPanel() {
         className="flex flex-wrap items-center gap-1 gap-y-1 border-b-2 border-rule px-3 py-2"
         role="tablist"
       >
-        {TABS.map((candidate) => (
-          <button
-            aria-selected={tab === candidate}
-            className={`px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
-              candidate === 'queue' && queueDragOver
-                ? 'bg-accent text-on-accent'
-                : tab === candidate
+        {TABS.map((candidate) => {
+          const isDropTarget = candidate === 'queue' || candidate === 'playlists'
+          const highlighted =
+            (candidate === 'queue' && queueDragOver) ||
+            (candidate === 'playlists' && playlistsDragOver)
+
+          return (
+            <button
+              aria-selected={tab === candidate}
+              className={`px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
+                highlighted || tab === candidate
                   ? 'bg-accent text-on-accent'
                   : 'text-ink-muted hover:text-ink'
-            }`}
-            key={candidate}
-            onClick={() => {
-              if (candidate === 'library') {
-                selectPlaylist(null)
+              }`}
+              key={candidate}
+              onClick={() => {
+                if (candidate === 'library') {
+                  selectPlaylist(null)
+                }
+                setTab(candidate)
+              }}
+              onDragEnter={
+                isDropTarget
+                  ? (event) => {
+                      if (acceptsLibraryDrop(event)) {
+                        if (candidate === 'queue') {
+                          setQueueDragOver(true)
+                        } else {
+                          setPlaylistsDragOver(true)
+                        }
+                      }
+                    }
+                  : undefined
               }
-              setTab(candidate)
-            }}
-            onDragEnter={
-              candidate === 'queue'
-                ? (event) => {
-                    if (acceptsLibraryDrop(event)) {
-                      setQueueDragOver(true)
+              onDragLeave={
+                isDropTarget
+                  ? () => {
+                      if (candidate === 'queue') {
+                        setQueueDragOver(false)
+                      } else {
+                        setPlaylistsDragOver(false)
+                      }
                     }
-                  }
-                : undefined
-            }
-            onDragLeave={candidate === 'queue' ? () => setQueueDragOver(false) : undefined}
-            onDragOver={
-              candidate === 'queue'
-                ? (event) => {
-                    if (acceptsLibraryDrop(event)) {
+                  : undefined
+              }
+              onDragOver={
+                isDropTarget
+                  ? (event) => {
+                      if (acceptsLibraryDrop(event)) {
+                        event.preventDefault()
+                        event.dataTransfer.dropEffect = 'copy'
+                      }
+                    }
+                  : undefined
+              }
+              onDrop={
+                isDropTarget
+                  ? (event) => {
+                      if (candidate === 'queue') {
+                        setQueueDragOver(false)
+                      } else {
+                        setPlaylistsDragOver(false)
+                      }
+                      const trackId = event.dataTransfer.getData(
+                        'application/x-legato-library-track',
+                      )
+                      if (trackId === '') {
+                        return
+                      }
                       event.preventDefault()
-                      event.dataTransfer.dropEffect = 'copy'
+                      const track = useLibraryStore
+                        .getState()
+                        .tracks.find((item) => item.id === trackId)
+                      if (track === undefined) {
+                        return
+                      }
+                      if (candidate === 'queue') {
+                        usePlayerStore.getState().enqueue(track)
+                      } else {
+                        const targetId = selectedPlaylistId ?? playlists[0]?.id
+                        if (targetId !== undefined) {
+                          addTrackToPlaylist(targetId, track)
+                        }
+                      }
+                      setTab(candidate)
                     }
-                  }
-                : undefined
-            }
-            onDrop={
-              candidate === 'queue'
-                ? (event) => {
-                    setQueueDragOver(false)
-                    const trackId = event.dataTransfer.getData('application/x-legato-library-track')
-                    if (trackId === '') {
-                      return
-                    }
-                    event.preventDefault()
-                    const track = useLibraryStore
-                      .getState()
-                      .tracks.find((item) => item.id === trackId)
-                    if (track !== undefined) {
-                      usePlayerStore.getState().enqueue(track)
-                      setTab('queue')
-                    }
-                  }
-                : undefined
-            }
-            role="tab"
-            type="button"
-          >
-            {t(TAB_KEYS[candidate])}
-          </button>
-        ))}
+                  : undefined
+              }
+              role="tab"
+              type="button"
+            >
+              {t(TAB_KEYS[candidate])}
+            </button>
+          )
+        })}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">

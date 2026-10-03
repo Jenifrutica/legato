@@ -26,6 +26,8 @@ import {
 } from '../features/library'
 import type { ImportErrorCode, LibraryTrack } from '../features/library'
 import { getPlaylistStructure, usePlaylistsStore } from '../features/playlists'
+import { importSourceTrackToPlaylist } from '../features/sources'
+import type { SourceTrack } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { HistoryButtons } from './HistoryButtons'
 import { QueueActions } from './QueueActions'
@@ -121,6 +123,7 @@ export function LibraryPanel() {
   const playlists = usePlaylistsStore((state) => state.playlists)
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
+  const createPlaylist = usePlaylistsStore((state) => state.createPlaylist)
   const renamePlaylist = usePlaylistsStore((state) => state.renamePlaylist)
   const duplicatePlaylist = usePlaylistsStore((state) => state.duplicatePlaylist)
   const removePlaylist = usePlaylistsStore((state) => state.removePlaylist)
@@ -139,6 +142,7 @@ export function LibraryPanel() {
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameDraft, setRenameDraft] = useState('')
   const [showStructure, setShowStructure] = useState(false)
+  const [playlistDragOver, setPlaylistDragOver] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -220,14 +224,49 @@ export function LibraryPanel() {
   return (
     <section
       aria-labelledby="biblioteca-titulo"
-      className="flex min-w-0 flex-col  border-2 border-rule/40 bg-surface shadow-soft"
+      className={`flex min-w-0 flex-col border-2 shadow-soft ${
+        playlistDragOver ? 'border-accent bg-accent-soft' : 'border-rule/40 bg-surface'
+      }`}
+      onDragLeave={() => setPlaylistDragOver(false)}
       onDragOver={(event) => {
         event.preventDefault()
+        if (
+          isPlaylistView &&
+          (event.dataTransfer.types.includes('application/x-legato-library-track') ||
+            event.dataTransfer.types.includes('application/x-legato-track'))
+        ) {
+          setPlaylistDragOver(true)
+        }
       }}
       onDrop={(event) => {
         event.preventDefault()
+        setPlaylistDragOver(false)
         if (!isPlaylistView) {
           void handleFiles(event.dataTransfer.files)
+          return
+        }
+        if (selectedPlaylist === null) {
+          return
+        }
+
+        const libraryId = event.dataTransfer.getData('application/x-legato-library-track')
+        if (libraryId !== '') {
+          const track = useLibraryStore.getState().tracks.find((item) => item.id === libraryId)
+          if (track !== undefined) {
+            const added = addTrackToPlaylist(selectedPlaylist.id, track)
+            setNotice(added ? t('library.addedToPlaylist') : t('search.duplicate'))
+          }
+          return
+        }
+
+        const sourceRaw = event.dataTransfer.getData('application/x-legato-track')
+        if (sourceRaw !== '') {
+          try {
+            const sourceTrack = JSON.parse(sourceRaw) as SourceTrack
+            void importSourceTrackToPlaylist(sourceTrack, selectedPlaylist.id)
+          } catch {
+            setNotice(t('search.saveError'))
+          }
         }
       }}
     >
@@ -489,27 +528,38 @@ export function LibraryPanel() {
                   </button>
                   <QueueActions track={track} />
                   <TrackMeta index={index} track={track} />
-                  {playlists.length > 0 && (
-                    <select
-                      aria-label={t('library.addToLabel', { title: track.title })}
-                      className="max-w-24 border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
-                      defaultValue=""
-                      onChange={(event) => {
-                        const playlistId = event.target.value
-                        if (playlistId !== '') {
-                          addTrackToPlaylist(playlistId, track)
-                          event.target.value = ''
-                        }
-                      }}
-                    >
-                      <option value="">＋ {t('library.addTo')}</option>
-                      {playlists.map((playlist) => (
-                        <option key={playlist.id} value={playlist.id}>
-                          {playlist.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                  <select
+                    aria-label={t('library.addToLabel', { title: track.title })}
+                    className="max-w-24 border-2 border-rule/30 bg-surface px-2.5 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-accent focus:border-accent focus:outline-none"
+                    defaultValue=""
+                    onChange={(event) => {
+                      const value = event.target.value
+                      event.target.value = ''
+                      if (value === '') {
+                        return
+                      }
+                      if (value === '__new__') {
+                        const base = t('playlists.defaultName')
+                        const existing = playlists.filter(
+                          (playlist) => playlist.name === base,
+                        ).length
+                        const name = existing === 0 ? base : `${base} ${existing + 1}`
+                        const id = createPlaylist(name)
+                        addTrackToPlaylist(id, track)
+                        setNotice(t('library.addedToPlaylist'))
+                        return
+                      }
+                      addTrackToPlaylist(value, track)
+                    }}
+                  >
+                    <option value="">＋ {t('library.addTo')}</option>
+                    {playlists.map((playlist) => (
+                      <option key={playlist.id} value={playlist.id}>
+                        {playlist.name}
+                      </option>
+                    ))}
+                    <option value="__new__">＋ {t('playlists.newPlaylist')}</option>
+                  </select>
                   <button
                     aria-label={t('library.removeFromLibrary', { title: track.title })}
                     className=" p-2 text-ink-muted transition-colors hover:text-danger"

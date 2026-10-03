@@ -46,6 +46,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 49 | **Cápsula nostálgica** (nueva funcionalidad): carrusel diario tipo historias con fragmentos, etiquetas de contexto y favoritos | Cerrada: 161 unit + 4 E2E, axe 0, detector 0 |
 | 50 | **Letras reales**: parser LRC propio + LRCLIB (siempre activo con aviso legal en privacidad), atribución visible y estados de carga/vacío | Cerrada: 172 unit + 4 E2E, axe 0, detector 0 |
 | 51 | **Cola intuitiva (F13)**: añadir al final / reproducir siguiente desde cada fila y la cápsula, quitar, reordenar por arrastre, vaciar y soltar sobre la pestaña Cola | Cerrada: 178 unit + 5 E2E, axe 0, detector 0 |
+| 52 | **Playlists DnD (F14)**: «Agregar a…» siempre visible con «＋ Nueva playlist» al vuelo, zonas de drop resaltadas, soltar sobre la pestaña Playlists y drop de búsqueda/biblioteca dentro de la playlist | Cerrada: 178 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 
