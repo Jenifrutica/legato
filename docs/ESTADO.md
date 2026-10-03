@@ -52,6 +52,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 55 | **Letras y hueco (F17)**: toggle «Letra» en héroe y panel de músicos (persistido), tira de cola (anterior · sonando · siguiente) cuando no hay letra y controles anclados al fondo del héroe | Cerrada: 178 unit + 6 E2E, axe 0, detector 0 |
 | 56 | **Bajos y ambiente (F18)**: refuerzo low-shelf 0–12 dB en el grafo + 4 camas generadas (lluvia, vinilo, café, viento) con volumen propio, apagadas por defecto y persistidas | Cerrada: 180 unit, sin errores al activar |
 | 57 | **Video mp4 (F19)**: importación con `mediaType`, motor local basado en `<video>`, visor con «Ver/Ocultar video» sincronizado (imagen) y audio por el motor | Cerrada: 183 unit + 6 E2E, axe 0, detector 0, captura con mp4 real |
+| 58 | **Selector de colección (F20)**: dropdown propio con truncado correcto y lista de biblioteca + playlists (reemplaza el select nativo que mostraba «alo») | Cerrada: typecheck + lint + 183 unit + 6 E2E + captura |
 
 ## Estado técnico
 

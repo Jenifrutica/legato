@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { A11yPanel, useA11yStore } from '../features/a11y'
 import { AccountChip } from '../features/auth'
@@ -17,6 +17,35 @@ export function TopBar() {
   const themeMode = useThemeStore((state) => state.mode)
   const toggleTheme = useThemeStore((state) => state.toggle)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [collectionOpen, setCollectionOpen] = useState(false)
+  const collectionRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!collectionOpen) {
+      return
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (collectionRef.current !== null && !collectionRef.current.contains(event.target as Node)) {
+        setCollectionOpen(false)
+      }
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCollectionOpen(false)
+      }
+    }
+
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [collectionOpen])
+
+  const currentCollectionName =
+    playlists.find((playlist) => playlist.id === selectedPlaylistId)?.name ?? t('nav.library')
 
   return (
     <header className="sticky top-0 z-30 border-b-2 border-rule bg-ink text-bg">
@@ -28,29 +57,66 @@ export function TopBar() {
 
         <span aria-hidden="true" className="mx-1 hidden h-6 w-0.5 bg-bg/25 sm:block" />
 
-        <span className="relative hidden sm:block">
-          <select
+        <div className="relative hidden sm:block" ref={collectionRef}>
+          <button
+            aria-expanded={collectionOpen}
+            aria-haspopup="listbox"
             aria-label={t('topbar.collection')}
-            className="max-w-52 cursor-pointer appearance-none border-2 border-bg/40 bg-transparent py-1.5 pr-8 pl-3 text-sm font-semibold text-bg focus:border-accent focus:outline-none"
-            onChange={(event) =>
-              selectPlaylist(event.target.value === 'library' ? null : event.target.value)
-            }
-            value={selectedPlaylistId ?? 'library'}
+            className="flex max-w-52 cursor-pointer items-center gap-2 border-2 border-bg/40 bg-transparent py-1.5 pr-2.5 pl-3 text-sm font-semibold text-bg focus:border-accent focus:outline-none"
+            onClick={() => setCollectionOpen((value) => !value)}
+            title={currentCollectionName}
+            type="button"
           >
-            <option value="library">{t('nav.library')}</option>
-            {playlists.map((playlist) => (
-              <option key={playlist.id} value={playlist.id}>
-                {playlist.name}
-              </option>
-            ))}
-          </select>
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 font-mono text-xs text-bg/70"
-          >
-            ▾
-          </span>
-        </span>
+            <span className="truncate">{currentCollectionName}</span>
+            <span aria-hidden="true" className="font-mono text-xs text-bg/70">
+              ▾
+            </span>
+          </button>
+
+          {collectionOpen && (
+            <div
+              aria-label={t('topbar.collection')}
+              className="absolute top-full left-0 z-40 mt-1 w-56 border-2 border-rule bg-surface text-ink shadow-[4px_4px_0_var(--color-rule)]"
+              role="listbox"
+            >
+              <button
+                aria-selected={selectedPlaylistId === null}
+                className={`block w-full truncate px-3 py-2 text-left text-sm ${
+                  selectedPlaylistId === null
+                    ? 'bg-accent font-semibold text-on-accent'
+                    : 'hover:bg-accent-soft'
+                }`}
+                onClick={() => {
+                  selectPlaylist(null)
+                  setCollectionOpen(false)
+                }}
+                role="option"
+                type="button"
+              >
+                {t('nav.library')}
+              </button>
+              {playlists.map((playlist) => (
+                <button
+                  aria-selected={playlist.id === selectedPlaylistId}
+                  className={`block w-full truncate border-t border-border px-3 py-2 text-left text-sm ${
+                    playlist.id === selectedPlaylistId
+                      ? 'bg-accent font-semibold text-on-accent'
+                      : 'hover:bg-accent-soft'
+                  }`}
+                  key={playlist.id}
+                  onClick={() => {
+                    selectPlaylist(playlist.id)
+                    setCollectionOpen(false)
+                  }}
+                  role="option"
+                  type="button"
+                >
+                  {playlist.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         <span
           aria-hidden="true"
