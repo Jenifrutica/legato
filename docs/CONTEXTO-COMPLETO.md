@@ -424,4 +424,4 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 
 - **No hay tokens**: la key de OpenAI está vencida; no hay sesión de Spotify en el entorno de desarrollo (verificación con el navegador de la autora y Premium); la access key de AWS debe rotarse.
 - Si la UI queda en blanco o un módulo «no exporta X» tras agregar archivos: reiniciar el server y `rm -rf node_modules/.vite`.
-- Prompt listo para la próxima sesión (modo plan): `docs/PROMPT-NUEVA-SESION.md`.
+- Prompt listo para la próxima sesión (modo plan): **`docs/PROMPT-PLAN-NUEVA-SESION.md`** (canónico, copiar y pegar); `docs/PROMPT-NUEVA-SESION.md` queda como entrada rápida.
