@@ -62,6 +62,10 @@ export const pt: typeof es = {
     activeSources: 'Fontes ativas: {{sources}}',
     noProviders: 'Nenhuma fonte ativa. Ative em Configurações (⚙).',
     queuedSpotify: 'Adicionada à fila do Spotify.',
+    queueNoDevice:
+      'Inicie a reprodução do Spotify (botão verde) para ativar o reprodutor e tente de novo.',
+    queuePremium: 'A fila do Spotify requer uma conta Premium.',
+    queueError: 'Não foi possível enfileirar no Spotify ({{error}}).',
     spotifyHint: 'Para buscar no Spotify, conecte em Configurações (⚙) → Conectar Spotify.',
   },
   theme: {

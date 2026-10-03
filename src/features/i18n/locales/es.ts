@@ -60,6 +60,9 @@ export const es = {
     activeSources: 'Fuentes activas: {{sources}}',
     noProviders: 'No hay fuentes activas. Actívalas en Ajustes (⚙).',
     queuedSpotify: 'Añadida a la cola de Spotify.',
+    queueNoDevice: 'Abre Spotify (botón verde) para activar el reproductor y vuelve a intentar.',
+    queuePremium: 'La cola de Spotify requiere una cuenta Premium.',
+    queueError: 'No se pudo encolar en Spotify ({{error}}).',
     spotifyHint: 'Para buscar en Spotify, conéctalo en Ajustes (⚙) → Conectar Spotify.',
   },
   theme: {

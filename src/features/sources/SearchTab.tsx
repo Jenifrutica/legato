@@ -98,8 +98,30 @@ export function SearchTab() {
         return
       }
 
-      const queued = await queueSpotifyTrack(`spotify:track:${track.id}`)
-      setMessage(queued ? t('search.queuedSpotify') : t('search.saveError'))
+      const uri = `spotify:track:${track.id}`
+      let deviceId = useSpotifyStore.getState().deviceId
+      let result = await queueSpotifyTrack(uri, deviceId)
+
+      // Sin dispositivo activo: inicializa el reproductor del SDK y reintenta.
+      if (!result.ok && deviceId === null && result.status !== 401) {
+        const connected = await useSpotifyStore.getState().connect()
+        if (connected) {
+          deviceId = useSpotifyStore.getState().deviceId
+          result = await queueSpotifyTrack(uri, deviceId)
+        }
+      }
+
+      if (result.ok) {
+        setMessage(t('search.queuedSpotify'))
+      } else if (result.status === 403) {
+        setMessage(t('search.queuePremium'))
+      } else if (result.status === 401) {
+        setMessage(t('search.spotifyHint'))
+      } else if (result.status === 404) {
+        setMessage(t('search.queueNoDevice'))
+      } else {
+        setMessage(t('search.queueError', { error: `HTTP ${result.status}` }))
+      }
       return
     }
 

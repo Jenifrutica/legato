@@ -62,6 +62,9 @@ export const en: typeof es = {
     activeSources: 'Active sources: {{sources}}',
     noProviders: 'No active sources. Enable them in Settings (⚙).',
     queuedSpotify: 'Added to the Spotify queue.',
+    queueNoDevice: 'Start Spotify playback (green button) to activate the player, then try again.',
+    queuePremium: 'The Spotify queue requires a Premium account.',
+    queueError: 'Could not queue on Spotify ({{error}}).',
     spotifyHint: 'To search Spotify, connect it in Settings (⚙) → Connect Spotify.',
   },
   theme: {
