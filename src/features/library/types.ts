@@ -13,6 +13,8 @@ export type LibraryTrack = {
   mimeType: string
   /** Presente en pistas importadas; ausente en registros antiguos = audio. */
   mediaType?: 'audio' | 'video'
+  /** Referencia externa (p. ej. Spotify): no tiene audio propio; se reproduce con su SDK. */
+  external?: boolean
   dedupeKey: string
   addedAt: number
   sampleRate: number | null

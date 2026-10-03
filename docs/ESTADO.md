@@ -57,6 +57,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 60 | **Cola desde búsqueda y mini flotante real (F21)**: botón de cola en cada resultado (guardar+`enqueue` en la DLL para Audius/Jamendo; cola de Spotify vía API si hay sesión), `PlaylistPicker` también en las filas de la cola, y **Picture-in-Picture de documento** para el mini reproductor (ventana siempre encima, fuera del navegador) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0, PiP verificado en Chromium |
 | 61 | **Cola de Spotify arreglada**: la API exige dispositivo; ahora se envía el `device_id` del SDK, y si no existe se inicializa el reproductor y se reintenta; mensajes específicos (Premium, sesión, sin dispositivo) | Cerrada: 183 unit + 6 E2E + build |
 | 62 | **La cola es «Lista» (DLL local)**: Spotify solo reproduce la canción (sin cola de Spotify); la pestaña se renombra a Lista con leyenda «doble enlace», y solo se alimenta de tus estructuras (biblioteca guardada, Audius/Jamendo, arrastres) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0 |
+| 63 | **Referencias de Spotify en tus estructuras**: los botones «＋ playlist» y «Lista» aparecen también en resultados de Spotify; la pista se guarda como referencia externa (metadatos + URI, sin audio) en biblioteca/playlists/Lista, y al sonar la reproduce el SDK con la Lista mandando el orden y avanzando al terminar | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

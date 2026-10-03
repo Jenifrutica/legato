@@ -25,6 +25,12 @@ export function getMediaElement(): HTMLMediaElement {
   return audio
 }
 
+export function setExternalPlayer(
+  player: { play: (uri: string) => Promise<void> | void; stop: () => void } | null,
+): void {
+  controller.setExternalPlayer(player)
+}
+
 const controller = new PlayerController(audio, streamAudio)
 const graph = new AudioGraph(audio)
 const sleepTimer = new SleepTimer(() => {

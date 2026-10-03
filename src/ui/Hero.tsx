@@ -60,6 +60,9 @@ export function Hero() {
   }, [currentTrack?.id])
 
   const spotifyActive = spotifyPlayback !== null
+  const externalCurrent =
+    currentTrack !== null &&
+    (currentTrack.external === true || currentTrack.sourceUrl.startsWith('spotify:'))
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const hasPlayable = spotifyActive || currentTrack !== null
 
@@ -117,7 +120,7 @@ export function Hero() {
   }
 
   function handleNext() {
-    if (spotifyActive) {
+    if (spotifyActive && !externalCurrent) {
       void spotifyNext()
     } else {
       next()
@@ -125,7 +128,7 @@ export function Hero() {
   }
 
   function handlePrevious() {
-    if (spotifyActive) {
+    if (spotifyActive && !externalCurrent) {
       void spotifyPrevious()
     } else {
       previous()

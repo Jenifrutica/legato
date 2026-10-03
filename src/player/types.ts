@@ -11,6 +11,8 @@ export type QueueTrack = {
   sourceUrl: string
   artworkUrl: string | null
   mediaType?: 'audio' | 'video'
+  /** Referencia externa (Spotify): su audio lo maneja el SDK, no el motor local. */
+  external?: boolean
 }
 
 export type QueueState = {

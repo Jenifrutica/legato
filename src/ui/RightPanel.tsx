@@ -307,6 +307,11 @@ function SortableQueueRow({
         <span className="block truncate text-sm font-semibold">{track.title}</span>
         <span className="block truncate text-xs text-ink-muted">{track.artist}</span>
       </button>
+      {track.sourceUrl.startsWith('spotify:') && (
+        <span className="shrink-0 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
+          Spotify
+        </span>
+      )}
       <span
         aria-hidden="true"
         className={`hidden h-3 shrink-0 border-2 border-rule sm:block ${

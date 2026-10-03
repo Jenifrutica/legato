@@ -92,10 +92,6 @@ export function SearchTab() {
   }
 
   async function addToQueue(track: SourceTrack) {
-    if (!track.downloadable) {
-      return
-    }
-
     setStatus('saving')
     setMessage(null)
 
@@ -247,24 +243,20 @@ export function SearchTab() {
               </span>
             </span>
 
-            {track.downloadable && (
-              <PlaylistPicker
-                label={`${t('search.addToPlaylist')} ${track.title}`}
-                onPick={(playlistId) => void addToPlaylist(track, playlistId)}
-              />
-            )}
+            <PlaylistPicker
+              label={`${t('search.addToPlaylist')} ${track.title}`}
+              onPick={(playlistId) => void addToPlaylist(track, playlistId)}
+            />
 
-            {track.downloadable && (
-              <button
-                aria-label={t('queue.addToEndLabel', { title: track.title })}
-                className="grid size-8 shrink-0 place-items-center text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={status !== 'idle'}
-                onClick={() => void addToQueue(track)}
-                type="button"
-              >
-                <ListMusicIcon className="size-4" />
-              </button>
-            )}
+            <button
+              aria-label={t('queue.addToEndLabel', { title: track.title })}
+              className="grid size-8 shrink-0 place-items-center text-ink-muted transition-colors hover:text-accent-ink disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={status !== 'idle'}
+              onClick={() => void addToQueue(track)}
+              type="button"
+            >
+              <ListMusicIcon className="size-4" />
+            </button>
 
             <button
               aria-label={`${t('search.play')} ${track.title}`}

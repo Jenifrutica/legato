@@ -55,6 +55,10 @@ export class PlayerController {
   #transitionToken = 0
   #lastError: string | null = null
   #sourcePlaylistId: string | null = null
+  #externalPlayer: {
+    play: (uri: string) => Promise<void> | void
+    stop: () => void
+  } | null = null
 
   constructor(audio?: AudioLike, streamAudio?: AudioLike) {
     this.#localEngine = new PlayerEngine(audio)
@@ -87,6 +91,16 @@ export class PlayerController {
         }
       })
     }
+  }
+
+  setExternalPlayer(
+    player: { play: (uri: string) => Promise<void> | void; stop: () => void } | null,
+  ): void {
+    this.#externalPlayer = player
+  }
+
+  #isExternal(track: QueueTrack): boolean {
+    return track.external === true || track.sourceUrl.startsWith('spotify:')
   }
 
   #engineFor(track: QueueTrack): PlayerEngine {
@@ -147,7 +161,18 @@ export class PlayerController {
   }
 
   async toggle(): Promise<void> {
-    if (this.#queue.currentTrack === null) {
+    const current = this.#queue.currentTrack
+    if (current === null) {
+      return
+    }
+
+    if (this.#isExternal(current)) {
+      try {
+        await this.#externalPlayer?.play(current.sourceUrl)
+      } catch {
+        this.#lastError = 'No se pudo reproducir en Spotify'
+      }
+      this.#notify()
       return
     }
 
@@ -347,7 +372,7 @@ export class PlayerController {
     this.#crossfadeSeconds = Math.min(12, Math.max(0, state.crossfadeSeconds ?? 2))
 
     const current = this.#queue.currentTrack
-    if (current !== null) {
+    if (current !== null && !this.#isExternal(current)) {
       this.#resetAbLoop()
       this.#selectEngine(current)
       this.#engine.load(current)
@@ -434,6 +459,26 @@ export class PlayerController {
 
   async #transitionTo(track: QueueTrack, fadeOutCurrent: boolean): Promise<void> {
     const token = ++this.#transitionToken
+
+    if (this.#isExternal(track)) {
+      this.#resetAbLoop()
+      this.#lastError = null
+      this.#engine.pause()
+      this.#notify()
+
+      try {
+        await this.#externalPlayer?.play(track.sourceUrl)
+      } catch {
+        this.#lastError = 'No se pudo reproducir en Spotify'
+      }
+
+      if (token === this.#transitionToken) {
+        this.#notify()
+      }
+      return
+    }
+
+    this.#externalPlayer?.stop()
     const crossfade = this.#crossfadeSeconds
     const shouldFade = fadeOutCurrent && crossfade > 0 && !this.#engine.paused
 

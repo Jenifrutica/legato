@@ -42,6 +42,9 @@ export function PlayerBar() {
   const [timerOpen, setTimerOpen] = useState(false)
 
   const spotifyActive = spotifyPlayback !== null
+  const externalCurrent =
+    currentTrack !== null &&
+    (currentTrack.external === true || currentTrack.sourceUrl.startsWith('spotify:'))
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const hasTrack = spotifyActive || currentTrack !== null
   const displayTitle = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? null)
@@ -121,7 +124,7 @@ export function PlayerBar() {
           icon={<SkipBackIcon className="size-5" />}
           label={t('player.previous')}
           onClick={() => {
-            if (spotifyActive) {
+            if (spotifyActive && !externalCurrent) {
               void spotifyPrevious()
             } else {
               previous()
@@ -146,7 +149,7 @@ export function PlayerBar() {
           icon={<SkipForwardIcon className="size-5" />}
           label={t('player.next')}
           onClick={() => {
-            if (spotifyActive) {
+            if (spotifyActive && !externalCurrent) {
               void spotifyNext()
             } else {
               next()

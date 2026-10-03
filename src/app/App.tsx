@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthContextProvider } from '../features/auth'
 import { usePlayTracker } from '../features/capsule'
+import { useExternalPlayback } from '../features/sources'
 import { useHistoryStore } from '../features/history'
 import { CookieConsent, LegalPage } from '../features/legal'
 import { SpotifyBanner } from '../features/sources'
@@ -26,6 +27,7 @@ function AppShell() {
   const { t } = useTranslation()
   useAlbumTheme()
   usePlayTracker()
+  useExternalPlayback()
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

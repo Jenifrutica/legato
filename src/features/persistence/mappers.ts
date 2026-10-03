@@ -20,6 +20,7 @@ export function trackToRecord(track: LibraryTrack): SongRecord {
     channels: track.channels,
     blob: track.blob,
     artwork: track.artworkBlob,
+    externalUrl: track.external === true ? track.sourceUrl : null,
   }
 }
 
@@ -30,7 +31,8 @@ export function recordToTrack(record: SongRecord): LibraryTrack {
     artist: record.artist,
     album: record.album,
     durationSeconds: record.durationSeconds,
-    sourceUrl: URL.createObjectURL(record.blob),
+    sourceUrl: record.externalUrl ?? URL.createObjectURL(record.blob),
+    external: record.externalUrl != null,
     artworkUrl: record.artwork === null ? null : URL.createObjectURL(record.artwork),
     artworkBlob: record.artwork,
     blob: record.blob,

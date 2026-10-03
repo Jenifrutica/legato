@@ -4,7 +4,11 @@ import type { LibraryTrack } from '../library'
 import type { PlaylistRestoreRecord } from '../playlists'
 import type { ChannelMode, LoopMode } from '../../player'
 
-export type SongRecord = Omit<LibraryTrack, 'sourceUrl' | 'artworkUrl' | 'artworkBlob' | 'blob'> & {
+export type SongRecord = Omit<
+  LibraryTrack,
+  'sourceUrl' | 'artworkUrl' | 'artworkBlob' | 'blob' | 'external'
+> & {
+  externalUrl?: string | null
   blob: Blob
   artwork: Blob | null
 }

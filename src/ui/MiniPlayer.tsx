@@ -62,6 +62,9 @@ function PipContent() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
 
   const spotifyActive = spotifyPlayback !== null
+  const externalCurrent =
+    currentTrack !== null &&
+    (currentTrack.external === true || currentTrack.sourceUrl.startsWith('spotify:'))
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const title = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? '')
   const artist = spotifyActive ? spotifyPlayback.artist : (currentTrack?.artist ?? '')
@@ -87,7 +90,7 @@ function PipContent() {
           aria-label={t('player.previous')}
           className="border-2 border-bg/50 p-2 text-bg transition-transform hover:-translate-y-0.5"
           onClick={() => {
-            if (spotifyActive) {
+            if (spotifyActive && !externalCurrent) {
               void spotifyPrevious()
             } else {
               previous()
@@ -115,7 +118,7 @@ function PipContent() {
           aria-label={t('player.next')}
           className="border-2 border-bg/50 p-2 text-bg transition-transform hover:-translate-y-0.5"
           onClick={() => {
-            if (spotifyActive) {
+            if (spotifyActive && !externalCurrent) {
               void spotifyNext()
             } else {
               next()
