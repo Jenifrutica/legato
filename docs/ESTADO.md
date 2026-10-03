@@ -21,9 +21,9 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 13 | Modo estructura (visualizador DLL) | Cerrado |
 | 14 | i18n ES/EN/PT | Cerrado |
 | 15 | IndexedDB + sesión persistente | Cerrado |
-| 16 | Timer + shuffle/bucles + scroll | Pendiente |
-| 17 | Accesibilidad WCAG 2.2 AA | Pendiente |
-| 18 | Páginas legales + cookies | Pendiente |
+| 16 | Timer + shuffle/bucles + scroll | Cerrado |
+| 17 | Accesibilidad WCAG 2.2 AA | Cerrado |
+| 18 | Páginas legales + cookies | En curso |
 | 19–21 | Extras: ensayo, undo/redo, karaoke M/S | Pendiente |
 | 22 | E2E smoke + regresión #12 | Pendiente |
 | 23–27 | Día 4: pulido, responsive, deploy S3+CloudFront, docs, rotar key | Pendiente |
@@ -32,11 +32,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 101 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia y audio).
+- **Tests:** 113 en verde (núcleo, player, biblioteca, playlists, estructura, i18n, persistencia, audio, timer y accesibilidad con axe).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #16: temporizador de apagado (tiempos predeterminados y número de canciones), controles de shuffle/bucle ya conectados y pulido del scroll de canciones.
+Issue #18: páginas legales (privacidad, términos, cookies, accesibilidad) en ES/EN/PT con consentimiento granular de cookies y centro de preferencias.
