@@ -26,6 +26,7 @@ export const en: typeof es = {
     imported: '{{count}} tracks imported',
     importError: 'Could not fetch your Spotify playlists.',
     emptyPlaylists: 'You have no playlists on Spotify.',
+    importScope: 'Reconnect Spotify to grant access to your playlists.',
   },
   settings: {
     title: 'Settings',

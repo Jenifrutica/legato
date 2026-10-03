@@ -48,6 +48,22 @@ describe('playlists de Spotify', () => {
     expect(playlists.map((playlist) => playlist.trackCount)).toEqual([3, 5])
   })
 
+  it('baja el límite si la API lo rechaza', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ message: 'invalid limit' }, false, 400))
+      .mockResolvedValueOnce(
+        jsonResponse({ items: [{ id: 'p1', name: 'Una', tracks: { total: 1 } }] }),
+      )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const playlists = await fetchSpotifyPlaylists()
+
+    expect(playlists).toHaveLength(1)
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain('limit=50')
+    expect(String(fetchMock.mock.calls[1]?.[0])).toContain('limit=20')
+  })
+
   it('lee el campo nuevo item y cae a /items cuando /tracks da 404', async () => {
     const fetchMock = vi
       .fn()

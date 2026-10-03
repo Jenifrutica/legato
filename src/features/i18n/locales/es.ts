@@ -24,6 +24,7 @@ export const es = {
     imported: '{{count}} pistas importadas',
     importError: 'No se pudieron traer tus playlists de Spotify.',
     emptyPlaylists: 'No tienes playlists en Spotify.',
+    importScope: 'Vuelve a conectar Spotify para dar permiso a tus playlists.',
   },
   settings: {
     title: 'Ajustes',

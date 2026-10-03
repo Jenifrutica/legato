@@ -66,6 +66,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 69 | **Ondas en el estado correcto**: reposo dibuja un anillo quieto (0% de variación), al sonar late (42–52% medido) y al pausar vuelve exactamente al reposo; el modo sintético (Spotify) solo se usa **mientras suena y sin señal real** | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
 | 70 | **Import de playlists de Spotify arreglado**: Spotify renombró `track`/`tracks` a `item`/`items`; se leen ambas formas, se cae de `/tracks` a `/items` en 400/404 y el mapeo es defensivo (álbum, artistas, URL externa) | Cerrada: 190 unit (3 tests nuevos del parser) |
 | 71 | **Ondas sincronizadas al golpe**: detector por **flujo espectral** de la banda del bombo con umbral adaptativo y periodo refractario (180 ms), envolvente de vida media 130 ms medida en milisegundos y el golpe dominando largo/opacidad/pop. Medido con bombo a 500 ms: picos cada 497 ms y 57% de variación | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
+| 72 | **Import de playlists resistente**: límites descendentes (50→20→10) como en la búsqueda, reintento en 429, paginación hasta 200 playlists y **mensaje de error exacto** con pistas para 401/403 | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

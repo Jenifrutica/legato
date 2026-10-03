@@ -204,6 +204,15 @@ export async function getSpotifyProfile(): Promise<{ name: string } | null> {
   return { name: data.display_name ?? 'Spotify' }
 }
 
+async function fetchWithRetry(url: string, token: string): Promise<Response> {
+  let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (response.status === 429) {
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  }
+  return response
+}
+
 async function describeError(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { error?: { message?: string } }
@@ -281,17 +290,49 @@ export async function fetchSpotifyPlaylists(): Promise<SpotifyPlaylistSummary[]>
     throw new Error('not-connected')
   }
 
-  const response = await fetch(`${API}/me/playlists?limit=50`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-
-  if (!response.ok) {
-    throw new Error(await describeError(response))
+  // Spotify ha ido bajando los límites máximos (búsqueda pasó de 50 a 10);
+  // probamos límites descendentes antes de rendirnos.
+  let response: Response | null = null
+  let lastError = 'HTTP ?'
+  for (const limit of [50, 20, 10]) {
+    response = await fetchWithRetry(`${API}/me/playlists?limit=${limit}&offset=0`, token)
+    if (response.ok) {
+      break
+    }
+    lastError = await describeError(response)
+    if (response.status !== 400) {
+      break
+    }
+    response = null
   }
 
-  const data = (await response.json()) as { items?: Array<SpotifyPlaylistItem | null> }
+  if (response === null || !response.ok) {
+    throw new Error(lastError)
+  }
 
-  return (data.items ?? [])
+  const data = (await response.json()) as {
+    items?: Array<SpotifyPlaylistItem | null>
+    next?: string | null
+  }
+
+  const items = [...(data.items ?? [])]
+
+  // Paginación suave (hasta 200 playlists) por si la cuenta tiene muchas.
+  let next = data.next ?? null
+  while (next !== null && items.length < 200) {
+    const page = await fetch(next, { headers: { Authorization: `Bearer ${token}` } })
+    if (!page.ok) {
+      break
+    }
+    const pageData = (await page.json()) as {
+      items?: Array<SpotifyPlaylistItem | null>
+      next?: string | null
+    }
+    items.push(...(pageData.items ?? []))
+    next = pageData.next ?? null
+  }
+
+  return items
     .filter((item): item is SpotifyPlaylistItem => item !== null)
     .map((item) => ({
       id: item.id,
@@ -314,16 +355,30 @@ export async function fetchSpotifyPlaylistTracks(
   const tracks: SourceTrack[] = []
   let offset = 0
 
-  const fetchPage = async (endpoint: 'tracks' | 'items') =>
-    fetch(`${API}/playlists/${playlistId}/${endpoint}?limit=50&offset=${offset}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+  const fetchPage = async (endpoint: 'tracks' | 'items', pageLimit: number) =>
+    fetchWithRetry(
+      `${API}/playlists/${playlistId}/${endpoint}?limit=${pageLimit}&offset=${offset}`,
+      token,
+    )
 
   while (tracks.length < limit) {
-    // Spotify renombró `track`/`tracks` a `item`/`items`; probamos ambos.
-    let response = await fetchPage('tracks')
+    // Spotify renombró `track`/`tracks` a `item`/`items`; probamos ambos,
+    // y bajamos el límite si la API lo rechaza (como en la búsqueda).
+    let response = await fetchPage('tracks', 50)
+    if (response.status === 400) {
+      response = await fetchPage('tracks', 20)
+    }
+    if (response.status === 400) {
+      response = await fetchPage('tracks', 10)
+    }
     if (response.status === 404 || response.status === 400) {
-      response = await fetchPage('items')
+      response = await fetchPage('items', 50)
+    }
+    if (response.status === 400) {
+      response = await fetchPage('items', 20)
+    }
+    if (response.status === 400) {
+      response = await fetchPage('items', 10)
     }
 
     if (!response.ok) {

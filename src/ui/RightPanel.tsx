@@ -81,9 +81,17 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     try {
       setSpotifyPlaylists(await fetchSpotifyPlaylists())
       setSpotifyStatus('idle')
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
-      setSpotifyMessage(t('spotify.importError'))
+      setSpotifyMessage(
+        message.includes('403')
+          ? t('spotify.importScope')
+          : message.includes('401') || message.includes('not-connected')
+            ? t('spotify.reconnect')
+            : `${t('spotify.importError')} ${message}`.trim(),
+      )
+      console.warn('[spotify-import]', error)
     }
   }
 
@@ -107,9 +115,17 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
 
       setSpotifyMessage(t('spotify.imported', { count: imported }))
       setSpotifyStatus('idle')
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
-      setSpotifyMessage(t('spotify.importError'))
+      setSpotifyMessage(
+        message.includes('403')
+          ? t('spotify.importScope')
+          : message.includes('401') || message.includes('not-connected')
+            ? t('spotify.reconnect')
+            : `${t('spotify.importError')} ${message}`.trim(),
+      )
+      console.warn('[spotify-import]', error)
     }
   }
 

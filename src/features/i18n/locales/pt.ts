@@ -26,6 +26,7 @@ export const pt: typeof es = {
     imported: '{{count}} faixas importadas',
     importError: 'Não foi possível buscar suas playlists do Spotify.',
     emptyPlaylists: 'Você não tem playlists no Spotify.',
+    importScope: 'Reconecte o Spotify para permitir acesso às suas playlists.',
   },
   settings: {
     title: 'Configurações',
