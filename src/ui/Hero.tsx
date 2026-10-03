@@ -53,12 +53,12 @@ export function Hero() {
         : t('player.repeatOne')
 
   return (
-    <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden lg:block lg:min-h-[calc(100dvh-9rem)]">
-      <div className="relative z-0 mx-auto w-60 sm:w-72 lg:pointer-events-none lg:absolute lg:-left-[30vw] lg:top-1/2 lg:w-[56vw] lg:-translate-y-1/2 xl:-left-[22vw] xl:w-[48vw]">
+    <section className="relative flex min-h-[70vh] flex-col items-center justify-center gap-8 overflow-hidden px-5 py-10 lg:grid lg:min-h-[calc(100dvh-9rem)] lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:gap-12 lg:px-10 xl:grid-cols-[minmax(0,32rem)_minmax(0,1fr)]">
+      <div className="w-60 sm:w-72 lg:w-full lg:max-w-[26rem] lg:justify-self-end xl:max-w-[30rem]">
         <VinylVisual />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-5 py-10 text-center lg:ml-[32%] lg:items-start lg:gap-6 lg:pl-8 lg:text-left xl:ml-[36%]">
+      <div className="flex w-full max-w-2xl flex-col items-center gap-5 text-center lg:items-start lg:gap-6 lg:text-left">
         <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl xl:text-6xl">
           {currentTrack?.title ?? t('vinyl.idleTitle')}
         </h2>
