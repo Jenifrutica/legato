@@ -1,5 +1,21 @@
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import {
   formatDuration,
   formatFileSize,
@@ -9,7 +25,67 @@ import {
 } from '../features/library'
 import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
-import { ListMusicIcon, SearchIcon, TrashIcon, UploadIcon, XIcon } from './icons'
+import { GripIcon, ListMusicIcon, SearchIcon, TrashIcon, UploadIcon, XIcon } from './icons'
+
+function TrackMeta({ index, track }: { index: number; track: LibraryTrack }) {
+  return (
+    <>
+      <span className="w-6 text-right text-xs tabular-nums text-ink-muted">{index + 1}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{track.title}</span>
+        <span className="block truncate text-xs text-ink-muted">
+          {track.artist}
+          {track.album === null ? '' : ` · ${track.album}`}
+        </span>
+      </span>
+      <span className="hidden text-xs tabular-nums text-ink-muted sm:block">
+        {formatFileSize(track.fileSize)}
+      </span>
+      <span className="text-xs tabular-nums text-ink-muted">
+        {formatDuration(track.durationSeconds)}
+      </span>
+    </>
+  )
+}
+
+function SortableTrackRow({
+  index,
+  track,
+  disabled,
+  children,
+}: {
+  index: number
+  track: LibraryTrack
+  disabled: boolean
+  children: ReactNode
+}) {
+  const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
+    disabled,
+    id: track.id,
+  })
+  const style = { transform: CSS.Transform.toString(transform), transition }
+
+  return (
+    <li
+      className={`flex items-center gap-3 px-5 py-3 ${isDragging ? 'relative z-10 bg-surface-2' : ''}`}
+      ref={setNodeRef}
+      style={style}
+    >
+      <button
+        aria-label={`Reordenar ${track.title}`}
+        className="cursor-grab touch-none rounded p-1 text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+        disabled={disabled}
+        type="button"
+        {...attributes}
+        {...listeners}
+      >
+        <GripIcon className="size-4" />
+      </button>
+      <TrackMeta index={index} track={track} />
+      {children}
+    </li>
+  )
+}
 
 export function LibraryPanel() {
   const tracks = useLibraryStore((state) => state.tracks)
@@ -29,12 +105,18 @@ export function LibraryPanel() {
   const removePlaylist = usePlaylistsStore((state) => state.removePlaylist)
   const addTrackToPlaylist = usePlaylistsStore((state) => state.addTrackToPlaylist)
   const removeTrackFromPlaylist = usePlaylistsStore((state) => state.removeTrackFromPlaylist)
+  const moveTrackInPlaylist = usePlaylistsStore((state) => state.moveTrackInPlaylist)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameDraft, setRenameDraft] = useState('')
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
 
   const selectedPlaylist = playlists.find((playlist) => playlist.id === selectedPlaylistId) ?? null
   const isPlaylistView = selectedPlaylist !== null
@@ -77,6 +159,24 @@ export function LibraryPanel() {
       }
     }
     removeTrack(trackId)
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    if (selectedPlaylist === null) {
+      return
+    }
+
+    const { active, over } = event
+    if (over === null || active.id === over.id) {
+      return
+    }
+
+    const newIndex = filtered.findIndex((track) => track.id === over.id)
+    if (newIndex === -1) {
+      return
+    }
+
+    moveTrackInPlaylist(selectedPlaylist.id, String(active.id), newIndex)
   }
 
   function submitRename(event: FormEvent) {
@@ -129,7 +229,8 @@ export function LibraryPanel() {
                 </h2>
               )}
               <p className="mt-1 text-sm text-ink-muted">
-                {selectedPlaylist.trackIds.length} canción(es) en la playlist.
+                {selectedPlaylist.trackIds.length} canción(es). Arrastra con el asa o usa el teclado
+                (espacio, flechas y espacio).
               </p>
             </div>
           ) : (
@@ -255,69 +356,71 @@ export function LibraryPanel() {
             <p className="px-5 py-8 text-center text-sm text-ink-muted">
               Sin resultados para «{query}».
             </p>
+          ) : isPlaylistView ? (
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+            >
+              <SortableContext
+                items={filtered.map((track) => track.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <ul className="divide-y divide-border">
+                  {filtered.map((track, index) => (
+                    <SortableTrackRow
+                      disabled={normalizedQuery !== ''}
+                      index={index}
+                      key={track.id}
+                      track={track}
+                    >
+                      <button
+                        aria-label={`Quitar ${track.title} de la playlist`}
+                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                        onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
+                        type="button"
+                      >
+                        <XIcon className="size-4" />
+                      </button>
+                    </SortableTrackRow>
+                  ))}
+                </ul>
+              </SortableContext>
+            </DndContext>
           ) : (
             <ul className="divide-y divide-border">
               {filtered.map((track, index) => (
                 <li className="flex items-center gap-3 px-5 py-3" key={track.id}>
-                  <span className="w-6 text-right text-xs tabular-nums text-ink-muted">
-                    {index + 1}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">{track.title}</span>
-                    <span className="block truncate text-xs text-ink-muted">
-                      {track.artist}
-                      {track.album === null ? '' : ` · ${track.album}`}
-                    </span>
-                  </span>
-                  <span className="hidden text-xs tabular-nums text-ink-muted sm:block">
-                    {formatFileSize(track.fileSize)}
-                  </span>
-                  <span className="text-xs tabular-nums text-ink-muted">
-                    {formatDuration(track.durationSeconds)}
-                  </span>
-
-                  {isPlaylistView ? (
-                    <button
-                      aria-label={`Quitar ${track.title} de la playlist`}
-                      className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
-                      onClick={() => removeTrackFromPlaylist(selectedPlaylist.id, track.id)}
-                      type="button"
+                  <TrackMeta index={index} track={track} />
+                  {playlists.length > 0 && (
+                    <select
+                      aria-label={`Agregar ${track.title} a una playlist`}
+                      className="max-w-32 rounded-md border border-border bg-bg px-2 py-1 text-xs text-ink-muted focus:border-primary focus:outline-none"
+                      defaultValue=""
+                      onChange={(event) => {
+                        const playlistId = event.target.value
+                        if (playlistId !== '') {
+                          addTrackToPlaylist(playlistId, track)
+                          event.target.value = ''
+                        }
+                      }}
                     >
-                      <XIcon className="size-4" />
-                    </button>
-                  ) : (
-                    <>
-                      {playlists.length > 0 && (
-                        <select
-                          aria-label={`Agregar ${track.title} a una playlist`}
-                          className="max-w-32 rounded-md border border-border bg-bg px-2 py-1 text-xs text-ink-muted focus:border-primary focus:outline-none"
-                          defaultValue=""
-                          onChange={(event) => {
-                            const playlistId = event.target.value
-                            if (playlistId !== '') {
-                              addTrackToPlaylist(playlistId, track)
-                              event.target.value = ''
-                            }
-                          }}
-                        >
-                          <option value="">Agregar a…</option>
-                          {playlists.map((playlist) => (
-                            <option key={playlist.id} value={playlist.id}>
-                              {playlist.name}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      <button
-                        aria-label={`Eliminar ${track.title} de la biblioteca`}
-                        className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
-                        onClick={() => handleRemoveFromLibrary(track.id)}
-                        type="button"
-                      >
-                        <TrashIcon className="size-4" />
-                      </button>
-                    </>
+                      <option value="">Agregar a…</option>
+                      {playlists.map((playlist) => (
+                        <option key={playlist.id} value={playlist.id}>
+                          {playlist.name}
+                        </option>
+                      ))}
+                    </select>
                   )}
+                  <button
+                    aria-label={`Eliminar ${track.title} de la biblioteca`}
+                    className="rounded-full p-2 text-ink-muted transition-colors hover:text-danger"
+                    onClick={() => handleRemoveFromLibrary(track.id)}
+                    type="button"
+                  >
+                    <TrashIcon className="size-4" />
+                  </button>
                 </li>
               ))}
             </ul>

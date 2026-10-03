@@ -111,6 +111,27 @@ export class PlaybackQueue {
     return true
   }
 
+  move(trackId: string, targetIndex: number): boolean {
+    const node = this.#list.find((track) => track.id === trackId)
+    if (node === null) {
+      return false
+    }
+
+    const moved = this.#list.moveNode(node, targetIndex)
+    if (!moved) {
+      return false
+    }
+
+    if (this.#playOrder !== null) {
+      const orderNode = this.#playOrder.find((track) => track.id === trackId)
+      if (orderNode !== null) {
+        this.#playOrder.moveNode(orderNode, targetIndex)
+      }
+    }
+
+    return true
+  }
+
   next(): QueueTrack | null {
     if (this.#playOrder !== null) {
       return this.#nextShuffled()

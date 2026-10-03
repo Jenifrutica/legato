@@ -16,7 +16,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 8 | Player engine + cola sobre lista doble | Cerrado |
 | 9 | Importar archivos/carpetas + metadatos | Cerrado |
 | 10 | CRUD canciones y playlists | Cerrado |
-| 11 | Drag & drop con fix #12 + teclado | En curso |
+| 11 | Drag & drop con fix #12 + teclado | Cerrado |
 | 12 | UI vinilo + ondas + mini player | Pendiente |
 | 13 | Modo estructura (visualizador DLL) | Pendiente |
 | 14 | i18n ES/EN/PT | Pendiente |
@@ -31,11 +31,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Estado técnico
 
-- **Tests:** 76 en verde (núcleo, player, biblioteca y playlists).
+- **Tests:** 78 en verde (núcleo, player, biblioteca y playlists).
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Bloqueo de cuenta AWS:** SCP bloquea Cognito/Amplify/Lambda/DynamoDB; deploy irá por S3 + CloudFront + ACM.
 - **Login:** perfil local activo; Cognito implementado y listo.
 
 ## Próximo paso
 
-Issue #11: drag & drop para reordenar playlists con `currentNode` por puntero (fix del bug #12) y alternativa de teclado.
+Issue #12: UI de reproducción real — vinilo girando, ondas con AnalyserNode, barra inferior conectada (play/pausa, seek, volumen, velocidad) y mini reproductor; incluye sincronizar el reordenamiento de la playlist con la cola en reproducción (fix #12 en vivo).

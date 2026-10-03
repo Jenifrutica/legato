@@ -184,6 +184,33 @@ describe('PlaybackQueue', () => {
     expect(seen.has('b')).toBe(false)
   })
 
+  it('bug #12: reordenar no cambia la cancion que suena', () => {
+    const queue = new PlaybackQueue()
+    queue.add(track('a'))
+    queue.add(track('b'))
+    queue.add(track('c'))
+    queue.setCurrent('a')
+
+    expect(queue.move('c', 0)).toBe(true)
+    expect(queue.tracks.map((t) => t.id)).toEqual(['c', 'a', 'b'])
+    expect(queue.currentTrack?.id).toBe('a')
+    expect(queue.next()?.id).toBe('b')
+    expect(queue.move('z', 0)).toBe(false)
+  })
+
+  it('mover con aleatorio activo mantiene la cancion actual', () => {
+    const queue = new PlaybackQueue()
+    queue.add(track('a'))
+    queue.add(track('b'))
+    queue.add(track('c'))
+    queue.setCurrent('b')
+    queue.setShuffle(true)
+
+    expect(queue.move('c', 0)).toBe(true)
+    expect(queue.currentTrack?.id).toBe('b')
+    expect(queue.tracks.map((t) => t.id)).toEqual(['c', 'a', 'b'])
+  })
+
   it('serializa y restaura el estado', () => {
     const queue = new PlaybackQueue()
     queue.add(track('a'))

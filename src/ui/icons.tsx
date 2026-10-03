@@ -201,3 +201,11 @@ export function XIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function GripIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01" />
+    </Icon>
+  )
+}
