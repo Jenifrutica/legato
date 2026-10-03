@@ -1,1 +1,77 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
 @import 'tailwindcss';
+
+@theme {
+  --color-bg: #faf6f0;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3ece3;
+  --color-ink: #2b2622;
+  --color-ink-muted: #6e645d;
+  --color-border: #e6ddd2;
+  --color-primary: #e4572e;
+  --color-primary-strong: #a93a19;
+  --color-primary-soft: #fbe4dc;
+  --color-accent: #1f7a8c;
+  --color-accent-soft: #dceef1;
+  --color-wood: #d9b382;
+  --color-success: #3e8e5a;
+  --color-danger: #c0392b;
+
+  --font-display: 'Fraunces Variable', Fraunces, ui-serif, Georgia, serif;
+  --font-body: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.5rem;
+
+  --shadow-soft: 0 6px 24px rgb(43 38 34 / 0.08);
+  --shadow-disc: 0 24px 60px rgb(43 38 34 / 0.18);
+  --shadow-bar: 0 -8px 30px rgb(43 38 34 / 0.06);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    @apply bg-bg font-body text-ink antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-dvh;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  * {
+    scrollbar-color: var(--color-wood) transparent;
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-clip: content-box;
+    background-color: var(--color-wood);
+    border: 3px solid transparent;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

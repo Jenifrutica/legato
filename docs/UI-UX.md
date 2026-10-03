@@ -20,10 +20,15 @@
 :root {
   --color-bg: #FAF6F0;          /* crema */
   --color-surface: #FFFFFF;
+  --color-surface-2: #F3ECE3;
   --color-ink: #2B2622;         /* texto principal */
-  --color-muted: #7A7069;
+  --color-ink-muted: #6E645D;   /* contraste >= 4.5:1 */
+  --color-border: #E6DDD2;
   --color-primary: #E4572E;     /* coral/terracota */
+  --color-primary-strong: #A93A19;
+  --color-primary-soft: #FBE4DC;
   --color-accent: #1F7A8C;      /* teal */
+  --color-accent-soft: #DCEEF1;
   --color-wood: #D9B382;        /* detalles */
   --color-success: #3E8E5A;
   --color-danger: #C0392B;
@@ -31,19 +36,21 @@
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 24px;
-  --radius-full: 999px;
 
   --shadow-soft: 0 6px 24px rgb(43 38 34 / 0.08);
   --shadow-disc: 0 24px 60px rgb(43 38 34 / 0.18);
+  --shadow-bar: 0 -8px 30px rgb(43 38 34 / 0.06);
 
   --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
   --space-4: 16px; --space-6: 24px; --space-8: 32px;
 
-  --font-display: "Fraunces", serif;      /* títulos */
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Fraunces Variable", serif;      /* títulos */
+  --font-body: "Inter Variable", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 ```
+
+Los tokens se implementan en Tailwind v4 (`@theme` en `src/styles/index.css`) y las tipografías se autoalojan con `@fontsource-variable` (sin peticiones a terceros).
 
 Tipografía: `Fraunces` (display, cálida) + `Inter` (cuerpo) + mono para el modo estructura.
 
