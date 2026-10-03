@@ -68,7 +68,7 @@ export function Lyrics({ lines = [] }: { lines?: LyricLine[] }) {
         aria-hidden="true"
         className="staff-lines absolute inset-x-0 top-1/2 h-[62px] -translate-y-1/2"
       />
-      <p className="relative inline-block border-l-4 border-accent bg-accent px-4 py-2 font-display text-[clamp(1.5rem,3.2vw,2.5rem)] leading-[1.05] font-black text-on-accent uppercase">
+      <p className="relative inline-block bg-accent px-4 py-2 font-display text-[clamp(1.5rem,3.2vw,2.5rem)] leading-[1.05] font-black text-on-accent uppercase">
         {current.text}
       </p>
       {next !== null && (

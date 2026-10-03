@@ -238,7 +238,7 @@ function QueueTab() {
       {queue.map((track, index) => (
         <li
           className={`flex items-center gap-3 px-4 py-3 ${
-            track.id === currentId ? 'border-l-4 border-accent bg-accent-soft' : ''
+            track.id === currentId ? 'bg-accent-soft' : ''
           }`}
           key={`${track.id}-${index}`}
         >
@@ -268,7 +268,7 @@ export function RightPanel() {
     <aside className="relative z-20 flex min-h-0 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0">
       <div
         aria-label={t('tabs.label')}
-        className="flex items-center gap-1 border-b-2 border-rule px-3 py-2"
+        className="flex flex-wrap items-center gap-1 gap-y-1 border-b-2 border-rule px-3 py-2"
         role="tablist"
       >
         {TABS.map((candidate) => (
