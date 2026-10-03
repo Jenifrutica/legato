@@ -33,15 +33,21 @@ Actualizar en el futuro:
 npx -y skills update -g -y
 ```
 
-## Comandos del proyecto (cuando exista código)
+## Comandos del proyecto
 
 ```bash
-bun install          # dependencias
-bun run dev          # servidor local (http://localhost:5173)
-bun run test         # tests unitarios
-bun run test:e2e     # Playwright
-bun run build        # build de producción
+bun install            # dependencias
+bun run dev            # servidor local (http://localhost:5173)
+bun run build          # build de produccion
+bun run lint           # oxlint (linter por defecto de Vite 8)
+bun run typecheck      # tsc -b
+bun run format         # prettier --write
+bun run test           # vitest run
+bun run test:watch     # vitest en modo watch
+bun run test:coverage  # cobertura
 ```
+
+Nota: el template actual de Vite 8 usa **oxlint** en lugar de ESLint; se mantiene Prettier para formato.
 
 ## Verificación de AWS
 
@@ -62,7 +68,8 @@ VITE_COGNITO_DOMAIN=
 
 ## Pendientes del entorno
 
-- [ ] `bun install` y dependencias del proyecto (Día 1, con el código).
+- [x] `bun install` y dependencias base del proyecto.
+- [x] Lint (oxlint) + formato (Prettier) configurados.
+- [x] Vitest + Testing Library + jsdom con smoke test.
 - [ ] Playwright + navegadores (Día 1–2).
-- [ ] Configuración de editor (ESLint + Prettier) al crear el código.
 - [ ] Rotar la access key al terminar la entrega.
