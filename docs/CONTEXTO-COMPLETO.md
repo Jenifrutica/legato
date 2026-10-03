@@ -355,3 +355,29 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 4. **Checklist de pantallas a rediseñar**: héroe (vinilo + título + controles), barra superior, barra inferior/móvil, panel derecho (Biblioteca/Buscar/Playlists/Cola/Audio), páginas legales, paneles de Ajustes/Accesibilidad, estado vacío, responsive 390/768/1024/1280/1440.
 5. Mantener: tokens en CSS variables, contraste AA, i18n ES/EN/PT, a11y (axe sin violaciones), una sola barra por vista, sin superposiciones, rendimiento (canvas a 30fps, sin blur costoso).
 6. **No romper los tests**: 154 unit + 4 E2E deben seguir en verde; los E2E usan selectores por `aria-label` (Reproducir/Pausar/Siguiente, Reordenar X, Agregar X a una playlist, pestañas, etc.). Si se renombran controles, actualizar `tests/e2e`.
+
+---
+
+## Sesión 3 (3 oct 2026) — rediseño decidido y arrancado
+
+### Nueva funcionalidad definida: Cápsula nostálgica
+
+La autora especificó la funcionalidad pendiente: un **carrusel interactivo tipo historias efímeras** en la pantalla principal (burbujas animadas que abren un visor vertical a pantalla completa, o popup siempre presente). Presenta a diario una cápsula de **3–5 tarjetas** que combinan el arte del álbum con un **fondo degradado dinámico**, **barra de progreso temporizada de 15 s** y reproducción automática de un **fragmento clave** (desde el segundo 30 o el coro). DTOs: objeto contenedor con fecha, id de usuario, expiración y arreglo de diapositivas; cada diapositiva lleva metadatos de la pista (título, artista, álbum, carátula, URL del fragmento), punto de inicio, **etiqueta de contexto** («Hace 1 año», «Obsesión olvidada») y texto evocador con métricas pasadas; en la interfaz: mantener presionado para pausar, reproducir la canción completa en la cola y guardar en favoritos. **Se implementa después del rediseño (F11)**; el rediseño reserva su carril de burbujas en el héroe.
+
+### Dirección visual elegida: **Duotono 62**
+
+Tras el flujo de impeccable (`context` → `new-work` → roll `concept-seed --scope direction --mode operate`, semilla `b6f5b18f` → cuatro comps), la autora eligió **Duotono 62**: edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Refinamientos pedidos por la autora e incorporados: **tintas adaptadas a la portada**, **ondas de líneas planas estilo tipográfico saliendo del disco** y **panel de músicos/partitura como slide-over con pestaña arrastrable, minimizable/maximizable** (solo para quien explora). Se descartaron A (Círculo armónico), C (Partitura) y D (Dos tintas); la notación de C vive dentro del panel de músicos de Duotono.
+
+- Plan, paleta, tipografías y validación: **`docs/REDISENO.md`**.
+- Contrato de dirección: `.impeccable/surfaces/src-app-app-tsx.md`.
+- Comp aprobado: `.impeccable/mocks/decision/b-duotono.png` + sidecar con `"approved": true`; `buildPath: comp` en `.impeccable/config.json`.
+- Comps construidos como mocks HTML locales capturados con Playwright (la key de OpenAI estaba vencida, error 401); previsualizaciones en `.impeccable/mocks/mockups/`.
+
+### Fases
+
+F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líneas · F4 panel + partitura slide-over · F5 barras móvil · F6 playlists estrella · F7 letras (diseño) · F8 responsive 390/768/1024/1280/1440 · F9 vacíos/oscuro/legales/a11y · F10 validación, docs y commits · F11 Cápsula nostálgica · F12 conexión de letras (LRCLIB + etiquetas/.lrc).
+
+- Reglas que se mantienen: claro por defecto (oscuro opcional), portada completa en el disco (**círculo completo posicionado, nunca `clip-path`**), UI teñida por el álbum, una sola barra por vista, cero superposiciones, 154 unit + 4 E2E en verde, typecheck/lint/build, axe sin violaciones, commits en inglés sin `Co-Authored-By` y push a `main` por bloque verificado.
+- **Documentar cada tanda** en `docs/ESTADO.md` y en este archivo.
+- La **key de OpenAI** de `.bashrc` está vencida; si se quiere volver a generar comps con IA, hay que reemplazarla. No es necesaria para el plan.
+- No desplegar hasta que la autora lo pida; rotar la access key antes de terminar la entrega.

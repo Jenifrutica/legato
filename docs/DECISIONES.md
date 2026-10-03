@@ -73,3 +73,18 @@ Todas las decisiones se tomaron entre el 2 y el 3 de octubre de 2026, antes de e
 | D40 | Salida de audio con **setSinkId** solo donde el navegador lo soporta (Chromium); fallback silencioso | Firefox/Safari no lo implementan |
 | D41 | Modo offline con **service worker en producción** (app shell) + IndexedDB local | No interfiere con el desarrollo; `sw.js` debe servirse sin caché en CloudFront |
 | D42 | Jam en tiempo real y playlists compartidas: **post-entrega** con interfaz `JamProvider` y diseño en `docs/JAM.md` | Requiere backend WebSocket y cuentas, bloqueados por la SCP; se sincroniza control, nunca audio |
+
+## Rediseño visual (3 oct 2026, sesión 3)
+
+| # | Decisión | Razón |
+|---|---|---|
+| D43 | Rediseño completo de la capa visual usando el flujo de **impeccable** (context → new-work → roll → comps → direction contract → build → detect → finish review) y elección de dirección con la autora antes de construir | No volver a iterar a ciegas sobre la UI |
+| D44 | Dirección elegida: **Duotono 62** (edición musical impresa a dos tintas: papel hueso, tinta negra y una tinta directa del álbum) | Máxima fuerza gráfica y tipográfica; conserva la portada como protagonista |
+| D45 | Se descartan las cartas A (Círculo armónico), C (Partitura) y D (Dos tintas); la notación de C vive dentro del panel de músicos de Duotono | Una sola coherencia visual; la fusión no superó a la dirección pura |
+| D46 | Tema por portada redefinido a **tres tintas derivadas** (papel, tinta y tinta directa) con contraste AA y variante oscura; el alto contraste de a11y gana | El pedido es que la UI se tiña de forma notoria sin perder legibilidad |
+| D47 | Tipografías: **Archivo variable** (display/UI, eje de ancho), **Source Serif 4** (notación y letras) y **JetBrains Mono** (datos); se retiran Fraunces e Inter | La tipografía es el material gráfico principal |
+| D48 | Ondas de **líneas planas** saliendo del disco, en las dos tintas del álbum, grosores alternados estilo tipográfico, sin glow; 30 fps y respeto a `prefers-reduced-motion` | El pedido textual: ondas tipo líneas siguiendo el estilo de la fuente |
+| D49 | Panel de músicos (partitura + modo Estructura) como **slide-over con pestaña arrastrable**, minimizable/maximizable y estado persistido | Es una capa para quien explora; no debe cargar la vista por defecto |
+| D50 | Letras: diseño e interacción ahora con datos de ejemplo; conexión **LRCLIB + etiquetas/.lrc** en la fase funcional siguiente | No acoplar el rediseño a una API externa |
+| D51 | Carril de burbujas reservado en el héroe para la **Cápsula nostálgica** (nueva funcionalidad); se implementa después del rediseño | La funcionalidad anunciada necesita hogar visual desde el inicio |
+| D52 | `buildPath: comp` registrado en `.impeccable/config.json`; los comps se produjeron como **mocks HTML locales** capturados con Playwright porque la key de OpenAI estaba vencida (401) | Verificación visual real sin coste ni dependencias |

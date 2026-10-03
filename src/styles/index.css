@@ -1,35 +1,42 @@
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/source-serif-4';
+@import '@fontsource-variable/jetbrains-mono';
 @import '@fontsource/opendyslexic';
 @import 'tailwindcss';
 
+/* Duotono 62 — edición musical a dos tintas.
+   Papel hueso + tinta negra + UNA tinta directa derivada de la portada. */
 @theme {
-  --color-bg: #f1f3f9;
-  --color-surface: #ffffff;
-  --color-surface-2: #e7eaf3;
-  --color-ink: #0f1222;
-  --color-ink-muted: #5c6178;
-  --color-border: #d8dce8;
-  --color-primary: #6c4cff;
-  --color-primary-strong: #4b2fd6;
-  --color-primary-soft: #e9e4ff;
-  --color-accent: #00a8b5;
-  --color-accent-soft: #d9f4f6;
-  --color-wood: #aeb6cc;
-  --color-success: #3e8e5a;
-  --color-danger: #d93a4a;
+  --color-bg: #f1ede4;
+  --color-surface: #fbf8f1;
+  --color-surface-2: #e7e1d3;
+  --color-ink: #13100c;
+  --color-ink-muted: #5c5548;
+  --color-border: #c7bfae;
+  --color-rule: #13100c;
+  --color-primary: #13100c;
+  --color-primary-strong: #000000;
+  --color-primary-soft: #e7e1d3;
+  --color-on-primary: #fbf8f1;
+  --color-accent: #ff5b2e;
+  --color-accent-soft: #fbe0d6;
+  --color-on-accent: #13100c;
+  --color-success: #2f7d4f;
+  --color-danger: #c62828;
 
-  --font-display: 'Fraunces Variable', Fraunces, ui-serif, Georgia, serif;
-  --font-body: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+  --font-display: 'Archivo Variable', Archivo, system-ui, sans-serif;
+  --font-body: 'Archivo Variable', Archivo, system-ui, sans-serif;
+  --font-serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.875rem;
-  --radius-lg: 1.5rem;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
 
-  --shadow-soft: 0 6px 24px rgb(43 38 34 / 0.08);
-  --shadow-disc: 0 24px 60px rgb(43 38 34 / 0.18);
-  --shadow-bar: 0 -8px 30px rgb(43 38 34 / 0.06);
+  --shadow-soft: 4px 4px 0 rgb(19 16 12 / 0.9);
+  --shadow-disc: 10px 10px 0 rgb(19 16 12 / 0.9);
+  --shadow-bar: 0 -4px 0 rgb(19 16 12 / 0.9);
 
   --animate-disc: legato-disc 6s linear infinite;
 }
@@ -51,20 +58,23 @@
 
   body {
     @apply m-0 min-h-dvh;
+    background-attachment: fixed;
+    background-image: radial-gradient(rgb(19 16 12 / 0.05) 1px, transparent 1.3px);
+    background-size: 13px 13px;
   }
 
   ::selection {
-    background-color: var(--color-primary-soft);
-    color: var(--color-ink);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 3px solid var(--color-accent);
     outline-offset: 2px;
   }
 
   * {
-    scrollbar-color: var(--color-wood) transparent;
+    scrollbar-color: var(--color-border) transparent;
     scrollbar-width: thin;
   }
 
@@ -75,9 +85,9 @@
 
   *::-webkit-scrollbar-thumb {
     background-clip: content-box;
-    background-color: var(--color-wood);
+    background-color: var(--color-border);
     border: 3px solid transparent;
-    border-radius: 999px;
+    border-radius: 0;
   }
 
   *::-webkit-scrollbar-track {
@@ -87,51 +97,74 @@
 
 @layer components {
   .panel {
-    @apply rounded-2xl border border-border/80 bg-surface/95 shadow-soft;
+    @apply border-2 border-rule bg-surface;
+    box-shadow: var(--shadow-soft);
   }
 
   .panel-inset {
-    @apply rounded-xl border border-border/70 bg-surface-2/60;
+    @apply border border-rule/30 bg-surface-2;
   }
 
   .metal-line {
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
-    height: 1px;
+    background: var(--color-rule);
+    height: 2px;
+  }
+
+  .u-display {
+    font-family: var(--font-display);
+    font-stretch: 115%;
+  }
+
+  .u-condensed {
+    font-stretch: 62%;
+  }
+
+  .u-label {
+    @apply font-mono text-[0.6875rem] uppercase;
+    letter-spacing: 0.16em;
   }
 }
 
 input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
-  border-radius: 999px;
+  height: 12px;
+  border: 2px solid var(--color-rule);
+  border-radius: 0;
   background: var(--color-surface-2);
   cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 12px;
+  border: 0;
+  background: transparent;
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: var(--color-primary-strong);
-  border: 2px solid var(--color-surface);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border: 2px solid var(--color-rule);
+  border-radius: 0;
+  background: var(--color-accent);
+  box-shadow: none;
 }
 
 input[type='range']::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--color-primary-strong);
-  border: 2px solid var(--color-surface);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-rule);
+  border-radius: 0;
+  background: var(--color-accent);
+  box-shadow: none;
 }
 
 input[type='range']::-moz-range-track {
-  height: 6px;
-  border-radius: 999px;
+  height: 12px;
+  border-radius: 0;
   background: var(--color-surface-2);
 }
 
@@ -144,101 +177,106 @@ html {
   font-size: calc(100% * var(--a11y-text-scale, 1));
 }
 
+/* Tema por portada: papel, tinta y tinta directa */
 html.album-theme {
   --color-bg: var(--album-bg);
   --color-surface: var(--album-surface);
   --color-surface-2: var(--album-surface-2);
   --color-border: var(--album-border);
+  --color-rule: var(--album-rule);
   --color-ink: var(--album-ink);
   --color-ink-muted: var(--album-ink-muted);
   --color-primary: var(--album-primary);
   --color-primary-strong: var(--album-primary-strong);
   --color-primary-soft: var(--album-primary-soft);
+  --color-on-primary: var(--album-on-primary);
   --color-accent: var(--album-accent);
   --color-accent-soft: var(--album-accent-soft);
+  --color-on-accent: var(--album-on-accent);
 }
 
+/* Duotono nocturno (opcional y conmutable) */
 html.theme-dark {
-  --color-bg: #0b0e17;
-  --color-surface: #131828;
-  --color-surface-2: #1c2233;
-  --color-ink: #eef1f8;
-  --color-ink-muted: #a2a9be;
-  --color-border: #2a3145;
-  --color-primary: #7c5cff;
-  --color-primary-strong: #6c4cff;
-  --color-primary-soft: #241f45;
-  --color-accent: #3fd6c9;
-  --color-accent-soft: #123a3b;
-  --color-wood: #6e7899;
-  --shadow-soft: 0 6px 24px rgb(0 0 0 / 0.45);
-  --shadow-disc: 0 24px 60px rgb(0 0 0 / 0.6);
-  --shadow-bar: 0 -8px 30px rgb(0 0 0 / 0.35);
+  --color-bg: #0b0e14;
+  --color-surface: #12161f;
+  --color-surface-2: #1a202b;
+  --color-ink: #f4efe6;
+  --color-ink-muted: #a79e8e;
+  --color-border: #4a4438;
+  --color-rule: #f4efe6;
+  --color-primary: #f4efe6;
+  --color-primary-strong: #ffffff;
+  --color-primary-soft: #1f2734;
+  --color-on-primary: #0b0e14;
+  --color-accent: #ff7a4d;
+  --color-accent-soft: #3a2218;
+  --color-on-accent: #13100c;
+  --color-success: #63b37f;
+  --color-danger: #e46767;
+  --shadow-soft: 4px 4px 0 rgb(0 0 0 / 0.85);
+  --shadow-disc: 10px 10px 0 rgb(0 0 0 / 0.85);
+  --shadow-bar: 0 -4px 0 rgb(0 0 0 / 0.85);
 }
 
 html.theme-dark.album-theme {
-  --color-primary: var(--album-dark-primary, #7c5cff);
-  --color-primary-strong: var(--album-dark-primary-strong, #6c4cff);
-  --color-primary-soft: var(--album-dark-primary-soft, #241f45);
-  --color-accent: var(--album-dark-accent, #3fd6c9);
-  --color-accent-soft: var(--album-dark-accent-soft, #123a3b);
+  --color-primary: var(--album-dark-primary);
+  --color-primary-strong: var(--album-dark-primary-strong);
+  --color-primary-soft: var(--album-dark-primary-soft);
+  --color-on-primary: var(--album-dark-on-primary);
+  --color-accent: var(--album-dark-accent);
+  --color-accent-soft: var(--album-dark-accent-soft);
+  --color-on-accent: var(--album-dark-on-accent);
 }
 
 html.theme-dark body {
-  background-image: radial-gradient(
-    900px 520px at 8% 6%,
-    var(--album-glow-soft, transparent),
-    transparent 70%
-  );
+  background-image: radial-gradient(rgb(244 239 230 / 0.05) 1px, transparent 1.3px);
 }
 
 html,
 body {
   transition:
-    background-color 500ms ease,
-    color 500ms ease;
-}
-
-body {
-  background-attachment: fixed;
-  background-image:
-    radial-gradient(1200px 640px at 12% -12%, rgb(255 255 255 / 0.7), transparent 62%),
-    radial-gradient(900px 520px at 8% 6%, var(--album-glow-soft, transparent), transparent 70%);
+    background-color 300ms ease,
+    color 300ms ease;
 }
 
 html.a11y-dyslexia {
-  --font-body: 'OpenDyslexic', 'Inter Variable', system-ui, sans-serif;
+  --font-body: 'OpenDyslexic', 'Archivo Variable', system-ui, sans-serif;
+  --font-display: 'OpenDyslexic', 'Archivo Variable', system-ui, sans-serif;
 }
 
-html.a11y-contrast {
+/* Alto contraste: gana sobre el tema del álbum y sobre el modo oscuro */
+html.a11y-contrast,
+html.a11y-contrast.album-theme,
+html.a11y-contrast.theme-dark,
+html.a11y-contrast.theme-dark.album-theme {
   --color-bg: #ffffff;
   --color-surface: #ffffff;
   --color-surface-2: #f0f0f0;
   --color-ink: #000000;
   --color-ink-muted: #2f2f2f;
   --color-border: #6b6b6b;
-  --color-primary: #8a2b00;
-  --color-primary-strong: #6d2200;
-  --color-primary-soft: #ffe8e0;
-  --color-accent: #0b4f5c;
-  --color-accent-soft: #dff3f7;
-  --color-wood: #7a5a2e;
+  --color-rule: #000000;
+  --color-primary: #000000;
+  --color-primary-strong: #000000;
+  --color-primary-soft: #e8e8e8;
+  --color-on-primary: #ffffff;
+  --color-accent: #8a2b00;
+  --color-accent-soft: #ffe8e0;
+  --color-on-accent: #ffffff;
 }
 
-html.a11y-cb-deuteranopia {
-  --color-primary: #0072b2;
-  --color-primary-strong: #005a8c;
-  --color-primary-soft: #dbeafe;
+html.a11y-cb-deuteranopia,
+html.a11y-cb-deuteranopia.album-theme {
+  --color-accent: #0072b2;
+  --color-accent-soft: #dbeafe;
+  --color-on-accent: #ffffff;
+}
+
+html.a11y-cb-protanopia,
+html.a11y-cb-protanopia.album-theme {
   --color-accent: #d55e00;
   --color-accent-soft: #ffe6cc;
-}
-
-html.a11y-cb-protanopia {
-  --color-primary: #0072b2;
-  --color-primary-strong: #005a8c;
-  --color-primary-soft: #dbeafe;
-  --color-accent: #e69f00;
-  --color-accent-soft: #fff0cc;
+  --color-on-accent: #13100c;
 }
 
 html.a11y-reduced-motion *,
@@ -257,10 +295,11 @@ html.a11y-large-controls a[href] {
 }
 
 html.a11y-large-controls input[type='range'] {
-  height: 10px;
+  height: 16px;
 }
 
 html.a11y-large-controls input[type='range']::-webkit-slider-thumb {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+  margin-top: -7px;
 }

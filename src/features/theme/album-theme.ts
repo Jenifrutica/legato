@@ -6,69 +6,77 @@ export type AlbumTheme = {
   surface: string
   surface2: string
   border: string
+  rule: string
   ink: string
   inkMuted: string
   primary: string
   primaryStrong: string
   primarySoft: string
+  onPrimary: string
   accent: string
   accentSoft: string
-  glow: string
-  glowSoft: string
+  onAccent: string
   darkPrimary: string
   darkPrimaryStrong: string
   darkPrimarySoft: string
+  darkOnPrimary: string
   darkAccent: string
   darkAccentSoft: string
+  darkOnAccent: string
 }
 
-const INK_BASE: Rgb = { r: 34, g: 30, b: 28 }
-const DARK_BASE: Rgb = { r: 11, g: 14, b: 23 }
+const INK_BASE: Rgb = { r: 19, g: 16, b: 12 }
+const BONE: Rgb = { r: 244, g: 239, b: 230 }
+const DARK_BASE: Rgb = { r: 11, g: 14, b: 20 }
 
 export function deriveTheme(palette: AlbumPalette): AlbumTheme {
-  const background = mix(WHITE, palette.dominant, 0.2)
-  const surface = mix(WHITE, palette.dominant, 0.06)
-  const surface2 = mix(WHITE, palette.dominant, 0.24)
-  const border = mix(WHITE, palette.muted, 0.42)
+  const background = mix(WHITE, palette.dominant, 0.06)
+  const surface = mix(WHITE, palette.dominant, 0.02)
+  const surface2 = mix(WHITE, palette.dominant, 0.14)
+  const border = mix(WHITE, palette.muted, 0.38)
 
   const ink = ensureContrast(INK_BASE, background, 7)
-  const inkMuted = ensureContrast(mix(ink, background, 0.4), background, 4.5)
+  const inkMuted = ensureContrast(mix(ink, background, 0.38), background, 4.5)
+  const rule = ink
+  const primary = ink
+  const primaryStrong = darken(ink, contrastRatio(ink, WHITE) > 10 ? 0.2 : 0)
+  const primarySoft = surface2
+  const onPrimary = ensureContrast(background, primaryStrong, 4.5)
 
-  const primaryStrong = ensureContrast(palette.vibrant, WHITE, 4.5)
-  const primary = ensureContrast(palette.vibrant, background, 3)
-  const primarySoft = mix(WHITE, palette.vibrant, 0.16)
-  const accent = ensureContrast(palette.muted, background, 3)
-  const accentSoft = mix(WHITE, palette.muted, 0.22)
-  const glow = rgbToHex(
-    darken(palette.vibrant, contrastRatio(palette.vibrant, WHITE) > 4.5 ? 0.1 : 0),
-  )
+  const accent = ensureContrast(palette.vibrant, background, 3)
+  const accentSoft = mix(background, palette.vibrant, 0.22)
+  const onAccent = ensureContrast(ink, accent, 4.5)
 
-  const darkPrimary = ensureContrast(palette.vibrant, DARK_BASE, 4.5)
-  const darkPrimaryStrong = ensureContrast(palette.vibrant, WHITE, 4.5)
-  const darkPrimarySoft = mix(DARK_BASE, palette.vibrant, 0.3)
-  const darkAccent = ensureContrast(palette.muted, DARK_BASE, 4.5)
-  const darkAccentSoft = mix(DARK_BASE, palette.muted, 0.32)
-  const glowSoft = `rgba(${Math.round(palette.vibrant.r)}, ${Math.round(palette.vibrant.g)}, ${Math.round(palette.vibrant.b)}, 0.32)`
+  const darkPrimary = ensureContrast(BONE, DARK_BASE, 7)
+  const darkPrimaryStrong = WHITE
+  const darkPrimarySoft = mix(DARK_BASE, WHITE, 0.14)
+  const darkOnPrimary = ensureContrast(DARK_BASE, darkPrimary, 4.5)
+  const darkAccent = ensureContrast(palette.vibrant, DARK_BASE, 4.5)
+  const darkAccentSoft = mix(DARK_BASE, palette.vibrant, 0.3)
+  const darkOnAccent = ensureContrast(INK_BASE, darkAccent, 4.5)
 
   return {
     background: rgbToHex(background),
     surface: rgbToHex(surface),
     surface2: rgbToHex(surface2),
     border: rgbToHex(border),
+    rule: rgbToHex(rule),
     ink: rgbToHex(ink),
     inkMuted: rgbToHex(inkMuted),
     primary: rgbToHex(primary),
     primaryStrong: rgbToHex(primaryStrong),
     primarySoft: rgbToHex(primarySoft),
+    onPrimary: rgbToHex(onPrimary),
     accent: rgbToHex(accent),
     accentSoft: rgbToHex(accentSoft),
-    glow: glow,
-    glowSoft: glowSoft,
+    onAccent: rgbToHex(onAccent),
     darkPrimary: rgbToHex(darkPrimary),
     darkPrimaryStrong: rgbToHex(darkPrimaryStrong),
     darkPrimarySoft: rgbToHex(darkPrimarySoft),
+    darkOnPrimary: rgbToHex(darkOnPrimary),
     darkAccent: rgbToHex(darkAccent),
     darkAccentSoft: rgbToHex(darkAccentSoft),
+    darkOnAccent: rgbToHex(darkOnAccent),
   }
 }
 
@@ -77,20 +85,23 @@ const THEME_VARIABLES: Array<[keyof AlbumTheme, string]> = [
   ['surface', '--album-surface'],
   ['surface2', '--album-surface-2'],
   ['border', '--album-border'],
+  ['rule', '--album-rule'],
   ['ink', '--album-ink'],
   ['inkMuted', '--album-ink-muted'],
   ['primary', '--album-primary'],
   ['primaryStrong', '--album-primary-strong'],
   ['primarySoft', '--album-primary-soft'],
+  ['onPrimary', '--album-on-primary'],
   ['accent', '--album-accent'],
   ['accentSoft', '--album-accent-soft'],
-  ['glow', '--album-glow'],
-  ['glowSoft', '--album-glow-soft'],
+  ['onAccent', '--album-on-accent'],
   ['darkPrimary', '--album-dark-primary'],
   ['darkPrimaryStrong', '--album-dark-primary-strong'],
   ['darkPrimarySoft', '--album-dark-primary-soft'],
+  ['darkOnPrimary', '--album-dark-on-primary'],
   ['darkAccent', '--album-dark-accent'],
   ['darkAccentSoft', '--album-dark-accent-soft'],
+  ['darkOnAccent', '--album-dark-on-accent'],
 ]
 
 export function applyAlbumTheme(theme: AlbumTheme): void {

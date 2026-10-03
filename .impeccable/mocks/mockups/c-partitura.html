@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Legato — C · Partitura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f8f8f5;
+        --paper-2: #efefea;
+        --ink: #16161a;
+        --muted: #5e5c63;
+        --staff: #b9b5ae;
+        --red: #b23a2e;
+        --red-tint: #f1dfda;
+        --petrol: #0e5f6e;
+        --petrol-tint: #dce9e7;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+        --serif: 'Source Serif 4', Georgia, serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: var(--serif);
+        background: var(--paper);
+        color: var(--ink);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(1000px 460px at 50% -12%, var(--petrol-tint), transparent 72%);
+        pointer-events: none;
+      }
+
+      /* ── Top bar ─────────────────────────────────────────── */
+      .topbar {
+        position: relative;
+        z-index: 6;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 26px;
+        background: var(--paper);
+        border-bottom: 1px solid var(--ink);
+      }
+      .mark {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--ink);
+        display: grid;
+        place-items: center;
+        color: var(--ink);
+      }
+      .mark svg {
+        width: 18px;
+        height: 18px;
+      }
+      .wordmark {
+        font-size: 19px;
+        font-variant: small-caps;
+        letter-spacing: 0.24em;
+        font-weight: 600;
+      }
+      .collection {
+        margin-left: 10px;
+        border: 1px solid var(--ink);
+        background: transparent;
+        padding: 6px 12px;
+        font-family: var(--serif);
+        font-size: 13px;
+        font-variant: small-caps;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .iconbtn {
+        width: 36px;
+        height: 36px;
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+      }
+      .iconbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--ink);
+        padding: 5px 12px 5px 6px;
+        font-size: 12.5px;
+        font-variant: small-caps;
+        letter-spacing: 0.1em;
+      }
+      .account span.dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid var(--ink);
+        background: var(--petrol);
+      }
+
+      /* ── Shell ───────────────────────────────────────────── */
+      .shell {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 384px;
+        height: calc(100vh - 64px);
+      }
+      .stage {
+        position: relative;
+        overflow: hidden;
+        padding: 0 34px;
+      }
+      .axis {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--staff);
+        z-index: 0;
+      }
+      .staff {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 296px;
+        height: 65px;
+        background: repeating-linear-gradient(
+          180deg,
+          var(--staff) 0 1px,
+          transparent 1px 16px
+        );
+        z-index: 0;
+      }
+
+      /* Capsule bubbles (reserved slot) */
+      .capsules {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 3;
+        display: flex;
+        gap: 12px;
+      }
+      .bubble {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        padding: 3px;
+        background: conic-gradient(from 210deg, var(--petrol), var(--red), var(--paper-2), var(--petrol));
+      }
+      .bubble i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 2px solid var(--ink);
+      }
+
+      /* ── Disc ────────────────────────────────────────────── */
+      .disc-zone {
+        position: relative;
+        height: 388px;
+        z-index: 1;
+      }
+      .disc {
+        position: absolute;
+        left: 50%;
+        top: -366px;
+        transform: translateX(-50%);
+        width: 664px;
+        height: 664px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 64% 34%, #f2e8d5 0 46px, transparent 47px),
+          linear-gradient(180deg, transparent 0 58%, #e4572e 58% 73%, transparent 73%),
+          repeating-linear-gradient(0deg, transparent 0 30px, rgba(242, 232, 213, 0.32) 30px 31px),
+          #0e3b43;
+        box-shadow: 0 0 0 1px rgba(22, 22, 26, 0.5);
+      }
+      .disc::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: repeating-radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0.22) 0 1px,
+          transparent 1px 6px
+        );
+        mix-blend-mode: multiply;
+      }
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 126px;
+        height: 126px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--ink);
+        display: grid;
+        place-items: center;
+        z-index: 2;
+      }
+      .label b {
+        font-family: var(--mono);
+        font-size: 14px;
+        letter-spacing: 0.16em;
+      }
+      .label em {
+        position: absolute;
+        bottom: 14px;
+        font-family: var(--serif);
+        font-style: normal;
+        font-size: 9px;
+        font-variant: small-caps;
+        letter-spacing: 0.22em;
+        color: var(--red);
+      }
+      .label::after {
+        content: '';
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+
+      /* ── Now playing ─────────────────────────────────────── */
+      .now {
+        position: relative;
+        z-index: 2;
+        max-width: 760px;
+        margin: 24px auto 0;
+        text-align: center;
+      }
+      .now h1 {
+        font-size: 46px;
+        line-height: 1.05;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .meta {
+        margin-top: 8px;
+        font-size: 14px;
+        font-variant: small-caps;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+      }
+      .meta b {
+        color: var(--red);
+        font-weight: 600;
+      }
+      .lyrics {
+        margin: 20px auto 0;
+        max-width: 600px;
+        display: grid;
+        gap: 9px;
+        font-size: 16.5px;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+      .lyrics .on {
+        position: relative;
+        color: var(--ink);
+        font-weight: 600;
+        font-size: 18px;
+        padding: 5px 14px 5px 16px;
+      }
+      .lyrics .on::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--red-tint);
+        z-index: -1;
+      }
+      .lyrics .on::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--red);
+      }
+      .progress {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .progress .t {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        width: 42px;
+      }
+      .progress .t:last-child {
+        text-align: left;
+      }
+      .track {
+        position: relative;
+        flex: 1;
+        height: 1px;
+        background: var(--ink);
+      }
+      .track i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 36%;
+        background: var(--red);
+      }
+      .track i::after {
+        content: '';
+        position: absolute;
+        right: -5px;
+        top: -5px;
+        width: 11px;
+        height: 11px;
+        background: var(--red);
+      }
+
+      .transport {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+      }
+      .tbtn {
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+      }
+      .tbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tbtn.play {
+        width: 66px;
+        height: 52px;
+        background: var(--ink);
+        color: var(--paper);
+        border-color: var(--ink);
+      }
+      .tbtn.play svg {
+        width: 22px;
+        height: 22px;
+      }
+      .extras {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+      }
+      .chip {
+        border: 1px solid var(--ink);
+        background: transparent;
+        padding: 5px 12px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        letter-spacing: 0.08em;
+      }
+      .vol {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+      }
+      .vol .bar {
+        width: 110px;
+        height: 1px;
+        background: var(--ink);
+        position: relative;
+      }
+      .vol .bar i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 64%;
+        background: var(--red);
+      }
+      .vol .bar i::after {
+        content: '';
+        position: absolute;
+        right: -4px;
+        top: -4.5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 1px solid var(--ink);
+        background: var(--paper);
+      }
+
+      /* ── Panel ───────────────────────────────────────────── */
+      .panel {
+        position: relative;
+        z-index: 5;
+        background: var(--paper);
+        border-left: 1px solid var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+      .tabs {
+        display: flex;
+        gap: 18px;
+        padding: 16px 20px 12px;
+        border-bottom: 1px solid var(--ink);
+      }
+      .tabs a {
+        font-size: 13px;
+        font-variant: small-caps;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .tabs a.on {
+        color: var(--ink);
+        font-weight: 600;
+        box-shadow: inset 0 -2px 0 var(--red);
+      }
+      .panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 14px 20px 6px;
+      }
+      .panel-head b {
+        font-size: 15px;
+        font-weight: 600;
+        font-variant: small-caps;
+        letter-spacing: 0.14em;
+      }
+      .panel-head span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+      .score {
+        list-style: none;
+        padding: 8px 18px 0;
+        position: relative;
+      }
+      .score::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background: var(--staff);
+      }
+      .score li {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        align-items: center;
+        height: 54px;
+      }
+      .score .axis-dot {
+        grid-column: 2;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--ink);
+        justify-self: center;
+      }
+      .bar {
+        height: 16px;
+        background: var(--paper-2);
+        border: 1px solid var(--ink);
+        position: relative;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+      .bar span {
+        font-size: 11px;
+        font-variant: small-caps;
+        letter-spacing: 0.06em;
+        padding: 0 8px;
+        white-space: nowrap;
+        color: var(--ink);
+      }
+      .bar.right {
+        grid-column: 3;
+        justify-self: start;
+      }
+      .bar.left {
+        grid-column: 1;
+        justify-self: end;
+        justify-content: flex-end;
+      }
+      .bar i {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 0;
+      }
+      .bar.left i {
+        left: auto;
+        right: 0;
+      }
+      .score li.on .bar {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--paper);
+      }
+      .score li.on .bar span {
+        color: var(--paper);
+      }
+      .score li.on .bar i {
+        width: 36%;
+        background: var(--red);
+        opacity: 0.85;
+      }
+      .score .dur {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+      }
+      .score .dur.right {
+        grid-column: 3;
+        justify-self: end;
+        padding-right: 2px;
+      }
+      .score .dur.left {
+        grid-column: 1;
+        justify-self: start;
+        padding-left: 2px;
+      }
+      .score .track-name {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .score .track-name.right {
+        grid-column: 1;
+        justify-self: end;
+        padding-right: 10px;
+        text-align: right;
+      }
+      .score .track-name.left {
+        grid-column: 3;
+        justify-self: start;
+        padding-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <span class="wordmark">Legato</span>
+      <select class="collection">
+        <option>Vidrio — Trío Ámbar</option>
+        <option>Biblioteca</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="iconbtn" title="Accesibilidad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="12" cy="5" r="2" />
+          <path d="M4 9h16M12 9v6m0 0-3 6m3-6 3 6" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Idioma">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21" />
+        </svg>
+      </button>
+      <span class="account"><span class="dot"></span>Daniela</span>
+    </header>
+
+    <div class="shell">
+      <main class="stage">
+        <span class="axis" aria-hidden="true"></span>
+        <span class="staff" aria-hidden="true"></span>
+
+        <div class="capsules" aria-hidden="true">
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+        </div>
+
+        <div class="disc-zone">
+          <div class="disc">
+            <span class="label"><b>N-04</b><em>Lado A · 33⅓</em></span>
+          </div>
+        </div>
+
+        <section class="now">
+          <h1>Nocturno en Re</h1>
+          <p class="meta">Trío Ámbar · <b>Vidrio</b> · Compás 4/4 · ♩ = 72</p>
+
+          <div class="lyrics">
+            <span class="on">La aguja cae sobre el mar quieto</span>
+            <span>y el cuarto entero aprende a respirar,</span>
+            <span>cada surco guarda un verano entero,</span>
+            <span>la noche gira y no quiere parar.</span>
+          </div>
+
+          <div class="progress">
+            <span class="t">1:24</span>
+            <span class="track"><i></i></span>
+            <span class="t">4:07</span>
+          </div>
+
+          <div class="transport">
+            <button class="tbtn" title="Aleatorio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+              </svg>
+            </button>
+            <button class="tbtn" title="Anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+            </button>
+            <button class="tbtn play" title="Pausa">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+            </button>
+            <button class="tbtn" title="Siguiente">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+            </button>
+            <button class="tbtn" title="Repetir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="extras">
+            <span class="chip">1x</span>
+            <span class="chip">A–B</span>
+            <span class="chip">Timer</span>
+            <span class="vol">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M11 5 6 9H2v6h4l5 4zM15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
+              </svg>
+              <span class="bar"><i></i></span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <nav class="tabs">
+          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a><a class="on" href="#">Cola</a><a href="#">Audio</a>
+        </nav>
+        <div class="panel-head"><b>Partitura de la cola</b><span>7 nodos · 17:56</span></div>
+        <ul class="score">
+          <li class="on">
+            <span class="track-name right">Nocturno en Re</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 235px"><i></i><span>4:07</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 183px"><i></i><span>3:12</span></span>
+            <span class="track-name left">Marea Baja</span>
+          </li>
+          <li>
+            <span class="track-name right">Cinta Magnética</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 286px"><i></i><span>5:01</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 213px"><i></i><span>3:44</span></span>
+            <span class="track-name left">Río de Noche</span>
+          </li>
+          <li>
+            <span class="track-name right">Bruma</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 192px"><i></i><span>3:21</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 260px"><i></i><span>4:33</span></span>
+            <span class="track-name left">Piedra y Sal</span>
+          </li>
+          <li>
+            <span class="track-name right">Verano en Villa</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 227px"><i></i><span>3:58</span></span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </body>
+</html>

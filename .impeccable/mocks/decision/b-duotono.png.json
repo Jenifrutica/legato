@@ -1,0 +1,15 @@
+{
+  "approved": true,
+  "choice": "duotono-62",
+  "kind": "pick",
+  "source": ".impeccable/mocks/mockups/b-duotono.html",
+  "capture": ".impeccable/mocks/decision/b-duotono.png",
+  "generator": "playwright screenshot 1440x1024 (local HTML mock, no API generation - OpenAI key invalid 401)",
+  "seedKey": "b6f5b18f",
+  "refinements": [
+    "Duotone inks derived from the playing album cover: paper, ink and one spot ink",
+    "Line-based waves around the disc in the display-face style, flat, no glow",
+    "Musicians/score panel as a draggable, minimizable slide-over for exploration only"
+  ],
+  "notes": "Direction approved by the author in-session. The score/partitura panel from the Partitura exploration lives inside this world as the musicians slide-over."
+}

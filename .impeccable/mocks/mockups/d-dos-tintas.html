@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Legato — D · Dos tintas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f4f1e8;
+        --paper-2: #ebe6d8;
+        --ink: #14110d;
+        --spot: #ff5b2e;
+        --spot-tint: #fbe0d6;
+        --muted: #5c5548;
+        --staff: #b9b5ae;
+        --serif: 'Source Serif 4', Georgia, serif;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: 'Archivo', system-ui, sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(rgba(20, 17, 13, 0.06) 1px, transparent 1.3px);
+        background-size: 13px 13px;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      /* ── Top bar ─────────────────────────────────────────── */
+      .topbar {
+        position: relative;
+        z-index: 6;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 26px;
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .mark {
+        width: 32px;
+        height: 32px;
+        background: var(--spot);
+        display: grid;
+        place-items: center;
+        color: var(--ink);
+      }
+      .mark svg {
+        width: 18px;
+        height: 18px;
+      }
+      .wordmark {
+        font-size: 21px;
+        font-weight: 900;
+        font-stretch: 118%;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .collection {
+        margin-left: 10px;
+        border: 2px solid var(--paper);
+        background: transparent;
+        padding: 6px 12px;
+        font-size: 13px;
+        color: var(--paper);
+        font-weight: 600;
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .iconbtn {
+        width: 36px;
+        height: 36px;
+        border: 0;
+        background: transparent;
+        color: var(--paper);
+        display: grid;
+        place-items: center;
+      }
+      .iconbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 2px solid var(--paper);
+        padding: 5px 12px 5px 6px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .account span.dot {
+        width: 22px;
+        height: 22px;
+        background: var(--spot);
+      }
+
+      /* ── Shell ───────────────────────────────────────────── */
+      .shell {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 384px;
+        height: calc(100vh - 64px);
+      }
+      .stage {
+        position: relative;
+        overflow: hidden;
+        padding: 0 34px;
+      }
+
+      /* Capsule bubbles (reserved slot) */
+      .capsules {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 3;
+        display: flex;
+        gap: 12px;
+      }
+      .bubble {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        padding: 3px;
+        background: conic-gradient(from 210deg, var(--spot), var(--ink), var(--paper-2), var(--spot));
+      }
+      .bubble i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 2px solid var(--ink);
+      }
+
+      /* ── Disc ────────────────────────────────────────────── */
+      .disc-zone {
+        position: relative;
+        height: 400px;
+        z-index: 1;
+      }
+      .field {
+        position: absolute;
+        left: 50%;
+        top: -320px;
+        transform: translateX(-50%);
+        width: 780px;
+        height: 780px;
+        background: var(--spot);
+        box-shadow: 14px 14px 0 var(--ink);
+      }
+      .disc {
+        position: absolute;
+        left: 50%;
+        top: -372px;
+        transform: translateX(-50%);
+        width: 672px;
+        height: 672px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 64% 34%, #f2e8d5 0 46px, transparent 47px),
+          linear-gradient(180deg, transparent 0 58%, var(--spot) 58% 73%, transparent 73%),
+          repeating-linear-gradient(0deg, transparent 0 30px, rgba(242, 232, 213, 0.3) 30px 31px),
+          #14110d;
+        box-shadow: 10px 10px 0 rgba(20, 17, 13, 0.9);
+        z-index: 1;
+      }
+      .disc::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: repeating-radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0.3) 0 1px,
+          transparent 1px 6px
+        );
+        mix-blend-mode: multiply;
+      }
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 128px;
+        height: 128px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: var(--paper);
+        border: 4px solid var(--ink);
+        display: grid;
+        place-items: center;
+        z-index: 2;
+      }
+      .label b {
+        font-family: var(--mono);
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+      }
+      .label em {
+        position: absolute;
+        bottom: 15px;
+        font-family: var(--serif);
+        font-style: normal;
+        font-size: 9px;
+        font-variant: small-caps;
+        letter-spacing: 0.2em;
+        color: var(--spot);
+      }
+      .label::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+
+      /* ── Now playing ─────────────────────────────────────── */
+      .now {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        margin-top: 26px;
+      }
+      .now h1 {
+        font-size: 88px;
+        line-height: 0.9;
+        font-weight: 900;
+        letter-spacing: -0.015em;
+        text-transform: uppercase;
+      }
+      .now h1 .wide {
+        font-stretch: 125%;
+        display: block;
+      }
+      .now h1 .narrow {
+        font-stretch: 62%;
+        display: block;
+        color: var(--spot);
+      }
+      .meta {
+        margin-top: 12px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .meta b {
+        color: var(--spot);
+        font-weight: 600;
+      }
+
+      /* Lyrics over an engraved staff */
+      .lyrics {
+        position: relative;
+        margin-top: 24px;
+        max-width: 800px;
+        padding: 14px 0 8px;
+      }
+      .lyrics .staff {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 26px;
+        height: 65px;
+        background: repeating-linear-gradient(180deg, var(--staff) 0 1px, transparent 1px 16px);
+      }
+      .lyrics .on {
+        position: relative;
+        display: inline-block;
+        width: max-content;
+        max-width: 100%;
+        background: var(--spot);
+        color: var(--ink);
+        font-size: 32px;
+        line-height: 1.1;
+        font-weight: 900;
+        font-stretch: 105%;
+        text-transform: uppercase;
+        letter-spacing: -0.005em;
+        padding: 8px 16px;
+      }
+      .lyrics .after {
+        display: block;
+        margin-top: 14px;
+        font-family: var(--serif);
+        font-size: 17px;
+        color: var(--muted);
+      }
+
+      .progress {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 800px;
+      }
+      .progress .t {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .track {
+        height: 12px;
+        flex: 1;
+        border: 2px solid var(--ink);
+        position: relative;
+      }
+      .track i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 36%;
+        background: var(--spot);
+        border-right: 2px solid var(--ink);
+      }
+
+      .transport {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .tbtn {
+        width: 46px;
+        height: 46px;
+        border: 2px solid var(--ink);
+        background: var(--paper);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .tbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tbtn.play {
+        width: 64px;
+        height: 64px;
+        background: var(--spot);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+      .tbtn.play svg {
+        width: 24px;
+        height: 24px;
+      }
+      .extras {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .chip {
+        border: 2px solid var(--ink);
+        background: var(--paper);
+        padding: 6px 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .vol {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .vol .bar {
+        width: 120px;
+        height: 12px;
+        border: 2px solid var(--ink);
+        position: relative;
+      }
+      .vol .bar i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 64%;
+        background: var(--ink);
+      }
+
+      /* ── Panel: the score ────────────────────────────────── */
+      .panel {
+        position: relative;
+        z-index: 5;
+        background: var(--paper);
+        border-left: 3px solid var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+      .tabs {
+        display: flex;
+        gap: 18px;
+        padding: 16px 20px 12px;
+        border-bottom: 3px solid var(--ink);
+      }
+      .tabs a {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(20, 17, 13, 0.45);
+        text-decoration: none;
+      }
+      .tabs a.on {
+        color: var(--ink);
+        background: var(--spot);
+        padding: 4px 8px;
+        margin: -4px -8px;
+      }
+      .panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 14px 20px 4px;
+      }
+      .panel-head b {
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .panel-head span {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+      .score {
+        list-style: none;
+        padding: 6px 18px 0;
+        position: relative;
+      }
+      .score::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 1px;
+        background: var(--staff);
+      }
+      .score li {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        align-items: center;
+        height: 56px;
+      }
+      .score .axis-dot {
+        grid-column: 2;
+        width: 5px;
+        height: 5px;
+        background: var(--ink);
+        justify-self: center;
+      }
+      .bar {
+        height: 18px;
+        background: var(--paper-2);
+        border: 2px solid var(--ink);
+        position: relative;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+      .bar span {
+        position: relative;
+        z-index: 1;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+      .bar.right {
+        grid-column: 3;
+        justify-self: start;
+      }
+      .bar.left {
+        grid-column: 1;
+        justify-self: end;
+        justify-content: flex-end;
+      }
+      .bar i {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 0;
+      }
+      .bar.left i {
+        left: auto;
+        right: 0;
+      }
+      .score li.on .bar {
+        background: var(--ink);
+      }
+      .score li.on .bar span {
+        color: var(--paper);
+      }
+      .score li.on .bar i {
+        width: 36%;
+        background: var(--spot);
+      }
+      .score .track-name {
+        font-family: var(--serif);
+        font-size: 12.5px;
+        color: var(--muted);
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .score .track-name.right {
+        grid-column: 1;
+        justify-self: end;
+        padding-right: 10px;
+        text-align: right;
+      }
+      .score .track-name.left {
+        grid-column: 3;
+        justify-self: start;
+        padding-left: 10px;
+      }
+      .score .num {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--spot);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <span class="wordmark">Legato</span>
+      <select class="collection">
+        <option>VIDRIO — TRÍO ÁMBAR</option>
+        <option>BIBLIOTECA</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="iconbtn" title="Accesibilidad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="5" r="2" />
+          <path d="M4 9h16M12 9v6m0 0-3 6m3-6 3 6" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Idioma">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21" />
+        </svg>
+      </button>
+      <span class="account"><span class="dot"></span>Daniela</span>
+    </header>
+
+    <div class="shell">
+      <main class="stage">
+        <div class="capsules" aria-hidden="true">
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+        </div>
+
+        <div class="disc-zone">
+          <div class="field"></div>
+          <div class="disc">
+            <span class="label"><b>N-04</b><em>Lado A · 33⅓</em></span>
+          </div>
+        </div>
+
+        <section class="now">
+          <h1><span class="wide">Nocturno</span><span class="narrow">en Re</span></h1>
+          <p class="meta">Lado A · Nodo 04 · Trío Ámbar · <b>Vidrio</b> · 4/4 · ♩=72</p>
+
+          <div class="lyrics">
+            <span class="staff" aria-hidden="true"></span>
+            <span class="on">La aguja cae sobre el mar quieto</span>
+            <span class="after">y el cuarto entero aprende a respirar, cada surco guarda un verano entero.</span>
+          </div>
+
+          <div class="progress">
+            <span class="t">1:24</span>
+            <span class="track"><i></i></span>
+            <span class="t">4:07</span>
+          </div>
+
+          <div class="transport">
+            <button class="tbtn" title="Aleatorio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+              </svg>
+            </button>
+            <button class="tbtn" title="Anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+            </button>
+            <button class="tbtn play" title="Pausa">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+            </button>
+            <button class="tbtn" title="Siguiente">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+            </button>
+            <button class="tbtn" title="Repetir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="extras">
+            <span class="chip">1x</span>
+            <span class="chip">A–B</span>
+            <span class="chip">Timer</span>
+            <span class="vol">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M11 5 6 9H2v6h4l5 4zM15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
+              </svg>
+              <span class="bar"><i></i></span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <nav class="tabs">
+          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a><a class="on" href="#">Cola</a><a href="#">Audio</a>
+        </nav>
+        <div class="panel-head"><b>Cola · partitura</b><span>7 nodos · doble enlace</span></div>
+        <ul class="score">
+          <li class="on">
+            <span class="track-name right">Nocturno en Re <span class="num">N-04</span></span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 235px"><i></i><span>4:07</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 183px"><i></i><span>3:12</span></span>
+            <span class="track-name left">Marea Baja</span>
+          </li>
+          <li>
+            <span class="track-name right">Cinta Magnética</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 286px"><i></i><span>5:01</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 213px"><i></i><span>3:44</span></span>
+            <span class="track-name left">Río de Noche</span>
+          </li>
+          <li>
+            <span class="track-name right">Bruma</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 192px"><i></i><span>3:21</span></span>
+          </li>
+          <li>
+            <span class="axis-dot"></span>
+            <span class="bar left" style="width: 260px"><i></i><span>4:33</span></span>
+            <span class="track-name left">Piedra y Sal</span>
+          </li>
+          <li>
+            <span class="track-name right">Verano en Villa</span>
+            <span class="axis-dot"></span>
+            <span class="bar right" style="width: 227px"><i></i><span>3:58</span></span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </body>
+</html>

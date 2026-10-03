@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Legato — A · Círculo armónico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3f6f5;
+        --surface: #ffffff;
+        --surface2: #e8efed;
+        --ink: #0c1b1e;
+        --muted: #54666a;
+        --border: #cfdad7;
+        --primary: #0e5f6e;
+        --primary-strong: #0a4653;
+        --soft: #dfedef;
+        --accent: #e4572e;
+        --accent-soft: #fbe3da;
+        --serif-display: 'Jost', system-ui, sans-serif;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: var(--serif-display);
+        background: var(--bg);
+        color: var(--ink);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+          1100px 520px at 70% -10%,
+          var(--soft),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      /* ── Top bar ─────────────────────────────────────────── */
+      .topbar {
+        position: relative;
+        z-index: 5;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 26px;
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
+        border-bottom: 1px solid var(--border);
+      }
+      .mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--ink);
+        display: grid;
+        place-items: center;
+        color: var(--surface);
+      }
+      .mark svg {
+        width: 18px;
+        height: 18px;
+      }
+      .wordmark {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .collection {
+        margin-left: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 6px;
+        padding: 7px 12px;
+        font-size: 13.5px;
+        color: var(--ink);
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .iconbtn {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        display: grid;
+        place-items: center;
+      }
+      .iconbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 5px 12px 5px 6px;
+        font-size: 13px;
+        color: var(--ink);
+        background: var(--surface);
+      }
+      .account span.dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+      }
+
+      /* ── Shell ───────────────────────────────────────────── */
+      .shell {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 384px;
+        height: calc(100vh - 64px);
+      }
+      .stage {
+        position: relative;
+        overflow: hidden;
+        padding: 0 34px;
+      }
+
+      /* Capsule bubbles (reserved slot) */
+      .capsules {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 3;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .bubble {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        padding: 3px;
+        background: conic-gradient(
+          from 210deg,
+          var(--primary),
+          var(--accent),
+          var(--soft),
+          var(--primary)
+        );
+      }
+      .bubble i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--surface);
+        border: 2px solid var(--surface);
+      }
+      .bubble.b2 {
+        background: conic-gradient(from 40deg, var(--accent), var(--primary), var(--accent-soft));
+      }
+      .bubble.b3 {
+        background: conic-gradient(from 120deg, var(--primary-strong), var(--accent), var(--soft));
+      }
+
+      /* ── Disc ────────────────────────────────────────────── */
+      .disc-zone {
+        position: relative;
+        height: 388px;
+      }
+      .disc {
+        position: absolute;
+        left: 50%;
+        top: -366px;
+        transform: translateX(-50%);
+        width: 672px;
+        height: 672px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 64% 34%, #f2e8d5 0 46px, transparent 47px),
+          radial-gradient(circle at 64% 34%, transparent 0 46px, #f2e8d5 47px 57px, transparent 58px),
+          linear-gradient(180deg, transparent 0 58%, #e4572e 58% 73%, transparent 73%),
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 30px,
+            rgba(242, 232, 213, 0.32) 30px 31px
+          ),
+          #0e3b43;
+        box-shadow:
+          0 26px 60px rgba(12, 27, 30, 0.18),
+          inset 0 0 90px rgba(0, 0, 0, 0.35);
+      }
+      .disc::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: repeating-radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0.24) 0 1px,
+          transparent 1px 6px
+        );
+        mix-blend-mode: multiply;
+      }
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 132px;
+        height: 132px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: #f2e8d5;
+        display: grid;
+        place-items: center;
+        z-index: 2;
+        box-shadow: inset 0 0 0 1px rgba(12, 27, 30, 0.25);
+      }
+      .label b {
+        font-family: var(--mono);
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        color: var(--primary-strong);
+      }
+      .label em {
+        position: absolute;
+        bottom: 16px;
+        font-family: var(--mono);
+        font-style: normal;
+        font-size: 7px;
+        letter-spacing: 0.28em;
+        color: rgba(12, 27, 30, 0.55);
+      }
+      .label::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+      .ring {
+        position: absolute;
+        left: 50%;
+        top: -430px;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 800px;
+        pointer-events: none;
+      }
+
+      /* ── Now playing ─────────────────────────────────────── */
+      .now {
+        position: relative;
+        z-index: 2;
+        max-width: 720px;
+        margin: 26px auto 0;
+        text-align: center;
+      }
+      .now h1 {
+        font-size: 46px;
+        line-height: 1.05;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+      .meta {
+        margin-top: 8px;
+        font-size: 16px;
+        color: var(--muted);
+      }
+      .meta b {
+        color: var(--primary);
+        font-weight: 600;
+      }
+      .lyrics {
+        margin: 18px auto 0;
+        max-width: 560px;
+        display: grid;
+        gap: 7px;
+        font-size: 16.5px;
+        line-height: 1.35;
+        color: var(--muted);
+      }
+      .lyrics .on {
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 18px;
+      }
+      .progress {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .progress .t {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        width: 42px;
+      }
+      .progress .t:last-child {
+        text-align: left;
+      }
+      .track {
+        position: relative;
+        flex: 1;
+        height: 3px;
+        background: var(--border);
+        border-radius: 999px;
+      }
+      .track i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 36%;
+        background: var(--primary);
+        border-radius: 999px;
+      }
+      .track i::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        top: -3px;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--primary-strong);
+      }
+
+      .transport {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+      .tbtn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 2px 0 rgba(12, 27, 30, 0.12);
+      }
+      .tbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tbtn.play {
+        width: 64px;
+        height: 64px;
+        background: var(--primary);
+        border-color: var(--primary-strong);
+        color: #fff;
+        box-shadow: 0 3px 0 var(--primary-strong);
+      }
+      .tbtn.play svg {
+        width: 24px;
+        height: 24px;
+      }
+      .extras {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .chip {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .vol {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+      }
+      .vol .bar {
+        width: 110px;
+        height: 3px;
+        background: var(--border);
+        border-radius: 999px;
+        position: relative;
+      }
+      .vol .bar i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 64%;
+        background: var(--primary);
+        border-radius: 999px;
+      }
+      .vol .bar i::after {
+        content: '';
+        position: absolute;
+        right: -4px;
+        top: -3.5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary-strong);
+      }
+
+      /* ── Panel ───────────────────────────────────────────── */
+      .panel {
+        position: relative;
+        z-index: 4;
+        background: var(--surface);
+        border-left: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+      }
+      .tabs {
+        display: flex;
+        gap: 20px;
+        padding: 16px 22px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .tabs a {
+        padding-bottom: 12px;
+        font-size: 13.5px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .tabs a.on {
+        color: var(--ink);
+        font-weight: 600;
+        box-shadow: inset 0 -2px 0 var(--primary);
+      }
+      .panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 16px 22px 10px;
+      }
+      .panel-head b {
+        font-size: 15px;
+      }
+      .panel-head span {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .tracks {
+        list-style: none;
+        padding: 0 10px;
+        display: grid;
+        gap: 2px;
+      }
+      .tracks li {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 12px;
+        border-radius: 6px;
+      }
+      .tracks li.on {
+        background: var(--soft);
+      }
+      .thumb {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        background:
+          radial-gradient(circle at 64% 34%, #f2e8d5 0 8px, transparent 9px),
+          linear-gradient(180deg, transparent 0 58%, #e4572e 58% 73%, transparent 73%),
+          #0e3b43;
+        box-shadow: inset 0 0 0 1px rgba(12, 27, 30, 0.2);
+      }
+      .tracks .tt {
+        min-width: 0;
+      }
+      .tracks .tt b {
+        display: block;
+        font-size: 14.5px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tracks .tt span {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .tracks .dur {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .tracks li.on .tt b {
+        font-weight: 600;
+        color: var(--primary-strong);
+      }
+      .tracks .node {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--accent);
+        grid-column: 3;
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <span class="wordmark">Legato</span>
+      <select class="collection">
+        <option>Vidrio — Trío Ámbar</option>
+        <option>Biblioteca</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="iconbtn" title="Accesibilidad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="5" r="2" />
+          <path d="M4 9h16M12 9v6m0 0-3 6m3-6 3 6" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Idioma">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21" />
+        </svg>
+      </button>
+      <span class="account"><span class="dot"></span>Daniela</span>
+    </header>
+
+    <div class="shell">
+      <main class="stage">
+        <div class="capsules" aria-hidden="true">
+          <span class="bubble"><i></i></span>
+          <span class="bubble b2"><i></i></span>
+          <span class="bubble b3"><i></i></span>
+        </div>
+
+        <div class="disc-zone">
+          <svg class="ring" id="ring" viewBox="0 0 800 800" aria-hidden="true"></svg>
+          <div class="disc">
+            <span class="label"><b>N-04</b><em>SIDE A · 33⅓</em></span>
+          </div>
+        </div>
+
+        <section class="now">
+          <h1>Nocturno en Re</h1>
+          <p class="meta">Trío Ámbar · <b>Vidrio</b> · 2025</p>
+
+          <div class="lyrics">
+            <span class="on">La aguja cae sobre el mar quieto</span>
+            <span>y el cuarto entero aprende a respirar,</span>
+            <span>cada surco guarda un verano entero,</span>
+            <span>la noche gira y no quiere parar.</span>
+          </div>
+
+          <div class="progress">
+            <span class="t">1:24</span>
+            <span class="track"><i></i></span>
+            <span class="t">4:07</span>
+          </div>
+
+          <div class="transport">
+            <button class="tbtn" title="Aleatorio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+              </svg>
+            </button>
+            <button class="tbtn" title="Anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+            </button>
+            <button class="tbtn play" title="Pausa">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+            </button>
+            <button class="tbtn" title="Siguiente">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+            </button>
+            <button class="tbtn" title="Repetir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="extras">
+            <span class="chip">1x</span>
+            <span class="chip">A–B</span>
+            <span class="chip">Timer</span>
+            <span class="vol">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M11 5 6 9H2v6h4l5 4zM15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
+              </svg>
+              <span class="bar"><i></i></span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <nav class="tabs">
+          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a><a class="on" href="#">Cola</a><a href="#">Audio</a>
+        </nav>
+        <div class="panel-head"><b>Cola de reproducción</b><span>7 nodos · doble enlace</span></div>
+        <ul class="tracks">
+          <li class="on">
+            <span class="thumb"></span>
+            <span class="tt"><b>Nocturno en Re</b><span>Trío Ámbar</span></span>
+            <span class="dur">4:07</span>
+            <span class="node">N-04 · SONANDO</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Marea Baja</b><span>Trío Ámbar</span></span>
+            <span class="dur">3:12</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Cinta Magnética</b><span>Lía Pardo</span></span>
+            <span class="dur">5:01</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Río de Noche</b><span>Los Cardos</span></span>
+            <span class="dur">3:44</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Bruma</b><span>Ana Solar</span></span>
+            <span class="dur">3:21</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Piedra y Sal</b><span>Trío Ámbar</span></span>
+            <span class="dur">4:33</span>
+          </li>
+          <li>
+            <span class="thumb"></span>
+            <span class="tt"><b>Verano en Villa</b><span>Mateo Ruiz</span></span>
+            <span class="dur">3:58</span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+
+    <script>
+      const NS = 'http://www.w3.org/2000/svg'
+      const svg = document.getElementById('ring')
+      const c = 400
+      const colors = ['var(--primary)', 'var(--accent)']
+
+      // 12 sectors of radial hairlines (album-tinted)
+      for (let s = 0; s < 12; s++) {
+        for (let i = 0; i < 4; i++) {
+          const angle = ((s * 30 + i * 6 - 90) * Math.PI) / 180
+          const r0 = 356
+          const len = 24 + 44 * Math.abs(Math.sin(s * 1.7 + i * 1.3))
+          const line = document.createElementNS(NS, 'line')
+          line.setAttribute('x1', c + Math.cos(angle) * r0)
+          line.setAttribute('y1', c + Math.sin(angle) * r0)
+          line.setAttribute('x2', c + Math.cos(angle) * (r0 + len))
+          line.setAttribute('y2', c + Math.sin(angle) * (r0 + len))
+          line.style.stroke = colors[(s + i) % 2]
+          line.style.opacity = 0.85
+          line.setAttribute('stroke-width', '2.5')
+          line.setAttribute('stroke-linecap', 'round')
+          svg.appendChild(line)
+        }
+      }
+
+      // node ticks around the rim
+      for (let n = 0; n < 12; n++) {
+        const angle = ((n * 30 - 90) * Math.PI) / 180
+        const tick = document.createElementNS(NS, 'line')
+        tick.setAttribute('x1', c + Math.cos(angle) * 336)
+        tick.setAttribute('y1', c + Math.sin(angle) * 336)
+        tick.setAttribute('x2', c + Math.cos(angle) * 346)
+        tick.setAttribute('y2', c + Math.sin(angle) * 346)
+        tick.style.stroke = 'var(--ink)'
+        tick.style.opacity = n === 0 ? 1 : 0.45
+        tick.setAttribute('stroke-width', n === 0 ? '3' : '1.5')
+        svg.appendChild(tick)
+      }
+
+      // needle at 12 o'clock marking the current node
+      const needle = document.createElementNS(NS, 'line')
+      needle.setAttribute('x1', c)
+      needle.setAttribute('y1', c - 340)
+      needle.setAttribute('x2', c)
+      needle.setAttribute('y2', c - 286)
+      needle.style.stroke = 'var(--primary-strong)'
+      needle.setAttribute('stroke-width', '3')
+      needle.setAttribute('stroke-linecap', 'round')
+      svg.appendChild(needle)
+    </script>
+  </body>
+</html>

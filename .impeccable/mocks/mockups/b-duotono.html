@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Legato — B · Duotono 62</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bone: #f1ede4;
+        --bone-2: #e7e1d3;
+        --ink: #13100c;
+        --navy: #12406f;
+        --orange: #ff5b2e;
+        --muted: #5c5548;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: 'Archivo', system-ui, sans-serif;
+        background: var(--bone);
+        color: var(--ink);
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(rgba(19, 16, 12, 0.07) 1px, transparent 1.4px);
+        background-size: 14px 14px;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* ── Top bar ─────────────────────────────────────────── */
+      .topbar {
+        position: relative;
+        z-index: 5;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 26px;
+        background: var(--ink);
+        color: var(--bone);
+      }
+      .mark {
+        width: 32px;
+        height: 32px;
+        background: var(--orange);
+        display: grid;
+        place-items: center;
+        color: var(--ink);
+      }
+      .mark svg {
+        width: 18px;
+        height: 18px;
+      }
+      .wordmark {
+        font-size: 21px;
+        font-weight: 900;
+        font-stretch: 118%;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .collection {
+        margin-left: 10px;
+        border: 2px solid var(--bone);
+        background: transparent;
+        border-radius: 0;
+        padding: 6px 12px;
+        font-size: 13px;
+        color: var(--bone);
+        font-weight: 600;
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .iconbtn {
+        width: 36px;
+        height: 36px;
+        border: 0;
+        background: transparent;
+        color: var(--bone);
+        display: grid;
+        place-items: center;
+      }
+      .iconbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 2px solid var(--bone);
+        padding: 5px 12px 5px 6px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .account span.dot {
+        width: 22px;
+        height: 22px;
+        background: var(--orange);
+      }
+
+      /* ── Shell ───────────────────────────────────────────── */
+      .shell {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 384px;
+        height: calc(100vh - 64px);
+      }
+      .stage {
+        position: relative;
+        overflow: hidden;
+        padding: 0 34px;
+      }
+      .stage::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 470px;
+        height: 130px;
+        background: var(--navy);
+        z-index: 0;
+      }
+
+      /* Capsule bubbles (reserved slot) */
+      .capsules {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 3;
+        display: flex;
+        gap: 12px;
+      }
+      .bubble {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        padding: 3px;
+        background: conic-gradient(from 210deg, var(--orange), var(--navy), var(--bone), var(--orange));
+      }
+      .bubble i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--bone);
+        border: 2px solid var(--ink);
+      }
+
+      /* ── Disc ────────────────────────────────────────────── */
+      .disc-zone {
+        position: relative;
+        height: 388px;
+        z-index: 1;
+      }
+      .sleeve {
+        position: absolute;
+        left: 50%;
+        top: -330px;
+        transform: translateX(-50%);
+        width: 760px;
+        height: 760px;
+        background: var(--navy);
+        box-shadow: 14px 14px 0 var(--ink);
+        z-index: 0;
+      }
+      .disc {
+        position: absolute;
+        left: 50%;
+        top: -366px;
+        transform: translateX(-50%);
+        width: 672px;
+        height: 672px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 64% 34%, var(--bone) 0 46px, transparent 47px),
+          linear-gradient(180deg, transparent 0 58%, var(--orange) 58% 73%, transparent 73%),
+          repeating-linear-gradient(0deg, transparent 0 30px, rgba(241, 237, 228, 0.3) 30px 31px),
+          var(--navy);
+        box-shadow: 10px 10px 0 rgba(19, 16, 12, 0.9);
+        z-index: 1;
+      }
+      .disc::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: repeating-radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0.28) 0 1px,
+          transparent 1px 6px
+        );
+        mix-blend-mode: multiply;
+      }
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 128px;
+        height: 128px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: var(--orange);
+        display: grid;
+        place-items: center;
+        z-index: 2;
+        box-shadow: inset 0 0 0 4px var(--ink);
+      }
+      .label b {
+        font-family: var(--mono);
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: var(--ink);
+      }
+      .label::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+
+      /* ── Now playing ─────────────────────────────────────── */
+      .now {
+        position: relative;
+        z-index: 2;
+        max-width: 780px;
+        margin-top: 30px;
+      }
+      .now h1 {
+        font-size: 92px;
+        line-height: 0.9;
+        font-weight: 900;
+        letter-spacing: -0.015em;
+        text-transform: uppercase;
+      }
+      .now h1 .wide {
+        font-stretch: 125%;
+        display: block;
+      }
+      .now h1 .narrow {
+        font-stretch: 62%;
+        display: block;
+        color: var(--orange);
+      }
+      .meta {
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .lyrics {
+        margin-top: 26px;
+        max-width: 760px;
+      }
+      .lyrics .on {
+        display: block;
+        font-size: 46px;
+        line-height: 1;
+        font-weight: 900;
+        font-stretch: 112%;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+      }
+      .lyrics .next {
+        display: block;
+        margin-top: 8px;
+        font-size: 24px;
+        font-weight: 700;
+        font-stretch: 90%;
+        color: rgba(19, 16, 12, 0.28);
+        text-transform: uppercase;
+      }
+      .progress {
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 760px;
+      }
+      .progress .t {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .track {
+        height: 12px;
+        flex: 1;
+        background: transparent;
+        border: 2px solid var(--ink);
+        position: relative;
+      }
+      .track i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 36%;
+        background: var(--orange);
+        border-right: 2px solid var(--ink);
+      }
+
+      .transport {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .tbtn {
+        width: 46px;
+        height: 46px;
+        border: 2px solid var(--ink);
+        background: var(--bone);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .tbtn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tbtn.play {
+        width: 64px;
+        height: 64px;
+        background: var(--orange);
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+      .tbtn.play svg {
+        width: 24px;
+        height: 24px;
+      }
+      .extras {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .chip {
+        border: 2px solid var(--ink);
+        background: var(--bone);
+        padding: 6px 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .vol {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
+      }
+      .vol .bar {
+        width: 120px;
+        height: 12px;
+        border: 2px solid var(--ink);
+        position: relative;
+      }
+      .vol .bar i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 64%;
+        background: var(--navy);
+      }
+
+      /* ── Panel ───────────────────────────────────────────── */
+      .panel {
+        position: relative;
+        z-index: 4;
+        background: var(--bone);
+        border-left: 3px solid var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+      .tabs {
+        display: flex;
+        gap: 18px;
+        padding: 16px 20px 12px;
+        border-bottom: 3px solid var(--ink);
+      }
+      .tabs a {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(19, 16, 12, 0.45);
+        text-decoration: none;
+      }
+      .tabs a.on {
+        color: var(--ink);
+        background: var(--orange);
+        padding: 4px 8px;
+        margin: -4px -8px;
+      }
+      .panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 16px 20px 8px;
+      }
+      .panel-head b {
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .panel-head span {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .side {
+        margin: 8px 20px 4px;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        color: var(--navy);
+      }
+      .tracks {
+        list-style: none;
+        padding: 0 20px;
+        display: grid;
+      }
+      .tracks li {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(19, 16, 12, 0.25);
+      }
+      .tracks .num {
+        font-weight: 900;
+        font-stretch: 118%;
+        font-size: 19px;
+      }
+      .tracks li.on {
+        background: var(--navy);
+        color: var(--bone);
+        margin: 0 -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        border-bottom-color: var(--navy);
+      }
+      .tracks .tt {
+        min-width: 0;
+      }
+      .tracks .tt b {
+        display: block;
+        font-size: 14.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tracks .tt span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .tracks li.on .tt span {
+        color: rgba(241, 237, 228, 0.75);
+      }
+      .tracks .dur {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <span class="wordmark">Legato</span>
+      <select class="collection">
+        <option>VIDRIO — TRÍO ÁMBAR</option>
+        <option>BIBLIOTECA</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="iconbtn" title="Accesibilidad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="5" r="2" />
+          <path d="M4 9h16M12 9v6m0 0-3 6m3-6 3 6" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M19.1 4.9 17 7m-10 10-2.1 2.1" />
+        </svg>
+      </button>
+      <button class="iconbtn" title="Idioma">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21M12 3C9.5 5.6 8.2 8.7 8.2 12S9.5 18.4 12 21" />
+        </svg>
+      </button>
+      <span class="account"><span class="dot"></span>Daniela</span>
+    </header>
+
+    <div class="shell">
+      <main class="stage">
+        <div class="capsules" aria-hidden="true">
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+          <span class="bubble"><i></i></span>
+        </div>
+
+        <div class="disc-zone">
+          <div class="sleeve"></div>
+          <div class="disc">
+            <span class="label"><b>N-04</b></span>
+          </div>
+        </div>
+
+        <section class="now">
+          <h1><span class="wide">Nocturno</span><span class="narrow">en Re</span></h1>
+          <p class="meta">LADO A · NODO 04 · 33⅓ RPM · TRÍO ÁMBAR · VIDRIO</p>
+
+          <div class="lyrics">
+            <span class="on">La aguja cae sobre el mar quieto</span>
+            <span class="next">y el cuarto entero aprende a respirar</span>
+          </div>
+
+          <div class="progress">
+            <span class="t">1:24</span>
+            <span class="track"><i></i></span>
+            <span class="t">4:07</span>
+          </div>
+
+          <div class="transport">
+            <button class="tbtn" title="Aleatorio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+              </svg>
+            </button>
+            <button class="tbtn" title="Anterior">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z" /></svg>
+            </button>
+            <button class="tbtn play" title="Pausa">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+            </button>
+            <button class="tbtn" title="Siguiente">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z" /></svg>
+            </button>
+            <button class="tbtn" title="Repetir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="extras">
+            <span class="chip">1x</span>
+            <span class="chip">A–B</span>
+            <span class="chip">Timer</span>
+            <span class="vol">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M11 5 6 9H2v6h4l5 4zM15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" />
+              </svg>
+              <span class="bar"><i></i></span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <nav class="tabs">
+          <a href="#">Biblioteca</a><a href="#">Buscar</a><a href="#">Playlists</a><a class="on" href="#">Cola</a><a href="#">Audio</a>
+        </nav>
+        <div class="panel-head"><b>Cola</b><span>7 nodos · doble enlace</span></div>
+        <div class="side">CARA A · LADO A</div>
+        <ul class="tracks">
+          <li class="on">
+            <span class="num">04</span>
+            <span class="tt"><b>Nocturno en Re</b><span>Trío Ámbar</span></span>
+            <span class="dur">4:07</span>
+          </li>
+          <li>
+            <span class="num">05</span>
+            <span class="tt"><b>Marea Baja</b><span>Trío Ámbar</span></span>
+            <span class="dur">3:12</span>
+          </li>
+          <li>
+            <span class="num">06</span>
+            <span class="tt"><b>Cinta Magnética</b><span>Lía Pardo</span></span>
+            <span class="dur">5:01</span>
+          </li>
+          <li>
+            <span class="num">07</span>
+            <span class="tt"><b>Río de Noche</b><span>Los Cardos</span></span>
+            <span class="dur">3:44</span>
+          </li>
+        </ul>
+        <div class="side">CARA B · LADO B</div>
+        <ul class="tracks">
+          <li>
+            <span class="num">08</span>
+            <span class="tt"><b>Bruma</b><span>Ana Solar</span></span>
+            <span class="dur">3:21</span>
+          </li>
+          <li>
+            <span class="num">09</span>
+            <span class="tt"><b>Piedra y Sal</b><span>Trío Ámbar</span></span>
+            <span class="dur">4:33</span>
+          </li>
+          <li>
+            <span class="num">10</span>
+            <span class="tt"><b>Verano en Villa</b><span>Mateo Ruiz</span></span>
+            <span class="dur">3:58</span>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </body>
+</html>

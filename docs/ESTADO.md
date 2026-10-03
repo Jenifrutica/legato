@@ -42,6 +42,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 45 | Ondas gráficas siempre vivas (sintéticas sin datos, reales al reproducir) | Cerrado |
 | 46 | Diagnóstico de Spotify (errores visibles + probar conexión) | Cerrado |
 | 47 | Agregar a playlist desde la búsqueda + crear playlist + drag & drop | Cerrado |
+| 48 | Rediseño completo de interfaz — dirección **Duotono 62** (plan en `docs/REDISENO.md`) | En curso (F0) |
 
 ## Estado técnico
 
@@ -71,4 +72,4 @@ Si tras agregar archivos nuevos la interfaz queda en blanco con un error de mód
 
 ## ⚠️ Pendiente #1: REDISEÑO COMPLETO DE LA INTERFAZ
 
-El usuario considera la interfaz actual **fea**. Todo lo funcional está estable (154 unit + 4 E2E); la capa visual debe rehacerse: composición del héroe, vinilo, ondas, paleta (la violeta/teal no convence), jerarquía de botones, barras y responsive. Ver el detalle y el plan recomendado al final de `docs/CONTEXTO-COMPLETO.md`. Usar el flujo de dirección de **impeccable** (elegir dirección con el usuario ANTES de construir) y las skills de diseño instaladas.
+**Dirección elegida:** **Duotono 62** — edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Plan por fases, contrato de dirección y validación en **`docs/REDISENO.md`**. Artefactos: comp aprobado y sidecar en `.impeccable/mocks/decision/b-duotono.png(.json)`, contrato en `.impeccable/surfaces/src-app-app-tsx.md`, `buildPath: comp`. Reglas: nada oscuro por defecto (oscuro opcional), la portada completa en el disco (círculo completo, nunca `clip-path`), UI teñida por el álbum, ondas de líneas planas saliendo del disco, una sola barra por vista, panel de músicos slide-over, letras diseñadas ahora (conexión LRCLIB/.lrc después) y Cápsula nostálgica con su carril reservado.
