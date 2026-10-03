@@ -77,6 +77,9 @@ test('crear playlist desde Agregar a… cuando aún no hay ninguna', async ({ pa
 
   await page.getByLabel('Agregar A a una playlist').click()
   await page.getByRole('menuitem', { name: /Nueva playlist/ }).click()
+  const nameInput = page.getByPlaceholder('Nombre de la playlist')
+  await nameInput.fill('Mi lista')
+  await nameInput.press('Enter')
   await expect(page.getByText('Agregada a la playlist.')).toBeVisible()
 
   await page.getByRole('tab', { name: 'Playlists' }).click()

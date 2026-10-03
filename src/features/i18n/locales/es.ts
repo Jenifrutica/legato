@@ -181,6 +181,7 @@ export const es = {
     title: 'Playlists',
     newPlaylist: 'Nueva playlist',
     defaultName: 'Mi lista',
+    create: 'Crear',
     dropHint: 'Suelta aquí para agregar a la playlist',
     namePlaceholder: 'Nombre de la playlist',
     back: 'Volver a la biblioteca',

@@ -68,6 +68,14 @@ export function SearchTab() {
     setStatus('idle')
   }
 
+  function spotifyUrisFrom(track: SourceTrack): string[] {
+    const clicked = `spotify:track:${track.id}`
+    const rest = results
+      .filter((item) => item.sourceId === 'spotify' && item.id !== track.id)
+      .map((item) => `spotify:track:${item.id}`)
+    return [clicked, ...rest]
+  }
+
   function play(track: SourceTrack) {
     if (track.sourceId === 'spotify') {
       if (!isSpotifyConnected()) {
@@ -75,11 +83,7 @@ export function SearchTab() {
         return
       }
 
-      void playSpotifyUris(
-        results
-          .filter((item) => item.sourceId === 'spotify')
-          .map((item) => `spotify:track:${item.id}`),
-      )
+      void playSpotifyUris(spotifyUrisFrom(track))
       return
     }
 
@@ -273,13 +277,7 @@ export function SearchTab() {
                 aria-label={`${t('search.playFull')} ${track.title}`}
                 className="grid size-8 shrink-0 place-items-center  bg-[#1db954] text-on-primary transition-opacity hover:opacity-90 disabled:opacity-40"
                 disabled={status !== 'idle'}
-                onClick={() =>
-                  void playSpotifyUris(
-                    results
-                      .filter((item) => item.sourceId === 'spotify')
-                      .map((item) => `spotify:track:${item.id}`),
-                  )
-                }
+                onClick={() => void playSpotifyUris(spotifyUrisFrom(track))}
                 type="button"
               >
                 <DiscMark className="size-4" />

@@ -182,6 +182,7 @@ export const en: typeof es = {
     title: 'Playlists',
     newPlaylist: 'New playlist',
     defaultName: 'My list',
+    create: 'Create',
     dropHint: 'Drop here to add to the playlist',
     namePlaceholder: 'Playlist name',
     back: 'Back to library',

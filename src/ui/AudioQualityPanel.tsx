@@ -38,6 +38,8 @@ export function AudioQualityPanel() {
   const setBass = useAudioFxStore((state) => state.setBass)
   const setAmbient = useAudioFxStore((state) => state.setAmbient)
   const setAmbientVolume = useAudioFxStore((state) => state.setAmbientVolume)
+  const crossfadeSeconds = usePlayerStore((state) => state.crossfadeSeconds)
+  const setCrossfade = usePlayerStore((state) => state.setCrossfade)
   const track = useLibraryStore((state) =>
     currentTrack === null
       ? null
@@ -145,6 +147,23 @@ export function AudioQualityPanel() {
           </select>
         </div>
       )}
+
+      <div className="mt-4">
+        <label className="text-xs font-medium text-ink-muted" htmlFor="audio-crossfade">
+          {t('practice.crossfade')}{' '}
+          <span className="font-mono text-ink">{crossfadeSeconds.toFixed(1)}s</span>
+        </label>
+        <input
+          className="mt-1 h-3 max-w-52 w-full cursor-pointer"
+          id="audio-crossfade"
+          max={12}
+          min={0}
+          onChange={(event) => setCrossfade(Number(event.target.value))}
+          step={0.5}
+          type="range"
+          value={crossfadeSeconds}
+        />
+      </div>
 
       <div className="mt-4">
         <label className="text-xs font-medium text-ink-muted" htmlFor="audio-bass">

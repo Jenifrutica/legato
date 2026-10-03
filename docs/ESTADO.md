@@ -58,6 +58,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 61 | **Cola de Spotify arreglada**: la API exige dispositivo; ahora se envía el `device_id` del SDK, y si no existe se inicializa el reproductor y se reintenta; mensajes específicos (Premium, sesión, sin dispositivo) | Cerrada: 183 unit + 6 E2E + build |
 | 62 | **La cola es «Lista» (DLL local)**: Spotify solo reproduce la canción (sin cola de Spotify); la pestaña se renombra a Lista con leyenda «doble enlace», y solo se alimenta de tus estructuras (biblioteca guardada, Audius/Jamendo, arrastres) | Cerrada: 183 unit + 6 E2E, axe 0, detector 0 |
 | 63 | **Referencias de Spotify en tus estructuras**: los botones «＋ playlist» y «Lista» aparecen también en resultados de Spotify; la pista se guarda como referencia externa (metadatos + URI, sin audio) en biblioteca/playlists/Lista, y al sonar la reproduce el SDK con la Lista mandando el orden y avanzando al terminar | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
+| 64 | **Ajustes finos**: «Nueva playlist» abre una ventanita para escribir el nombre (no auto-crea), la canción pulsada en Spotify suena primero (no la primera de la búsqueda), crossfade visible en el panel de Audio (0–12 s) y ondas más grandes (líneas de hasta 9 px, longitud ×2.2, zona más alta) | Cerrada: 187 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

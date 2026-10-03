@@ -105,7 +105,7 @@ export function WaveRing({
         bass = 0.4 + 0.4 * Math.sin(seconds * 2.6)
       }
       const beat = Math.pow(Math.max(0, Math.sin(seconds * 3.2)), 6)
-      const pulse = Math.min(1.9, 1 + bass * 0.8 + beat * 1)
+      const pulse = Math.min(2.2, 1 + bass * 0.9 + beat * 1.1)
 
       for (let index = 0; index < segments; index++) {
         const angle = (index / segments) * Math.PI * 2 - Math.PI / 2
@@ -118,7 +118,7 @@ export function WaveRing({
             ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.22 * beat
             : (levels[Math.floor((index / segments) * levels.length)] ?? 0) / 255
         const intensity = Math.max(0.05, Math.min(1, raw))
-        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.6
+        const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.55
         const length =
           (6 + intensity * size * (activeRef.current ? 0.09 : 0.03) * pulse) * downScale
         const x0 = center + Math.cos(angle) * base
@@ -128,7 +128,7 @@ export function WaveRing({
 
         context.globalAlpha = 0.95
         context.strokeStyle = index % 5 === 0 ? inks.accent : inks.ink
-        context.lineWidth = index % 10 === 0 ? 7 : index % 3 === 0 ? 4 : 2
+        context.lineWidth = index % 10 === 0 ? 9 : index % 3 === 0 ? 5 : 2.4
         context.lineCap = 'butt'
         context.beginPath()
         context.moveTo(x0, y0)
