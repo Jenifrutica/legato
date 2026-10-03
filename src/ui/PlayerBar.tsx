@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
-import { getAnalyser, usePlayerStore } from '../player'
+import { useSpotifyStore } from '../features/sources'
+import { usePlayerStore } from '../player'
 import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
-import { WaveBars } from './WaveBars'
 import {
   DiscMark,
   FlagIcon,
@@ -34,12 +34,22 @@ export function PlayerBar() {
   const seek = usePlayerStore((state) => state.seek)
   const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
   const cycleLoopMode = usePlayerStore((state) => state.cycleLoopMode)
+  const spotifyPlayback = useSpotifyStore((state) => state.playback)
+  const spotifyToggle = useSpotifyStore((state) => state.toggle)
+  const spotifyNext = useSpotifyStore((state) => state.next)
+  const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
 
-  const isPlaying = status === 'playing'
-  const hasTrack = currentTrack !== null
-  const maxProgress = duration > 0 ? duration : 1
+  const spotifyActive = spotifyPlayback !== null
+  const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
+  const hasTrack = spotifyActive || currentTrack !== null
+  const displayTitle = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? null)
+  const displayArtist = spotifyActive ? spotifyPlayback.artist : (currentTrack?.artist ?? null)
+  const displayArtwork = spotifyActive ? spotifyPlayback.artworkUrl : currentTrack?.artworkUrl
+  const progressTime = spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime
+  const progressDuration = spotifyActive ? spotifyPlayback.durationMs / 1000 : duration
+  const maxProgress = progressDuration > 0 ? progressDuration : 1
   const loopLabel =
     loopMode === 'none'
       ? t('player.repeatOff')
@@ -54,11 +64,11 @@ export function PlayerBar() {
     >
       <div className="flex items-center gap-2 px-3 pb-1 pt-2">
         <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-ink text-bg">
-          {currentTrack?.artworkUrl !== null && currentTrack?.artworkUrl !== undefined ? (
+          {displayArtwork !== null && displayArtwork !== undefined ? (
             <img
-              alt={t('vinyl.coverAlt', { title: currentTrack.title })}
+              alt={t('vinyl.coverAlt', { title: displayTitle ?? '' })}
               className="size-full object-cover"
-              src={currentTrack.artworkUrl}
+              src={displayArtwork}
             />
           ) : (
             <DiscMark className="size-5" />
@@ -66,11 +76,9 @@ export function PlayerBar() {
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">
-            {currentTrack?.title ?? t('player.noPlayback')}
-          </p>
+          <p className="truncate text-sm font-semibold">{displayTitle ?? t('player.noPlayback')}</p>
           <p className="truncate text-xs text-ink-muted">
-            {currentTrack?.artist ?? t('player.importSong')}
+            {displayArtist ?? t('player.importSong')}
           </p>
         </div>
 
@@ -112,20 +120,38 @@ export function PlayerBar() {
           disabled={!hasTrack}
           icon={<SkipBackIcon className="size-5" />}
           label={t('player.previous')}
-          onClick={previous}
+          onClick={() => {
+            if (spotifyActive) {
+              void spotifyPrevious()
+            } else {
+              previous()
+            }
+          }}
         />
         <TransportButton
           disabled={!hasTrack}
           icon={isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
           label={isPlaying ? t('player.pause') : t('player.play')}
-          onClick={() => void toggle()}
+          onClick={() => {
+            if (spotifyActive) {
+              void spotifyToggle()
+            } else {
+              void toggle()
+            }
+          }}
           primary
         />
         <TransportButton
           disabled={!hasTrack}
           icon={<SkipForwardIcon className="size-5" />}
           label={t('player.next')}
-          onClick={next}
+          onClick={() => {
+            if (spotifyActive) {
+              void spotifyNext()
+            } else {
+              next()
+            }
+          }}
         />
         <TransportButton
           disabled={!hasTrack}
@@ -147,26 +173,29 @@ export function PlayerBar() {
 
       <div className="flex items-center gap-2 px-3 pb-2">
         <span className="w-9 text-right text-[0.625rem] tabular-nums text-ink-muted">
-          {formatDuration(currentTime)}
+          {formatDuration(progressTime)}
         </span>
         <input
           aria-label={t('player.progress')}
-          className="h-1 flex-1 cursor-pointer accent-primary disabled:cursor-not-allowed"
+          className="h-1 min-w-0 flex-1 cursor-pointer disabled:cursor-not-allowed"
           disabled={!hasTrack}
           max={maxProgress}
           min={0}
-          onChange={(event) => seek(Number(event.target.value))}
+          onChange={(event) => {
+            const seconds = Number(event.target.value)
+            if (spotifyActive) {
+              void useSpotifyStore.getState().seek(seconds * 1000)
+            } else {
+              seek(seconds)
+            }
+          }}
           step={0.5}
           type="range"
-          value={Math.min(currentTime, maxProgress)}
+          value={Math.min(progressTime, maxProgress)}
         />
         <span className="w-9 text-[0.625rem] tabular-nums text-ink-muted">
-          {formatDuration(duration)}
+          {formatDuration(progressDuration)}
         </span>
-      </div>
-
-      <div className="hidden px-3 pb-1 sm:block">
-        <WaveBars active={isPlaying} analyser={getAnalyser()} />
       </div>
     </section>
   )

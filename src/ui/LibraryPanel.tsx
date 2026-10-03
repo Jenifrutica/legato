@@ -462,7 +462,15 @@ export function LibraryPanel() {
           ) : (
             <ul className="divide-y divide-border">
               {filtered.map((track, index) => (
-                <li className="flex items-center gap-3 px-5 py-3" key={track.id}>
+                <li
+                  className="flex items-center gap-3 px-5 py-3"
+                  draggable
+                  key={track.id}
+                  onDragStart={(event) => {
+                    event.dataTransfer.setData('application/x-legato-library-track', track.id)
+                    event.dataTransfer.effectAllowed = 'copy'
+                  }}
+                >
                   <button
                     aria-label={t('library.playTrack', { title: track.title })}
                     className="rounded-full p-2 text-ink-muted transition-colors hover:text-primary-strong"

@@ -267,3 +267,12 @@ Cambios aplicados después del primer handoff (commit siguiente a `dc40927`):
 - `GET /me` ya no devuelve `product` (cambio feb 2026); "Probar conexión" muestra solo el nombre.
 - Vinilo: ahora **~3/4 visible** (lg: `-left-[11rem] w-[44rem]`, xl: `-left-[12rem] w-[48rem]`), contenido desplazado a `ml-[34rem]/ml-[37rem]`.
 - Ondas: reaccionan a los **bajos** (pulso global calculado con los primeros bins) y al espectro; alrededor del disco visible; sintéticas cuando no hay datos del analizador.
+
+### Correcciones de UI/UX (sesión 2, tanda 3)
+
+- **Sin superposiciones**: el héroe se apila debajo de `xl`; el sangrado del vinilo solo aplica en `xl+`; el contenido nunca invade el panel derecho (`min-w-0`, `overflow-x-hidden`, panel con `z-20 bg-bg`).
+- **Disco sin cortes**: tamaño acotado por altura (`xl:w-[min(44rem,70dvh)]`) y sin recorte vertical.
+- **Ondas solo en el disco**: se eliminaron las ondas de la barra (WaveBars ya no se usa); el anillo rodea el disco visible y reacciona a los bajos + espectro (sintético sin datos).
+- **Tema por portada también para pistas online**: `useAlbumTheme` ahora usa `currentTrack.artworkUrl` (antes buscaba en la biblioteca y Spotify/Audius/Jamendo no tenían tema).
+- **Controles conscientes de Spotify**: con playback del SDK activo, play/pausa, anterior/siguiente, progreso y seek en héroe y barra móvil controlan Spotify.
+- **Agregar a playlists / listas dobles**: filas de la biblioteca arrastrables a las playlists; resultados de búsqueda con "Agregar a…", "＋ Nueva playlist…" y drag & drop. Todo pasa por `PlaylistCollection` (append/moveNode sobre la DLL). El modo Estructura visualiza los nodos.

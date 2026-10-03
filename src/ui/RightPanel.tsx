@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLibraryStore } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
 import { importSourceTrackToPlaylist, SearchTab } from '../features/sources'
 import type { SourceTrack } from '../features/sources'
@@ -105,24 +106,42 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                 }`}
                 key={playlist.id}
                 onDragOver={(event) => {
-                  if (event.dataTransfer.types.includes('application/x-legato-track')) {
+                  const types = event.dataTransfer.types
+                  if (
+                    types.includes('application/x-legato-track') ||
+                    types.includes('application/x-legato-library-track')
+                  ) {
                     event.preventDefault()
                     event.dataTransfer.dropEffect = 'copy'
                   }
                 }}
                 onDrop={(event) => {
-                  const raw = event.dataTransfer.getData('application/x-legato-track')
-                  if (raw === '') {
+                  const sourceRaw = event.dataTransfer.getData('application/x-legato-track')
+                  if (sourceRaw !== '') {
+                    event.preventDefault()
+                    try {
+                      const track = JSON.parse(sourceRaw) as SourceTrack
+                      void importSourceTrackToPlaylist(track, playlist.id).then((added) => {
+                        setDropMessage(added ? t('search.addedToPlaylist') : t('search.cannotSave'))
+                      })
+                    } catch {
+                      setDropMessage(t('search.saveError'))
+                    }
                     return
                   }
-                  event.preventDefault()
-                  try {
-                    const track = JSON.parse(raw) as SourceTrack
-                    void importSourceTrackToPlaylist(track, playlist.id).then((added) => {
-                      setDropMessage(added ? t('search.addedToPlaylist') : t('search.cannotSave'))
-                    })
-                  } catch {
-                    setDropMessage(t('search.saveError'))
+
+                  const libraryId = event.dataTransfer.getData('application/x-legato-library-track')
+                  if (libraryId !== '') {
+                    event.preventDefault()
+                    const track = useLibraryStore
+                      .getState()
+                      .tracks.find((item) => item.id === libraryId)
+                    if (track !== undefined) {
+                      const added = usePlaylistsStore
+                        .getState()
+                        .addTrackToPlaylist(playlist.id, track)
+                      setDropMessage(added ? t('search.addedToPlaylist') : t('search.duplicate'))
+                    }
                   }
                 }}
               >

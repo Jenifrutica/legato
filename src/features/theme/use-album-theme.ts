@@ -1,16 +1,10 @@
 import { useEffect } from 'react'
-import { useLibraryStore } from '../library'
 import { usePlayerStore } from '../../player'
 import { applyAlbumTheme, clearAlbumTheme, deriveTheme } from './album-theme'
 import { extractPaletteFromUrl } from './palette'
 
 export function useAlbumTheme(): void {
-  const currentTrack = usePlayerStore((state) => state.currentTrack)
-  const artworkUrl = useLibraryStore((state) =>
-    currentTrack === null
-      ? null
-      : (state.tracks.find((track) => track.id === currentTrack.id)?.artworkUrl ?? null),
-  )
+  const artworkUrl = usePlayerStore((state) => state.currentTrack?.artworkUrl ?? null)
 
   useEffect(() => {
     if (artworkUrl === null) {
