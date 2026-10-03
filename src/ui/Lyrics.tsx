@@ -1,16 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { useSpotifyStore } from '../features/sources'
+import { activeLineIndex, type LyricLine } from '../features/lyrics'
 import { usePlayerStore } from '../player'
 
-export type LyricLine = {
-  time: number
-  text: string
-}
+export type { LyricLine }
 
 /**
- * Letra demostrativa para validar el diseño (F7). La conexión real
- * (LRCLIB para streaming y etiquetas/.lrc para archivos) llega en F12.
- * Solo se activa con la bandera local `legato.lyrics.demo`, nunca por defecto.
+ * Letra de demostración para validar el diseño sin red. Se activa solo con la
+ * bandera local `legato.lyrics.demo`, nunca por defecto.
  */
 export const DEMO_LYRICS: LyricLine[] = [
   { time: 0, text: 'La aguja cae sobre el mar quieto' },
@@ -32,19 +29,13 @@ function demoEnabled(): boolean {
   }
 }
 
-export function activeLineIndex(lines: LyricLine[], time: number): number {
-  let active = -1
-  for (let index = 0; index < lines.length; index++) {
-    if (lines[index].time <= time) {
-      active = index
-    } else {
-      break
-    }
-  }
-  return active
-}
-
-export function Lyrics({ lines = [] }: { lines?: LyricLine[] }) {
+export function Lyrics({
+  lines = [],
+  source = null,
+}: {
+  lines?: LyricLine[]
+  source?: 'lrclib' | null
+}) {
   const { t } = useTranslation()
   const currentTime = usePlayerStore((state) => state.currentTime)
   const status = usePlayerStore((state) => state.status)
@@ -71,11 +62,23 @@ export function Lyrics({ lines = [] }: { lines?: LyricLine[] }) {
       <p className="relative inline-block bg-accent px-4 py-2 font-display text-[clamp(1.5rem,3.2vw,2.5rem)] leading-[1.05] font-black text-on-accent uppercase">
         {current.text}
       </p>
-      {next !== null && (
-        <p className="relative mt-3 font-serif text-base text-ink-muted sm:text-lg" lang="es">
-          {next.text}
-        </p>
-      )}
+      <div className="relative mt-3 flex flex-wrap items-baseline gap-x-4">
+        {next !== null && (
+          <p className="font-serif text-base text-ink-muted sm:text-lg" lang="es">
+            {next.text}
+          </p>
+        )}
+        {source === 'lrclib' && (
+          <a
+            className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase underline underline-offset-2 hover:text-ink"
+            href="https://lrclib.net"
+            rel="noreferrer noopener"
+            target="_blank"
+          >
+            {t('lyrics.source')}
+          </a>
+        )}
+      </div>
     </div>
   )
 }

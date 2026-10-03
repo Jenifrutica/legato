@@ -37,7 +37,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Terceros',
           paragraphs: [
-            'AWS como proveedor de hosting; Google para inicio de sesión y ACRCloud para reconocimiento por micrófono, solo si activas esas funciones. No vendemos ni compartimos tus datos con fines comerciales.',
+            'AWS como proveedor de hosting; Google para inicio de sesión, ACRCloud para reconocimiento por micrófono y LRCLIB para buscar letras sincronizadas enviando el título, artista y álbum de la canción en reproducción (lrclib.net). No vendemos ni compartimos tus datos con fines comerciales.',
           ],
         },
         {
@@ -193,7 +193,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Third parties',
           paragraphs: [
-            'AWS as hosting provider; Google for sign-in and ACRCloud for microphone recognition, only if you enable those features. We never sell your data.',
+            'AWS as hosting provider; Google for sign-in, ACRCloud for microphone recognition and LRCLIB to look up synced lyrics by sending the title, artist and album of the playing song (lrclib.net). We never sell your data.',
           ],
         },
         {
@@ -347,7 +347,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Terceiros',
           paragraphs: [
-            'AWS como hospedagem; Google para login e ACRCloud para reconhecimento por microfone, apenas se ativar essas funções. Nunca vendemos seus dados.',
+            'AWS como hospedagem; Google para login, ACRCloud para reconhecimento por microfone e LRCLIB para buscar letras sincronizadas enviando título, artista e álbum da música em reprodução (lrclib.net). Nunca vendemos seus dados.',
           ],
         },
         {

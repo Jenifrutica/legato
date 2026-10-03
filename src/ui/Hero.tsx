@@ -7,6 +7,7 @@ import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
 import { VinylVisual } from './VinylVisual'
+import { useLyrics } from '../features/lyrics'
 import { Lyrics, useDemoLyrics } from './Lyrics'
 import { NostalgiaCapsule } from './NostalgiaCapsule'
 import {
@@ -48,11 +49,30 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
-  const lyrics = useDemoLyrics()
+  const demoLyrics = useDemoLyrics()
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const hasPlayable = spotifyActive || currentTrack !== null
+
+  const lyricsQuery = spotifyActive
+    ? {
+        title: spotifyPlayback.title,
+        artist: spotifyPlayback.artist,
+        album: null,
+        durationSeconds: spotifyPlayback.durationMs / 1000,
+      }
+    : currentTrack === null
+      ? null
+      : {
+          title: currentTrack.title,
+          artist: currentTrack.artist,
+          album: currentTrack.album,
+          durationSeconds: currentTrack.durationSeconds,
+        }
+  const lyricsState = useLyrics(lyricsQuery)
+  const lyricsLines = demoLyrics.length > 0 ? demoLyrics : lyricsState.lines
+  const lyricsSource = demoLyrics.length > 0 ? null : lyricsState.source
   const displayTitle = spotifyActive
     ? spotifyPlayback.title
     : (currentTrack?.title ?? t('vinyl.idleTitle'))
@@ -131,7 +151,7 @@ export function Hero() {
             </p>
           )}
 
-          <Lyrics lines={lyrics} />
+          <Lyrics lines={lyricsLines} source={lyricsSource} />
 
           <div className="mt-8 hidden items-center gap-3 lg:flex">
             <span className="w-10 text-right font-mono text-[0.6875rem] text-ink-muted">

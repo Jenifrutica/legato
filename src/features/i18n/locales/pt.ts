@@ -226,6 +226,7 @@ export const pt: typeof es = {
   },
   lyrics: {
     region: 'Letra da música',
+    source: 'Letra via LRCLIB',
   },
   structure: {
     region: 'Estrutura da lista duplamente encadeada',

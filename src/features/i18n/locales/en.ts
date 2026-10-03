@@ -227,6 +227,7 @@ export const en: typeof es = {
   },
   lyrics: {
     region: 'Song lyrics',
+    source: 'Lyrics via LRCLIB',
   },
   structure: {
     region: 'Doubly linked list structure',

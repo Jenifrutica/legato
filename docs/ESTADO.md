@@ -44,6 +44,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 47 | Agregar a playlist desde la búsqueda + crear playlist + drag & drop | Cerrado |
 | 48 | Rediseño completo de interfaz — dirección **Duotono 62** (plan en `docs/REDISENO.md`) | Rediseño cerrado (F0–F10): 154 unit + 4 E2E, axe 0, detector 0. F12 letras reales pendiente |
 | 49 | **Cápsula nostálgica** (nueva funcionalidad): carrusel diario tipo historias con fragmentos, etiquetas de contexto y favoritos | Cerrada: 161 unit + 4 E2E, axe 0, detector 0 |
+| 50 | **Letras reales**: parser LRC propio + LRCLIB (siempre activo con aviso legal en privacidad), atribución visible y estados de carga/vacío | Cerrada: 172 unit + 4 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 

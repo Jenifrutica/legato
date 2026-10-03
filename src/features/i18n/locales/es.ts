@@ -226,6 +226,7 @@ export const es = {
   },
   lyrics: {
     region: 'Letra de la canción',
+    source: 'Letra vía LRCLIB',
   },
   structure: {
     region: 'Estructura de la lista doble',
