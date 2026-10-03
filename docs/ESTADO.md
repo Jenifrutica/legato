@@ -67,6 +67,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 70 | **Import de playlists de Spotify arreglado**: Spotify renombró `track`/`tracks` a `item`/`items`; se leen ambas formas, se cae de `/tracks` a `/items` en 400/404 y el mapeo es defensivo (álbum, artistas, URL externa) | Cerrada: 190 unit (3 tests nuevos del parser) |
 | 71 | **Ondas sincronizadas al golpe**: detector por **flujo espectral** de la banda del bombo con umbral adaptativo y periodo refractario (180 ms), envolvente de vida media 130 ms medida en milisegundos y el golpe dominando largo/opacidad/pop. Medido con bombo a 500 ms: picos cada 497 ms y 57% de variación | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
 | 72 | **Import de playlists resistente**: límites descendentes (50→20→10) como en la búsqueda, reintento en 429, paginación hasta 200 playlists y **mensaje de error exacto** con pistas para 401/403 | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
+| 73 | **Cierre y handoff de la sesión 4**: documentación total (`docs/PENDIENTES.md`), prompt de próxima sesión en modo plan, limpieza de tokens de Spotify al fallar el refresh y botón «Conectar Spotify de nuevo» en el panel de import | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
 
 ## Estado técnico
 
@@ -82,7 +83,7 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 
 ## Próximo paso
 
-Probar en local con `bun run dev` (abrir `http://127.0.0.1:5173` si se va a conectar Spotify). Después: nueva funcionalidad pendiente por definir, pulido final y Día 4 (deploy S3 + CloudFront).
+Leer **`docs/PENDIENTES.md`** y **`docs/PROMPT-NUEVA-SESION.md`**. La próxima sesión arranca en **modo plan** y debe proponer plan para: (1) configurar/verificar el import de playlists de Spotify, (2) afinar las ondas al ritmo, (3) módulo para músicos, (4) login obligatorio con base de datos, (5) refinar + Día 4 (deploy y rotar la access key). Entorno: sin tokens de OpenAI y sin sesión de Spotify (verificar en el navegador de la autora).
 
 ## Handoff
 

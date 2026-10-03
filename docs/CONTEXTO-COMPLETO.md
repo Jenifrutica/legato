@@ -2,10 +2,11 @@
 
 > **Lee este documento completo antes de tocar nada.** Está escrito para que una sesión nueva (o un agente distinto) continúe el proyecto exactamente donde quedó, sin releer toda la conversación anterior.
 
-- **Última actualización:** 3 de octubre de 2026, sesión de tarde.
-- **Último commit:** `a5cebc0` (docs) sobre `e85ffa3` (Spotify SDK). Rama `main`, árbol limpio, todo pusheado.
-- **Tests:** 154 unitarios + 4 E2E en verde. typecheck/lint/build en verde.
-- **Servidor de desarrollo:** corriendo en `http://127.0.0.1:5173` (importante: `127.0.0.1`, no `localhost`, por Spotify).
+- **Última actualización:** 4 de octubre de 2026, sesión 4 (cierre).
+- **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
+- **Tests:** 191 unitarios + 6 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Pendientes detallados:** `docs/PENDIENTES.md` (import de playlists, ondas al ritmo, módulo de músicos, login obligatorio con base de datos, deploy).
+- **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
 ---
 
@@ -392,3 +393,35 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **F12 Letras reales cerrada** (issue #50): parser LRC propio + LRCLIB (`/api/get` con respaldo de búsqueda), hook con caché/timeout, atribución «Letra vía LRCLIB» y política de privacidad actualizada en ES/EN/PT (LRCLIB siempre activo por decisión de la autora). La bandera `legato.lyrics.demo` sigue disponible para previsualizar el diseño sin red.
 - Estado global tras la sesión: **172 unit + 4 E2E**, typecheck/lint/build, axe 0 y `impeccable detect` en `[]`.
 - Commits de la sesión: `032a310` (tema), `40ca44b` (UI), `acc2e8e` (detector), `b1f8960` (cierre del rediseño + DESIGN.md) y cierres de cápsula y letras.
+
+
+---
+
+## Sesión 4 (4 oct 2026) — Lista, Spotify en tus estructuras, PiP, audio e import de playlists
+
+### Lo implementado (todo con tests y commits en `main`)
+
+- **Lista (cola) con punteros:** `enqueue` (`append`), `playNext` (`insertAt` tras el nodo actual), quitar, vaciar y reordenar (`moveNode`); la pestaña se llama **Lista** y muestra «doble enlace»; menú «＋» por fila (biblioteca/playlists) y en la Cápsula; drop sobre la pestaña Lista; E2E propio que verifica además que reordenar no cambia lo que suena (fix #12).
+- **Referencias externas de Spotify:** los resultados de búsqueda guardan la pista como referencia (`external: true`, `sourceUrl = spotify:track:...`, sin audio; `externalUrl` persistido en IndexedDB) y entran a biblioteca, playlists y Lista. El controlador delega su reproducción al SDK (`setExternalPlayer`), la Lista manda next/prev y **avanza sola al terminar**; las filas marcan `SPOTIFY`. Spotify aporta solo la canción (se eliminó la cola de Spotify).
+- **Playlists DnD:** «Agregar a…» siempre visible (crea al vuelo), zonas resaltadas, drop sobre la pestaña Playlists y dentro de la playlist abierta.
+- **Mini reproductor:** flotante (z-60, por encima de todas las pantallas), arrastrable con posición persistida; botón para **sacarlo del navegador con Document Picture-in-Picture** (ventana siempre encima) con estilos clonados y controles sincronizados.
+- **Audio:** bajos con **lowshelf 0–12 dB** y **4 camas de ambiente generadas** (lluvia, vinilo, café, viento); **crossfade visible** en la pestaña Audio (0–12 s, secuencial); avance automático reanuda el `AudioContext` (antes podía avanzar en silencio); slider de progreso con estado de arrastre (sin trabas).
+- **Video mp4:** `mediaType`, motor local con `<video>`, visor «Ver/Ocultar video» sincronizado (audio por el motor).
+- **Interfaz:** rótulo «Lado A · 33⅓» eliminado; selector de colección propio (adiós al «alo» del select nativo); ventanita para nombrar playlists; dropdown de colección; toggles de letra (héroe + panel de músicos) con tira de cola cuando no hay letra; controles anclados abajo.
+- **Ondas:** líneas finas y largas con curva envolvente de puntas, espacio sobre el campo de tinta y tinta fuera; reposo quieto, al sonar late. Detector de golpes por **flujo espectral** de la banda del bombo (umbral adaptativo + refractario 180 ms + envolvente 130 ms). Medición con bombo de 500 ms: picos cada **497 ms**. Spotify/streaming: pulso sintético 120 BPM mientras suena (el SDK no se puede analizar por DRM).
+- **Import de playlists de Spotify:** pestaña Playlists → «Importar de Spotify» (lista de la cuenta, tope 100 pistas, referencias externas). Soporta el renombre de campos `track`→`item`, `tracks`→`items`, fallback `/tracks`→`/items`, límites 50/20/10, reintento 429 y paginación hasta 200. **Pendiente de verificar con la cuenta real** (ver `docs/PENDIENTES.md` §1).
+- **Cápsula nostálgica** (sesión previa) y **letras reales** (LRCLIB) siguen en verde.
+
+### Pendientes (detalle y criterios en `docs/PENDIENTES.md`)
+
+1. Configurar/verificar la importación de playlists de Spotify (diagnóstico con la autora).
+2. Afinar las ondas al ritmo con música real (y evaluar control de sensibilidad/BPM).
+3. Módulo para músicos: metrónomo, BPM/tonalidad, ChordPro, transposición, LRC local, pitch shift, setlists, notas; stems (Demucs) post-entrega.
+4. **Login obligatorio** con usuarios en la base de datos (probable auth local en IndexedDB con PBKDF2; Cognito bloqueado por la SCP).
+5. Refinar y desplegar (Día 4) + **rotar la access key** expuesta.
+
+### Entorno
+
+- **No hay tokens**: la key de OpenAI está vencida; no hay sesión de Spotify en el entorno de desarrollo (verificación con el navegador de la autora y Premium); la access key de AWS debe rotarse.
+- Si la UI queda en blanco o un módulo «no exporta X» tras agregar archivos: reiniciar el server y `rm -rf node_modules/.vite`.
+- Prompt listo para la próxima sesión (modo plan): `docs/PROMPT-NUEVA-SESION.md`.

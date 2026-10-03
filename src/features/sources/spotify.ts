@@ -164,6 +164,8 @@ async function getAccessToken(): Promise<string | null> {
   })
 
   if (!response.ok) {
+    // El refresh token ya no sirve: se limpia para forzar una conexión nueva.
+    disconnectSpotify()
     return null
   }
 

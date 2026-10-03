@@ -21,9 +21,11 @@ import { formatDuration, useLibraryStore } from '../features/library'
 import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
 import {
+  connectSpotify,
   fetchSpotifyPlaylistTracks,
   fetchSpotifyPlaylists,
   importSourceTrackToPlaylist,
+  isSpotifyConfigured,
   isSpotifyConnected,
   saveSourceTrack,
   SearchTab,
@@ -71,12 +73,21 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [spotifyMessage, setSpotifyMessage] = useState<string | null>(null)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
-  const spotifyConnected = isSpotifyConnected()
+  const [spotifyConnectedState, setSpotifyConnectedState] = useState(isSpotifyConnected)
 
   async function openSpotifyImport() {
     setSpotifyOpen(true)
-    setSpotifyStatus('loading')
     setSpotifyMessage(null)
+
+    const connected = isSpotifyConnected()
+    setSpotifyConnectedState(connected)
+    if (!connected) {
+      setSpotifyPlaylists([])
+      setSpotifyStatus('error')
+      return
+    }
+
+    setSpotifyStatus('loading')
 
     try {
       setSpotifyPlaylists(await fetchSpotifyPlaylists())
@@ -151,7 +162,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-semibold">{t('nav.playlists')}</h2>
         <div className="flex items-center gap-2">
-          {spotifyConnected && (
+          {isSpotifyConfigured() && (
             <button
               className="border-2 border-rule/40 px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
               onClick={() => void openSpotifyImport()}
@@ -188,6 +199,16 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
               <XIcon className="size-3.5" />
             </button>
           </div>
+
+          {spotifyStatus === 'error' && !spotifyConnectedState && (
+            <button
+              className="mt-2 border-2 border-rule bg-accent px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.08em] text-on-accent uppercase"
+              onClick={() => void connectSpotify()}
+              type="button"
+            >
+              {t('spotify.reconnectButton')}
+            </button>
+          )}
 
           {spotifyStatus === 'loading' && (
             <p className="mt-2 text-xs text-ink-muted">{t('spotify.loadingPlaylists')}</p>

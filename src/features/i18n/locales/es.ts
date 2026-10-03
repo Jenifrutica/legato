@@ -25,6 +25,7 @@ export const es = {
     importError: 'No se pudieron traer tus playlists de Spotify.',
     emptyPlaylists: 'No tienes playlists en Spotify.',
     importScope: 'Vuelve a conectar Spotify para dar permiso a tus playlists.',
+    reconnectButton: 'Conectar Spotify de nuevo',
   },
   settings: {
     title: 'Ajustes',
