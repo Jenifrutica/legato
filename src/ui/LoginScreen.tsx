@@ -13,6 +13,7 @@ const ERROR_KEYS = {
   'email-in-use': 'auth.errorEmailInUse',
   'weak-password': 'auth.errorWeakPassword',
   'user-not-found': 'auth.errorUserNotFound',
+  'email-not-verified': 'auth.errorEmailNotVerified',
   'too-many-requests': 'auth.errorTooManyRequests',
   network: 'auth.errorNetwork',
   'not-supported': 'auth.errorNotSupported',
@@ -50,7 +51,11 @@ export function LoginScreen() {
 
     try {
       if (mode === 'signup') {
-        await signUp({ email, password, name })
+        const result = await signUp({ email, password, name })
+        if (result.needsEmailVerification) {
+          setPassword('')
+          setNotice(t('auth.pendingNotice', { email: email.trim() }))
+        }
       } else if (mode === 'signin') {
         await signIn(email, password)
       } else {

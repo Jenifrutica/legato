@@ -127,6 +127,9 @@ export const en: typeof es = {
     errorTooManyRequests: 'Too many attempts. Wait a moment.',
     errorNetwork: 'No connection. Check your network and try again.',
     errorNotSupported: 'Recovery is not available in this mode.',
+    errorEmailNotVerified: 'Confirm your email before signing in. We resent the link.',
+    pendingNotice:
+      'Account created. We sent an email to {{email}}; confirm it and then sign in here. (Check the spam folder.)',
     errorUnknown: 'Could not complete. Please try again.',
     privacy: 'Your audio library lives only in this browser. The account is used to sign in.',
     verifyTitle: 'Confirm your email',

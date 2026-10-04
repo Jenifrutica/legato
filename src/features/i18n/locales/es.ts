@@ -126,6 +126,9 @@ export const es = {
     errorTooManyRequests: 'Demasiados intentos. Espera un momento.',
     errorNetwork: 'Sin conexión. Revisa tu red e inténtalo de nuevo.',
     errorNotSupported: 'La recuperación no está disponible en este modo.',
+    errorEmailNotVerified: 'Confirma tu correo antes de entrar. Te reenviamos el enlace.',
+    pendingNotice:
+      'Cuenta creada. Te enviamos un correo a {{email}}; confírmalo y luego entra aquí. (Mira la carpeta de spam.)',
     errorUnknown: 'No se pudo completar. Inténtalo de nuevo.',
     privacy: 'Tu biblioteca de audio vive solo en este navegador. La cuenta se usa para entrar.',
     verifyTitle: 'Confirma tu correo',

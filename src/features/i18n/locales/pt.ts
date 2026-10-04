@@ -127,6 +127,9 @@ export const pt: typeof es = {
     errorTooManyRequests: 'Tentativas demais. Espere um momento.',
     errorNetwork: 'Sem conexão. Verifique a rede e tente de novo.',
     errorNotSupported: 'A recuperação não está disponível neste modo.',
+    errorEmailNotVerified: 'Confirme seu e-mail antes de entrar. Reenviamos o link.',
+    pendingNotice:
+      'Conta criada. Enviamos um e-mail para {{email}}; confirme e depois entre aqui. (Verifique a pasta de spam.)',
     errorUnknown: 'Não foi possível concluir. Tente de novo.',
     privacy: 'Sua biblioteca de áudio vive só neste navegador. A conta serve para entrar.',
     verifyTitle: 'Confirme seu e-mail',

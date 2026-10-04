@@ -99,6 +99,15 @@ export class FirebaseAuthProvider implements AuthProvider {
 
   async init(): Promise<void> {
     await this.#firstAuthState
+
+    // Una sesión sin correo confirmado no cuenta como registrada.
+    if (this.#auth.currentUser !== null && !this.#auth.currentUser.emailVerified) {
+      await firebaseSignOut(this.#auth)
+      this.#removeLoginAt()
+      this.#setUser(null)
+      return
+    }
+
     const loginAt = this.#readLoginAt()
     if (this.#auth.currentUser !== null && loginAt !== null && Date.now() - loginAt > SESSION_MS) {
       await firebaseSignOut(this.#auth)
@@ -126,8 +135,11 @@ export class FirebaseAuthProvider implements AuthProvider {
         await updateProfile(credential.user, { displayName: input.name.trim() })
       }
       await sendEmailVerification(credential.user, emailActionSettings())
-      this.#writeLoginAt()
-      this.#setUser(mapUser(this.#auth.currentUser ?? credential.user))
+      // Sin correo confirmado no queda sesión abierta: la cuenta está creada,
+      // pero no «registrada» en la app hasta verificar.
+      await firebaseSignOut(this.#auth)
+      this.#removeLoginAt()
+      this.#setUser(null)
       return { needsEmailVerification: true }
     } catch (error) {
       throw toAuthError(error)
@@ -137,10 +149,18 @@ export class FirebaseAuthProvider implements AuthProvider {
   async signIn(email: string, password: string): Promise<void> {
     try {
       const credential = await signInWithEmailAndPassword(this.#auth, email.trim(), password)
+      if (!credential.user.emailVerified) {
+        // Reenvía el enlace y cierra la sesión: sin verificar no se entra.
+        await sendEmailVerification(credential.user, emailActionSettings()).catch(() => undefined)
+        await firebaseSignOut(this.#auth)
+        this.#removeLoginAt()
+        this.#setUser(null)
+        throw new AuthError('email-not-verified')
+      }
       this.#writeLoginAt()
       this.#setUser(mapUser(credential.user))
     } catch (error) {
-      throw toAuthError(error)
+      throw error instanceof AuthError ? error : toAuthError(error)
     }
   }
 
