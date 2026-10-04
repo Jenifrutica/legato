@@ -152,7 +152,7 @@ describe('PlayerController', () => {
     const snapshot = controller.getSnapshot()
     expect(audio.currentTime).toBe(30)
     expect(snapshot.volume).toBe(0.5)
-    expect(snapshot.rate).toBe(0.9)
+    expect(snapshot.rate).toBe(1.25)
     expect(snapshot.shuffle).toBe(true)
     expect(snapshot.loopMode).toBe('all')
     expect(listener).toHaveBeenCalled()
@@ -166,8 +166,13 @@ describe('PlayerController', () => {
     controller.cycleRate()
     controller.cycleRate()
     controller.cycleRate()
-    expect(controller.getSnapshot().rate).toBe(0.5)
+    expect(controller.getSnapshot().rate).toBe(2)
 
+    controller.cycleRate()
+    expect(controller.getSnapshot().rate).toBe(0.9)
+
+    controller.cycleRate()
+    controller.cycleRate()
     controller.cycleRate()
     expect(controller.getSnapshot().rate).toBe(1)
   })

@@ -15,20 +15,20 @@ test('volumen y velocidad funcionan en local (escritorio)', async ({ page }) => 
 
   const speed = page.locator('button[aria-label^="Velocidad"]:visible')
   await speed.click()
-  await expect(speed).toHaveText('0.9x')
+  await expect(speed).toHaveText('1.25x')
+
+  await speed.click()
+  await expect(speed).toHaveText('1.5x')
+
+  await speed.click()
+  await expect(speed).toHaveText('2x')
   expect(await page.evaluate(() => window.__legato.getMediaElement().playbackRate)).toBeCloseTo(
-    0.9,
+    2,
     3,
   )
 
   await speed.click()
-  await expect(speed).toHaveText('0.75x')
-
-  await speed.click()
-  await expect(speed).toHaveText('0.5x')
-
-  await speed.click()
-  await expect(speed).toHaveText('1x')
+  await expect(speed).toHaveText('0.9x')
 })
 
 test('en móvil la barra tiene volumen y velocidad', async ({ page }) => {
@@ -46,8 +46,9 @@ test('en móvil la barra tiene volumen y velocidad', async ({ page }) => {
 
   const speed = page.locator('button[aria-label^="Velocidad"]:visible')
   await speed.click()
+  await expect(speed).toHaveText('1.25x')
   expect(await page.evaluate(() => window.__legato.getMediaElement().playbackRate)).toBeCloseTo(
-    0.9,
+    1.25,
     3,
   )
 })

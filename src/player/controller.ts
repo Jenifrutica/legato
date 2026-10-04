@@ -318,9 +318,10 @@ export class PlayerController {
   }
 
   cycleRate(): void {
-    const presets = [1, 0.9, 0.75, 0.5]
+    // Primero acelera (hasta 2×) y luego baja para practicar.
+    const presets = [1, 1.25, 1.5, 2, 0.9, 0.75, 0.5]
     const index = presets.indexOf(this.#rate)
-    this.setRate(presets[(index + 1) % presets.length])
+    this.setRate(presets[(index + 1) % presets.length] ?? 1)
   }
 
   toggleShuffle(): void {

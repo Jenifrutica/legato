@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { usePlayerStore } from '../player'
 
-const RATES = [0.5, 0.75, 0.9, 1]
+const RATES = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 2]
 
 export function PracticePanel({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation()
