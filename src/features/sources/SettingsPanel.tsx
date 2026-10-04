@@ -4,7 +4,7 @@ import { XIcon } from '../../ui/icons'
 import { readAuthEnv, useAuth } from '../auth'
 import { usePlayLogStore } from '../capsule'
 import { useMusicianStore } from '../musician'
-import { deleteUserData } from '../persistence'
+import { deleteUserData, wipeLocalData } from '../persistence'
 import { configureCloudSync, syncNow, useSyncStore } from '../sync'
 import { isJamendoConfigured } from './jamendo'
 import { useProvidersStore } from './providers-store'
@@ -27,7 +27,9 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const [testResult, setTestResult] = useState<string | null>(null)
   const musicianEnabled = useMusicianStore((state) => state.enabled)
   const setMusicianEnabled = useMusicianStore((state) => state.setEnabled)
-  const { user, deleteAccount } = useAuth()
+  const { user, deleteAccount, signOut } = useAuth()
+  const [resetOpen, setResetOpen] = useState(false)
+  const [resetBusy, setResetBusy] = useState(false)
   const syncEnabled = useSyncStore((state) => state.enabled)
   const syncStatus = useSyncStore((state) => state.status)
   const syncNeedsSetup = useSyncStore((state) => state.needsSetup)
@@ -56,6 +58,17 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
     } finally {
       setDeleteBusy(false)
       setDeletePassword('')
+    }
+  }
+
+  async function confirmReset() {
+    setResetBusy(true)
+    try {
+      await signOut().catch(() => undefined)
+      await wipeLocalData()
+      window.location.reload()
+    } catch {
+      setResetBusy(false)
     }
   }
 
@@ -344,6 +357,44 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             </div>
           </section>
         )}
+
+        <section aria-label={t('reset.title')} className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            {t('reset.title')}
+          </h3>
+
+          <div className="mt-3 border border-border bg-bg/50 p-3">
+            <p className="text-xs leading-relaxed text-ink-muted">{t('reset.hint')}</p>
+
+            {!resetOpen ? (
+              <button
+                className="mt-3 border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
+                onClick={() => setResetOpen(true)}
+                type="button"
+              >
+                {t('reset.action')}
+              </button>
+            ) : (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  className="border-2 border-danger bg-surface px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-danger uppercase disabled:opacity-60"
+                  disabled={resetBusy}
+                  onClick={() => void confirmReset()}
+                  type="button"
+                >
+                  {t('reset.confirm')}
+                </button>
+                <button
+                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase"
+                  onClick={() => setResetOpen(false)}
+                  type="button"
+                >
+                  {t('reset.cancel')}
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   )

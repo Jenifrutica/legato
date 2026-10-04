@@ -142,6 +142,13 @@ export const pt: typeof es = {
     deleteConfirm: 'Excluir definitivamente',
     deleteCancel: 'Cancelar',
   },
+  reset: {
+    title: 'Dados do aplicativo',
+    hint: 'Apaga tudo o que é local: biblioteca, perfis locais, sessões e ajustes salvos. A nuvem (Firebase) não é tocada. Útil para começar do zero.',
+    action: 'Restabelecer aplicativo',
+    confirm: 'Apagar tudo e reiniciar',
+    cancel: 'Cancelar',
+  },
   sync: {
     title: 'Sincronização (nuvem)',
     enable: 'Sincronizar com a nuvem',

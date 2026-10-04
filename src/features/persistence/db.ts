@@ -175,3 +175,18 @@ export function getDatabase(): LegatoDatabase | null {
   database ??= new LegatoDatabase()
   return database
 }
+
+/** Borra la base local completa (restablecer aplicación). */
+export async function deleteDatabase(): Promise<void> {
+  if (typeof indexedDB === 'undefined') {
+    return
+  }
+
+  const target = database
+  database = null
+  if (target !== null) {
+    await target.delete()
+  } else {
+    await Dexie.delete('legato')
+  }
+}

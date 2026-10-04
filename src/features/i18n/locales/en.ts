@@ -142,6 +142,13 @@ export const en: typeof es = {
     deleteConfirm: 'Delete permanently',
     deleteCancel: 'Cancel',
   },
+  reset: {
+    title: 'App data',
+    hint: 'Deletes everything local: library, local profiles, sessions and saved settings. The cloud (Firebase) is not touched. Useful to start fresh.',
+    action: 'Reset app',
+    confirm: 'Delete all and restart',
+    cancel: 'Cancel',
+  },
   sync: {
     title: 'Cloud sync',
     enable: 'Sync with the cloud',

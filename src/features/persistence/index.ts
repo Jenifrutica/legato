@@ -1,4 +1,4 @@
-export { getDatabase } from './db'
+export { deleteDatabase, getDatabase } from './db'
 export type {
   AnalysisRecord,
   AuthSessionRecord,
@@ -29,4 +29,5 @@ export {
   syncPlaylists,
   syncSetlists,
   syncSongs,
+  wipeLocalData,
 } from './persistence'

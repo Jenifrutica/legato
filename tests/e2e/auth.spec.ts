@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { acceptCookies, registerAndEnter } from './fixtures'
+import { acceptCookies, importWavFiles, registerAndEnter } from './fixtures'
 
 test('login obligatorio: registro, salida, error de contraseña y entrada', async ({ page }) => {
   await page.goto('/')
@@ -41,4 +41,25 @@ test('eliminar cuenta borra el usuario y vuelve a la puerta', async ({ page }) =
   await page.getByLabel('Contraseña').fill('legato1234')
   await page.locator('form').getByRole('button', { name: 'Entrar' }).click()
   await expect(page.getByText('Correo o contraseña incorrectos.')).toBeVisible()
+})
+
+test('restablecer aplicación deja todo limpio para el primer usuario', async ({ page }) => {
+  await page.goto('/')
+  await registerAndEnter(page, { email: 'reset-a@legato.local' })
+  await acceptCookies(page)
+
+  await importWavFiles(page, ['R'])
+  await expect(page.getByText('1 canción(es) importada(s)')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  await page.getByRole('button', { name: 'Restablecer aplicación' }).click()
+  await page.getByRole('button', { name: 'Borrar todo y reiniciar' }).click()
+  await page.waitForLoadState('networkidle')
+
+  await expect(page.getByRole('tab', { name: 'Crear cuenta' })).toBeVisible()
+
+  await registerAndEnter(page, { email: 'reset-b@legato.local' })
+  await acceptCookies(page)
+  await expect(page.getByRole('heading', { name: 'Sin reproducción' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Agregar / })).toHaveCount(0)
 })

@@ -14,7 +14,7 @@ import { usePlaylistsStore } from '../playlists'
 import type { PlaylistRestoreRecord } from '../playlists'
 import { usePlayerStore } from '../../player'
 import type { Table } from 'dexie'
-import { getDatabase } from './db'
+import { deleteDatabase, getDatabase } from './db'
 import type { SessionRecord } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
 
@@ -262,6 +262,28 @@ export function startPersistence(): void {
 export function stopPersistence(): void {
   persistenceCleanup?.()
   persistenceCleanup = null
+}
+
+/** Restablecer aplicación: borra la base local y las claves `legato.*`. */
+export async function wipeLocalData(): Promise<void> {
+  stopPersistence()
+  setActiveUserId(null)
+  await deleteDatabase()
+
+  try {
+    const keys: string[] = []
+    for (let index = 0; index < localStorage.length; index++) {
+      const key = localStorage.key(index)
+      if (key !== null && key.startsWith('legato.')) {
+        keys.push(key)
+      }
+    }
+    for (const key of keys) {
+      localStorage.removeItem(key)
+    }
+  } catch {
+    // sin almacenamiento local
+  }
 }
 
 export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {

@@ -141,6 +141,13 @@ export const es = {
     deleteConfirm: 'Eliminar definitivamente',
     deleteCancel: 'Cancelar',
   },
+  reset: {
+    title: 'Datos de la aplicación',
+    hint: 'Borra todo lo local: biblioteca, perfiles locales, sesiones y ajustes guardados. La nube (Firebase) no se toca. Útil para empezar de cero.',
+    action: 'Restablecer aplicación',
+    confirm: 'Borrar todo y reiniciar',
+    cancel: 'Cancelar',
+  },
   sync: {
     title: 'Sincronización (nube)',
     enable: 'Sincronizar con la nube',

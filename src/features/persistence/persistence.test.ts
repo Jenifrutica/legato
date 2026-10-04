@@ -15,6 +15,7 @@ import {
   syncLyrics,
   syncNotes,
   syncSetlists,
+  wipeLocalData,
 } from './persistence'
 
 function track(id: string): LibraryTrack {
@@ -349,6 +350,33 @@ describe('persistence database', () => {
     expect(await db.songs.get('a')).toBeUndefined()
     expect(await db.playlists.get('p1')).toBeUndefined()
     expect((await db.songs.get('b'))?.userId).toBe('u2')
+  })
+
+  it('wipeLocalData borra la base y las claves legato.*', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.users.put({
+      id: 'u-wipe',
+      email: 'wipe@legato.local',
+      name: 'Wipe',
+      passwordHash: 'x',
+      salt: 'y',
+      iterations: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    })
+    localStorage.setItem('legato.test', '1')
+
+    await wipeLocalData()
+
+    expect(localStorage.getItem('legato.test')).toBeNull()
+    const fresh = getDatabase()
+    expect(await fresh?.users.count()).toBe(0)
+    expect(await fresh?.songs.count()).toBe(0)
   })
 
   it('syncLyrics descarta pistas que ya no están en la biblioteca', async () => {
