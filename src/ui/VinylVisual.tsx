@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTrackAnalysisStore } from '../features/musician'
+import { getMicAnalyser, useMicStore, useTrackAnalysisStore } from '../features/musician'
 import { useSpotifyStore } from '../features/sources'
 import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
@@ -19,6 +19,7 @@ export function VinylVisual() {
   const analysis = useTrackAnalysisStore((state) =>
     trackId === null ? null : (state.records[trackId] ?? null),
   )
+  const micListening = useMicStore((state) => state.status === 'listening')
 
   const spotifyActive = spotifyPlayback !== null
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
@@ -51,6 +52,7 @@ export function VinylVisual() {
             bpmOverride={analysis?.bpm ?? null}
             offsetOverride={analysis?.beatOffset ?? null}
             position={spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime}
+            micAnalyser={micListening ? getMicAnalyser() : null}
           />
 
           <div

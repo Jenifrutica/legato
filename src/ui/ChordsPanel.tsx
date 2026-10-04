@@ -8,6 +8,7 @@ import {
   detectBpmFromBlob,
   detectChordsFromBlob,
   spotifyKeyName,
+  useMicStore,
   useTrackAnalysisStore,
 } from '../features/musician'
 import type { ChordProLine, ChordToken, DetectedChord } from '../features/musician'
@@ -19,6 +20,7 @@ import {
   useSpotifyStore,
 } from '../features/sources'
 import { usePlayerStore } from '../player'
+import { MicControl } from './MicControl'
 
 const SECTION_KEYS = {
   chorus: 'chords.sections.chorus',
@@ -62,6 +64,8 @@ export function ChordsPanel() {
   const [detecting, setDetecting] = useState<'local' | 'spotify' | null>(null)
   const [spotifyError, setSpotifyError] = useState<string | null>(null)
   const [spotifyNotice, setSpotifyNotice] = useState<string | null>(null)
+  const micListening = useMicStore((state) => state.status === 'listening')
+  const micChord = useMicStore((state) => state.liveChord)
   const attempted = useRef<Set<string>>(new Set())
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -100,7 +104,7 @@ export function ChordsPanel() {
     // Deja que la UI pinte el estado antes del cálculo pesado.
     await new Promise((resolve) => setTimeout(resolve, 30))
     const chords = await detectChordsFromBlob(libraryTrack.blob)
-    setDetectedChords(trackId, chords)
+    setDetectedChords(trackId, chords, 'audio')
     setDetecting(null)
   }
 
@@ -127,7 +131,7 @@ export function ChordsPanel() {
         return 'failed'
       }
       if (trackId !== null) {
-        setDetectedChords(trackId, chords)
+        setDetectedChords(trackId, chords, 'spotify')
         const bpm = await detectBpmFromBlob(blob)
         const current = useTrackAnalysisStore.getState().records[trackId]
         if (bpm !== null && (current?.bpm ?? null) === null) {
@@ -151,7 +155,7 @@ export function ChordsPanel() {
 
     try {
       const analysis = await fetchSpotifyAudioAnalysis(spotifyTrackId)
-      setDetectedChords(trackId, chordsFromSpotifySegments(analysis.segments))
+      setDetectedChords(trackId, chordsFromSpotifySegments(analysis.segments), 'spotify')
       if (analysis.beats.length > 0) {
         setDetectedBeats(trackId, analysis.beats)
       }
@@ -309,6 +313,8 @@ export function ChordsPanel() {
             <p className="truncate text-xs text-ink-muted">{currentTrack?.artist}</p>
           </div>
 
+          <MicControl />
+
           {detecting !== null && (
             <p className="text-xs text-ink-muted" role="status">
               {detecting === 'spotify' ? t('chords.spotifyDetecting') : t('chords.detecting')}
@@ -379,12 +385,16 @@ export function ChordsPanel() {
                 className="flex items-center justify-between gap-3 border-2 border-rule bg-accent-soft px-3 py-2"
               >
                 <span className="font-display text-2xl font-black text-ink">
-                  {activeEvent?.chord ?? detected[0]?.chord ?? '—'}
+                  {micListening && micChord !== null
+                    ? micChord
+                    : (activeEvent?.chord ?? detected[0]?.chord ?? '—')}
                 </span>
                 <span className="text-right font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase">
-                  {nextEvent === undefined
-                    ? t('chords.lastChord')
-                    : t('chords.nextChord', { chord: nextEvent.chord })}
+                  {micListening
+                    ? t('mic.live')
+                    : nextEvent === undefined
+                      ? t('chords.lastChord')
+                      : t('chords.nextChord', { chord: nextEvent.chord })}
                 </span>
               </div>
 

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app/App.tsx'
+import { getMicAnalyser, useMicStore } from './features/musician'
 import { hydrateStores, startPersistence } from './features/persistence'
 import { handleSpotifyRedirect } from './features/sources'
 import { getAnalyser, getMediaElement, usePlayerStore } from './player'
@@ -11,6 +12,8 @@ if (import.meta.env.DEV) {
   ;(window as Window & { __legato?: unknown }).__legato = {
     getAnalyser,
     getMediaElement,
+    getMicAnalyser,
+    useMicStore,
     usePlayerStore,
   }
 }

@@ -72,6 +72,7 @@ export function WaveRing({
   beats = null,
   bpmOverride = null,
   offsetOverride = null,
+  micAnalyser = null,
 }: {
   analyser: AnalyserLike | null
   active: boolean
@@ -84,6 +85,8 @@ export function WaveRing({
   bpmOverride?: number | null
   /** Fase de la pista (tap tempo) que gana sobre la fase global. */
   offsetOverride?: number | null
+  /** Micrófono en vivo: sus golpes ganan al pulso sintético cuando suena Spotify. */
+  micAnalyser?: { getBeatBass(): number } | null
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const activeRef = useRef(active)
@@ -107,6 +110,8 @@ export function WaveRing({
   bpmOverrideRef.current = bpmOverride
   const offsetOverrideRef = useRef(offsetOverride)
   offsetOverrideRef.current = offsetOverride
+  const micRef = useRef(micAnalyser)
+  micRef.current = micAnalyser
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -124,6 +129,7 @@ export function WaveRing({
     let inkTick = 0
     let inks = readInks()
     const detector = new BeatDetector(sensitivityRef.current)
+    const micDetector = new BeatDetector(sensitivityRef.current)
     const segmentSmooth: number[] = []
     let anchorPosition = positionRef.current
     let anchorAt = 0
@@ -186,6 +192,11 @@ export function WaveRing({
             : fallbackBass(levels)
         detector.setSensitivity(sensitivityRef.current)
         beat = detector.process(bass, time)
+        pulse = 1 + beat * 2.4
+      } else if (active && micRef.current !== null) {
+        // Micrófono en vivo: los golpes llegan de la sala (Spotify por altavoces).
+        micDetector.setSensitivity(sensitivityRef.current)
+        beat = micDetector.process(micRef.current.getBeatBass(), time)
         pulse = 1 + beat * 2.4
       } else if (active) {
         // Sin señal analizable (Spotify por DRM): si Spotify publicó su

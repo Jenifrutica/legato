@@ -524,3 +524,13 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Indicador en vivo** en la pestaña Acordes: tarjeta grande con el **acorde vigente** y el **siguiente** (`Siguiente: X` / `Último acorde`), sincronizada a la posición (motor local o `positionMs` de Spotify). Resalta además la **línea de letra activa** y la **fila activa** de la línea de tiempo.
 - **Ayuda**: cuando no hay letra, el aviso invita a cargar un `.lrc` en Notas.
 - **Helper puro** `activeChordIndex` con tests (posiciones antes del primer acorde, límites y vacío). Total: **267 unit + 6 E2E**; verificado en navegador con la pista C·G·Am·F (C → G → Am → F en vivo).
+
+### C10 Modo micrófono en vivo (implementado, pedido de la autora)
+
+- **Motivo**: para Spotify no hay análisis (403) ni preview en muchos casos. La vía casera elegida: **escuchar la sala por micrófono** (audio 100 % en el dispositivo) para estimar en vivo beats y acordes, siempre disponible.
+- **Motor** `mic-analyzer.ts`: `getUserMedia` (sin cancelación de eco/ruido ni AGC) → `AnalyserNode` de niveles (fftSize 4096, croma) → analizador de bombo (1024, sin suavizado) → gain 0 al destino (silencio, sin realimentación). `stop()` libera el stream y cierra el contexto. Errores tipados (permiso denegado / sin micrófono / desconocido).
+- **Pureza testeable**: `chromaFromMagnitudes`, `chordFromChroma`, `majorityChord` (en `chord-detect.ts`) y `estimateBpmFromBeats` + `phaseFromBeats` (en `mic-analyzer.ts`).
+- **Store** `mic-store.ts`: polling cada 120 ms; ventana móvil de 5 etiquetas para el acorde en vivo; `BeatDetector` sobre la banda del bombo con **latencia compensada** (80 ms) y cálculo de BPM/fase contra la posición de la pista (local o Spotify, vía callbacks que aporta la UI para no acoplar módulos). Al cambiar de pista finaliza y continúa con la nueva; al detener **guarda por pista**: `detectedChords` (origen `mic`), `detectedBeats`, `bpm` y `beatOffset`, **sin pisar un análisis de archivo local** (`shouldSaveMicChords`).
+- **UI**: `MicControl` en las pestañas **Audio** y **Acordes** (iniciar/detener, estado, acorde en vivo, BPM oído, nota de privacidad); el indicador grande de Acordes muestra el acorde del micrófono mientras escucha; `WaveRing` prioriza los golpes del micrófono cuando no hay señal local (Spotify/vinilo) sobre el pulso sintético.
+- **Tests** (12 nuevos): helpers de BPM/fase, reconocimiento desde croma, voto mayoritario, regla de guardado y un **E2E con micrófono falso de Chromium** (`--use-fake-device-for-media-stream`) que verifica permiso, escucha y parada. Total: **279 unit + 7 E2E**.
+- **Límites documentados**: calidad según ruido/volumen de la sala; los acordes en vivo son orientativos; no sustituye al análisis de un archivo local.

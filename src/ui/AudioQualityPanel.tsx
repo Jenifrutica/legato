@@ -16,6 +16,7 @@ import {
   WAVE_SENSITIVITIES,
 } from '../player'
 import type { AmbientId, ChannelMode, WaveSensitivity } from '../player'
+import { MicControl } from './MicControl'
 
 const MODE_KEYS = {
   stereo: 'audio.modes.stereo',
@@ -355,6 +356,10 @@ export function AudioQualityPanel() {
         </div>
 
         <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('audio.bpmHint')}</p>
+      </div>
+
+      <div className="mt-4">
+        <MicControl />
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('audio.hint')}</p>

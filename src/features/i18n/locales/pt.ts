@@ -396,6 +396,17 @@ export const pt: typeof es = {
     playlistEmpty: 'Escolha uma playlist no painel para anotar.',
     placeholder: 'Ideias, acordes, lembretes…',
   },
+  mic: {
+    start: 'Escutar pelo microfone',
+    stop: 'Parar microfone',
+    requesting: 'Pedindo permissão…',
+    live: 'Ao vivo',
+    bpm: 'BPM ouvido: {{bpm}}',
+    denied: 'Permissão de microfone negada.',
+    unavailable: 'Nenhum microfone encontrado.',
+    unknown: 'Não foi possível iniciar o microfone.',
+    hint: 'O áudio é analisado no seu dispositivo (nada é enviado à internet). Ao parar, salvam-se o BPM, a fase e os acordes do que foi ouvido.',
+  },
   localLyrics: {
     title: 'Letra local (.lrc)',
     loaded: 'Usando a letra local desta faixa. Ela tem prioridade sobre o LRCLIB.',

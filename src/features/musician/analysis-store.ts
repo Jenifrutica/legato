@@ -23,6 +23,7 @@ export type TrackAnalysis = {
   bpm: number | null
   key: string | null
   detectedChords?: DetectedChord[] | null
+  detectedChordsSource?: 'audio' | 'spotify' | 'mic' | null
   detectedBeats?: number[] | null
   beatOffset?: number | null
   updatedAt: number
@@ -33,7 +34,11 @@ type AnalysisState = {
   hydrate: (records: TrackAnalysis[]) => void
   setBpm: (trackId: string, bpm: number | null) => void
   setKey: (trackId: string, key: string | null) => void
-  setDetectedChords: (trackId: string, chords: DetectedChord[] | null) => void
+  setDetectedChords: (
+    trackId: string,
+    chords: DetectedChord[] | null,
+    source?: 'audio' | 'spotify' | 'mic',
+  ) => void
   setDetectedBeats: (trackId: string, beats: number[] | null) => void
   setBeatOffset: (trackId: string, offset: number | null) => void
 }
@@ -45,6 +50,7 @@ function recordFor(
     bpm?: number | null
     key?: string | null
     detectedChords?: DetectedChord[] | null
+    detectedChordsSource?: 'audio' | 'spotify' | 'mic' | null
     detectedBeats?: number[] | null
     beatOffset?: number | null
   },
@@ -55,6 +61,10 @@ function recordFor(
     key: patch.key === undefined ? (current?.key ?? null) : patch.key,
     detectedChords:
       patch.detectedChords === undefined ? (current?.detectedChords ?? null) : patch.detectedChords,
+    detectedChordsSource:
+      patch.detectedChordsSource === undefined
+        ? (current?.detectedChordsSource ?? null)
+        : patch.detectedChordsSource,
     detectedBeats:
       patch.detectedBeats === undefined ? (current?.detectedBeats ?? null) : patch.detectedBeats,
     beatOffset: patch.beatOffset === undefined ? (current?.beatOffset ?? null) : patch.beatOffset,
@@ -92,11 +102,14 @@ export const useTrackAnalysisStore = create<AnalysisState>((set) => ({
       },
     })),
 
-  setDetectedChords: (trackId, chords) =>
+  setDetectedChords: (trackId, chords, source) =>
     set((state) => ({
       records: {
         ...state.records,
-        [trackId]: recordFor(state.records[trackId], trackId, { detectedChords: chords }),
+        [trackId]: recordFor(state.records[trackId], trackId, {
+          detectedChords: chords,
+          detectedChordsSource: chords === null ? null : (source ?? null),
+        }),
       },
     })),
 

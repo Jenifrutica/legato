@@ -3,11 +3,23 @@ export type { TrackAnalysis } from './analysis-store'
 export { detectBpmFromBlob, estimateBpmFromSamples } from './bpm-estimator'
 export {
   activeChordIndex,
+  chordFromChroma,
   chordsFromChromaFrames,
+  chromaFromMagnitudes,
   detectChordsFromBlob,
   detectChordsFromSamples,
+  majorityChord,
 } from './chord-detect'
 export type { ChromaFrame, DetectedChord } from './chord-detect'
+export {
+  estimateBpmFromBeats,
+  MicAnalyzer,
+  MIC_LATENCY_SECONDS,
+  phaseFromBeats,
+} from './mic-analyzer'
+export type { MicStartResult } from './mic-analyzer'
+export { getMicAnalyser, shouldSaveMicChords, useMicStore } from './mic-store'
+export type { MicError, MicSessionOptions } from './mic-store'
 export {
   noteIndex,
   parseChordPro,

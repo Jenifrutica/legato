@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { activeChordIndex, detectChordsFromSamples } from './chord-detect'
+import {
+  activeChordIndex,
+  chordFromChroma,
+  detectChordsFromSamples,
+  majorityChord,
+} from './chord-detect'
 
 const SAMPLE_RATE = 8192
 
@@ -69,5 +74,32 @@ describe('activeChordIndex', () => {
 
   it('sin acordes devuelve -1', () => {
     expect(activeChordIndex([], 1)).toBe(-1)
+  })
+})
+
+describe('chordFromChroma', () => {
+  it('reconoce un Do mayor claro', () => {
+    const chroma = Array.from({ length: 12 }, () => 0)
+    chroma[0] = 1
+    chroma[4] = 1
+    chroma[7] = 1
+
+    expect(chordFromChroma(chroma)).toBe('C')
+  })
+
+  it('sin energía no reconoce nada', () => {
+    expect(chordFromChroma(Array.from({ length: 12 }, () => 0))).toBeNull()
+  })
+})
+
+describe('majorityChord', () => {
+  it('elige el acorde más repetido ignorando los nulos', () => {
+    expect(majorityChord(['C', null, 'C', 'G'])).toBe('C')
+    expect(majorityChord([null, null, 'Am'])).toBe('Am')
+  })
+
+  it('sin etiquetas devuelve null', () => {
+    expect(majorityChord([null, null])).toBeNull()
+    expect(majorityChord([])).toBeNull()
   })
 })

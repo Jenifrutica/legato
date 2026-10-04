@@ -396,6 +396,17 @@ export const en: typeof es = {
     playlistEmpty: 'Pick a playlist in the panel to take notes.',
     placeholder: 'Ideas, chords, reminders…',
   },
+  mic: {
+    start: 'Listen through the microphone',
+    stop: 'Stop microphone',
+    requesting: 'Requesting permission…',
+    live: 'Live',
+    bpm: 'Heard BPM: {{bpm}}',
+    denied: 'Microphone permission denied.',
+    unavailable: 'No microphone was found.',
+    unknown: 'The microphone could not be started.',
+    hint: 'Audio is analysed on your device (nothing is sent to the internet). On stop, the heard BPM, phase and chords are saved.',
+  },
   localLyrics: {
     title: 'Local lyrics (.lrc)',
     loaded: 'Using the local lyrics of this track. They take priority over LRCLIB.',

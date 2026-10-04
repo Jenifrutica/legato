@@ -397,6 +397,17 @@ export const es = {
     playlistEmpty: 'Elige una playlist en el panel para anotar.',
     placeholder: 'Ideas, acordes, recordatorios…',
   },
+  mic: {
+    start: 'Escuchar por micrófono',
+    stop: 'Detener micrófono',
+    requesting: 'Pidiendo permiso…',
+    live: 'En vivo',
+    bpm: 'BPM oído: {{bpm}}',
+    denied: 'Permiso de micrófono denegado.',
+    unavailable: 'No se encontró ningún micrófono.',
+    unknown: 'No se pudo iniciar el micrófono.',
+    hint: 'El audio se analiza en tu dispositivo (nada se envía a internet). Al detener se guardan el BPM, la fase y los acordes de lo escuchado.',
+  },
   localLyrics: {
     title: 'Letra local (.lrc)',
     loaded: 'Usando la letra local de esta pista. Tiene prioridad sobre LRCLIB.',

@@ -21,8 +21,8 @@ const MINOR_TRIAD = [0, 3, 7]
 const UNKNOWN = 'N'
 
 /** Perfil cromático de un cuadro: energía por clase de altura (12). */
-function chromaForFrame(
-  magnitudes: Float32Array,
+export function chromaFromMagnitudes(
+  magnitudes: ArrayLike<number>,
   sampleRate: number,
   frameSize: number,
 ): Float32Array {
@@ -60,6 +60,32 @@ function chordScore(chroma: ArrayLike<number>, root: number, triad: number[]): n
     score += chroma[(root + interval) % 12] ?? 0
   }
   return score / triad.length
+}
+
+/** Mejor tríada para un croma; null si no hay señal clara. */
+export function chordFromChroma(chroma: ArrayLike<number>): string | null {
+  const chord = bestChordForFrame(chroma)
+  return chord === UNKNOWN ? null : chord
+}
+
+/** Acorde mayoritario de una ventana de etiquetas (null si no hay ninguno). */
+export function majorityChord(labels: Array<string | null>): string | null {
+  const counts = new Map<string, number>()
+  for (const label of labels) {
+    if (label !== null) {
+      counts.set(label, (counts.get(label) ?? 0) + 1)
+    }
+  }
+
+  let best: string | null = null
+  let bestCount = 0
+  for (const [value, count] of counts) {
+    if (count > bestCount) {
+      best = value
+      bestCount = count
+    }
+  }
+  return best
 }
 
 function bestChordForFrame(chroma: ArrayLike<number>): string {
@@ -192,7 +218,7 @@ export function detectChordsFromSamples(
     }
     frames.push({
       time: start / sampleRate,
-      chroma: chromaForFrame(fftMagnitudes(frame), sampleRate, FRAME_SIZE),
+      chroma: chromaFromMagnitudes(fftMagnitudes(frame), sampleRate, FRAME_SIZE),
     })
   }
 
