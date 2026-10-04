@@ -13,6 +13,7 @@ export function readAuthEnv(): AuthEnv {
   const authDomain = envValue(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN)
   const projectId = envValue(import.meta.env.VITE_FIREBASE_PROJECT_ID)
   const appId = envValue(import.meta.env.VITE_FIREBASE_APP_ID)
+  const storageBucket = envValue(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET)
   const cognitoDomain = envValue(import.meta.env.VITE_COGNITO_DOMAIN)
   const cognitoClientId = envValue(import.meta.env.VITE_COGNITO_CLIENT_ID)
 
@@ -29,7 +30,7 @@ export function readAuthEnv(): AuthEnv {
       authDomain !== undefined &&
       projectId !== undefined &&
       appId !== undefined
-        ? { apiKey, authDomain, projectId, appId }
+        ? { apiKey, authDomain, projectId, appId, storageBucket }
         : undefined,
   }
 }

@@ -1,5 +1,7 @@
 import { getApps, initializeApp } from 'firebase/app'
 import type { FirebaseConfig } from '../auth/firebase-auth-provider'
+import { base64ToBytes, bytesToBase64, fileIdFromPath, joinBytes, splitBytes } from './file-chunks'
+import type { FileManifest } from './file-chunks'
 import type { CloudBackend, SyncRecord, SyncTable, SyncTombstone } from './types'
 
 const BATCH_SIZE = 400
@@ -20,27 +22,68 @@ function clean(value: unknown): unknown {
   return value
 }
 
-/** Backend de sincronización sobre Firestore (metadatos) y Storage (archivos). */
+function chunkDocId(fileId: string, index: number): string {
+  return `${fileId}__${String(index).padStart(4, '0')}`
+}
+
+/**
+ * Backend de sincronización sobre Firestore: metadatos por colección y
+ * archivos troceados en documentos (`fileManifests` + `fileChunks`), sin
+ * necesidad de Firebase Storage.
+ */
 export function createFirebaseBackend(config: FirebaseConfig): CloudBackend {
   const app =
     getApps().find((candidate) => candidate.name === 'legato') ?? initializeApp(config, 'legato')
 
   let firestoreModule: typeof import('firebase/firestore') | null = null
-  let storageModule: typeof import('firebase/storage') | null = null
 
   async function firestore() {
     firestoreModule ??= await import('firebase/firestore')
     return firestoreModule
   }
 
-  async function storageLib() {
-    storageModule ??= await import('firebase/storage')
-    return storageModule
-  }
-
   async function database() {
     const { getFirestore } = await firestore()
     return getFirestore(app)
+  }
+
+  /** Borra manifiesto y trozos existentes de un archivo. */
+  async function deleteFileDocuments(uid: string, path: string): Promise<void> {
+    const { collection, doc, getDocs, query, where, writeBatch } = await firestore()
+    const db = await database()
+    const fileId = fileIdFromPath(path)
+    const snapshot = await getDocs(
+      query(
+        collection(db, 'users', uid, 'fileChunks'),
+        where('__name__', '>=', `${fileId}__`),
+        where('__name__', '<=', `${fileId}__\uf8ff`),
+      ),
+    )
+
+    const refs = snapshot.docs.map((document) => document.ref)
+    for (let start = 0; start < refs.length; start += BATCH_SIZE) {
+      const batch = writeBatch(db)
+      for (const ref of refs.slice(start, start + BATCH_SIZE)) {
+        batch.delete(ref)
+      }
+      await batch.commit()
+    }
+
+    await batchDeleteDocs(db, [doc(db, 'users', uid, 'fileManifests', fileId)])
+  }
+
+  async function batchDeleteDocs(
+    db: Awaited<ReturnType<typeof database>>,
+    refs: Array<import('firebase/firestore').DocumentReference>,
+  ): Promise<void> {
+    const { writeBatch } = await firestore()
+    for (let start = 0; start < refs.length; start += BATCH_SIZE) {
+      const batch = writeBatch(db)
+      for (const ref of refs.slice(start, start + BATCH_SIZE)) {
+        batch.delete(ref)
+      }
+      await batch.commit()
+    }
   }
 
   return {
@@ -120,26 +163,71 @@ export function createFirebaseBackend(config: FirebaseConfig): CloudBackend {
     },
 
     async uploadFile(path: string, blob: Blob): Promise<void> {
-      const { getStorage, ref, uploadBytes } = await storageLib()
-      await uploadBytes(ref(getStorage(app), path), blob)
+      const { doc, writeBatch } = await firestore()
+      const db = await database()
+      const uid = path.split('/')[1] ?? ''
+      const bytes = new Uint8Array(await blob.arrayBuffer())
+      const chunks = splitBytes(bytes)
+      const fileId = fileIdFromPath(path)
+
+      await deleteFileDocuments(uid, path)
+
+      const manifest: FileManifest = {
+        size: bytes.length,
+        mime: blob.type,
+        chunks: chunks.length,
+      }
+
+      const entries: Array<{ ref: ReturnType<typeof doc>; data: Record<string, unknown> }> = [
+        {
+          ref: doc(db, 'users', uid, 'fileManifests', fileId),
+          data: manifest as unknown as Record<string, unknown>,
+        },
+        ...chunks.map((chunk, index) => ({
+          ref: doc(db, 'users', uid, 'fileChunks', chunkDocId(fileId, index)),
+          data: { data: bytesToBase64(chunk) },
+        })),
+      ]
+
+      for (let start = 0; start < entries.length; start += BATCH_SIZE) {
+        const batch = writeBatch(db)
+        for (const entry of entries.slice(start, start + BATCH_SIZE)) {
+          batch.set(entry.ref, entry.data)
+        }
+        await batch.commit()
+      }
     },
 
     async downloadFile(path: string): Promise<Blob | null> {
-      try {
-        const { getBlob, getStorage, ref } = await storageLib()
-        return await getBlob(ref(getStorage(app), path))
-      } catch {
+      const { doc, getDoc } = await firestore()
+      const db = await database()
+      const uid = path.split('/')[1] ?? ''
+      const fileId = fileIdFromPath(path)
+
+      const manifestSnap = await getDoc(doc(db, 'users', uid, 'fileManifests', fileId))
+      if (!manifestSnap.exists()) {
         return null
       }
+
+      const manifest = manifestSnap.data() as FileManifest
+      const parts: Uint8Array<ArrayBuffer>[] = []
+      for (let index = 0; index < manifest.chunks; index++) {
+        const chunkSnap = await getDoc(
+          doc(db, 'users', uid, 'fileChunks', chunkDocId(fileId, index)),
+        )
+        if (!chunkSnap.exists()) {
+          return null
+        }
+        const chunkData = chunkSnap.data() as { data?: string }
+        parts.push(base64ToBytes(chunkData.data ?? ''))
+      }
+
+      return new Blob([joinBytes(parts)], { type: manifest.mime })
     },
 
     async removeFile(path: string): Promise<void> {
-      try {
-        const { deleteObject, getStorage, ref } = await storageLib()
-        await deleteObject(ref(getStorage(app), path))
-      } catch {
-        // el archivo ya no existe
-      }
+      const uid = path.split('/')[1] ?? ''
+      await deleteFileDocuments(uid, path)
     },
   }
 }

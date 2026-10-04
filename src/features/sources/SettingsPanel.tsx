@@ -30,6 +30,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const { user, deleteAccount } = useAuth()
   const syncEnabled = useSyncStore((state) => state.enabled)
   const syncStatus = useSyncStore((state) => state.status)
+  const syncNeedsSetup = useSyncStore((state) => state.needsSetup)
   const syncProgress = useSyncStore((state) => state.progress)
   const syncLastAt = useSyncStore((state) => state.lastSyncAt)
   const setSyncEnabled = useSyncStore((state) => state.setEnabled)
@@ -265,14 +266,16 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
                 <span className="font-mono text-[0.6875rem] text-ink-muted">
                   {syncStatus === 'error'
                     ? t('sync.error')
-                    : syncProgress !== null
-                      ? t('sync.progress', {
-                          done: syncProgress.done,
-                          total: syncProgress.total,
-                        })
-                      : syncLastAt === null
-                        ? t('sync.never')
-                        : t('sync.last', { time: new Date(syncLastAt).toLocaleTimeString() })}
+                    : syncNeedsSetup
+                      ? t('sync.needsSetup')
+                      : syncProgress !== null
+                        ? t('sync.progress', {
+                            done: syncProgress.done,
+                            total: syncProgress.total,
+                          })
+                        : syncLastAt === null
+                          ? t('sync.never')
+                          : t('sync.last', { time: new Date(syncLastAt).toLocaleTimeString() })}
                 </span>
               </div>
             )}

@@ -569,9 +569,9 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 ### N Sincronización en la nube (implementado)
 
 - **Motivo**: la autora necesita que cada usuario tenga lo suyo **en cualquier dispositivo** (móvil o PC), no por navegador.
-- **Arquitectura**: `features/sync/` con backend abstracto; **Firebase** implementa Firestore (metadatos por usuario) y Storage (audios/portadas). Backend en memoria para tests.
+- **Arquitectura**: `features/sync/` con backend abstracto; **Firebase** implementa Firestore: metadatos por usuario y **audios/portadas troceados** en documentos (`fileManifests` + `fileChunks`, 700 KB por trozo en base64), porque Storage exige el plan Blaze; backend en memoria para tests.
 - **Fusión**: por registro con `updatedAt` (gana la edición más reciente) y **lápidas** (`tombstones`) para que los borrados viajen sin resucitar; `mergeTable`/`mergeTombstones` puros y testeados.
 - **Ciclo**: al iniciar sesión se baja y aplica (con descarga de audios faltantes y progreso), se hidrata y luego se sube lo local; los cambios locales se empujan con debounce de 3 s; botón «Sincronizar ahora» y toggle en Ajustes (la sincronización solo se activa con Firebase configurado).
-- **Límites**: cuotas gratuitas de Firestore/Storage (documentadas en `docs/AUTH.md`); las referencias de Spotify viajan como metadatos y la conexión del SDK se hace por dispositivo (misma cuenta Premium).
+- **Límites**: cuotas gratuitas de Firestore (documentadas en `docs/AUTH.md`); las referencias de Spotify viajan como metadatos y la conexión del SDK se hace por dispositivo (misma cuenta Premium).
 - **Privacidad**: con la nube activa, canciones y audios se guardan en Firebase (Google); política actualizada en ES/EN/PT.
 - **Tests**: fusión (5), motor con backend en memoria (4) y persistencia con lápidas; total **300 unit + 10 E2E**.

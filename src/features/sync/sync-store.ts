@@ -21,16 +21,19 @@ type SyncState = {
   lastSyncAt: number | null
   progress: { done: number; total: number } | null
   error: string | null
+  /** Firestore aún sin crear o reglas sin publicar. */
+  needsSetup: boolean
   setEnabled: (enabled: boolean) => void
 }
 
-/** Estado de la sincronización en la nube (Firestore + Storage). */
+/** Estado de la sincronización en la nube (Firestore, con archivos troceados). */
 export const useSyncStore = create<SyncState>((set) => ({
   enabled: readEnabled(),
   status: 'off',
   lastSyncAt: null,
   progress: null,
   error: null,
+  needsSetup: false,
 
   setEnabled: (enabled) => {
     try {
@@ -38,6 +41,12 @@ export const useSyncStore = create<SyncState>((set) => ({
     } catch {
       // sin persistencia
     }
-    set({ enabled, status: enabled ? 'idle' : 'off', error: null, progress: null })
+    set({
+      enabled,
+      status: enabled ? 'idle' : 'off',
+      error: null,
+      progress: null,
+      needsSetup: false,
+    })
   },
 }))

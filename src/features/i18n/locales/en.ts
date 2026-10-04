@@ -145,7 +145,7 @@ export const en: typeof es = {
   sync: {
     title: 'Cloud sync',
     enable: 'Sync with the cloud',
-    hint: 'Your songs, playlists, session and notes are stored in Firebase so you have them on any device. Audio files go to Firebase Storage.',
+    hint: 'Your songs, playlists, session and notes are stored in Firebase so you have them on any device. Audio files travel too (chunked in Firestore).',
     notConfigured: 'Configure Firebase to enable the cloud (see docs/AUTH.md).',
     now: 'Sync now',
     syncing: 'Syncing…',
@@ -153,6 +153,7 @@ export const en: typeof es = {
     never: 'Not synced yet',
     last: 'Last: {{time}}',
     error: 'Could not sync. Check your connection.',
+    needsSetup: 'Pending setup: create Firestore and publish the rules.',
   },
   account: {
     signIn: 'Sign in',

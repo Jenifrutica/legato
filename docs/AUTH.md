@@ -33,13 +33,12 @@
 
 > Sin esos valores, la app arranca en **modo local** (cuentas del navegador) y el E2E funciona igual. En el pie de la pantalla de acceso no se anuncia el proveedor; la política de privacidad ya declara Firebase/Google.
 
-## 2b. Activar la nube (Firestore + Storage) — para que los datos sigan al usuario
+## 2b. Activar la nube (Firestore) — para que los datos sigan al usuario
 
-La sincronización entre dispositivos vive en **Firestore** (metadatos) y **Firebase Storage** (audios y portadas). En la consola:
+La sincronización entre dispositivos usa **Firestore** para todo: metadatos por colección y **audios/portadas troceados** en documentos (`fileManifests` + `fileChunks`), sin Firebase Storage ni plan Blaze. En la consola:
 
-1. **Compilación → Firestore Database → Crear base de datos** (modo producción; región `us-central1` o `nam5`).
-2. **Compilación → Storage → Comenzar** (modo producción).
-3. En **Firestore → Rules** pega y publica:
+1. **Compilación → Firestore Database → Crear base de datos** (edición **Standard**, modo producción; ID `(default)`, región `us-central1` o `nam5`).
+2. En **Firestore → Rules** pega y publica:
    ```
    rules_version = '2';
    service cloud.firestore {
@@ -50,20 +49,9 @@ La sincronización entre dispositivos vive en **Firestore** (metadatos) y **Fire
      }
    }
    ```
-4. En **Storage → Rules** pega y publica:
-   ```
-   rules_version = '2';
-   service firebase.storage {
-     match /b/{bucket}/o {
-       match /users/{uid}/{allPaths=**} {
-         allow read, write: if request.auth != null && request.auth.uid == uid;
-       }
-     }
-   }
-   ```
-5. En la app: **Ajustes → Sincronización (nube)** debe estar activada (lo está por defecto si hay config). Al iniciar sesión se bajan los datos y audios que falten (con progreso) y los cambios se suben solos.
+3. En la app: **Ajustes → Sincronización (nube)** activada (lo está por defecto si hay config). Al iniciar sesión se bajan los datos y audios que falten (con progreso) y los cambios se suben solos.
 
-**Cuotas gratuitas (Spark)**: Firestore ~1 GiB y 50 000 lecturas/día; Storage ~5 GiB con ~1 GB de descargas al día. Con muchos audios se agota rápido: si aparece error de cuota, desactiva la sincronización o pasa a un plan de pago.
+**Cuotas gratuitas (Spark)**: Firestore ~1 GiB guardado, 50 000 lecturas y 20 000 escrituras al día. Un MP3 de 5 MB ocupa ~6,5 MB troceado (≈140 canciones en 1 GiB) y al subir/bajar se hacen ~7 operaciones. Si aparece «pendiente de configurar», revisa que Firestore exista y las reglas estén publicadas.
 
 **Spotify entre dispositivos**: las referencias viajan como metadatos, pero tokens del SDK **no** (Spotify los rota y sería inseguro). En cada dispositivo se conecta Spotify una vez con la misma cuenta Premium.
 

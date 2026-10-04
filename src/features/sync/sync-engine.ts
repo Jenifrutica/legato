@@ -33,6 +33,26 @@ function scopeKey(userId: string): string {
   return `current:${userId}`
 }
 
+/** Firestore sin crear o reglas sin publicar se muestra como «pendiente». */
+function reportSyncError(error: unknown): void {
+  const code =
+    typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code: unknown }).code)
+      : ''
+  const needsSetup =
+    code.includes('permission') ||
+    code.includes('not-found') ||
+    code.includes('failed-precondition') ||
+    code.includes('unavailable')
+
+  useSyncStore.setState({
+    status: needsSetup ? 'idle' : 'error',
+    needsSetup,
+    error: needsSetup ? null : 'sync-failed',
+    progress: null,
+  })
+}
+
 function stripUserId(row: Record<string, unknown>): Record<string, unknown> {
   const { userId: _ignored, ...rest } = row
   return rest
@@ -457,9 +477,15 @@ export async function syncNow(options: { downloadFiles?: boolean } = {}): Promis
     await hydrateStores()
     await pushPlans(plans, tombstones)
 
-    useSyncStore.setState({ status: 'idle', lastSyncAt: Date.now(), progress: null, error: null })
-  } catch {
-    useSyncStore.setState({ status: 'error', error: 'sync-failed', progress: null })
+    useSyncStore.setState({
+      status: 'idle',
+      lastSyncAt: Date.now(),
+      progress: null,
+      error: null,
+      needsSetup: false,
+    })
+  } catch (error) {
+    reportSyncError(error)
   } finally {
     syncing = false
     suppressPush = false
@@ -486,9 +512,14 @@ async function pushLocalChanges(): Promise<void> {
       })
     })
     await pushPlans(plans, await readLocalTombstones())
-    useSyncStore.setState({ status: 'idle', lastSyncAt: Date.now(), error: null })
-  } catch {
-    useSyncStore.setState({ status: 'error', error: 'sync-failed' })
+    useSyncStore.setState({
+      status: 'idle',
+      lastSyncAt: Date.now(),
+      error: null,
+      needsSetup: false,
+    })
+  } catch (error) {
+    reportSyncError(error)
   }
 }
 

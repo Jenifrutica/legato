@@ -7,15 +7,15 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     launchOptions: {
       args: ['--autoplay-policy=no-user-gesture-required'],
     },
   },
   webServer: {
-    command: '"$HOME/.bun/bin/bun" run dev --port 5173',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
+    command: 'VITE_AUTH_MODE=local "$HOME/.bun/bin/bun" run dev --port 5174',
+    url: 'http://localhost:5174',
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 })

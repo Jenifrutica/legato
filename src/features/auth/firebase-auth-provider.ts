@@ -24,6 +24,7 @@ export type FirebaseConfig = {
   authDomain: string
   projectId: string
   appId: string
+  storageBucket?: string
 }
 
 const LOGIN_AT_KEY = 'legato.auth.loginAt'

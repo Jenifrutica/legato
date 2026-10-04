@@ -73,5 +73,6 @@ export type AuthEnv = {
     authDomain: string
     projectId: string
     appId: string
+    storageBucket?: string
   }
 }

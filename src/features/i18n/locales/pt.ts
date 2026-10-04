@@ -145,7 +145,7 @@ export const pt: typeof es = {
   sync: {
     title: 'Sincronização (nuvem)',
     enable: 'Sincronizar com a nuvem',
-    hint: 'Suas músicas, listas, sessão e anotações ficam no Firebase para tê-las em qualquer dispositivo. Os áudios vão para o Firebase Storage.',
+    hint: 'Suas músicas, listas, sessão e anotações ficam no Firebase para tê-las em qualquer dispositivo. Os áudios também viajam (em partes no Firestore).',
     notConfigured: 'Configure o Firebase para ativar a nuvem (veja docs/AUTH.md).',
     now: 'Sincronizar agora',
     syncing: 'Sincronizando…',
@@ -153,6 +153,7 @@ export const pt: typeof es = {
     never: 'Ainda sem sincronizar',
     last: 'Última: {{time}}',
     error: 'Não foi possível sincronizar. Verifique a conexão.',
+    needsSetup: 'Pendente de configurar: crie o Firestore e publique as regras.',
   },
   account: {
     signIn: 'Entrar',
