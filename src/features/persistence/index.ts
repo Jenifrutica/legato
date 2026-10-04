@@ -1,6 +1,7 @@
 export { getDatabase } from './db'
 export type {
   AnalysisRecord,
+  AuthSessionRecord,
   ChordRecord,
   LyricsRecord,
   NoteRecord,
@@ -8,6 +9,7 @@ export type {
   SessionRecord,
   SetlistRecord,
   SongRecord,
+  UserRecord,
 } from './db'
 export { recordToTrack, trackToRecord } from './mappers'
 export {

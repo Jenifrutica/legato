@@ -1,31 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { CognitoAuthProvider } from './cognito-auth-provider'
-import { createAuthProvider } from './create-auth-provider'
-import { LocalAuthProvider } from './local-auth-provider'
+import { resolveAuthMode } from './create-auth-provider'
+import type { AuthEnv } from './types'
 
-describe('createAuthProvider', () => {
-  it('usa perfil local en modo local', () => {
-    expect(createAuthProvider({ localMode: true })).toBeInstanceOf(LocalAuthProvider)
+const firebase: AuthEnv['firebase'] = {
+  apiKey: 'key',
+  authDomain: 'legato.firebaseapp.com',
+  projectId: 'legato',
+  appId: 'app',
+}
+
+describe('resolveAuthMode', () => {
+  it('usa Firebase cuando está configurado', () => {
+    expect(resolveAuthMode({ mode: 'firebase', firebase })).toBe('firebase')
+    expect(resolveAuthMode({ mode: 'firebase' })).toBe('local')
   })
 
-  it('usa Cognito cuando hay configuracion completa', () => {
-    const provider = createAuthProvider({
-      localMode: false,
-      cognitoDomain: 'legato-123.auth.us-east-1.amazoncognito.com',
-      cognitoClientId: 'abc123',
-    })
-
-    expect(provider).toBeInstanceOf(CognitoAuthProvider)
-    expect(provider.kind).toBe('cognito')
+  it('cae al respaldo local sin configuración', () => {
+    expect(resolveAuthMode({ mode: 'local' })).toBe('local')
+    expect(resolveAuthMode({ mode: 'firebase' })).toBe('local')
   })
 
-  it('cae a perfil local si falta configuracion de Cognito', () => {
-    expect(createAuthProvider({ localMode: false })).toBeInstanceOf(LocalAuthProvider)
-    expect(
-      createAuthProvider({ localMode: false, cognitoDomain: 'legato-123.example.com' }),
-    ).toBeInstanceOf(LocalAuthProvider)
-    expect(createAuthProvider({ localMode: false, cognitoClientId: 'abc123' })).toBeInstanceOf(
-      LocalAuthProvider,
+  it('Cognito solo si se pide y está completo', () => {
+    expect(resolveAuthMode({ mode: 'cognito', cognitoDomain: 'd', cognitoClientId: 'c' })).toBe(
+      'cognito',
     )
+    expect(resolveAuthMode({ mode: 'cognito' })).toBe('local')
+  })
+
+  it('el modo local explícito gana aunque haya Firebase', () => {
+    expect(resolveAuthMode({ mode: 'local', firebase })).toBe('local')
   })
 })

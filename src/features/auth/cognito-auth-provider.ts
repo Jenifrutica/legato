@@ -1,4 +1,5 @@
-import type { AuthProvider, AuthUser } from './types'
+import { AuthError } from './types'
+import type { AuthProvider, AuthSignUpResult, AuthUser } from './types'
 
 type CognitoConfig = {
   domain: string
@@ -57,11 +58,16 @@ function toUser(idToken: string): AuthUser {
     name: name ?? 'Usuario',
     email,
     pictureUrl: typeof claims.picture === 'string' ? claims.picture : null,
+    emailVerified: true,
+    provider: 'cognito',
   }
 }
 
 export class CognitoAuthProvider implements AuthProvider {
   readonly kind = 'cognito'
+  readonly supportsEmailVerification = false
+  readonly supportsPasswordReset = false
+  readonly supportsGoogle = false
   #config: CognitoConfig
   #user: AuthUser | null = null
   #listeners = new Set<(user: AuthUser | null) => void>()
@@ -86,6 +92,18 @@ export class CognitoAuthProvider implements AuthProvider {
 
   getUser(): AuthUser | null {
     return this.#user
+  }
+
+  async signUp(): Promise<AuthSignUpResult> {
+    throw new AuthError('not-supported', 'Cognito pendiente de activar')
+  }
+
+  async resetPassword(): Promise<void> {
+    throw new AuthError('not-supported', 'Cognito pendiente de activar')
+  }
+
+  async deleteAccount(): Promise<void> {
+    throw new AuthError('not-supported', 'Cognito pendiente de activar')
   }
 
   async signIn(): Promise<void> {

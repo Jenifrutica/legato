@@ -27,6 +27,24 @@ export type NoteRecord = Note
 
 export type LyricsRecord = LocalLyrics
 
+export type UserRecord = {
+  id: string
+  email: string
+  name: string
+  passwordHash: string
+  salt: string
+  iterations: number
+  createdAt: number
+  updatedAt: number
+}
+
+export type AuthSessionRecord = {
+  tokenHash: string
+  userId: string
+  createdAt: number
+  expiresAt: number
+}
+
 export type SessionRecord = {
   key: string
   trackIds: string[]
@@ -50,6 +68,8 @@ class LegatoDatabase extends Dexie {
   setlists!: Table<SetlistRecord, string>
   notes!: Table<NoteRecord>
   lyrics!: Table<LyricsRecord, string>
+  users!: Table<UserRecord, string>
+  authSessions!: Table<AuthSessionRecord, string>
 
   constructor() {
     super('legato')
@@ -89,6 +109,18 @@ class LegatoDatabase extends Dexie {
       setlists: 'id',
       notes: '[targetType+targetId]',
       lyrics: 'trackId',
+    })
+    this.version(6).stores({
+      songs: 'id',
+      playlists: 'id',
+      session: 'key',
+      analysis: 'trackId',
+      chords: 'trackId',
+      setlists: 'id',
+      notes: '[targetType+targetId]',
+      lyrics: 'trackId',
+      users: 'id, &email',
+      authSessions: 'tokenHash, userId',
     })
   }
 }
