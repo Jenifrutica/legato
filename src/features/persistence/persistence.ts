@@ -1,7 +1,13 @@
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
-import { useChordStore, useTrackAnalysisStore } from '../musician'
-import type { ChordSheet, TrackAnalysis } from '../musician'
+import {
+  noteKey,
+  useChordStore,
+  useNotesStore,
+  useSetlistStore,
+  useTrackAnalysisStore,
+} from '../musician'
+import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
 import { usePlaylistsStore } from '../playlists'
 import type { PlaylistRestoreRecord } from '../playlists'
 import { usePlayerStore } from '../../player'
@@ -33,6 +39,12 @@ export async function hydrateStores(): Promise<boolean> {
   const chordRecords = await db.chords.toArray()
   useChordStore.getState().hydrate(chordRecords)
 
+  const setlistRecords = await db.setlists.toArray()
+  useSetlistStore.getState().hydrate(setlistRecords)
+
+  const noteRecords = await db.notes.toArray()
+  useNotesStore.getState().hydrate(noteRecords)
+
   return true
 }
 
@@ -46,6 +58,8 @@ export function startPersistence(): void {
   let lastPlaylists = usePlaylistsStore.getState().playlists
   let lastAnalysis = useTrackAnalysisStore.getState().records
   let lastChords = useChordStore.getState().records
+  let lastSetlists = useSetlistStore.getState().setlists
+  let lastNotes = useNotesStore.getState().records
   let sessionTimer: ReturnType<typeof setTimeout> | null = null
 
   useLibraryStore.subscribe((state) => {
@@ -80,6 +94,22 @@ export function startPersistence(): void {
     void syncChords(state.records)
   })
 
+  useSetlistStore.subscribe((state) => {
+    if (state.setlists === lastSetlists) {
+      return
+    }
+    lastSetlists = state.setlists
+    void syncSetlists(state.setlists)
+  })
+
+  useNotesStore.subscribe((state) => {
+    if (state.records === lastNotes) {
+      return
+    }
+    lastNotes = state.records
+    void syncNotes(state.records)
+  })
+
   usePlayerStore.subscribe(() => {
     if (sessionTimer !== null) {
       return
@@ -107,11 +137,15 @@ export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
   const existing = await db.songs.toCollection().primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.songs, db.analysis, db.chords, async () => {
+  await db.transaction('rw', db.songs, db.analysis, db.chords, db.notes, async () => {
     if (stale.length > 0) {
       await db.songs.bulkDelete(stale)
       await db.analysis.bulkDelete(stale)
       await db.chords.bulkDelete(stale)
+      await db.notes
+        .where('[targetType+targetId]')
+        .anyOf(stale.map((id) => ['track', id]))
+        .delete()
     }
     await db.songs.bulkPut(records)
   })
@@ -169,11 +203,63 @@ export async function syncPlaylists(playlists: PlaylistRestoreRecord[]): Promise
   const existing = await db.playlists.toCollection().primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.playlists, async () => {
+  await db.transaction('rw', db.playlists, db.notes, async () => {
     if (stale.length > 0) {
       await db.playlists.bulkDelete(stale)
+      await db.notes
+        .where('[targetType+targetId]')
+        .anyOf(stale.map((id) => ['playlist', id]))
+        .delete()
     }
     await db.playlists.bulkPut(playlists)
+  })
+}
+
+export async function syncSetlists(setlists: Setlist[]): Promise<void> {
+  const db = getDatabase()
+  if (db === null) {
+    return
+  }
+
+  const ids = new Set(setlists.map((setlist) => setlist.id))
+  const existing = await db.setlists.toCollection().primaryKeys()
+  const stale = existing.filter((id) => !ids.has(id))
+
+  await db.transaction('rw', db.setlists, async () => {
+    if (stale.length > 0) {
+      await db.setlists.bulkDelete(stale)
+    }
+    await db.setlists.bulkPut(setlists)
+  })
+}
+
+export async function syncNotes(records: Record<string, Note>): Promise<void> {
+  const db = getDatabase()
+  if (db === null) {
+    return
+  }
+
+  // Solo se persisten notas de pistas y playlists que existen.
+  const known = new Set<string>()
+  for (const track of useLibraryStore.getState().tracks) {
+    known.add(noteKey('track', track.id))
+  }
+  for (const playlist of usePlaylistsStore.getState().playlists) {
+    known.add(noteKey('playlist', playlist.id))
+  }
+
+  const values = Object.values(records).filter((note) =>
+    known.has(noteKey(note.targetType, note.targetId)),
+  )
+  const keep = new Set(values.map((note) => noteKey(note.targetType, note.targetId)))
+  const existing = await db.notes.toArray()
+  const stale = existing.filter((note) => !keep.has(noteKey(note.targetType, note.targetId)))
+
+  await db.transaction('rw', db.notes, async () => {
+    if (stale.length > 0) {
+      await db.notes.bulkDelete(stale.map((note) => [note.targetType, note.targetId]))
+    }
+    await db.notes.bulkPut(values)
   })
 }
 

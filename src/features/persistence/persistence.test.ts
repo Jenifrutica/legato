@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
-import { useChordStore, useTrackAnalysisStore } from '../musician'
+import { useChordStore, useNotesStore, useSetlistStore, useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
-import { syncAnalysis, syncChords } from './persistence'
+import { syncAnalysis, syncChords, syncNotes, syncSetlists } from './persistence'
 
 function track(id: string): LibraryTrack {
   return {
@@ -55,10 +55,14 @@ describe('persistence database', () => {
       await db.session.clear()
       await db.analysis.clear()
       await db.chords.clear()
+      await db.setlists.clear()
+      await db.notes.clear()
     }
     useLibraryStore.getState().hydrate([])
     useTrackAnalysisStore.getState().hydrate([])
     useChordStore.getState().hydrate([])
+    useSetlistStore.getState().hydrate([])
+    useNotesStore.getState().hydrate([])
   })
 
   it('guarda y carga canciones con blob', async () => {
@@ -173,5 +177,45 @@ describe('persistence database', () => {
 
     const keys = await db.chords.toCollection().primaryKeys()
     expect(keys).toEqual(['a'])
+  })
+
+  it('guarda y carga setlists', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await syncSetlists([
+      {
+        id: 's1',
+        name: 'Bolo',
+        items: [{ trackId: 'a', played: true }],
+        createdAt: 1,
+        updatedAt: 2,
+      },
+    ])
+    const record = await db.setlists.get('s1')
+
+    expect(record?.name).toBe('Bolo')
+    expect(record?.items).toEqual([{ trackId: 'a', played: true }])
+  })
+
+  it('syncNotes guarda destinos existentes y borra los que ya no están', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    useLibraryStore.getState().hydrate([track('a')])
+    await db.notes.put({ targetType: 'track', targetId: 'ghost', text: 'no', updatedAt: 1 })
+    await syncNotes({
+      'track:a': { targetType: 'track', targetId: 'a', text: 'sí', updatedAt: 1 },
+    })
+
+    const records = await db.notes.toArray()
+    expect(records.map((note) => note.targetId)).toEqual(['a'])
+    expect(records[0]?.text).toBe('sí')
   })
 })

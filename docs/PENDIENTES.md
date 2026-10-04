@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 232 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 244 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -94,11 +94,11 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 | **Transposición** | **Hecho (C3)**: ±11 semitonos sobre ChordPro (acordes con barra y enarmonía correcta); solo cambia la vista, la hoja original no se toca |
 | **LRC local** | Cargar `.lrc` junto al audio (File System Access API o input) y usarlo antes que LRCLIB |
 | **Pitch shift** | Cambiar tono sin cambiar tempo (fase/vocoder; considerar librería o `detune` con trade-offs); UI en el panel |
-| **Setlists** | Orden de ensayo sobre las playlists (otra DLL): reordenar, marcar tocadas |
-| **Notas** | Notas por pista/playlist en IndexedDB |
+| **Setlists** | **Hecho (C4)**: otra DLL del núcleo; crear vacía o desde playlist, reordenar con `moveNode`, marcar tocadas, quitar, duración total y reproducir; persistidas en IndexedDB (`setlists`, Dexie v4) |
+| **Notas** | **Hecho (C4)**: notas por pista y por playlist en IndexedDB (`notes`, clave compuesta) con autoguardado; pendiente post-entrega lo de marcas de tiempo por sección |
 | **Stems (Demucs)** | Post-entrega (requiere servidor/Python); dejado documentado |
 
-**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → notas/setlists (C4) → LRC local (C5); pitch shift y stems, post-entrega.
+**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → ~~notas/setlists (C4, hecho)~~ → LRC local (C5); pitch shift y stems, post-entrega.
 **Criterio:** cada función en el panel de músicos, con i18n, persistencia y tests.
 
 ---
@@ -150,7 +150,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 232 unitarios
+~/.bun/bin/bun run test        # 244 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

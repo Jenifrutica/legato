@@ -475,3 +475,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **UI** (pestaña **Acordes**): importar `.cho/.pro` o pegar texto, editor con autoguardado (debounce 400 ms), botones − / + de transporte con «Original», y vista en `<ruby>` (acorde sobre la sílaba, en tinta directa) con título/artista y `Tono: X`. i18n ES/EN/PT.
 - **Tests** (12 nuevos): parser (tokens, secciones, comentarios, directivas desconocidas), transporte (mayores, menores, séptimas, octava, bemoles, barras, acordes inválidos), `transposeSong` y persistencia/store de hojas. Total: **232 unit + 6 E2E**; verificado en navegador (G→A con `+2`, persistencia tras recargar, sin errores).
 - Detector de impeccable: se corrigió un `text-[0.625rem]` fuera de la rampa a `0.6875rem`; resultado `[]`.
+
+### C4 Setlists y notas (implementado)
+
+- **Setlists sobre otra DLL del núcleo** (`setlist.ts`): `moveSetlistItem` reconstruye la lista doble y reordena con `moveNode`; helpers de marcar/desmarcar tocada y quitar. Store `setlist-store.ts` con crear (vacía o desde playlist, sin duplicados), eliminar, seleccionar, mover, marcar y quitar; selección conservada al hidratar.
+- **Notas** (`notes-store.ts`) por pista y por playlist con clave `tipo:id`; `NotesEditor` reutilizable con autoguardado (debounce 400 ms).
+- **Persistencia IndexedDB**: Dexie sube a **versión 4** con `setlists: 'id'` y `notes: '[targetType+targetId]'` (clave compuesta); hidratación, `syncSetlists` y `syncNotes` (descarta destinos inexistentes); al borrar canciones o playlists se limpian sus notas.
+- **UI**: pestañas **Setlist** (crear, elegir, reproducir, eliminar, filas con nº, tocada, subir/bajar, quitar, duración total) y **Notas** (pista actual + playlist seleccionada). Total 5 pestañas con `flex-wrap`. i18n ES/EN/PT.
+- **Tests** (12 nuevos): reordenar con la DLL (extremos y mismo índice), ignorar pistas ausentes, marcar/quitar; store (crear/seleccionar/eliminar/hidratar); notas (guardar/hidratar/borrar); persistencia de setlists y de notas con limpieza de huérfanos. Total: **244 unit + 6 E2E**; verificado en navegador (2 pistas, 1:12, reordenar, tocada y nota persisten tras recargar).
