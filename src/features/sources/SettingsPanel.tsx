@@ -56,6 +56,9 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
 
     try {
       const profile = await getSpotifyProfile()
+      if (profile !== null) {
+        setSpotifyConnected(true)
+      }
       setTestResult(
         profile === null
           ? t('settings.testError', { error: 'sin sesión' })
@@ -69,12 +72,23 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   }
 
   useEffect(() => {
-    if (open) {
-      void handleSpotifyRedirect().then((changed) => {
-        if (changed) {
-          setSpotifyConnected(true)
-        }
-      })
+    if (!open) {
+      return
+    }
+
+    let active = true
+    // Al abrir, relee el estado real (los tokens viven por usuario y el
+    // bootstrap puede haberlos migrado después del primer render).
+    setSpotifyConnected(isSpotifyConnected())
+
+    void handleSpotifyRedirect().then((changed) => {
+      if (active && (changed || isSpotifyConnected())) {
+        setSpotifyConnected(true)
+      }
+    })
+
+    return () => {
+      active = false
     }
   }, [open])
 
@@ -111,7 +125,7 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
       <div
         aria-label={t('settings.title')}
         aria-modal="true"
-        className="h-full w-full max-w-sm overflow-y-auto border-l border-border bg-surface p-5 shadow-soft"
+        className="h-full w-full max-w-sm overflow-y-auto border-l border-border bg-surface p-5 text-ink shadow-soft"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >

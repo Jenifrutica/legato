@@ -63,7 +63,7 @@ export function A11yPanel() {
       <div
         aria-label={t('a11y.title')}
         aria-modal="true"
-        className="h-full w-full max-w-sm overflow-y-auto border-l border-border bg-surface p-5 shadow-soft"
+        className="h-full w-full max-w-sm overflow-y-auto border-l border-border bg-surface p-5 text-ink shadow-soft"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
