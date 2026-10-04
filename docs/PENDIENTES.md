@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 260 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 262 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -68,7 +68,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 - Analizador dedicado al bombo en `audio-graph.ts` (`fftSize` 1024, `smoothing` 0, banda 40–150 Hz calculada por `sampleRate`) separado del analizador de dibujo (`fftSize` 256, `smoothing` 0.68).
 - Control de **sensibilidad** y **BPM manual con tap tempo** en la pestaña Audio (persistidos en `legato.waves.v1`); con Spotify/DRM el pulso es sintético al BPM manual (120 por defecto).
 - Pistas de prueba fuera del repo: `~/Downloads/legato-ritmo-120bpm.wav`, `~/Downloads/legato-ritmo-100bpm.wav` y `~/Downloads/legato-acordes.wav` (C·G·Am·F, 8 s).
-- **Spotify (C7)**: se consulta `/v1/audio-analysis` de la pista para obtener la rejilla de beats (ondas exactas) y el croma (acordes con la letra); el pulso sintético ya queda anclado a la posición de la pista. **Pendiente comprobar con la cuenta si responde 200 o 403.**
+- **Spotify (C7)**: se consulta `/v1/audio-analysis` de la pista para obtener la rejilla de beats (ondas exactas) y el croma (acordes con la letra); el pulso sintético ya queda anclado a la posición de la pista. **Verificado con la cuenta: 403**, así que se añadió fallback por preview de 30 s; si no hay preview, en Spotify quedan BPM manual (anclado) y editor ChordPro.
 
 **Pendiente (solo verificación con la autora):**
 - Importar las pistas de prueba (o música real local) y confirmar a ojo que los picos caen en los golpes; reposo/pausa quieto.
@@ -151,7 +151,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 260 unitarios
+~/.bun/bin/bun run test        # 262 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

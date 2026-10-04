@@ -350,6 +350,8 @@ export const pt: typeof es = {
     spotifyDetecting: 'Consultando a análise do Spotify…',
     spotifyNotConnected: 'Conecte o Spotify (⚙) para usar a análise de batidas e acordes.',
     spotifyError: 'A análise do Spotify não está disponível: {{error}}',
+    previewDetected:
+      'O Spotify bloqueou sua análise ({{error}}); os acordes foram estimados do preview de 30 s, assim como o BPM.',
     sections: {
       chorus: 'Refrão',
       verse: 'Verso',

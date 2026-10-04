@@ -351,6 +351,8 @@ export const es = {
     spotifyDetecting: 'Consultando el análisis de Spotify…',
     spotifyNotConnected: 'Conecta Spotify (⚙) para usar su análisis de beats y acordes.',
     spotifyError: 'El análisis de Spotify no está disponible: {{error}}',
+    previewDetected:
+      'Spotify bloqueó su análisis ({{error}}); los acordes se estimaron del preview de 30 s y el BPM también.',
     sections: {
       chorus: 'Coro',
       verse: 'Verso',

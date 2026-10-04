@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fetchSpotifyPlaylistTracks, fetchSpotifyPlaylists } from './spotify'
+import {
+  fetchSpotifyPlaylistTracks,
+  fetchSpotifyPlaylists,
+  fetchSpotifyTrackPreview,
+} from './spotify'
 
 const TOKENS_KEY = 'legato.spotify.tokens'
 
@@ -76,6 +80,21 @@ describe('playlists de Spotify', () => {
     expect(tracks).toHaveLength(1)
     expect(tracks[0]?.externalUrl).toBe('https://open.spotify.com/track/t1')
     expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('lee el preview cuando Spotify lo ofrece', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(jsonResponse({ preview_url: 'https://p.scdn.co/x.mp3' })),
+    )
+
+    expect(await fetchSpotifyTrackPreview('t1')).toBe('https://p.scdn.co/x.mp3')
+  })
+
+  it('devuelve null cuando no hay preview', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ preview_url: null })))
+
+    expect(await fetchSpotifyTrackPreview('t1')).toBeNull()
   })
 
   it('ignora pistas locales, nulas o sin id', async () => {

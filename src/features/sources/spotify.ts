@@ -270,6 +270,22 @@ export async function searchSpotify(query: string): Promise<SourceTrack[]> {
   return (data.tracks?.items ?? []).map(mapSpotifyTrack)
 }
 
+/** URL del preview de 30 s de la pista (null si Spotify ya no lo ofrece). */
+export async function fetchSpotifyTrackPreview(trackId: string): Promise<string | null> {
+  const token = await getAccessToken()
+  if (token === null) {
+    throw new Error('not-connected')
+  }
+
+  const response = await fetchWithRetry(`${API}/tracks/${trackId}`, token)
+  if (!response.ok) {
+    throw new Error(await describeError(response))
+  }
+
+  const data = (await response.json()) as { preview_url?: string | null }
+  return data.preview_url ?? null
+}
+
 export type SpotifyAudioAnalysis = {
   tempo: number
   key: number

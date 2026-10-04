@@ -8,6 +8,7 @@ export {
   fetchSpotifyAudioAnalysis,
   fetchSpotifyPlaylists,
   fetchSpotifyPlaylistTracks,
+  fetchSpotifyTrackPreview,
   handleSpotifyRedirect,
   isSpotifyConfigured,
   isSpotifyConnected,

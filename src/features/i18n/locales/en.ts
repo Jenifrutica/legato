@@ -350,6 +350,8 @@ export const en: typeof es = {
     spotifyDetecting: 'Fetching the Spotify analysis…',
     spotifyNotConnected: 'Connect Spotify (⚙) to use its beat and chord analysis.',
     spotifyError: 'The Spotify analysis is not available: {{error}}',
+    previewDetected:
+      'Spotify blocked its analysis ({{error}}); chords were estimated from the 30 s preview, and so was the BPM.',
     sections: {
       chorus: 'Chorus',
       verse: 'Verse',

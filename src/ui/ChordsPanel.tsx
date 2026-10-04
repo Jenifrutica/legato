@@ -4,13 +4,18 @@ import { formatDuration, useLibraryStore } from '../features/library'
 import { parseChordPro, transposeSong, useChordStore } from '../features/musician'
 import {
   chordsFromSpotifySegments,
+  detectBpmFromBlob,
   detectChordsFromBlob,
   spotifyKeyName,
   useTrackAnalysisStore,
 } from '../features/musician'
 import type { ChordProLine, ChordToken, DetectedChord } from '../features/musician'
 import { useLyrics } from '../features/lyrics'
-import { fetchSpotifyAudioAnalysis, isSpotifyConnected } from '../features/sources'
+import {
+  fetchSpotifyAudioAnalysis,
+  fetchSpotifyTrackPreview,
+  isSpotifyConnected,
+} from '../features/sources'
 import { usePlayerStore } from '../player'
 
 const SECTION_KEYS = {
@@ -52,6 +57,7 @@ export function ChordsPanel() {
   const [semitones, setSemitones] = useState(0)
   const [detecting, setDetecting] = useState<'local' | 'spotify' | null>(null)
   const [spotifyError, setSpotifyError] = useState<string | null>(null)
+  const [spotifyNotice, setSpotifyNotice] = useState<string | null>(null)
   const attempted = useRef<Set<string>>(new Set())
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -86,11 +92,42 @@ export function ChordsPanel() {
 
     setDetecting('local')
     setSpotifyError(null)
+    setSpotifyNotice(null)
     // Deja que la UI pinte el estado antes del cálculo pesado.
     await new Promise((resolve) => setTimeout(resolve, 30))
     const chords = await detectChordsFromBlob(libraryTrack.blob)
     setDetectedChords(trackId, chords)
     setDetecting(null)
+  }
+
+  /** Si Spotify bloquea su análisis, se intenta el preview de 30 s (audio descargable). */
+  async function detectFromPreview(id: string): Promise<boolean> {
+    try {
+      const url = await fetchSpotifyTrackPreview(id)
+      if (url === null || url === '') {
+        return false
+      }
+      const response = await fetch(url)
+      if (!response.ok) {
+        return false
+      }
+      const blob = await response.blob()
+      const chords = await detectChordsFromBlob(blob)
+      if (chords === null) {
+        return false
+      }
+      if (trackId !== null) {
+        setDetectedChords(trackId, chords)
+        const bpm = await detectBpmFromBlob(blob)
+        const current = useTrackAnalysisStore.getState().records[trackId]
+        if (bpm !== null && (current?.bpm ?? null) === null) {
+          setBpm(trackId, bpm)
+        }
+      }
+      return true
+    } catch {
+      return false
+    }
   }
 
   async function runSpotifyAnalysis() {
@@ -100,6 +137,7 @@ export function ChordsPanel() {
 
     setDetecting('spotify')
     setSpotifyError(null)
+    setSpotifyNotice(null)
 
     try {
       const analysis = await fetchSpotifyAudioAnalysis(spotifyTrackId)
@@ -118,7 +156,13 @@ export function ChordsPanel() {
         }
       }
     } catch (error) {
-      setSpotifyError(error instanceof Error ? error.message : 'error')
+      const message = error instanceof Error ? error.message : 'error'
+      const fromPreview = await detectFromPreview(spotifyTrackId)
+      if (fromPreview) {
+        setSpotifyNotice(t('chords.previewDetected', { error: message }))
+      } else {
+        setSpotifyError(message)
+      }
     } finally {
       setDetecting(null)
     }
@@ -273,6 +317,12 @@ export function ChordsPanel() {
                 {t('chords.spotifyDetect')}
               </button>
             </div>
+          )}
+
+          {spotifyNotice !== null && (
+            <p className="text-xs leading-relaxed text-ink-muted" role="status">
+              {spotifyNotice}
+            </p>
           )}
 
           {detected !== null && detected.length > 0 && (
