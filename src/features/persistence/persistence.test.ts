@@ -283,6 +283,39 @@ describe('persistence database', () => {
     expect(useTrackAnalysisStore.getState().records.a).toBeUndefined()
   })
 
+  it('hereda los datos de una cuenta local anterior', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.users.put({
+      id: 'local-1',
+      email: 'local@legato.local',
+      name: 'Local',
+      passwordHash: 'x',
+      salt: 'y',
+      iterations: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    })
+    await db.songs.put({ ...trackToRecord(track('a'), 'local-1'), externalUrl: 'spotify:track:a' })
+    await db.playlists.put({
+      id: 'p1',
+      name: 'P',
+      createdAt: 1,
+      updatedAt: 1,
+      trackIds: ['a'],
+      userId: 'local-1',
+    })
+
+    await adoptOrphanData('firebase-9', { inheritLocalAccounts: true })
+
+    expect((await db.songs.get('a'))?.userId).toBe('firebase-9')
+    expect((await db.playlists.get('p1'))?.userId).toBe('firebase-9')
+  })
+
   it('deleteUserData borra todo lo del usuario y respeta lo ajeno', async () => {
     const db = getDatabase()
     expect(db).not.toBeNull()

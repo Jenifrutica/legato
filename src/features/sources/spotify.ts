@@ -19,10 +19,28 @@ export function setSpotifyScope(userId: string | null): void {
 
   try {
     const scoped = tokensKey()
+    if (localStorage.getItem(scoped) !== null) {
+      return
+    }
+
+    // Hereda los tokens globales o los de una cuenta local anterior.
     const legacy = localStorage.getItem(TOKENS_KEY_BASE)
-    if (localStorage.getItem(scoped) === null && legacy !== null) {
+    if (legacy !== null) {
       localStorage.setItem(scoped, legacy)
       localStorage.removeItem(TOKENS_KEY_BASE)
+      return
+    }
+
+    for (let index = 0; index < localStorage.length; index++) {
+      const key = localStorage.key(index)
+      if (key !== null && key.startsWith(`${TOKENS_KEY_BASE}.`) && key !== scoped) {
+        const value = localStorage.getItem(key)
+        if (value !== null) {
+          localStorage.setItem(scoped, value)
+          localStorage.removeItem(key)
+          return
+        }
+      }
     }
   } catch {
     // sin persistencia

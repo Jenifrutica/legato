@@ -34,7 +34,7 @@ export default function App() {
 
 export function AuthGate() {
   const { t } = useTranslation()
-  const { user, ready } = useAuth()
+  const { user, ready, kind } = useAuth()
 
   if (!ready) {
     return (
@@ -55,10 +55,10 @@ export function AuthGate() {
     return <VerifyEmailScreen />
   }
 
-  return <AppShell userId={user.id} />
+  return <AppShell authKind={kind} userId={user.id} />
 }
 
-function AppShell({ userId }: { userId: string }) {
+function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
   const { t } = useTranslation()
   useAlbumTheme()
   usePlayTracker()
@@ -74,7 +74,7 @@ function AppShell({ userId }: { userId: string }) {
       setActiveUserId(userId)
       setSpotifyScope(userId)
       usePlayLogStore.getState().setScope(userId)
-      await adoptOrphanData(userId)
+      await adoptOrphanData(userId, { inheritLocalAccounts: authKind !== 'local' })
       if (cancelled) {
         return
       }
@@ -88,7 +88,7 @@ function AppShell({ userId }: { userId: string }) {
       cancelled = true
       teardownSession()
     }
-  }, [userId])
+  }, [userId, authKind])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

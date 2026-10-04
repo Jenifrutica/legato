@@ -80,13 +80,33 @@ export const usePlayLogStore = create<PlayLogState>((set, get) => ({
   setScope: (userId) => {
     scopeSuffix = userId === null ? '' : `.${userId}`
 
-    // Los registros previos (sin cuenta) pasan al primer usuario.
+    // Los registros previos (sin cuenta o de una cuenta local anterior)
+    // pasan al usuario que entra.
     if (userId !== null && typeof localStorage !== 'undefined') {
       try {
-        const legacy = localStorage.getItem(STORAGE_KEY_BASE)
-        if (localStorage.getItem(storageKey()) === null && legacy !== null) {
-          localStorage.setItem(storageKey(), legacy)
-          localStorage.removeItem(STORAGE_KEY_BASE)
+        const key = storageKey()
+        if (localStorage.getItem(key) === null) {
+          const legacy = localStorage.getItem(STORAGE_KEY_BASE)
+          if (legacy !== null) {
+            localStorage.setItem(key, legacy)
+            localStorage.removeItem(STORAGE_KEY_BASE)
+          } else {
+            for (let index = 0; index < localStorage.length; index++) {
+              const candidate = localStorage.key(index)
+              if (
+                candidate !== null &&
+                candidate.startsWith(`${STORAGE_KEY_BASE}.`) &&
+                candidate !== key
+              ) {
+                const value = localStorage.getItem(candidate)
+                if (value !== null) {
+                  localStorage.setItem(key, value)
+                  localStorage.removeItem(candidate)
+                  break
+                }
+              }
+            }
+          }
         }
       } catch {
         // sin persistencia

@@ -37,7 +37,10 @@ function scopeKey(userId: string): string {
  * El primer usuario adopta los datos que quedaron sin dueño (biblioteca,
  * playlists, sesión y análisis previos a las cuentas).
  */
-export async function adoptOrphanData(userId: string): Promise<void> {
+export async function adoptOrphanData(
+  userId: string,
+  options: { inheritLocalAccounts?: boolean } = {},
+): Promise<void> {
   const db = getDatabase()
   if (db === null) {
     return
@@ -65,6 +68,41 @@ export async function adoptOrphanData(userId: string): Promise<void> {
   if (legacy !== undefined) {
     await db.session.put({ ...legacy, key: scopeKey(userId) })
     await db.session.delete('current')
+  }
+
+  // Al pasar de cuenta local a la nube (Firebase), los datos de las cuentas
+  // locales anteriores se heredan al primer usuario real que entra. Entre
+  // cuentas locales (respaldo) no se hereda: cada una sigue aislada.
+  const localUsers = options.inheritLocalAccounts === true ? await db.users.toArray() : []
+  const localIds = localUsers.map((user) => user.id)
+  if (localIds.length > 0) {
+    for (const table of tables) {
+      const records = await table.toArray()
+      const inherited = records.filter(
+        (record) => record.userId != null && localIds.includes(record.userId),
+      )
+      if (inherited.length > 0) {
+        await table.bulkPut(inherited.map((record) => ({ ...record, userId })))
+      }
+    }
+
+    for (const localId of localIds) {
+      const session = await db.session.get(scopeKey(localId))
+      if (session !== undefined) {
+        await db.session.put({ ...session, key: scopeKey(userId) })
+        await db.session.delete(scopeKey(localId))
+      }
+    }
+
+    const tombstones = await db.tombstones.toArray()
+    const inheritedTombstones = tombstones.filter(
+      (tombstone) => tombstone.userId != null && localIds.includes(tombstone.userId),
+    )
+    if (inheritedTombstones.length > 0) {
+      await db.tombstones.bulkPut(
+        inheritedTombstones.map((tombstone) => ({ ...tombstone, userId })),
+      )
+    }
   }
 }
 
