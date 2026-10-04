@@ -131,6 +131,9 @@ export const pt: typeof es = {
     privacy: 'Sua biblioteca de áudio vive só neste navegador. A conta serve para entrar.',
     verifyTitle: 'Confirme seu e-mail',
     verifyText: 'Enviamos um link para {{email}}. Confirme para entrar.',
+    verifyHint:
+      'Não chegou? Verifique a pasta de spam (procure «firebaseapp» ou «Legato») e espere um minuto antes de reenviar.',
+    verifyGoogle: 'Entrar com Google (sem e-mail de verificação)',
     resend: 'Reenviar e-mail',
     resent: 'E-mail reenviado.',
     verified: 'Já confirmei',

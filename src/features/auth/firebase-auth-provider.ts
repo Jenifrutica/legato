@@ -50,6 +50,11 @@ export function toAuthError(error: unknown): AuthError {
   return new AuthError(ERROR_MAP[code] ?? 'unknown', code)
 }
 
+function emailActionSettings() {
+  // El enlace de verificación vuelve a la app (no a una página genérica).
+  return typeof window === 'undefined' ? undefined : { url: window.location.origin }
+}
+
 function mapUser(user: User): AuthUser {
   const google = user.providerData.some((provider) => provider.providerId === 'google.com')
   return {
@@ -120,7 +125,7 @@ export class FirebaseAuthProvider implements AuthProvider {
       if (input.name.trim() !== '') {
         await updateProfile(credential.user, { displayName: input.name.trim() })
       }
-      await sendEmailVerification(credential.user)
+      await sendEmailVerification(credential.user, emailActionSettings())
       this.#writeLoginAt()
       this.#setUser(mapUser(this.#auth.currentUser ?? credential.user))
       return { needsEmailVerification: true }
@@ -155,7 +160,7 @@ export class FirebaseAuthProvider implements AuthProvider {
       throw new AuthError('user-not-found')
     }
     try {
-      await sendEmailVerification(user)
+      await sendEmailVerification(user, emailActionSettings())
     } catch (error) {
       throw toAuthError(error)
     }

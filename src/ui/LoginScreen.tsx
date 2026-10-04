@@ -212,7 +212,8 @@ export function LoginScreen() {
 
 export function VerifyEmailScreen() {
   const { t } = useTranslation()
-  const { user, resendVerificationEmail, refreshUser, signOut } = useAuth()
+  const { user, resendVerificationEmail, refreshUser, signOut, supportsGoogle, signInWithGoogle } =
+    useAuth()
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -260,6 +261,25 @@ export function VerifyEmailScreen() {
           <p className="mt-3 text-xs text-danger" role="alert">
             {error}
           </p>
+        )}
+
+        <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('auth.verifyHint')}</p>
+
+        {supportsGoogle && signInWithGoogle !== undefined && (
+          <button
+            className="mt-3 w-full border-2 border-rule bg-surface px-3 py-2 font-mono text-[0.6875rem] tracking-[0.1em] text-ink uppercase transition-colors hover:border-accent disabled:opacity-60"
+            disabled={busy}
+            onClick={() => {
+              setBusy(true)
+              void signOut()
+                .then(() => signInWithGoogle())
+                .catch((caught: unknown) => setError(t(errorKey(caught))))
+                .finally(() => setBusy(false))
+            }}
+            type="button"
+          >
+            {t('auth.verifyGoogle')}
+          </button>
         )}
 
         <div className="mt-4 flex flex-wrap gap-2">

@@ -130,6 +130,9 @@ export const es = {
     privacy: 'Tu biblioteca de audio vive solo en este navegador. La cuenta se usa para entrar.',
     verifyTitle: 'Confirma tu correo',
     verifyText: 'Te enviamos un enlace a {{email}}. Confírmalo para entrar.',
+    verifyHint:
+      '¿No llega? Revisa la carpeta de spam (busca «firebaseapp» o «Legato») y espera un minuto antes de reenviar.',
+    verifyGoogle: 'Entrar con Google (sin correo de verificación)',
     resend: 'Reenviar correo',
     resent: 'Correo reenviado.',
     verified: 'Ya lo confirmé',

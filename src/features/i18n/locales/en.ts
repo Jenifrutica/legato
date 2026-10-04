@@ -131,6 +131,9 @@ export const en: typeof es = {
     privacy: 'Your audio library lives only in this browser. The account is used to sign in.',
     verifyTitle: 'Confirm your email',
     verifyText: 'We sent a link to {{email}}. Confirm it to sign in.',
+    verifyHint:
+      'Not arriving? Check the spam folder (look for “firebaseapp” or “Legato”) and wait a minute before resending.',
+    verifyGoogle: 'Sign in with Google (no verification email)',
     resend: 'Resend email',
     resent: 'Email resent.',
     verified: 'I confirmed it',
