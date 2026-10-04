@@ -203,14 +203,15 @@ export function AudioQualityPanel() {
             className="h-3 max-w-52 flex-1 cursor-pointer"
             id="audio-bass"
             max={12}
-            min={0}
+            min={-12}
             onChange={(event) => setBass(Number(event.target.value))}
             step={1}
             type="range"
             value={bassDb}
           />
           <span className="w-12 font-mono text-xs tabular-nums text-ink-muted">
-            {bassDb > 0 ? `+${bassDb}` : '0'} dB
+            {bassDb > 0 ? '+' : ''}
+            {bassDb} dB
           </span>
         </div>
       </div>

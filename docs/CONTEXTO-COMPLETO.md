@@ -491,3 +491,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **UI**: sección «Letra local (.lrc)» en la pestaña **Notas** (cargar archivo, estado y quitar). i18n ES/EN/PT.
 - **Tests** (4 nuevos): store local; `useLyrics` prefiere la letra local y no llama a `fetch`; persistencia (guardar/leer) y `syncLyrics` descarta pistas ausentes. Total: **248 unit + 6 E2E**; verificado en navegador (héroe con línea local y persistencia tras recargar).
 - **Cierre del módulo de músicos**: C1–C5 completos; **pitch shift y stems (Demucs) quedan post-entrega** como se acordó.
+
+### C6 Acordes automáticos con la letra (implementado, pedido de la autora)
+
+- **Motor de detección** propio y puro: `fft.ts` (radix-2 con ventana Hann), `audio-decode.ts` (decodifica a mono, compartido con BPM) y `chord-detect.ts`: por cuadro (4096, hop ~93 ms, primeros 120 s) calcula el **perfil cromático**, prueba las **24 tríadas mayores/menores** y suaviza con mediana + herencia del acorde anterior; los tramos cortos se funden. Devuelve `{ time, duration, chord }[]`.
+- **Sin trabajo manual**: al abrir la pestaña **Acordes**, si hay archivo local y no hay acordes guardados, la detección corre sola (una vez por pista). El resultado se guarda en el análisis de la pista (`detectedChords`, persistido con la tabla `analysis`).
+- **Con la letra**: si hay letra local o de LRCLIB, cada línea muestra encima el acorde vigente (sección «Acordes con la letra»); si no hay letra, se muestra la **línea de tiempo**. El editor manual ChordPro (pegar/importar/transportar) pasa a un desplegable «Editor manual (ChordPro)».
+- **Aislamiento de instrumentos**: los stems reales (Demucs) siguen post-entrega; mientras tanto se mantienen las aproximaciones por DSP: karaoke M/S (atenuar voz), aislamiento L/R, balance y **bajos de −12 a +12 dB** (ahora también atenúan).
+- **Tests** (7 nuevos): FFT (pico de un seno, DC), detección (C→G con tiempos, menores, silencio, audio corto) y store (`setDetectedChords` no pisa BPM/tono). Total: **255 unit + 6 E2E**; verificado en navegador con una pista de prueba C·G·Am·F generada con ffmpeg (`~/Downloads/legato-acordes.wav`).

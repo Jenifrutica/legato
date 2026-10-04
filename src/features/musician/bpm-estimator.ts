@@ -1,4 +1,5 @@
 import { clampBpm } from '../../player'
+import { decodeMono } from './audio-decode'
 
 const MIN_ESTIMATE_BPM = 60
 const MAX_ESTIMATE_BPM = 200
@@ -161,26 +162,9 @@ export function estimateBpmFromSamples(samples: Float32Array, sampleRate: number
 
 /** Decodifica el blob y estima el BPM (solo navegador; null si no se puede). */
 export async function detectBpmFromBlob(blob: Blob): Promise<number | null> {
-  if (blob.size === 0 || typeof OfflineAudioContext === 'undefined') {
+  const decoded = await decodeMono(blob, MAX_ANALYSIS_SECONDS)
+  if (decoded === null) {
     return null
   }
-
-  try {
-    const context = new OfflineAudioContext(1, 1, 44100)
-    const buffer = await context.decodeAudioData(await blob.arrayBuffer())
-    const length = Math.min(buffer.length, Math.floor(buffer.sampleRate * MAX_ANALYSIS_SECONDS))
-    const samples = new Float32Array(length)
-    const channels = Math.max(1, buffer.numberOfChannels)
-
-    for (let channelIndex = 0; channelIndex < channels; channelIndex++) {
-      const data = buffer.getChannelData(channelIndex)
-      for (let index = 0; index < length; index++) {
-        samples[index] += (data[index] ?? 0) / channels
-      }
-    }
-
-    return estimateBpmFromSamples(samples, buffer.sampleRate)
-  } catch {
-    return null
-  }
+  return estimateBpmFromSamples(decoded.samples, decoded.sampleRate)
 }

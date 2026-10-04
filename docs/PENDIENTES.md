@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 248 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 255 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -90,15 +90,15 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 |---|---|
 | **Metrónomo** | **Hecho (C1)**: motor Web Audio con lookahead, BPM 30–240, compases 2/4 · 3/4 · 4/4 · 6/8 (acento en 1 y 4), tap tempo, volumen; pestaña Práctica del panel de músicos; toggle «Modo músico» en Ajustes. Verificado y con tests |
 | **BPM/tonalidad** | **Hecho (C2)**: estimador propio (paso-bajos + envolvente de ataques + autocorrelación), BPM manual y tonalidad manual persistidos por pista (IndexedDB, tabla `analysis`), botón «Usar en el metrónomo». Verificado con las pistas de prueba (120/100 exactos) |
-| **ChordPro** | **Hecho (C3)**: parser propio `[Acorde]` + letra, directivas/secciones/comentarios; archivos `.cho`/`.pro` importables o pegados; editor con autoguardado y vista `<ruby>`; sin sincronía con audio (opcional, no pedida) |
+| **ChordPro** | **Hecho (C3/C6)**: además del parser/editor manual, los acordes se **detectan solos del audio** y se alinean con la letra; el editor ChordPro queda plegado como opción avanzada |
 | **Transposición** | **Hecho (C3)**: ±11 semitonos sobre ChordPro (acordes con barra y enarmonía correcta); solo cambia la vista, la hoja original no se toca |
 | **LRC local** | **Hecho (C5)**: cargar `.lrc` por pista desde la pestaña Notas, con prioridad sobre LRCLIB y persistencia en IndexedDB (`lyrics`, Dexie v5) |
 | **Pitch shift** | Cambiar tono sin cambiar tempo (fase/vocoder; considerar librería o `detune` con trade-offs); UI en el panel |
 | **Setlists** | **Hecho (C4)**: otra DLL del núcleo; crear vacía o desde playlist, reordenar con `moveNode`, marcar tocadas, quitar, duración total y reproducir; persistidas en IndexedDB (`setlists`, Dexie v4) |
 | **Notas** | **Hecho (C4)**: notas por pista y por playlist en IndexedDB (`notes`, clave compuesta) con autoguardado; pendiente post-entrega lo de marcas de tiempo por sección |
-| **Stems (Demucs)** | Post-entrega (requiere servidor/Python); dejado documentado |
+| **Stems (Demucs)** | Post-entrega (requiere servidor/Python). Mientras tanto: aproximaciones por DSP (karaoke M/S para la voz, aislamiento de canal, balance y bajos de −12 a +12 dB) |
 
-**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → ~~notas/setlists (C4, hecho)~~ → ~~LRC local (C5, hecho)~~. **Módulo de músicos completo**; pitch shift y stems, post-entrega.
+**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → ~~notas/setlists (C4, hecho)~~ → ~~LRC local (C5, hecho)~~. **Módulo de músicos completo** (+ C6: acordes automáticos con la letra); pitch shift y stems, post-entrega.
 **Criterio:** cada función en el panel de músicos, con i18n, persistencia y tests.
 
 ---
@@ -150,7 +150,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 248 unitarios
+~/.bun/bin/bun run test        # 255 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

@@ -336,6 +336,17 @@ export const es = {
     reset: 'Original',
     key: 'Tono: {{key}}',
     hint: 'Formato ChordPro: acordes entre corchetes sobre la letra. El transporte solo cambia la vista; tu hoja original no se modifica.',
+    detected: 'Acordes estimados del audio',
+    detecting: 'Analizando acordes…',
+    detectAgain: 'Volver a detectar',
+    clearDetected: 'Borrar acordes estimados',
+    detectedEmpty: 'No se detectaron acordes claros en esta pista.',
+    detectUnavailable:
+      'La detección de acordes necesita un archivo local (el audio de Spotify va protegido por DRM).',
+    withLyrics: 'Acordes con la letra',
+    noLyrics: 'Sin letra para alinear; aquí tienes la línea de tiempo.',
+    timeline: 'Línea de tiempo',
+    manual: 'Editor manual (ChordPro)',
     sections: {
       chorus: 'Coro',
       verse: 'Verso',

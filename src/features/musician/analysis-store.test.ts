@@ -30,4 +30,18 @@ describe('store de análisis por pista', () => {
     useTrackAnalysisStore.getState().setBpm('c', null)
     expect(useTrackAnalysisStore.getState().records.c?.bpm).toBeNull()
   })
+
+  it('guarda y borra los acordes detectados sin perder el resto', () => {
+    useTrackAnalysisStore.getState().setDetectedChords('d', [{ time: 0, duration: 2, chord: 'C' }])
+    useTrackAnalysisStore.getState().setBpm('d', 100)
+
+    expect(useTrackAnalysisStore.getState().records.d?.detectedChords).toEqual([
+      { time: 0, duration: 2, chord: 'C' },
+    ])
+    expect(useTrackAnalysisStore.getState().records.d?.bpm).toBe(100)
+
+    useTrackAnalysisStore.getState().setDetectedChords('d', null)
+    expect(useTrackAnalysisStore.getState().records.d?.detectedChords).toBeNull()
+    expect(useTrackAnalysisStore.getState().records.d?.bpm).toBe(100)
+  })
 })

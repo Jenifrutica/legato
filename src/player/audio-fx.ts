@@ -13,7 +13,7 @@ export type SavedAudioFx = {
 const engine = new AmbientEngine()
 
 function clampDb(value: number): number {
-  return Math.min(12, Math.max(0, Math.round(value)))
+  return Math.min(12, Math.max(-12, Math.round(value)))
 }
 
 function clampVolume(value: number): number {

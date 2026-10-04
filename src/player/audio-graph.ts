@@ -167,7 +167,7 @@ export class AudioGraph implements AnalyserLike {
   }
 
   setBass(gainDb: number): void {
-    this.#bassDb = Math.min(12, Math.max(0, gainDb))
+    this.#bassDb = Math.min(12, Math.max(-12, gainDb))
     if (this.#bass === null || this.#context === null) {
       return
     }

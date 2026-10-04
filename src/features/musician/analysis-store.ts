@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { clampBpm } from '../../player'
+import type { DetectedChord } from './chord-detect'
 
 export const KEY_OPTIONS = [
   'C',
@@ -22,6 +23,7 @@ export type TrackAnalysis = {
   trackId: string
   bpm: number | null
   key: string | null
+  detectedChords?: DetectedChord[] | null
   updatedAt: number
 }
 
@@ -30,17 +32,20 @@ type AnalysisState = {
   hydrate: (records: TrackAnalysis[]) => void
   setBpm: (trackId: string, bpm: number | null) => void
   setKey: (trackId: string, key: string | null) => void
+  setDetectedChords: (trackId: string, chords: DetectedChord[] | null) => void
 }
 
 function recordFor(
   current: TrackAnalysis | undefined,
   trackId: string,
-  patch: { bpm?: number | null; key?: string | null },
+  patch: { bpm?: number | null; key?: string | null; detectedChords?: DetectedChord[] | null },
 ): TrackAnalysis {
   return {
     trackId,
     bpm: patch.bpm === undefined ? (current?.bpm ?? null) : patch.bpm,
     key: patch.key === undefined ? (current?.key ?? null) : patch.key,
+    detectedChords:
+      patch.detectedChords === undefined ? (current?.detectedChords ?? null) : patch.detectedChords,
     updatedAt: Date.now(),
   }
 }
@@ -73,6 +78,14 @@ export const useTrackAnalysisStore = create<AnalysisState>((set) => ({
         [trackId]: recordFor(state.records[trackId], trackId, {
           key: key === null || key === '' ? null : key,
         }),
+      },
+    })),
+
+  setDetectedChords: (trackId, chords) =>
+    set((state) => ({
+      records: {
+        ...state.records,
+        [trackId]: recordFor(state.records[trackId], trackId, { detectedChords: chords }),
       },
     })),
 }))
