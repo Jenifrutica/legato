@@ -110,7 +110,6 @@ export const pt: typeof es = {
     signIn: 'Entrar',
     signUp: 'Criar conta',
     reset: 'Recuperar',
-    name: 'Nome visível',
     email: 'E-mail',
     password: 'Senha',
     passwordHint: 'Mínimo de {{count}} caracteres.',

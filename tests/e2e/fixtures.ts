@@ -35,14 +35,12 @@ export async function acceptCookies(page: Page): Promise<void> {
 /** Registra una cuenta local (modo respaldo) y entra en la app. */
 export async function registerAndEnter(
   page: Page,
-  options: { name?: string; email?: string; password?: string } = {},
+  options: { email?: string; password?: string } = {},
 ): Promise<void> {
-  const name = options.name ?? 'Jenifedora'
   const email = options.email ?? 'e2e@legato.local'
   const password = options.password ?? 'legato1234'
 
   await page.getByRole('tab', { name: 'Crear cuenta' }).click()
-  await page.getByLabel('Nombre visible').fill(name)
   await page.getByLabel('Correo').fill(email)
   await page.getByLabel('Contraseña').fill(password)
   await page.locator('form').getByRole('button', { name: 'Crear cuenta' }).click()

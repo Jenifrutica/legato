@@ -109,7 +109,6 @@ export const es = {
     signIn: 'Entrar',
     signUp: 'Crear cuenta',
     reset: 'Recuperar',
-    name: 'Nombre visible',
     email: 'Correo',
     password: 'Contraseña',
     passwordHint: 'Mínimo {{count}} caracteres.',
