@@ -555,3 +555,12 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Diagnóstico medido**: la banda del bombo saturaba (media 0.71, pico 0.98) porque `getByteFrequencyData` con el rango por defecto (`-100..-30 dB`) recorta un bajo continuo; el flujo del golpe quedaba aplastado.
 - **Arreglo**: `beatAnalyser.minDecibels = -90`, `maxDecibels = -10` en el grafo local y en el micrófono. Verificado: en la pista de 120 BPM la media baja a 0.50 y se cuentan 15 golpes en 6 s; en la pista sin bombo, 0 golpes. El pulso del golpe sube a ×3 y la pestaña Audio explica cuándo las ondas siguen el beat real (local/micrófono) y cuándo usan el BPM marcado (Spotify sin micrófono).
 - **Metrónomo documentado para otra sesión**: `docs/METRONOMO.md` (uso paso a paso, arquitectura, problemas conocidos y criterios de aceptación).
+
+### D Login obligatorio (implementado)
+
+- **Proveedor real**: Firebase Authentication con correo/contraseña + Google, verificación por email y recuperación por correo; política de sesión de 7 días. Si falta configuración, **respaldo local** con cuentas PBKDF2-SHA256 (310k, salt y comparación constante) y sesiones opacas en IndexedDB, para clase sin internet y E2E.
+- **Puerta**: `AuthGate` en `App` (cargando → login → verificación → shell); pantallas Duotono en `LoginScreen.tsx`; i18n ES/EN/PT; axe 0; política de privacidad actualizada (Firebase/Google).
+- **Datos por usuario** con Dexie v7 (`userId` + índices): biblioteca, playlists, sesión (`current:<uid>`), análisis, acordes, letras, setlists y notas; al entrar se hidratan por usuario y al salir se vacían. **El primer usuario adopta los huérfanos** (biblioteca previa). Tokens de Spotify y cápsula por usuario (sobreviven al logout); ajustes de dispositivo globales.
+- **Cuenta**: cerrar sesión (chip) y eliminar cuenta (Ajustes, con contraseña) que borra usuario y datos.
+- **Pruebas**: 290 unit (PBKDF2, cuentas locales, migración/filtrado, selección de proveedor) + **9 E2E** (auth.spec nuevo y los 7 existentes con `registerAndEnter`).
+- **Pendiente manual**: crear/pegar la configuración de Firebase (pasos con enlaces en `docs/AUTH.md`) y verificar registro con correo real, Google, recuperación y borrado.

@@ -1,32 +1,60 @@
-# Inicio de sesión — estado y pendientes
+# Inicio de sesión — estado, seguridad y configuración
 
-> **Estado actual: perfil local activo. Cognito/Google pendientes.**
+> **Estado: implementado y obligatorio.** Para usar Legato hay que iniciar sesión; sin sesión solo se ve la puerta de entrada. El proveedor real es **Firebase Authentication**; si falta su configuración, la app usa un **respaldo local** con cuentas en IndexedDB (para clase sin internet y para los E2E).
 
-## Lo que funciona hoy
+## 1. Cómo funciona
 
-- **Perfil local** (`LocalAuthProvider`): nombre/avatar guardados en el navegador (localStorage). No hay cuentas reales ni datos en la nube.
-- Interfaz `AuthProvider` con dos implementaciones: `LocalAuthProvider` y `CognitoAuthProvider`.
-- **Cognito correo/contraseña implementado** (`CognitoAuthProvider` con OAuth 2.0 + PKCE: authorize, token, refresh, logout), pero **no activable en la cuenta AWS actual**: la SCP bloquea Cognito (ver `docs/DESPLIEGUE.md`).
-- Chip de cuenta en la barra superior (Iniciar sesión / Salir).
+- **Gate en `App`**: al abrir, `AuthContextProvider` inicializa el proveedor; sin usuario → `LoginScreen` (Entrar / Crear cuenta / Recuperar); con usuario sin verificar → pantalla «Confirma tu correo»; con sesión → el shell completo.
+- **Firebase (correo/contraseña + Google)**: verificación de correo obligatoria, restablecimiento por correo, Google siempre verificado, sesiones gestionadas por el SDK y **política de 7 días** (`legato.auth.loginAt`; pasados 7 días se cierra la sesión).
+- **Respaldo local** (`LocalAuthProvider`): cuentas en IndexedDB con **PBKDF2-HMAC-SHA256** (310 000 iteraciones, salt de 16 bytes, comparación en tiempo constante) y token de sesión opaco (solo se guarda su SHA-256; caduca a los 7 días). No tiene recuperación por correo (la UI la oculta).
+- **Datos por usuario**: canciones, playlists, sesión, análisis, acordes, letras, setlists y notas llevan `userId`; los stores se hidratan al entrar y se vacían al salir. **El primer usuario adopta los datos huérfanos** (tu biblioteca actual pasa a tu cuenta). Los tokens de Spotify (`legato.spotify.tokens.<uid>`) y el historial de la cápsula (`legato.plays.*`) también son por usuario y **sobreviven al cerrar sesión** en el mismo navegador. Los ajustes del dispositivo (tema, accesibilidad, ondas, idioma, consentimiento) quedan globales.
+- **Eliminar cuenta** (Ajustes): borra el usuario y todos sus datos (Firebase o IndexedDB).
 
-## Lo que falta
+## 2. Configurar Firebase (una vez, ~5 minutos)
 
-| Pendiente | Detalle |
+1. Entra a **https://console.firebase.google.com** con tu cuenta de Google y crea un proyecto (p. ej. `legato-jenilarper`). Puedes desactivar Google Analytics.
+2. En el menú lateral: **Compilación → Authentication → Comenzar**.
+   - Pestaña **Sign-in method** → activa **Correo electrónico/Contraseña**.
+   - Activa también **Google** (elige un correo de asistencia y guarda).
+3. **Configuración del proyecto** (engranaje) → **Tus apps** → icono **Web `</>`** → registra una app web (nombre `legato-web`). Copia el objeto `firebaseConfig`.
+4. Pégalo en **`.env.local`** (nunca se sube al repo):
+   ```
+   VITE_AUTH_MODE=firebase
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=legato-....firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=legato-...
+   VITE_FIREBASE_APP_ID=1:...:web:...
+   ```
+5. En **Authentication → Settings → Authorized domains** añade:
+   - `127.0.0.1` (desarrollo, ya suele estar `localhost`; añade la IP)
+   - `app.jenilarper.dev` (cuando despleguemos)
+6. En **Authentication → Templates** puedes personalizar los correos (verificación y restablecimiento) en español.
+7. Reinicia el servidor de desarrollo y verifica: registro → llega el correo → confirmas → entras; «Recuperar» envía el enlace; Google abre el popup.
+
+> Sin esos valores, la app arranca en **modo local** (cuentas del navegador) y el E2E funciona igual. En el pie de la pantalla de acceso no se anuncia el proveedor; la política de privacidad ya declara Firebase/Google.
+
+## 3. Seguridad (decisiones)
+
+- La contraseña **nunca** se guarda en claro: Firebase la cifra en su backend; el respaldo local guarda PBKDF2 + salt.
+- La sesión local es un token aleatorio de 32 bytes; en IndexedDB solo vive su SHA-256, con caducidad; al cerrar sesión se revoca.
+- Verificación de correo obligatoria con Firebase (los usuarios de Google ya vienen verificados).
+- El borrado de cuenta elimina también los datos musicales del usuario en este navegador.
+- Cognito queda como vía futura (bloqueado por la SCP de la cuenta AWS); su provider sigue en el repo con métodos «no soportado».
+
+## 4. Archivos
+
+| Pieza | Archivo |
 |---|---|
-| **Cuenta AWS sin SCP** | Cognito User Pool + dominio Hosted UI + app client público (PKCE). |
-| **Google IdP** | Crear proyecto/credenciales en Google Cloud y agregarlo como proveedor en el User Pool (diferido; requiere que Google Cloud permita crear el proyecto). |
-| **Flujo de eliminación de cuenta** | Borrar datos de DynamoDB/S3 del usuario y cerrar la cuenta; enlace en Ajustes y en la política de privacidad. |
-| **Exportación de datos** | Descargar biblioteca/metadatos (JSON) desde Ajustes. |
-| **Sync multi-dispositivo** | S3 + DynamoDB con última edición gana (`updatedAt`), post-entrega. |
-| **Protección de la API** | Authorizer JWT de Cognito en API Gateway cuando exista backend. |
-| **Cookies/consentimiento con sesión** | Ya implementados (solo esenciales); al activar Cognito, la cookie/token de sesión queda cubierta por la política existente. |
+| Interfaz y errores tipados | `src/features/auth/types.ts` |
+| Selección de proveedor (Firebase si hay config, si no local) | `src/features/auth/create-auth-provider.ts` |
+| Firebase (correo/Google/verificación/reset/borrado) | `src/features/auth/firebase-auth-provider.ts` |
+| Respaldo local (PBKDF2 + sesiones) | `src/features/auth/local-auth-provider.ts`, `password-hash.ts` |
+| Contexto y puerta | `src/features/auth/auth-context.tsx`, `src/ui/LoginScreen.tsx`, `src/app/App.tsx` |
+| Datos por usuario y migración | `src/features/persistence/persistence.ts` (v7 del esquema), `spotify.ts` (`setSpotifyScope`), `play-log.ts` |
+| Cuenta (cerrar/eliminar) | `src/features/sources/SettingsPanel.tsx` |
 
-## Cómo se activará (cuando exista la cuenta)
+## 5. Pruebas
 
-1. Crear User Pool (correo/contraseña) y dominio `legato-<cuenta>.auth.us-east-1.amazoncognito.com`.
-2. App client público (sin secreto) con callback/logout `http://localhost:5173` y `https://app.jenilarper.dev`, flujo `code`, scopes `openid email profile`.
-3. Definir en `.env.local`: `VITE_LOCAL_MODE=false`, `VITE_COGNITO_DOMAIN`, `VITE_COGNITO_CLIENT_ID`, `VITE_COGNITO_REDIRECT_URI`.
-4. Google: agregar IdP en el User Pool con las credenciales de Google Cloud.
-5. Probar login/logout y la eliminación de cuenta.
-
-El código ya está listo: no hay que tocar la UI, solo configuración.
+- **Unit**: PBKDF2 (hash/verify/salt/comparación), cuentas locales (registro, login, duplicados, borrado), selección de proveedor, migración de huérfanos y filtrado por usuario.
+- **E2E** (modo local): `tests/e2e/auth.spec.ts` (registro, gate, salida, error de contraseña, entrada, eliminación) y el helper `registerAndEnter` en los 7 E2E existentes.
+- **Manual con Firebase** (cuando esté configurada): registro con verificación real, Google, recuperación por correo y borrado; comprobar los dominios autorizados.
