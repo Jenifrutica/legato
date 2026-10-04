@@ -425,3 +425,29 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **No hay tokens**: la key de OpenAI está vencida; no hay sesión de Spotify en el entorno de desarrollo (verificación con el navegador de la autora y Premium); la access key de AWS debe rotarse.
 - Si la UI queda en blanco o un módulo «no exporta X» tras agregar archivos: reiniciar el server y `rm -rf node_modules/.vite`.
 - Prompt listo para la próxima sesión (modo plan): **`docs/PROMPT-PLAN-NUEVA-SESION.md`** (canónico, copiar y pegar); `docs/PROMPT-NUEVA-SESION.md` queda como entrada rápida.
+
+---
+
+## Sesión 5 (3 oct 2026) — Ondas v6 (fase B) y reorden nueva
+
+### Reorden acordado con la autora
+
+- El arreglo del **import de playlists de Spotify (fase A)** se pospone a **justo antes del despliegue**: la autora prefiere implementar otras fases primero. Orden actual: **B → C → D → A → E** (E = deploy, siempre al final; rotar la access key al cierre).
+- Login (fase D): la primera cuenta registrada será la de la autora («jenifedora»); adoptará la biblioteca/playlists actuales. Datos **separados por usuario**, recuperación con **código**, Spotify sobrevive al logout dentro del mismo navegador.
+- Músicos (fase C): activado por **toggle en Ajustes**; ChordPro con **parser propio**; BPM manual+estimado y tonalidad manual; **pitch shift y stems post-entrega**.
+
+### Lo implementado (todo con tests y verificación)
+
+- **Detector puro** `src/player/beat-detector.ts`: flujo espectral de la banda del bombo con umbral adaptativo, refractario y envolvente; presets `soft` / `normal` / `aggressive` (`BEAT_PRESETS`). El primer cuadro fija la línea base (arrancar no cuenta como golpe) y `reset()` vuelve a reposo.
+- **Store** `src/player/waves-store.ts`: sensibilidad y BPM manual persistidos (`legato.waves.v1`), `clampBpm` (30–240) y `nextTap` (tap tempo que se reinicia tras 2 s).
+- **Audiógrafo** (`src/player/audio-graph.ts`): segundo `AnalyserNode` exclusivo para golpes (`fftSize` 1024, `smoothing` 0) con la banda 40–150 Hz calculada por `sampleRate`; `getBeatBass()` devuelve el nivel normalizado. El analizador de dibujo no cambia.
+- **Ondas** (`src/ui/WaveRing.tsx`): usa `BeatDetector` con la sensibilidad elegida; con señal real detecta golpes, sin señal (Spotify por DRM) usa **pulso sintético al BPM manual** (120 por defecto); en reposo, anillo quieto.
+- **UI** (pestaña Audio): botones Suave/Normal/Agresiva (con `aria-pressed`), campo BPM 30–240 y botón **Marcar** (tap tempo), con aviso de que aplica al streaming. i18n ES/EN/PT.
+- **Pistas de prueba** (fuera del repo, generadas con ffmpeg): `~/Downloads/legato-ritmo-120bpm.wav` y `~/Downloads/legato-ritmo-100bpm.wav` (bombo claro + bajo + pad, 36 s).
+- **Tests nuevos (11)**: `beat-detector.test.ts` (120 BPM sin desfase, refractario, agresiva detecta golpes suaves que suave ignora, sin señal no hay golpes, reset, presets ordenados) y `waves-store.test.ts` (clamp y tap tempo).
+- **Verificación**: baseline (191+6+build) y cierre de la tanda (**202 unit + 6 E2E + build + typecheck + lint + format**, axe 0 dentro de la suite y `impeccable detect` en `[]`).
+
+### Pendiente dentro de B
+
+- Validación auditiva de la autora con las pistas de prueba (picos a ojo en los golpes, reposo quieto) y afinar presets si hace falta.
+- Documentar en `docs/PENDIENTES.md` §2.

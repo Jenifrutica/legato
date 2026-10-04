@@ -229,6 +229,14 @@ export const es = {
     ambientCafe: 'Café',
     ambientWind: 'Viento',
     ambientVolume: 'Volumen del ambiente',
+    waves: 'Ondas al ritmo',
+    waveSoft: 'Suave',
+    waveNormal: 'Normal',
+    waveAggressive: 'Agresiva',
+    bpmManual: 'BPM (streaming)',
+    tap: 'Marcar',
+    bpmHint:
+      'Con Spotify el audio va protegido (DRM) y el pulso es sintético: marca el tempo con «Marcar» o escríbelo. Los archivos locales detectan los golpes solos.',
     channelMode: 'Aislamiento de canales',
     modes: {
       stereo: 'Estéreo',

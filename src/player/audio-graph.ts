@@ -2,11 +2,16 @@ import type { ChannelMode } from './types'
 
 export type AnalyserLike = {
   getLevels(): Uint8Array
+  getBeatBass?(): number
 }
 
 export class AudioGraph implements AnalyserLike {
   #context: AudioContext | null = null
   #analyser: AnalyserNode | null = null
+  #beatAnalyser: AnalyserNode | null = null
+  #beatData: Uint8Array<ArrayBuffer> | null = null
+  #beatStartBin = 0
+  #beatEndBin = 0
   #bass: BiquadFilterNode | null = null
   #leftGain: GainNode | null = null
   #rightGain: GainNode | null = null
@@ -31,32 +36,51 @@ export class AudioGraph implements AnalyserLike {
       const merger = context.createChannelMerger(2)
       const bass = context.createBiquadFilter()
       const analyser = context.createAnalyser()
+      // Analizador aparte para los golpes: sin suavizado y con más resolución
+      // en la banda del bombo (40–150 Hz).
+      const beatAnalyser = context.createAnalyser()
 
       analyser.fftSize = 256
       analyser.smoothingTimeConstant = 0.68
+      beatAnalyser.fftSize = 1024
+      beatAnalyser.smoothingTimeConstant = 0
       bass.type = 'lowshelf'
       bass.frequency.value = 180
+
+      const binHz = context.sampleRate / beatAnalyser.fftSize
+      const beatStartBin = Math.max(0, Math.floor(40 / binHz))
+      const beatEndBin = Math.min(
+        beatAnalyser.frequencyBinCount - 1,
+        Math.max(beatStartBin, Math.floor(150 / binHz)),
+      )
 
       source.connect(splitter)
       splitter.connect(leftGain, 0)
       splitter.connect(rightGain, 1)
       merger.connect(bass)
       bass.connect(analyser)
-      analyser.connect(context.destination)
+      analyser.connect(beatAnalyser)
+      beatAnalyser.connect(context.destination)
 
       this.#context = context
       this.#analyser = analyser
+      this.#beatAnalyser = beatAnalyser
+      this.#beatStartBin = beatStartBin
+      this.#beatEndBin = beatEndBin
       this.#bass = bass
       this.#leftGain = leftGain
       this.#rightGain = rightGain
       this.#merger = merger
       this.#data = new Uint8Array(analyser.frequencyBinCount)
+      this.#beatData = new Uint8Array(beatAnalyser.frequencyBinCount)
 
       this.#applyRouting()
       this.#applyGains()
     } catch {
       this.#context = null
       this.#analyser = null
+      this.#beatAnalyser = null
+      this.#beatData = null
       this.#bass = null
       this.#leftGain = null
       this.#rightGain = null
@@ -92,6 +116,23 @@ export class AudioGraph implements AnalyserLike {
 
     this.#analyser.getByteFrequencyData(this.#data)
     return this.#data
+  }
+
+  /** Nivel medio normalizado (0–1) de la banda del bombo, sin suavizado. */
+  getBeatBass(): number {
+    if (this.#beatAnalyser === null || this.#beatData === null) {
+      return 0
+    }
+
+    this.#beatAnalyser.getByteFrequencyData(this.#beatData)
+    let sum = 0
+    let count = 0
+    for (let index = this.#beatStartBin; index <= this.#beatEndBin; index++) {
+      sum += this.#beatData[index] ?? 0
+      count++
+    }
+
+    return count === 0 ? 0 : sum / (count * 255)
   }
 
   async resume(): Promise<void> {

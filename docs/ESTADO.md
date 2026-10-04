@@ -68,10 +68,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 71 | **Ondas sincronizadas al golpe**: detector por **flujo espectral** de la banda del bombo con umbral adaptativo y periodo refractario (180 ms), envolvente de vida media 130 ms medida en milisegundos y el golpe dominando largo/opacidad/pop. Medido con bombo a 500 ms: picos cada 497 ms y 57% de variación | Cerrada: 190 unit + 6 E2E, axe 0, detector 0 |
 | 72 | **Import de playlists resistente**: límites descendentes (50→20→10) como en la búsqueda, reintento en 429, paginación hasta 200 playlists y **mensaje de error exacto** con pistas para 401/403 | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
 | 73 | **Cierre y handoff de la sesión 4**: documentación total (`docs/PENDIENTES.md`), prompt de próxima sesión en modo plan, limpieza de tokens de Spotify al fallar el refresh y botón «Conectar Spotify de nuevo» en el panel de import | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
+| 74 | **Ondas v6 (fase B)**: detector dedicado al bombo (40–150 Hz, `fftSize` 1024 sin suavizado) separado del analizador de dibujo; control **suave / normal / agresiva** persistido; **BPM manual con tap tempo** para streaming (Spotify por DRM usa pulso sintético); pistas de prueba generadas con ffmpeg para validar | Cerrada: 202 unit + 6 E2E, build, axe 0, detector 0; pendiente validación auditiva de la autora |
 
 ## Estado técnico
 
-- **Tests:** 154 unitarios + 4 E2E (Playwright) en verde.
+- **Tests:** 202 unitarios + 6 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Diseño:** paleta nueva **violeta/teal** (ya no crema/terracota) con **modo oscuro opcional** (botón sol/luna en la barra, persistido, el tema por portada se adapta a oscuro). Vinilo 2D grande con la portada completa, **mostrando ~1/4 sangrando por la izquierda**; ondas de barras y anillo **siempre animadas** (sintéticas sin datos del analizador, reales al reproducir local); controles del héroe con `flex-wrap` para no superponerse al panel derecho.
 - **Fuentes:** Spotify (PKCE + previews + SDK Premium con banner), Audius y Jamendo con toggles; por defecto solo Spotify. **Errores de búsqueda visibles por proveedor** + botón "Probar conexión" en Ajustes. En resultados: agregar a playlist (guardar+agregar), crear playlist inline y **drag & drop** de resultados (Audius/Jamendo) sobre las playlists.

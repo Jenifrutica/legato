@@ -1,8 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatFileSize, useLibraryStore } from '../features/library'
-import { AMBIENT_IDS, supportsOutputSelection, useAudioFxStore, usePlayerStore } from '../player'
-import type { AmbientId, ChannelMode } from '../player'
+import {
+  AMBIENT_IDS,
+  MAX_BPM,
+  MIN_BPM,
+  nextTap,
+  supportsOutputSelection,
+  useAudioFxStore,
+  usePlayerStore,
+  useWavesStore,
+  WAVE_SENSITIVITIES,
+} from '../player'
+import type { AmbientId, ChannelMode, WaveSensitivity } from '../player'
 
 const MODE_KEYS = {
   stereo: 'audio.modes.stereo',
@@ -19,6 +29,12 @@ const AMBIENT_KEYS = {
 } as const satisfies Record<AmbientId, string>
 
 const CHANNEL_MODES: ChannelMode[] = ['stereo', 'left', 'right', 'mono']
+
+const SENSITIVITY_KEYS = {
+  soft: 'audio.waveSoft',
+  normal: 'audio.waveNormal',
+  aggressive: 'audio.waveAggressive',
+} as const satisfies Record<WaveSensitivity, string>
 
 export function AudioQualityPanel() {
   const { t } = useTranslation()
@@ -40,6 +56,11 @@ export function AudioQualityPanel() {
   const setAmbientVolume = useAudioFxStore((state) => state.setAmbientVolume)
   const crossfadeSeconds = usePlayerStore((state) => state.crossfadeSeconds)
   const setCrossfade = usePlayerStore((state) => state.setCrossfade)
+  const sensitivity = useWavesStore((state) => state.sensitivity)
+  const bpm = useWavesStore((state) => state.bpm)
+  const setSensitivity = useWavesStore((state) => state.setSensitivity)
+  const setBpm = useWavesStore((state) => state.setBpm)
+  const [taps, setTaps] = useState<number[]>([])
   const track = useLibraryStore((state) =>
     currentTrack === null
       ? null
@@ -51,6 +72,14 @@ export function AudioQualityPanel() {
       void refreshOutputDevices()
     }
   }, [canSelectOutput, refreshOutputDevices])
+
+  function handleTap() {
+    const result = nextTap(taps, performance.now())
+    setTaps(result.taps)
+    if (result.bpm !== null) {
+      setBpm(result.bpm)
+    }
+  }
 
   const quality = [
     { label: t('audio.codec'), value: track?.codec ?? '—' },
@@ -232,6 +261,55 @@ export function AudioQualityPanel() {
             />
           </div>
         )}
+      </div>
+
+      <div className="mt-4">
+        <p className="text-xs font-medium text-ink-muted">{t('audio.waves')}</p>
+        <div aria-label={t('audio.waves')} className="mt-2 flex flex-wrap gap-2" role="group">
+          {WAVE_SENSITIVITIES.map((value) => (
+            <button
+              aria-pressed={sensitivity === value}
+              className={`border-2 px-3 py-1.5 text-[0.6875rem] font-semibold tracking-[0.1em] uppercase transition-colors ${
+                sensitivity === value
+                  ? 'border-rule bg-accent text-on-accent'
+                  : 'border-rule/40 text-ink-muted hover:text-ink'
+              }`}
+              key={value}
+              onClick={() => setSensitivity(value)}
+              type="button"
+            >
+              {t(SENSITIVITY_KEYS[value])}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-end gap-2">
+          <label className="text-xs font-medium text-ink-muted" htmlFor="audio-bpm">
+            {t('audio.bpmManual')}
+          </label>
+          <input
+            className="w-20 border-2 border-rule bg-surface px-2 py-1 font-mono text-sm text-ink focus:border-accent focus:outline-none"
+            id="audio-bpm"
+            max={MAX_BPM}
+            min={MIN_BPM}
+            onChange={(event) =>
+              setBpm(event.target.value === '' ? null : Number(event.target.value))
+            }
+            placeholder="120"
+            step={1}
+            type="number"
+            value={bpm ?? ''}
+          />
+          <button
+            className="border-2 border-rule/40 px-3 py-1 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+            onClick={handleTap}
+            type="button"
+          >
+            {t('audio.tap')}
+          </button>
+        </div>
+
+        <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('audio.bpmHint')}</p>
       </div>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('audio.hint')}</p>

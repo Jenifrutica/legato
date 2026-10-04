@@ -1,10 +1,20 @@
 import { useEffect, useRef } from 'react'
+import { BeatDetector, useWavesStore } from '../player'
 import type { AnalyserLike } from '../player'
 
 type Inks = {
   accent: string
   ink: string
   paper: string
+}
+
+function fallbackBass(levels: Uint8Array): number {
+  const bins = Math.max(1, Math.min(3, levels.length))
+  let sum = 0
+  for (let index = 0; index < bins; index++) {
+    sum += levels[index] ?? 0
+  }
+  return sum / (bins * 255)
 }
 
 function parseHex(value: string): string | null {
@@ -50,6 +60,12 @@ export function WaveRing({
   activeRef.current = active
   const arcRef = useRef(arc)
   arcRef.current = arc
+  const sensitivity = useWavesStore((state) => state.sensitivity)
+  const bpm = useWavesStore((state) => state.bpm)
+  const sensitivityRef = useRef(sensitivity)
+  sensitivityRef.current = sensitivity
+  const bpmRef = useRef(bpm)
+  bpmRef.current = bpm
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -66,11 +82,7 @@ export function WaveRing({
     let last = 0
     let inkTick = 0
     let inks = readInks()
-    let prevBass = 0
-    let fluxAverage = 0.02
-    let beatEnergy = 0
-    let lastBeatAt = -1000
-    let lastDrawAt = 0
+    const detector = new BeatDetector(sensitivityRef.current)
     const segmentSmooth: number[] = []
 
     const reduced =
@@ -105,45 +117,31 @@ export function WaveRing({
       const seconds = time / 1000
       const segments = 110
 
-      let bass = 0
       let beat = 0
       let pulse = 1
-      const dtMs = lastDrawAt === 0 ? 33 : Math.min(200, Math.max(8, time - lastDrawAt))
-      lastDrawAt = time
 
       if (active && hasSignal) {
-        // Banda del bombo (primeros bins, ~0–500 Hz según muestreo).
-        const bassBins = Math.max(1, Math.min(3, levels.length))
-        for (let index = 0; index < bassBins; index++) {
-          bass += levels[index] ?? 0
-        }
-        bass = bass / (bassBins * 255)
-
-        // Flujo espectral de la banda del bombo: detecta el ataque de cada golpe.
-        const flux = Math.max(0, bass - prevBass)
-        prevBass = bass
-        fluxAverage = fluxAverage * 0.9 + flux * 0.1
-        if (flux > 0.05 && flux > fluxAverage * 1.6 && time - lastBeatAt > 180) {
-          beatEnergy = 1
-          lastBeatAt = time
-        }
-
-        // Envolvente con vida media ~130 ms, medida en milisegundos.
-        beatEnergy *= Math.pow(0.5, dtMs / 130)
-        beat = beatEnergy
-        pulse = 1 + beatEnergy * 2.4
+        // Golpes reales: analizador dedicado al bombo (40–150 Hz, sin suavizado);
+        // si el analizador no lo expone, se usa la banda baja del espectro.
+        const bass =
+          typeof analyser?.getBeatBass === 'function'
+            ? analyser.getBeatBass()
+            : fallbackBass(levels)
+        detector.setSensitivity(sensitivityRef.current)
+        beat = detector.process(bass, time)
+        pulse = 1 + beat * 2.4
       } else if (active) {
-        // Sin analizador (Spotify/streaming): pulso sintético a 120 BPM.
-        const phase = ((time / 1000) * 2) % 1
+        // Sin señal analizable (Spotify por DRM): pulso sintético al BPM manual
+        // o 120 BPM por defecto.
+        detector.reset()
+        const beatsPerSecond = (bpmRef.current ?? 120) / 60
+        const phase = ((time / 1000) * beatsPerSecond) % 1
         const kick = Math.pow(1 - phase, 8)
-        beatEnergy = kick
         beat = kick
         pulse = 1 + kick * 2.2
       } else {
         // En reposo: líneas cortas y quietas (sin movimiento por tiempo).
-        prevBass = 0
-        beatEnergy *= 0.9
-        bass = 0
+        detector.reset()
         beat = 0
         pulse = 1
       }

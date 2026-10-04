@@ -2,8 +2,9 @@
 
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
-- **Fecha:** 4 de octubre de 2026.
-- **Estado base:** 191 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
+- **Estado base:** 202 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
 
@@ -60,21 +61,22 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 ---
 
-## 2. Ondas al ritmo de los golpes (AFINAR / VERIFICAR CON MÚSICA REAL)
+## 2. Ondas al ritmo de los golpes (VERIFICAR CON LA AUTORA)
 
-**Qué hay:** las ondas son líneas finas (1.4–3.2 px) que salen del disco, con longitud, opacidad y un **pop radial** disparados por un detector de **flujo espectral** de la banda del bombo (primeros bins), umbral adaptativo (`flujo > promedio × 1.6`), **periodo refractario de 180 ms** y envolvente con vida media de 130 ms medida en milisegundos. La curva envolvente de las puntas también se ilumina con el golpe.
+**Qué hay (fase B, cerrada en código):**
+- Detector puro `BeatDetector` (`src/player/beat-detector.ts`): flujo espectral de la banda del bombo con umbral adaptativo, refractario y envolvente con vida media en ms; presets **suave / normal / agresiva**.
+- Analizador dedicado al bombo en `audio-graph.ts` (`fftSize` 1024, `smoothing` 0, banda 40–150 Hz calculada por `sampleRate`) separado del analizador de dibujo (`fftSize` 256, `smoothing` 0.68).
+- Control de **sensibilidad** y **BPM manual con tap tempo** en la pestaña Audio (persistidos en `legato.waves.v1`); con Spotify/DRM el pulso es sintético al BPM manual (120 por defecto).
+- Pistas de prueba fuera del repo: `~/Downloads/legato-ritmo-120bpm.wav` y `~/Downloads/legato-ritmo-100bpm.wav` (bombo + bajo + pad, 36 s).
 
-**Estados:** reposo/pausa → anillo corto y quieto (0% de variación medido); sonando local → onsets reales (picos cada **497 ms** con un bombo de 500 ms, 57% de variación); sonando Spotify/streaming → **pulso sintético a 120 BPM** (el audio del SDK no se puede analizar por DRM).
+**Pendiente (solo verificación con la autora):**
+- Importar las pistas de prueba (o música real local) y confirmar a ojo que los picos caen en los golpes; reposo/pausa quieto.
+- Ajustar presets si su oído pide más/menos sensibilidad (`BEAT_PRESETS`).
+- Revisar rendimiento con 110 segmentos a 30 fps mientras suena.
 
-**Pendiente:**
-- Probar con **música real** (no solo el fixture de kicks) y afinar: umbral base (0.05), factor adaptativo (1.6), refractario (180 ms), vida media (130 ms).
-- Evaluar exponer un **control de sensibilidad** en la pestaña Audio (suave/normal/agresivo).
-- Evaluar para streaming: control manual de **BPM** o detección por otro medio (imposible con el SDK por DRM).
-- Revisar rendimiento con muchos segmentos (110) y 30 fps.
+**Criterio de cierre:** con las pistas de prueba los picos caen en los golpes a ojo de la autora; pausa quieto.
 
-**Criterio de cierre:** con una canción con beat claro, los picos caen en los golpes a ojo de la autora; pausa quieto.
-
-**Archivos:** `src/ui/WaveRing.tsx`, `src/player/audio-graph.ts` (smoothing 0.68). Scripts de medición en `.impeccable/review/measure-rhythm.mjs` (local, ignorado por git).
+**Archivos:** `src/player/beat-detector.ts`, `src/player/waves-store.ts`, `src/player/audio-graph.ts`, `src/ui/WaveRing.tsx`, `src/ui/AudioQualityPanel.tsx` y tests `src/player/beat-detector.test.ts` / `waves-store.test.ts`.
 
 ---
 
@@ -148,7 +150,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 191 unitarios
+~/.bun/bin/bun run test        # 202 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

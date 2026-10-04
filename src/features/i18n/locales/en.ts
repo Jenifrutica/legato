@@ -230,6 +230,14 @@ export const en: typeof es = {
     ambientCafe: 'Café',
     ambientWind: 'Wind',
     ambientVolume: 'Ambience volume',
+    waves: 'Beat-reactive waves',
+    waveSoft: 'Soft',
+    waveNormal: 'Normal',
+    waveAggressive: 'Aggressive',
+    bpmManual: 'BPM (streaming)',
+    tap: 'Tap',
+    bpmHint:
+      'On Spotify the audio is protected (DRM) and the pulse is synthetic: tap the tempo with “Tap” or type it. Local files detect beats on their own.',
     channelMode: 'Channel isolation',
     modes: {
       stereo: 'Stereo',
