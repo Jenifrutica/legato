@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
+import { useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
+import { syncAnalysis } from './persistence'
 
 function track(id: string): LibraryTrack {
   return {
@@ -50,7 +53,10 @@ describe('persistence database', () => {
       await db.songs.clear()
       await db.playlists.clear()
       await db.session.clear()
+      await db.analysis.clear()
     }
+    useLibraryStore.getState().hydrate([])
+    useTrackAnalysisStore.getState().hydrate([])
   })
 
   it('guarda y carga canciones con blob', async () => {
@@ -104,5 +110,36 @@ describe('persistence database', () => {
     expect(session?.shuffle).toBe(true)
     expect(session?.balance).toBe(-0.3)
     expect(session?.channelMode).toBe('left')
+  })
+
+  it('guarda y carga el análisis por pista', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.analysis.put({ trackId: 'a', bpm: 128, key: 'Dm', updatedAt: 1 })
+    const record = await db.analysis.get('a')
+
+    expect(record?.bpm).toBe(128)
+    expect(record?.key).toBe('Dm')
+  })
+
+  it('syncAnalysis descarta pistas que ya no están en la biblioteca', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    useLibraryStore.getState().hydrate([track('a')])
+    await syncAnalysis({
+      a: { trackId: 'a', bpm: 120, key: null, updatedAt: 1 },
+      ghost: { trackId: 'ghost', bpm: 90, key: null, updatedAt: 1 },
+    })
+
+    const keys = await db.analysis.toCollection().primaryKeys()
+    expect(keys).toEqual(['a'])
   })
 })

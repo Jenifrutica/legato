@@ -1,3 +1,6 @@
+export { ALL_KEY_OPTIONS, KEY_OPTIONS, useTrackAnalysisStore } from './analysis-store'
+export type { TrackAnalysis } from './analysis-store'
+export { detectBpmFromBlob, estimateBpmFromSamples } from './bpm-estimator'
 export {
   BEATS_PER_BAR_OPTIONS,
   clampBeatsPerBar,

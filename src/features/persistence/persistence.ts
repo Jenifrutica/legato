@@ -1,5 +1,7 @@
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
+import { useTrackAnalysisStore } from '../musician'
+import type { TrackAnalysis } from '../musician'
 import { usePlaylistsStore } from '../playlists'
 import type { PlaylistRestoreRecord } from '../playlists'
 import { usePlayerStore } from '../../player'
@@ -25,6 +27,9 @@ export async function hydrateStores(): Promise<boolean> {
     usePlayerStore.getState().restoreSession(session)
   }
 
+  const analysisRecords = await db.analysis.toArray()
+  useTrackAnalysisStore.getState().hydrate(analysisRecords)
+
   return true
 }
 
@@ -36,6 +41,7 @@ export function startPersistence(): void {
 
   let lastTracks = useLibraryStore.getState().tracks
   let lastPlaylists = usePlaylistsStore.getState().playlists
+  let lastAnalysis = useTrackAnalysisStore.getState().records
   let sessionTimer: ReturnType<typeof setTimeout> | null = null
 
   useLibraryStore.subscribe((state) => {
@@ -52,6 +58,14 @@ export function startPersistence(): void {
     }
     lastPlaylists = state.playlists
     void syncPlaylists(state.playlists)
+  })
+
+  useTrackAnalysisStore.subscribe((state) => {
+    if (state.records === lastAnalysis) {
+      return
+    }
+    lastAnalysis = state.records
+    void syncAnalysis(state.records)
   })
 
   usePlayerStore.subscribe(() => {
@@ -81,11 +95,33 @@ export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
   const existing = await db.songs.toCollection().primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.songs, async () => {
+  await db.transaction('rw', db.songs, db.analysis, async () => {
     if (stale.length > 0) {
       await db.songs.bulkDelete(stale)
+      await db.analysis.bulkDelete(stale)
     }
     await db.songs.bulkPut(records)
+  })
+}
+
+export async function syncAnalysis(records: Record<string, TrackAnalysis>): Promise<void> {
+  const db = getDatabase()
+  if (db === null) {
+    return
+  }
+
+  // Solo se persiste el análisis de pistas que siguen en la biblioteca.
+  const known = new Set(useLibraryStore.getState().tracks.map((track) => track.id))
+  const values = Object.values(records).filter((record) => known.has(record.trackId))
+  const ids = new Set(values.map((record) => record.trackId))
+  const existing = await db.analysis.toCollection().primaryKeys()
+  const stale = existing.filter((id) => !ids.has(id))
+
+  await db.transaction('rw', db.analysis, async () => {
+    if (stale.length > 0) {
+      await db.analysis.bulkDelete(stale)
+    }
+    await db.analysis.bulkPut(values)
   })
 }
 

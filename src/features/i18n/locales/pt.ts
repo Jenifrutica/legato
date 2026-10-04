@@ -304,6 +304,21 @@ export const pt: typeof es = {
     volume: 'Volume do clique',
     hint: 'Clique com acento no primeiro tempo (e no quarto em 6/8). Soa sobre a música, local ou Spotify.',
   },
+  analysis: {
+    title: 'BPM e tonalidade',
+    empty: 'Reproduza ou escolha uma faixa para analisá-la.',
+    bpm: 'BPM da faixa',
+    detect: 'Detectar BPM',
+    detecting: 'Analisando…',
+    detected: 'BPM estimado: {{bpm}}',
+    detectFailed: 'Não foi possível estimar o BPM desta faixa.',
+    detectUnavailable:
+      'A detecção precisa de um arquivo local (o áudio do Spotify é protegido por DRM); você pode digitar o BPM à mão.',
+    key: 'Tonalidade',
+    keyNone: 'Sem definir',
+    useInMetronome: 'Usar no metrônomo',
+    hint: 'Salvo por faixa. Se a estimativa não convencer, digite à mão.',
+  },
   legal: {
     back: 'Voltar ao app',
     updated: 'Atualizado: {{date}}',

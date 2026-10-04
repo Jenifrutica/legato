@@ -305,6 +305,21 @@ export const en: typeof es = {
     volume: 'Click volume',
     hint: 'Click with an accent on the first beat (and the fourth in 6/8). Plays over the music, locally or on Spotify.',
   },
+  analysis: {
+    title: 'BPM and key',
+    empty: 'Play or pick a track to analyse it.',
+    bpm: 'Track BPM',
+    detect: 'Detect BPM',
+    detecting: 'Analysing…',
+    detected: 'Estimated BPM: {{bpm}}',
+    detectFailed: 'Could not estimate the BPM of this track.',
+    detectUnavailable:
+      'Detection needs a local file (Spotify audio is DRM-protected); you can type the BPM by hand.',
+    key: 'Key',
+    keyNone: 'Not set',
+    useInMetronome: 'Use in the metronome',
+    hint: 'Saved per track. If the estimate does not convince you, type it by hand.',
+  },
   legal: {
     back: 'Back to the app',
     updated: 'Updated: {{date}}',

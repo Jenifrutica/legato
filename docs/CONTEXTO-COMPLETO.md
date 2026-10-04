@@ -458,3 +458,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - Compases 2/4, 3/4, 4/4 y 6/8 (acento en el 1 y el 4); tap tempo reutiliza `nextTap` de las ondas; el cambio de BPM reagenda el siguiente pulso desde el último clic; si el reloj se atrasa, se resincroniza sin perder la fase.
 - UI: toggle **«Modo músico»** en Ajustes (apagado por defecto) y pestaña **Práctica** en el panel de músicos (Estructura sigue siempre disponible). i18n ES/EN/PT.
 - Tests: `metronome.test.ts` (acentos, programación a 120 BPM, cambio de BPM, resincronización, motor con contexto falso y sin contexto). Total: **211 unit + 6 E2E**; verificado en navegador con Playwright (inicia/detiene sin errores).
+
+### C2 BPM y tonalidad por pista (implementado)
+
+- **Estimador propio** `bpm-estimator.ts`: filtro paso-bajos RBJ a 150 Hz, envolvente de ataques por flujo de energía (hops de 10 ms) y autocorrelación con interpolación parabólica y corrección de octava. `estimateBpmFromSamples` es puro y testeable; `detectBpmFromBlob` decodifica con `OfflineAudioContext` (primeros 90 s, mezcla a mono).
+- **Verificado con las pistas de prueba** (`~/Downloads/legato-ritmo-120bpm.wav` y `100bpm.wav`, con bombo + bajo + pad): devuelve **120 y 100 exactos**.
+- **Persistencia por pista** en IndexedDB: Dexie sube a **versión 2** con la tabla `analysis` (`trackId`); `hydrateStores` la carga y `startPersistence` la sincroniza; al borrar una canción se limpia su análisis. Tabla en ES/EN/PT.
+- **UI** (pestaña Práctica): panel «BPM y tonalidad» con BPM manual (30–240), botón **Detectar BPM**, mensaje de estimación, selector de **tonalidad** (24 mayores/menores) y botón **Usar en el metrónomo**. La detección se desactiva en referencias externas de Spotify (DRM) con aviso para escribir el BPM a mano.
+- **Tests** (9 nuevos): estimador sintético a 120/100, silencio y audio corto; store (clamp, alta/borrado de campos, conservación); persistencia (guardar/leer y `syncAnalysis` descarta pistas borradas). Total: **220 unit + 6 E2E**; verificado en navegador (detectó 120 y persistió BPM/tonalidad tras recargar).

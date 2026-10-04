@@ -7,6 +7,7 @@ import { usePlayerStore } from '../player'
 import { XIcon } from './icons'
 import { MetronomePanel } from './MetronomePanel'
 import { StructureView } from './StructureView'
+import { TrackAnalysisPanel } from './TrackAnalysisPanel'
 
 const STORAGE_KEY = 'legato.musicians'
 
@@ -209,7 +210,11 @@ export function MusiciansPanel() {
               {activeTab === 'structure' ? (
                 <StructureView currentId={currentTrackId} nodes={queueStructure} />
               ) : (
-                <MetronomePanel />
+                <>
+                  <TrackAnalysisPanel />
+                  <div className="border-t-2 border-rule" />
+                  <MetronomePanel />
+                </>
               )}
             </div>
           </div>

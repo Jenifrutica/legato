@@ -70,10 +70,11 @@ Actualizado: 3 de octubre de 2026 (Día 2 en curso).
 | 73 | **Cierre y handoff de la sesión 4**: documentación total (`docs/PENDIENTES.md`), prompt de próxima sesión en modo plan, limpieza de tokens de Spotify al fallar el refresh y botón «Conectar Spotify de nuevo» en el panel de import | Cerrada: 191 unit + 6 E2E, axe 0, detector 0 |
 | 74 | **Ondas v6 (fase B)**: detector dedicado al bombo (40–150 Hz, `fftSize` 1024 sin suavizado) separado del analizador de dibujo; control **suave / normal / agresiva** persistido; **BPM manual con tap tempo** para streaming (Spotify por DRM usa pulso sintético); pistas de prueba generadas con ffmpeg para validar | Cerrada: 202 unit + 6 E2E, build, axe 0, detector 0; pendiente validación auditiva de la autora |
 | 75 | **Metrónomo (C1)**: motor Web Audio con lookahead (30–240 BPM, compases 2/4 · 3/4 · 4/4 · 6/8 con acento en el 1 y el 4, volumen propio), programador puro con tests, tap tempo; **toggle «Modo músico» en Ajustes** y pestaña **Práctica** en el panel de músicos | Cerrada: 211 unit + 6 E2E, build, detector 0, verificado en navegador |
+| 76 | **BPM y tonalidad por pista (C2)**: estimador propio (paso-bajos 150 Hz + envolvente de ataques + autocorrelación con corrección de octava) que acierta 120/100 en las pistas de prueba; edición manual; persistencia por pista en IndexedDB (tabla `analysis`, Dexie v2) y botón «Usar en el metrónomo» | Cerrada: 220 unit + 6 E2E, build, detector 0, verificado en navegador (detecta 120 y persiste tras recargar) |
 
 ## Estado técnico
 
-- **Tests:** 211 unitarios + 6 E2E (Playwright) en verde.
+- **Tests:** 220 unitarios + 6 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Diseño:** paleta nueva **violeta/teal** (ya no crema/terracota) con **modo oscuro opcional** (botón sol/luna en la barra, persistido, el tema por portada se adapta a oscuro). Vinilo 2D grande con la portada completa, **mostrando ~1/4 sangrando por la izquierda**; ondas de barras y anillo **siempre animadas** (sintéticas sin datos del analizador, reales al reproducir local); controles del héroe con `flex-wrap` para no superponerse al panel derecho.
 - **Fuentes:** Spotify (PKCE + previews + SDK Premium con banner), Audius y Jamendo con toggles; por defecto solo Spotify. **Errores de búsqueda visibles por proveedor** + botón "Probar conexión" en Ajustes. En resultados: agregar a playlist (guardar+agregar), crear playlist inline y **drag & drop** de resultados (Audius/Jamendo) sobre las playlists.
