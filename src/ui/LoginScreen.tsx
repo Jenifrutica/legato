@@ -105,7 +105,11 @@ export function LoginScreen() {
             ))}
           </div>
 
-          <form className="mt-4 flex flex-col gap-3" onSubmit={(event) => void submit(event)}>
+          <form
+            autoComplete="off"
+            className="mt-4 flex flex-col gap-3"
+            onSubmit={(event) => void submit(event)}
+          >
             {mode === 'signup' && (
               <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
                 {t('auth.name')}
@@ -124,11 +128,14 @@ export function LoginScreen() {
             <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
               {t('auth.email')}
               <input
-                autoComplete="email"
+                autoComplete="off"
+                autoCorrect="off"
                 className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
+                inputMode="email"
                 onChange={(event) => setEmail(event.target.value)}
                 required
-                type="email"
+                spellCheck={false}
+                type="text"
                 value={email}
               />
             </label>
@@ -137,7 +144,7 @@ export function LoginScreen() {
               <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
                 {t('auth.password')}
                 <input
-                  autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                  autoComplete="off"
                   className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
                   minLength={mode === 'signup' ? PASSWORD_MIN_LENGTH : undefined}
                   onChange={(event) => setPassword(event.target.value)}
