@@ -276,6 +276,7 @@ export const es = {
   lyrics: {
     region: 'Letra de la canción',
     source: 'Letra vía LRCLIB',
+    sourceLocal: 'Letra local',
     toggle: 'Letra',
   },
   structure: {
@@ -373,6 +374,14 @@ export const es = {
     playlist: 'Notas de la playlist',
     playlistEmpty: 'Elige una playlist en el panel para anotar.',
     placeholder: 'Ideas, acordes, recordatorios…',
+  },
+  localLyrics: {
+    title: 'Letra local (.lrc)',
+    loaded: 'Usando la letra local de esta pista. Tiene prioridad sobre LRCLIB.',
+    empty: 'Sin letra local: se busca en LRCLIB.',
+    emptyTrack: 'Reproduce o elige una pista para cargar su .lrc.',
+    import: 'Cargar .lrc',
+    clear: 'Quitar letra local',
   },
   legal: {
     back: 'Volver a la app',

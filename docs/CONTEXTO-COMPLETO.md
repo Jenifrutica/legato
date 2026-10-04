@@ -483,3 +483,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Persistencia IndexedDB**: Dexie sube a **versión 4** con `setlists: 'id'` y `notes: '[targetType+targetId]'` (clave compuesta); hidratación, `syncSetlists` y `syncNotes` (descarta destinos inexistentes); al borrar canciones o playlists se limpian sus notas.
 - **UI**: pestañas **Setlist** (crear, elegir, reproducir, eliminar, filas con nº, tocada, subir/bajar, quitar, duración total) y **Notas** (pista actual + playlist seleccionada). Total 5 pestañas con `flex-wrap`. i18n ES/EN/PT.
 - **Tests** (12 nuevos): reordenar con la DLL (extremos y mismo índice), ignorar pistas ausentes, marcar/quitar; store (crear/seleccionar/eliminar/hidratar); notas (guardar/hidratar/borrar); persistencia de setlists y de notas con limpieza de huérfanos. Total: **244 unit + 6 E2E**; verificado en navegador (2 pistas, 1:12, reordenar, tocada y nota persisten tras recargar).
+
+### C5 Letra local .lrc (implementado)
+
+- **Store** `local-lyrics-store.ts` (por pista) y **persistencia**: Dexie sube a **versión 5** con la tabla `lyrics` (`trackId`); hidratación, `syncLyrics` (descarta pistas borradas) y limpieza al eliminar canciones.
+- **Prioridad sobre LRCLIB**: `useLyrics` lee la letra local primero y, si tiene líneas sincronizadas, no llama a la red; `LyricsQuery` gana `trackId` (el héroe lo pasa también en modo Spotify para referencias guardadas). El héroe muestra la atribución **«Letra local»** cuando aplica.
+- **UI**: sección «Letra local (.lrc)» en la pestaña **Notas** (cargar archivo, estado y quitar). i18n ES/EN/PT.
+- **Tests** (4 nuevos): store local; `useLyrics` prefiere la letra local y no llama a `fetch`; persistencia (guardar/leer) y `syncLyrics` descarta pistas ausentes. Total: **248 unit + 6 E2E**; verificado en navegador (héroe con línea local y persistencia tras recargar).
+- **Cierre del módulo de músicos**: C1–C5 completos; **pitch shift y stems (Demucs) quedan post-entrega** como se acordó.

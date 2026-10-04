@@ -34,7 +34,7 @@ export function Lyrics({
   source = null,
 }: {
   lines?: LyricLine[]
-  source?: 'lrclib' | null
+  source?: 'lrclib' | 'local' | null
 }) {
   const { t } = useTranslation()
   const currentTime = usePlayerStore((state) => state.currentTime)
@@ -77,6 +77,11 @@ export function Lyrics({
           >
             {t('lyrics.source')}
           </a>
+        )}
+        {source === 'local' && (
+          <span className="font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+            {t('lyrics.sourceLocal')}
+          </span>
         )}
       </div>
     </div>

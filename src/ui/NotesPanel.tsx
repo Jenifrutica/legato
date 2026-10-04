@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { usePlaylistsStore } from '../features/playlists'
 import { usePlayerStore } from '../player'
+import { LocalLyricsEditor } from './LocalLyricsEditor'
 import { NotesEditor } from './NotesEditor'
 
 export function NotesPanel() {
@@ -29,6 +30,11 @@ export function NotesPanel() {
           />
         </div>
       )}
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-ink">{t('localLyrics.title')}</p>
+        <LocalLyricsEditor />
+      </div>
 
       {selectedPlaylist === null ? (
         <p className="text-xs leading-relaxed text-ink-muted">{t('notes.playlistEmpty')}</p>

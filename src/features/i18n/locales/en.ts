@@ -276,6 +276,7 @@ export const en: typeof es = {
   lyrics: {
     region: 'Song lyrics',
     source: 'Lyrics via LRCLIB',
+    sourceLocal: 'Local lyrics',
     toggle: 'Lyrics',
   },
   structure: {
@@ -373,6 +374,14 @@ export const en: typeof es = {
     playlist: 'Playlist notes',
     playlistEmpty: 'Pick a playlist in the panel to take notes.',
     placeholder: 'Ideas, chords, reminders…',
+  },
+  localLyrics: {
+    title: 'Local lyrics (.lrc)',
+    loaded: 'Using the local lyrics of this track. They take priority over LRCLIB.',
+    empty: 'No local lyrics: LRCLIB is searched.',
+    emptyTrack: 'Play or pick a track to load its .lrc.',
+    import: 'Load .lrc',
+    clear: 'Remove local lyrics',
   },
   legal: {
     back: 'Back to the app',

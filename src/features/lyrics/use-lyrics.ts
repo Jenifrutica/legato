@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import type { LyricLine } from './lrc'
+import { parseLrc, type LyricLine } from './lrc'
+import { useLocalLyricsStore } from './local-lyrics-store'
 import { fetchLyrics, type LyricsQuery } from './provider'
 
 export type LyricsStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
@@ -7,7 +8,7 @@ export type LyricsStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
 export type LyricsState = {
   status: LyricsStatus
   lines: LyricLine[]
-  source: 'lrclib' | null
+  source: 'lrclib' | 'local' | null
 }
 
 const IDLE: LyricsState = { status: 'idle', lines: [], source: null }
@@ -16,6 +17,10 @@ const TIMEOUT_MS = 8_000
 export function useLyrics(query: LyricsQuery | null): LyricsState {
   const [state, setState] = useState<LyricsState>(IDLE)
   const cache = useRef<Map<string, LyricLine[]>>(new Map())
+  const trackId = query?.trackId ?? null
+  const localText = useLocalLyricsStore((store) =>
+    trackId === null ? null : (store.records[trackId]?.text ?? null),
+  )
 
   const key =
     query === null
@@ -26,6 +31,15 @@ export function useLyrics(query: LyricsQuery | null): LyricsState {
     if (query === null || key === null) {
       setState(IDLE)
       return
+    }
+
+    // La letra local del usuario siempre gana sobre LRCLIB.
+    if (localText !== null) {
+      const localLines = parseLrc(localText)
+      if (localLines.length > 0) {
+        setState({ status: 'ready', lines: localLines, source: 'local' })
+        return
+      }
     }
 
     const cached = cache.current.get(key)
@@ -55,7 +69,7 @@ export function useLyrics(query: LyricsQuery | null): LyricsState {
       controller.abort()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key])
+  }, [key, localText])
 
   return state
 }

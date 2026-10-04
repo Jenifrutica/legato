@@ -1,6 +1,7 @@
 import Dexie from 'dexie'
 import type { Table } from 'dexie'
 import type { LibraryTrack } from '../library'
+import type { LocalLyrics } from '../lyrics'
 import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
 import type { PlaylistRestoreRecord } from '../playlists'
 import type { ChannelMode, LoopMode } from '../../player'
@@ -24,6 +25,8 @@ export type SetlistRecord = Setlist
 
 export type NoteRecord = Note
 
+export type LyricsRecord = LocalLyrics
+
 export type SessionRecord = {
   key: string
   trackIds: string[]
@@ -46,6 +49,7 @@ class LegatoDatabase extends Dexie {
   chords!: Table<ChordRecord, string>
   setlists!: Table<SetlistRecord, string>
   notes!: Table<NoteRecord>
+  lyrics!: Table<LyricsRecord, string>
 
   constructor() {
     super('legato')
@@ -75,6 +79,16 @@ class LegatoDatabase extends Dexie {
       chords: 'trackId',
       setlists: 'id',
       notes: '[targetType+targetId]',
+    })
+    this.version(5).stores({
+      songs: 'id',
+      playlists: 'id',
+      session: 'key',
+      analysis: 'trackId',
+      chords: 'trackId',
+      setlists: 'id',
+      notes: '[targetType+targetId]',
+      lyrics: 'trackId',
     })
   }
 }

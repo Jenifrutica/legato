@@ -72,6 +72,7 @@ export function Hero() {
         artist: spotifyPlayback.artist,
         album: null,
         durationSeconds: spotifyPlayback.durationMs / 1000,
+        trackId: currentTrack?.id ?? null,
       }
     : currentTrack === null
       ? null
@@ -80,6 +81,7 @@ export function Hero() {
           artist: currentTrack.artist,
           album: currentTrack.album,
           durationSeconds: currentTrack.durationSeconds,
+          trackId: currentTrack.id,
         }
   const lyricsState = useLyrics(lyricsQuery)
   const lyricsVisible = useLyricsStore((state) => state.enabled)

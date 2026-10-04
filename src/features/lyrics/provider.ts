@@ -5,6 +5,8 @@ export type LyricsQuery = {
   artist: string
   album: string | null
   durationSeconds: number | null
+  /** Pista de la biblioteca: si tiene letra local, gana sobre LRCLIB. */
+  trackId?: string | null
 }
 
 type LrclibRecord = {

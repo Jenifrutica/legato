@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
+import { useLocalLyricsStore } from '../lyrics'
 import { useChordStore, useNotesStore, useSetlistStore, useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
-import { syncAnalysis, syncChords, syncNotes, syncSetlists } from './persistence'
+import { syncAnalysis, syncChords, syncLyrics, syncNotes, syncSetlists } from './persistence'
 
 function track(id: string): LibraryTrack {
   return {
@@ -57,12 +58,14 @@ describe('persistence database', () => {
       await db.chords.clear()
       await db.setlists.clear()
       await db.notes.clear()
+      await db.lyrics.clear()
     }
     useLibraryStore.getState().hydrate([])
     useTrackAnalysisStore.getState().hydrate([])
     useChordStore.getState().hydrate([])
     useSetlistStore.getState().hydrate([])
     useNotesStore.getState().hydrate([])
+    useLocalLyricsStore.getState().hydrate([])
   })
 
   it('guarda y carga canciones con blob', async () => {
@@ -217,5 +220,35 @@ describe('persistence database', () => {
     const records = await db.notes.toArray()
     expect(records.map((note) => note.targetId)).toEqual(['a'])
     expect(records[0]?.text).toBe('sí')
+  })
+
+  it('guarda y carga la letra local por pista', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.lyrics.put({ trackId: 'a', text: '[00:01.00]Hola', updatedAt: 1 })
+    const record = await db.lyrics.get('a')
+
+    expect(record?.text).toBe('[00:01.00]Hola')
+  })
+
+  it('syncLyrics descarta pistas que ya no están en la biblioteca', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    useLibraryStore.getState().hydrate([track('a')])
+    await syncLyrics({
+      a: { trackId: 'a', text: '[00:01.00]Hola', updatedAt: 1 },
+      ghost: { trackId: 'ghost', text: '[00:01.00]Fantasma', updatedAt: 1 },
+    })
+
+    const keys = await db.lyrics.toCollection().primaryKeys()
+    expect(keys).toEqual(['a'])
   })
 })

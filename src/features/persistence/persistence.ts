@@ -1,5 +1,7 @@
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
+import { useLocalLyricsStore } from '../lyrics'
+import type { LocalLyrics } from '../lyrics'
 import {
   noteKey,
   useChordStore,
@@ -45,6 +47,9 @@ export async function hydrateStores(): Promise<boolean> {
   const noteRecords = await db.notes.toArray()
   useNotesStore.getState().hydrate(noteRecords)
 
+  const lyricsRecords = await db.lyrics.toArray()
+  useLocalLyricsStore.getState().hydrate(lyricsRecords)
+
   return true
 }
 
@@ -60,6 +65,7 @@ export function startPersistence(): void {
   let lastChords = useChordStore.getState().records
   let lastSetlists = useSetlistStore.getState().setlists
   let lastNotes = useNotesStore.getState().records
+  let lastLyrics = useLocalLyricsStore.getState().records
   let sessionTimer: ReturnType<typeof setTimeout> | null = null
 
   useLibraryStore.subscribe((state) => {
@@ -110,6 +116,14 @@ export function startPersistence(): void {
     void syncNotes(state.records)
   })
 
+  useLocalLyricsStore.subscribe((state) => {
+    if (state.records === lastLyrics) {
+      return
+    }
+    lastLyrics = state.records
+    void syncLyrics(state.records)
+  })
+
   usePlayerStore.subscribe(() => {
     if (sessionTimer !== null) {
       return
@@ -137,11 +151,12 @@ export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
   const existing = await db.songs.toCollection().primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.songs, db.analysis, db.chords, db.notes, async () => {
+  await db.transaction('rw', db.songs, db.analysis, db.chords, db.notes, db.lyrics, async () => {
     if (stale.length > 0) {
       await db.songs.bulkDelete(stale)
       await db.analysis.bulkDelete(stale)
       await db.chords.bulkDelete(stale)
+      await db.lyrics.bulkDelete(stale)
       await db.notes
         .where('[targetType+targetId]')
         .anyOf(stale.map((id) => ['track', id]))
@@ -190,6 +205,27 @@ export async function syncChords(records: Record<string, ChordSheet>): Promise<v
       await db.chords.bulkDelete(stale)
     }
     await db.chords.bulkPut(values)
+  })
+}
+
+export async function syncLyrics(records: Record<string, LocalLyrics>): Promise<void> {
+  const db = getDatabase()
+  if (db === null) {
+    return
+  }
+
+  // Solo se persiste la letra local de pistas que siguen en la biblioteca.
+  const known = new Set(useLibraryStore.getState().tracks.map((track) => track.id))
+  const values = Object.values(records).filter((record) => known.has(record.trackId))
+  const ids = new Set(values.map((record) => record.trackId))
+  const existing = await db.lyrics.toCollection().primaryKeys()
+  const stale = existing.filter((id) => !ids.has(id))
+
+  await db.transaction('rw', db.lyrics, async () => {
+    if (stale.length > 0) {
+      await db.lyrics.bulkDelete(stale)
+    }
+    await db.lyrics.bulkPut(values)
   })
 }
 
