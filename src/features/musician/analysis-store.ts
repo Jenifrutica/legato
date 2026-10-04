@@ -24,6 +24,7 @@ export type TrackAnalysis = {
   key: string | null
   detectedChords?: DetectedChord[] | null
   detectedBeats?: number[] | null
+  beatOffset?: number | null
   updatedAt: number
 }
 
@@ -34,6 +35,7 @@ type AnalysisState = {
   setKey: (trackId: string, key: string | null) => void
   setDetectedChords: (trackId: string, chords: DetectedChord[] | null) => void
   setDetectedBeats: (trackId: string, beats: number[] | null) => void
+  setBeatOffset: (trackId: string, offset: number | null) => void
 }
 
 function recordFor(
@@ -44,6 +46,7 @@ function recordFor(
     key?: string | null
     detectedChords?: DetectedChord[] | null
     detectedBeats?: number[] | null
+    beatOffset?: number | null
   },
 ): TrackAnalysis {
   return {
@@ -54,6 +57,7 @@ function recordFor(
       patch.detectedChords === undefined ? (current?.detectedChords ?? null) : patch.detectedChords,
     detectedBeats:
       patch.detectedBeats === undefined ? (current?.detectedBeats ?? null) : patch.detectedBeats,
+    beatOffset: patch.beatOffset === undefined ? (current?.beatOffset ?? null) : patch.beatOffset,
     updatedAt: Date.now(),
   }
 }
@@ -101,6 +105,14 @@ export const useTrackAnalysisStore = create<AnalysisState>((set) => ({
       records: {
         ...state.records,
         [trackId]: recordFor(state.records[trackId], trackId, { detectedBeats: beats }),
+      },
+    })),
+
+  setBeatOffset: (trackId, offset) =>
+    set((state) => ({
+      records: {
+        ...state.records,
+        [trackId]: recordFor(state.records[trackId], trackId, { beatOffset: offset }),
       },
     })),
 }))

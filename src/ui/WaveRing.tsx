@@ -71,6 +71,7 @@ export function WaveRing({
   position = null,
   beats = null,
   bpmOverride = null,
+  offsetOverride = null,
 }: {
   analyser: AnalyserLike | null
   active: boolean
@@ -81,6 +82,8 @@ export function WaveRing({
   beats?: number[] | null
   /** BPM de la pista que gana sobre el BPM manual global. */
   bpmOverride?: number | null
+  /** Fase de la pista (tap tempo) que gana sobre la fase global. */
+  offsetOverride?: number | null
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const activeRef = useRef(active)
@@ -89,16 +92,21 @@ export function WaveRing({
   arcRef.current = arc
   const sensitivity = useWavesStore((state) => state.sensitivity)
   const bpm = useWavesStore((state) => state.bpm)
+  const offset = useWavesStore((state) => state.offsetSeconds)
   const sensitivityRef = useRef(sensitivity)
   sensitivityRef.current = sensitivity
   const bpmRef = useRef(bpm)
   bpmRef.current = bpm
+  const offsetRef = useRef(offset)
+  offsetRef.current = offset
   const positionRef = useRef(position)
   positionRef.current = position
   const beatsRef = useRef(beats)
   beatsRef.current = beats
   const bpmOverrideRef = useRef(bpmOverride)
   bpmOverrideRef.current = bpmOverride
+  const offsetOverrideRef = useRef(offsetOverride)
+  offsetOverrideRef.current = offsetOverride
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -196,7 +204,8 @@ export function WaveRing({
         } else {
           const bpmValue = bpmOverrideRef.current ?? bpmRef.current ?? 120
           const beatsPerSecond = bpmValue / 60
-          const base = now ?? time / 1000
+          const offsetValue = offsetOverrideRef.current ?? offsetRef.current
+          const base = (now ?? time / 1000) - offsetValue
           const phase = (((base * beatsPerSecond) % 1) + 1) % 1
           const kick = Math.pow(1 - phase, 8)
           beat = kick

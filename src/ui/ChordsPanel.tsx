@@ -101,20 +101,26 @@ export function ChordsPanel() {
   }
 
   /** Si Spotify bloquea su análisis, se intenta el preview de 30 s (audio descargable). */
-  async function detectFromPreview(id: string): Promise<boolean> {
+  async function detectFromPreview(id: string): Promise<'ok' | 'none' | 'failed'> {
+    let url: string | null
     try {
-      const url = await fetchSpotifyTrackPreview(id)
-      if (url === null || url === '') {
-        return false
-      }
+      url = await fetchSpotifyTrackPreview(id)
+    } catch {
+      return 'failed'
+    }
+    if (url === null || url === '') {
+      return 'none'
+    }
+
+    try {
       const response = await fetch(url)
       if (!response.ok) {
-        return false
+        return 'failed'
       }
       const blob = await response.blob()
       const chords = await detectChordsFromBlob(blob)
       if (chords === null) {
-        return false
+        return 'failed'
       }
       if (trackId !== null) {
         setDetectedChords(trackId, chords)
@@ -124,9 +130,9 @@ export function ChordsPanel() {
           setBpm(trackId, bpm)
         }
       }
-      return true
+      return 'ok'
     } catch {
-      return false
+      return 'failed'
     }
   }
 
@@ -157,11 +163,13 @@ export function ChordsPanel() {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'error'
-      const fromPreview = await detectFromPreview(spotifyTrackId)
-      if (fromPreview) {
+      const preview = await detectFromPreview(spotifyTrackId)
+      if (preview === 'ok') {
         setSpotifyNotice(t('chords.previewDetected', { error: message }))
       } else {
-        setSpotifyError(message)
+        const reason =
+          preview === 'none' ? t('chords.spotifyNoPreview') : t('chords.spotifyPreviewFailed')
+        setSpotifyError(`${message} · ${reason}`)
       }
     } finally {
       setDetecting(null)

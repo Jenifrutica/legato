@@ -83,12 +83,13 @@ describe('playlists de Spotify', () => {
   })
 
   it('lee el preview cuando Spotify lo ofrece', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(jsonResponse({ preview_url: 'https://p.scdn.co/x.mp3' })),
-    )
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ preview_url: 'https://p.scdn.co/x.mp3' }))
+    vi.stubGlobal('fetch', fetchMock)
 
     expect(await fetchSpotifyTrackPreview('t1')).toBe('https://p.scdn.co/x.mp3')
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain('market=from_token')
   })
 
   it('devuelve null cuando no hay preview', async () => {

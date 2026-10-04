@@ -76,7 +76,8 @@ export class AudioGraph implements AnalyserLike {
 
       this.#applyRouting()
       this.#applyGains()
-    } catch {
+    } catch (error) {
+      console.warn('[audio-graph] no se pudo crear el grafo de audio', error)
       this.#context = null
       this.#analyser = null
       this.#beatAnalyser = null

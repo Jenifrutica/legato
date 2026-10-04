@@ -15,6 +15,14 @@ export type { OutputDevice } from './output-devices'
 export { PlaybackQueue } from './queue'
 export { SleepTimer } from './sleep-timer'
 export type { TimerMode, TimerSnapshot } from './sleep-timer'
-export { clampBpm, MAX_BPM, MIN_BPM, nextTap, useWavesStore } from './waves-store'
+export {
+  clampBpm,
+  clampOffset,
+  MAX_BPM,
+  MIN_BPM,
+  nextTap,
+  offsetFromPositions,
+  useWavesStore,
+} from './waves-store'
 export type { SavedWaves, TapState } from './waves-store'
 export type { ChannelMode, LoopMode, QueueState, QueueTrack, StructureNode } from './types'

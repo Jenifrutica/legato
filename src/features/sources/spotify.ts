@@ -277,7 +277,7 @@ export async function fetchSpotifyTrackPreview(trackId: string): Promise<string 
     throw new Error('not-connected')
   }
 
-  const response = await fetchWithRetry(`${API}/tracks/${trackId}`, token)
+  const response = await fetchWithRetry(`${API}/tracks/${trackId}?market=from_token`, token)
   if (!response.ok) {
     throw new Error(await describeError(response))
   }

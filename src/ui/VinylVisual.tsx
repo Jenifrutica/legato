@@ -49,6 +49,7 @@ export function VinylVisual() {
             analyser={getAnalyser()}
             beats={analysis?.detectedBeats ?? null}
             bpmOverride={analysis?.bpm ?? null}
+            offsetOverride={analysis?.beatOffset ?? null}
             position={spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime}
           />
 

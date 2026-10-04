@@ -17,6 +17,30 @@ export function clampBpm(value: number): number {
 export type SavedWaves = {
   sensitivity: WaveSensitivity
   bpm: number | null
+  offsetSeconds: number
+}
+
+export function clampOffset(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0
+  }
+  const period = 10
+  return ((value % period) + period) % period
+}
+
+/** Fase media (segundos dentro del compás) de una serie de toques a un BPM. */
+export function offsetFromPositions(positions: number[], bpm: number): number {
+  if (positions.length === 0 || bpm <= 0) {
+    return 0
+  }
+
+  const period = 60 / bpm
+  let angle = 0
+  for (const position of positions) {
+    angle += (2 * Math.PI * (position % period)) / period
+  }
+  angle /= positions.length
+  return clampOffset(((angle / (2 * Math.PI)) * period + period) % period)
 }
 
 export type TapState = {
@@ -51,7 +75,7 @@ export function nextTap(current: number[], now: number): TapState {
 }
 
 function readSaved(): SavedWaves {
-  const fallback: SavedWaves = { sensitivity: 'normal', bpm: null }
+  const fallback: SavedWaves = { sensitivity: 'normal', bpm: null, offsetSeconds: 0 }
   if (typeof localStorage === 'undefined') {
     return fallback
   }
@@ -68,6 +92,8 @@ function readSaved(): SavedWaves {
       return {
         sensitivity,
         bpm: typeof parsed.bpm === 'number' ? clampBpm(parsed.bpm) : null,
+        offsetSeconds:
+          typeof parsed.offsetSeconds === 'number' ? clampOffset(parsed.offsetSeconds) : 0,
       }
     }
   } catch {
@@ -88,6 +114,7 @@ function persist(state: SavedWaves): void {
 type WavesState = SavedWaves & {
   setSensitivity: (sensitivity: WaveSensitivity) => void
   setBpm: (bpm: number | null) => void
+  setOffset: (seconds: number) => void
 }
 
 export const useWavesStore = create<WavesState>((set, get) => ({
@@ -95,12 +122,18 @@ export const useWavesStore = create<WavesState>((set, get) => ({
 
   setSensitivity: (sensitivity) => {
     set({ sensitivity })
-    persist({ sensitivity, bpm: get().bpm })
+    persist({ sensitivity, bpm: get().bpm, offsetSeconds: get().offsetSeconds })
   },
 
   setBpm: (bpm) => {
     const value = bpm === null ? null : clampBpm(bpm)
     set({ bpm: value })
-    persist({ sensitivity: get().sensitivity, bpm: value })
+    persist({ sensitivity: get().sensitivity, bpm: value, offsetSeconds: get().offsetSeconds })
+  },
+
+  setOffset: (seconds) => {
+    const value = clampOffset(seconds)
+    set({ offsetSeconds: value })
+    persist({ sensitivity: get().sensitivity, bpm: get().bpm, offsetSeconds: value })
   },
 }))

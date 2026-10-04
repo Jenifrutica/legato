@@ -353,6 +353,8 @@ export const es = {
     spotifyError: 'El análisis de Spotify no está disponible: {{error}}',
     previewDetected:
       'Spotify bloqueó su análisis ({{error}}); los acordes se estimaron del preview de 30 s y el BPM también.',
+    spotifyNoPreview: 'Spotify tampoco ofrece preview para esta canción.',
+    spotifyPreviewFailed: 'El preview existe, pero no se pudo descargar o analizar.',
     sections: {
       chorus: 'Coro',
       verse: 'Verso',

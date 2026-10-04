@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatFileSize, useLibraryStore } from '../features/library'
+import { useTrackAnalysisStore } from '../features/musician'
+import { useSpotifyStore } from '../features/sources'
 import {
   AMBIENT_IDS,
   MAX_BPM,
   MIN_BPM,
   nextTap,
+  offsetFromPositions,
   supportsOutputSelection,
   useAudioFxStore,
   usePlayerStore,
@@ -60,7 +63,14 @@ export function AudioQualityPanel() {
   const bpm = useWavesStore((state) => state.bpm)
   const setSensitivity = useWavesStore((state) => state.setSensitivity)
   const setBpm = useWavesStore((state) => state.setBpm)
+  const setOffset = useWavesStore((state) => state.setOffset)
+  const setAnalysisBpm = useTrackAnalysisStore((state) => state.setBpm)
+  const setAnalysisBeatOffset = useTrackAnalysisStore((state) => state.setBeatOffset)
+  const spotifyPlayback = useSpotifyStore((state) => state.playback)
+  const currentTime = usePlayerStore((state) => state.currentTime)
   const [taps, setTaps] = useState<number[]>([])
+  const [tapPositions, setTapPositions] = useState<number[]>([])
+  const anchorRef = useRef<{ position: number; at: number } | null>(null)
   const track = useLibraryStore((state) =>
     currentTrack === null
       ? null
@@ -73,14 +83,48 @@ export function AudioQualityPanel() {
     }
   }, [canSelectOutput, refreshOutputDevices])
 
+  useEffect(() => {
+    if (spotifyPlayback !== null) {
+      anchorRef.current = { position: spotifyPlayback.positionMs / 1000, at: performance.now() }
+    }
+  }, [spotifyPlayback])
+
+  /** Posición de la pista en segundos (interpolada entre sondeos de Spotify). */
+  function currentPlaybackPosition(): number | null {
+    if (spotifyPlayback !== null) {
+      const anchor = anchorRef.current
+      return anchor === null
+        ? spotifyPlayback.positionMs / 1000
+        : anchor.position + (performance.now() - anchor.at) / 1000
+    }
+    return currentTrack !== null ? currentTime : null
+  }
+
   function handleTap() {
     const result = nextTap(taps, performance.now())
     setTaps(result.taps)
-    if (result.bpm !== null) {
-      setBpm(result.bpm)
+    if (result.bpm === null) {
+      return
+    }
+
+    setBpm(result.bpm)
+    if (currentTrack?.external === true && currentTrack.id !== '') {
+      setAnalysisBpm(currentTrack.id, result.bpm)
+    }
+
+    // Fase: los toques también fijan en qué punto del compás caen las ondas.
+    const position = currentPlaybackPosition()
+    if (position === null) {
+      return
+    }
+    const samples = result.taps.length <= 1 ? [position] : [...tapPositions, position].slice(-4)
+    setTapPositions(samples)
+    const offsetValue = offsetFromPositions(samples, result.bpm)
+    setOffset(offsetValue)
+    if (currentTrack?.external === true) {
+      setAnalysisBeatOffset(currentTrack.id, offsetValue)
     }
   }
-
   const quality = [
     { label: t('audio.codec'), value: track?.codec ?? '—' },
     {

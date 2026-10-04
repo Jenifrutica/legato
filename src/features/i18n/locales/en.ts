@@ -352,6 +352,8 @@ export const en: typeof es = {
     spotifyError: 'The Spotify analysis is not available: {{error}}',
     previewDetected:
       'Spotify blocked its analysis ({{error}}); chords were estimated from the 30 s preview, and so was the BPM.',
+    spotifyNoPreview: 'Spotify does not offer a preview for this song either.',
+    spotifyPreviewFailed: 'The preview exists, but it could not be downloaded or analysed.',
     sections: {
       chorus: 'Chorus',
       verse: 'Verse',
