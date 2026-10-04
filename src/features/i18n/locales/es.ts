@@ -350,6 +350,12 @@ export const es = {
     lastChord: 'Último acorde',
     timeline: 'Línea de tiempo',
     manual: 'Editor manual (ChordPro)',
+    helpTitle: 'Cómo usar los acordes',
+    helpImport: 'Importa un archivo .cho / .pro (o pega el texto) aquí abajo.',
+    helpExample:
+      'Formato: directivas como {title: Mi canción} / {key: G} y acordes entre corchetes sobre la letra: [G]Hola [D]mundo.',
+    helpSave:
+      'Se guarda solo, por pista. Con − / + transportas la vista sin tocar tu hoja original.',
     spotifyDetect: 'Detectar desde Spotify',
     spotifyDetecting: 'Consultando el análisis de Spotify…',
     spotifyNotConnected: 'Conecta Spotify (⚙) para usar su análisis de beats y acordes.',

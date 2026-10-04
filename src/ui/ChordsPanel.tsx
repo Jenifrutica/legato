@@ -7,6 +7,7 @@ import {
   chordsFromSpotifySegments,
   detectBpmFromBlob,
   detectChordsFromBlob,
+  isChordsAutoEnabled,
   spotifyKeyName,
   useMicStore,
   useTrackAnalysisStore,
@@ -43,6 +44,8 @@ function chordAt(events: DetectedChord[], time: number): string | null {
 
 export function ChordsPanel() {
   const { t } = useTranslation()
+  // La detección automática está archivada tras una bandera apagada por defecto.
+  const autoEnabled = isChordsAutoEnabled()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const currentTime = usePlayerStore((state) => state.currentTime)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
@@ -193,7 +196,7 @@ export function ChordsPanel() {
   }
 
   useEffect(() => {
-    if (trackId === null || detecting !== null) {
+    if (!autoEnabled || trackId === null || detecting !== null) {
       return
     }
     if (record?.detectedChords != null) {
@@ -210,7 +213,7 @@ export function ChordsPanel() {
       void runSpotifyAnalysis()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackId, canDetect, isSpotifyExternal])
+  }, [trackId, canDetect, isSpotifyExternal, autoEnabled])
 
   useEffect(() => {
     setDraft(trackId === null ? '' : (useChordStore.getState().records[trackId]?.text ?? ''))
@@ -298,6 +301,109 @@ export function ChordsPanel() {
     )
   }
 
+  const manualEditor = (
+    <div className="mt-3 flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="cursor-pointer border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink">
+          {t('chords.import')}
+          <input
+            accept=".cho,.pro,.chordpro,.txt,text/plain"
+            className="hidden"
+            onChange={(event) => void handleFile(event.target.files?.[0])}
+            type="file"
+          />
+        </label>
+
+        <div aria-label={t('chords.transpose')} className="flex items-center gap-1" role="group">
+          <button
+            aria-label={t('chords.down')}
+            className="border-2 border-rule/40 px-2 py-1 font-mono text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink"
+            onClick={() => setSemitones((value) => Math.max(-11, value - 1))}
+            type="button"
+          >
+            −
+          </button>
+          <span className="w-9 text-center font-mono text-xs tabular-nums text-ink">
+            {semitones > 0 ? `+${semitones}` : semitones}
+          </span>
+          <button
+            aria-label={t('chords.up')}
+            className="border-2 border-rule/40 px-2 py-1 font-mono text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink"
+            onClick={() => setSemitones((value) => Math.min(11, value + 1))}
+            type="button"
+          >
+            +
+          </button>
+          {semitones !== 0 && (
+            <button
+              className="ml-1 border-2 border-rule/40 px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+              onClick={() => setSemitones(0)}
+              type="button"
+            >
+              {t('chords.reset')}
+            </button>
+          )}
+        </div>
+
+        {hasSheet && (
+          <button
+            className="ml-auto border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
+            onClick={() => {
+              if (trackId !== null) {
+                clearSheet(trackId)
+              }
+              setDraft('')
+              setSemitones(0)
+            }}
+            type="button"
+          >
+            {t('chords.clear')}
+          </button>
+        )}
+      </div>
+
+      <div className="border-2 border-rule/40 bg-accent-soft/50 p-3 text-xs leading-relaxed text-ink-muted">
+        <p className="font-mono text-[0.6875rem] tracking-[0.1em] text-ink uppercase">
+          {t('chords.helpTitle')}
+        </p>
+        <ol className="mt-2 list-decimal space-y-1 pl-4">
+          <li>{t('chords.helpImport')}</li>
+          <li>{t('chords.helpExample')}</li>
+          <li>{t('chords.helpSave')}</li>
+        </ol>
+      </div>
+
+      {transposed.key !== null && (
+        <p className="font-mono text-xs text-ink-muted">
+          {t('chords.key', { key: transposed.key })}
+        </p>
+      )}
+
+      <textarea
+        aria-label={t('chords.editor')}
+        className="h-32 w-full resize-y border-2 border-rule bg-surface p-2 font-mono text-xs text-ink focus:border-accent focus:outline-none"
+        onChange={(event) => updateDraft(event.target.value)}
+        placeholder={t('chords.placeholder')}
+        value={draft}
+      />
+
+      {hasSheet && (
+        <div className="border-2 border-rule bg-surface p-3">
+          <p className="mb-1 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+            {t('chords.preview')}
+          </p>
+          {transposed.title !== null && (
+            <p className="font-display text-sm font-semibold">{transposed.title}</p>
+          )}
+          {transposed.artist !== null && (
+            <p className="text-xs text-ink-muted">{transposed.artist}</p>
+          )}
+          <div className="mt-2">{transposed.lines.map(renderLine)}</div>
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <section aria-label={t('chords.title')} className="flex flex-col gap-4 p-5">
       <h3 className="font-display text-base font-semibold">{t('chords.title')}</h3>
@@ -313,270 +419,190 @@ export function ChordsPanel() {
             <p className="truncate text-xs text-ink-muted">{currentTrack?.artist}</p>
           </div>
 
-          <MicControl />
-
-          {detecting !== null && (
-            <p className="text-xs text-ink-muted" role="status">
-              {detecting === 'spotify' ? t('chords.spotifyDetecting') : t('chords.detecting')}
-            </p>
-          )}
-
-          {!canDetect && !isSpotifyExternal && (
-            <p className="text-xs leading-relaxed text-ink-muted">
-              {t('chords.detectUnavailable')}
-            </p>
-          )}
-
-          {isSpotifyExternal && !isSpotifyConnected() && (
-            <p className="text-xs leading-relaxed text-ink-muted">
-              {t('chords.spotifyNotConnected')}
-            </p>
-          )}
-
-          {isSpotifyExternal && spotifyError !== null && (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs leading-relaxed text-ink-muted" role="status">
-                {t('chords.spotifyError', { error: spotifyError })}
-              </p>
-              <button
-                className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                onClick={() => void runSpotifyAnalysis()}
-                type="button"
-              >
-                {t('chords.spotifyDetect')}
-              </button>
-            </div>
-          )}
-
-          {spotifyNotice !== null && (
-            <p className="text-xs leading-relaxed text-ink-muted" role="status">
-              {spotifyNotice}
-            </p>
-          )}
-
-          {detected !== null && detected.length > 0 && (
+          {autoEnabled && (
             <>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[0.6875rem] tracking-[0.1em] text-accent-ink uppercase">
-                  {t('chords.detected')}
-                </span>
-                <button
-                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                  onClick={retryDetection}
-                  type="button"
-                >
-                  {t('chords.detectAgain')}
-                </button>
-                <button
-                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
-                  onClick={() => {
-                    if (trackId !== null) {
-                      setDetectedChords(trackId, null)
-                    }
-                  }}
-                  type="button"
-                >
-                  {t('chords.clearDetected')}
-                </button>
-              </div>
+              <MicControl />
 
-              <div
-                aria-label={t('chords.nowPlaying')}
-                className="flex items-center justify-between gap-3 border-2 border-rule bg-accent-soft px-3 py-2"
-              >
-                <span className="font-display text-2xl font-black text-ink">
-                  {micListening && micChord !== null
-                    ? micChord
-                    : (activeEvent?.chord ?? detected[0]?.chord ?? '—')}
-                </span>
-                <span className="text-right font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase">
-                  {micListening
-                    ? t('mic.live')
-                    : nextEvent === undefined
-                      ? t('chords.lastChord')
-                      : t('chords.nextChord', { chord: nextEvent.chord })}
-                </span>
-              </div>
-
-              {lyrics.lines.length > 0 ? (
-                <div className="border-2 border-rule bg-surface p-3">
-                  <p className="mb-2 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
-                    {t('chords.withLyrics')}
-                  </p>
-                  <div className="flex flex-col gap-1.5">
-                    {lyrics.lines.map((line, index) => (
-                      <div
-                        className={index === activeLyricIndex ? 'bg-accent-soft px-1' : ''}
-                        key={index}
-                      >
-                        <span className="block font-mono text-[0.6875rem] leading-tight font-semibold text-accent-ink">
-                          {chordAt(detected, line.time) ?? ' '}
-                        </span>
-                        <span className="font-serif text-sm text-ink">{line.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs leading-relaxed text-ink-muted">{t('chords.noLyrics')}</p>
+              {detecting !== null && (
+                <p className="text-xs text-ink-muted" role="status">
+                  {detecting === 'spotify' ? t('chords.spotifyDetecting') : t('chords.detecting')}
+                </p>
               )}
 
-              <details className="border-2 border-rule/40 bg-surface p-3">
-                <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
-                  {t('chords.timeline')}
-                </summary>
-                <ol className="mt-2 flex flex-col">
-                  {detected.map((event, index) => (
-                    <li
-                      className={`flex items-center justify-between border-b border-border py-1 ${
-                        index === activeIndex ? 'bg-accent-soft px-1' : ''
-                      }`}
-                      key={`${event.time}-${index}`}
+              {!canDetect && !isSpotifyExternal && (
+                <p className="text-xs leading-relaxed text-ink-muted">
+                  {t('chords.detectUnavailable')}
+                </p>
+              )}
+
+              {isSpotifyExternal && !isSpotifyConnected() && (
+                <p className="text-xs leading-relaxed text-ink-muted">
+                  {t('chords.spotifyNotConnected')}
+                </p>
+              )}
+
+              {isSpotifyExternal && spotifyError !== null && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs leading-relaxed text-ink-muted" role="status">
+                    {t('chords.spotifyError', { error: spotifyError })}
+                  </p>
+                  <button
+                    className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                    onClick={() => void runSpotifyAnalysis()}
+                    type="button"
+                  >
+                    {t('chords.spotifyDetect')}
+                  </button>
+                </div>
+              )}
+
+              {spotifyNotice !== null && (
+                <p className="text-xs leading-relaxed text-ink-muted" role="status">
+                  {spotifyNotice}
+                </p>
+              )}
+
+              {detected !== null && detected.length > 0 && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[0.6875rem] tracking-[0.1em] text-accent-ink uppercase">
+                      {t('chords.detected')}
+                    </span>
+                    <button
+                      className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                      onClick={retryDetection}
+                      type="button"
                     >
-                      <span className="font-mono text-sm font-semibold text-ink">
-                        {event.chord}
-                      </span>
-                      <span className="font-mono text-xs text-ink-muted">
-                        {formatDuration(event.time)}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </details>
+                      {t('chords.detectAgain')}
+                    </button>
+                    <button
+                      className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
+                      onClick={() => {
+                        if (trackId !== null) {
+                          setDetectedChords(trackId, null)
+                        }
+                      }}
+                      type="button"
+                    >
+                      {t('chords.clearDetected')}
+                    </button>
+                  </div>
+
+                  <div
+                    aria-label={t('chords.nowPlaying')}
+                    className="flex items-center justify-between gap-3 border-2 border-rule bg-accent-soft px-3 py-2"
+                  >
+                    <span className="font-display text-2xl font-black text-ink">
+                      {micListening && micChord !== null
+                        ? micChord
+                        : (activeEvent?.chord ?? detected[0]?.chord ?? '—')}
+                    </span>
+                    <span className="text-right font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase">
+                      {micListening
+                        ? t('mic.live')
+                        : nextEvent === undefined
+                          ? t('chords.lastChord')
+                          : t('chords.nextChord', { chord: nextEvent.chord })}
+                    </span>
+                  </div>
+
+                  {lyrics.lines.length > 0 ? (
+                    <div className="border-2 border-rule bg-surface p-3">
+                      <p className="mb-2 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+                        {t('chords.withLyrics')}
+                      </p>
+                      <div className="flex flex-col gap-1.5">
+                        {lyrics.lines.map((line, index) => (
+                          <div
+                            className={index === activeLyricIndex ? 'bg-accent-soft px-1' : ''}
+                            key={index}
+                          >
+                            <span className="block font-mono text-[0.6875rem] leading-tight font-semibold text-accent-ink">
+                              {chordAt(detected, line.time) ?? ' '}
+                            </span>
+                            <span className="font-serif text-sm text-ink">{line.text}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs leading-relaxed text-ink-muted">{t('chords.noLyrics')}</p>
+                  )}
+
+                  <details className="border-2 border-rule/40 bg-surface p-3">
+                    <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
+                      {t('chords.timeline')}
+                    </summary>
+                    <ol className="mt-2 flex flex-col">
+                      {detected.map((event, index) => (
+                        <li
+                          className={`flex items-center justify-between border-b border-border py-1 ${
+                            index === activeIndex ? 'bg-accent-soft px-1' : ''
+                          }`}
+                          key={`${event.time}-${index}`}
+                        >
+                          <span className="font-mono text-sm font-semibold text-ink">
+                            {event.chord}
+                          </span>
+                          <span className="font-mono text-xs text-ink-muted">
+                            {formatDuration(event.time)}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                </>
+              )}
+
+              {!detecting &&
+                detected !== null &&
+                detected.length === 0 &&
+                (canDetect || isSpotifyExternal) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs leading-relaxed text-ink-muted">
+                      {t('chords.detectedEmpty')}
+                    </p>
+                    <button
+                      className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                      onClick={retryDetection}
+                      type="button"
+                    >
+                      {t('chords.detectAgain')}
+                    </button>
+                  </div>
+                )}
+
+              {isSpotifyExternal &&
+                isSpotifyConnected() &&
+                detecting === null &&
+                detected === null &&
+                spotifyError === null && (
+                  <button
+                    className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                    onClick={() => void runSpotifyAnalysis()}
+                    type="button"
+                  >
+                    {t('chords.spotifyDetect')}
+                  </button>
+                )}
             </>
           )}
 
-          {!detecting &&
-            detected !== null &&
-            detected.length === 0 &&
-            (canDetect || isSpotifyExternal) && (
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs leading-relaxed text-ink-muted">
-                  {t('chords.detectedEmpty')}
-                </p>
-                <button
-                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                  onClick={retryDetection}
-                  type="button"
-                >
-                  {t('chords.detectAgain')}
-                </button>
-              </div>
-            )}
-
-          {isSpotifyExternal &&
-            isSpotifyConnected() &&
-            detecting === null &&
-            detected === null &&
-            spotifyError === null && (
-              <button
-                className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                onClick={() => void runSpotifyAnalysis()}
-                type="button"
-              >
-                {t('chords.spotifyDetect')}
-              </button>
-            )}
-
-          <details className="border-2 border-rule/40 bg-surface p-3">
-            <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
-              {t('chords.manual')}
-            </summary>
-
-            <div className="mt-3 flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="cursor-pointer border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink">
-                  {t('chords.import')}
-                  <input
-                    accept=".cho,.pro,.chordpro,.txt,text/plain"
-                    className="hidden"
-                    onChange={(event) => void handleFile(event.target.files?.[0])}
-                    type="file"
-                  />
-                </label>
-
-                <div
-                  aria-label={t('chords.transpose')}
-                  className="flex items-center gap-1"
-                  role="group"
-                >
-                  <button
-                    aria-label={t('chords.down')}
-                    className="border-2 border-rule/40 px-2 py-1 font-mono text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink"
-                    onClick={() => setSemitones((value) => Math.max(-11, value - 1))}
-                    type="button"
-                  >
-                    −
-                  </button>
-                  <span className="w-9 text-center font-mono text-xs tabular-nums text-ink">
-                    {semitones > 0 ? `+${semitones}` : semitones}
-                  </span>
-                  <button
-                    aria-label={t('chords.up')}
-                    className="border-2 border-rule/40 px-2 py-1 font-mono text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink"
-                    onClick={() => setSemitones((value) => Math.min(11, value + 1))}
-                    type="button"
-                  >
-                    +
-                  </button>
-                  {semitones !== 0 && (
-                    <button
-                      className="ml-1 border-2 border-rule/40 px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                      onClick={() => setSemitones(0)}
-                      type="button"
-                    >
-                      {t('chords.reset')}
-                    </button>
-                  )}
-                </div>
-
-                {hasSheet && (
-                  <button
-                    className="ml-auto border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
-                    onClick={() => {
-                      if (trackId !== null) {
-                        clearSheet(trackId)
-                      }
-                      setDraft('')
-                      setSemitones(0)
-                    }}
-                    type="button"
-                  >
-                    {t('chords.clear')}
-                  </button>
-                )}
-              </div>
-
-              {transposed.key !== null && (
-                <p className="font-mono text-xs text-ink-muted">
-                  {t('chords.key', { key: transposed.key })}
-                </p>
-              )}
-
-              <textarea
-                aria-label={t('chords.editor')}
-                className="h-32 w-full resize-y border-2 border-rule bg-surface p-2 font-mono text-xs text-ink focus:border-accent focus:outline-none"
-                onChange={(event) => updateDraft(event.target.value)}
-                placeholder={t('chords.placeholder')}
-                value={draft}
-              />
-
-              {hasSheet && (
-                <div className="border-2 border-rule bg-surface p-3">
-                  <p className="mb-1 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
-                    {t('chords.preview')}
-                  </p>
-                  {transposed.title !== null && (
-                    <p className="font-display text-sm font-semibold">{transposed.title}</p>
-                  )}
-                  {transposed.artist !== null && (
-                    <p className="text-xs text-ink-muted">{transposed.artist}</p>
-                  )}
-                  <div className="mt-2">{transposed.lines.map(renderLine)}</div>
-                </div>
-              )}
+          {autoEnabled ? (
+            <details className="border-2 border-rule/40 bg-surface p-3">
+              <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
+                {t('chords.manual')}
+              </summary>
+              {manualEditor}
+            </details>
+          ) : (
+            <div className="border-2 border-rule bg-surface p-3">
+              <p className="mb-1 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+                {t('chords.manual')}
+              </p>
+              {manualEditor}
             </div>
-          </details>
+          )}
 
           <p className="text-xs leading-relaxed text-ink-muted">{t('chords.hint')}</p>
         </>

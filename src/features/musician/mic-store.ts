@@ -4,6 +4,7 @@ import { useTrackAnalysisStore } from './analysis-store'
 import type { TrackAnalysis } from './analysis-store'
 import { chordFromChroma, chromaFromMagnitudes, majorityChord } from './chord-detect'
 import type { DetectedChord } from './chord-detect'
+import { isChordsAutoEnabled } from './chords-flag'
 import {
   estimateBpmFromBeats,
   MicAnalyzer,
@@ -48,6 +49,7 @@ let detector: BeatDetector | null = null
 let timer: ReturnType<typeof setInterval> | null = null
 let options: MicSessionOptions | null = null
 let session = newSession(null)
+let chordsEnabled = false
 
 export function getMicAnalyser(): MicAnalyzer | null {
   return analyzer !== null && analyzer.listening ? analyzer : null
@@ -62,7 +64,7 @@ function finalizeSession(): void {
   const store = useTrackAnalysisStore.getState()
   const existing = store.records[trackId] ?? null
 
-  if (shouldSaveMicChords(existing, session.events.length)) {
+  if (chordsEnabled && shouldSaveMicChords(existing, session.events.length)) {
     const chords: DetectedChord[] = session.events.map((event, index) => ({
       time: event.time,
       duration: (session.events[index + 1]?.time ?? event.time + 2) - event.time,
@@ -107,7 +109,8 @@ function poll(): void {
   }
 
   // Acordes: croma del espectro + voto mayoritario de la ventana.
-  const levels = analyzerNow.getLevels()
+  // (Archivados tras la bandera; el micrófono siempre aporta beats/BPM/fase.)
+  const levels = chordsEnabled ? analyzerNow.getLevels() : new Uint8Array(0)
   if (levels.length > 0) {
     const chroma = chromaFromMagnitudes(levels, analyzerNow.sampleRate, analyzerNow.frameSize)
     session.labels.push(chordFromChroma(chroma))
@@ -170,6 +173,7 @@ export const useMicStore = create<MicState>((set) => ({
     analyzer = created
     options = sessionOptions
     detector = new BeatDetector('normal')
+    chordsEnabled = isChordsAutoEnabled()
     session = newSession(sessionOptions.getTrackId())
     timer = setInterval(poll, 120)
     set({ status: 'listening', error: null })
@@ -185,6 +189,7 @@ export const useMicStore = create<MicState>((set) => ({
     analyzer = null
     detector = null
     options = null
+    chordsEnabled = false
     session = newSession(null)
     set({ status: 'idle', liveChord: null, bpm: null })
   },

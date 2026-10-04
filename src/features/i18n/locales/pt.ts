@@ -349,6 +349,12 @@ export const pt: typeof es = {
     lastChord: 'Último acorde',
     timeline: 'Linha do tempo',
     manual: 'Editor manual (ChordPro)',
+    helpTitle: 'Como usar os acordes',
+    helpImport: 'Importe um arquivo .cho / .pro (ou cole o texto) aqui abaixo.',
+    helpExample:
+      'Formato: diretivas como {title: Minha música} / {key: G} e acordes entre colchetes sobre a letra: [G]Olá [D]mundo.',
+    helpSave:
+      'Salva sozinho, por faixa. Com − / + você transporta a vista sem alterar sua folha original.',
     spotifyDetect: 'Detectar do Spotify',
     spotifyDetecting: 'Consultando a análise do Spotify…',
     spotifyNotConnected: 'Conecte o Spotify (⚙) para usar a análise de batidas e acordes.',

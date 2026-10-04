@@ -349,6 +349,12 @@ export const en: typeof es = {
     lastChord: 'Last chord',
     timeline: 'Timeline',
     manual: 'Manual editor (ChordPro)',
+    helpTitle: 'How to use chords',
+    helpImport: 'Import a .cho / .pro file (or paste the text) below.',
+    helpExample:
+      'Format: directives like {title: My song} / {key: G} and chords in brackets over the lyrics: [G]Hello [D]world.',
+    helpSave:
+      'It saves automatically, per track. Use − / + to transpose the view without touching your original sheet.',
     spotifyDetect: 'Detect from Spotify',
     spotifyDetecting: 'Fetching the Spotify analysis…',
     spotifyNotConnected: 'Connect Spotify (⚙) to use its beat and chord analysis.',

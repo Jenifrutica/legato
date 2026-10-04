@@ -534,3 +534,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **UI**: `MicControl` en las pestañas **Audio** y **Acordes** (iniciar/detener, estado, acorde en vivo, BPM oído, nota de privacidad); el indicador grande de Acordes muestra el acorde del micrófono mientras escucha; `WaveRing` prioriza los golpes del micrófono cuando no hay señal local (Spotify/vinilo) sobre el pulso sintético.
 - **Tests** (12 nuevos): helpers de BPM/fase, reconocimiento desde croma, voto mayoritario, regla de guardado y un **E2E con micrófono falso de Chromium** (`--use-fake-device-for-media-stream`) que verifica permiso, escucha y parada. Total: **279 unit + 7 E2E**.
 - **Límites documentados**: calidad según ruido/volumen de la sala; los acordes en vivo son orientativos; no sustituye al análisis de un archivo local.
+
+### R Rollback de acordes automáticos (implementado, decisión de la autora)
+
+- **Motivo**: en música real el detector clásico (croma + tríadas) no produce acordes fiables, así que se archiva la detección automática en lugar de mostrarla.
+- **Bandera `legato.chords.auto`** (apagada por defecto, `features/musician/chords-flag.ts`): con la bandera activa vuelve todo (detección local, Spotify y micrófono). Sin ella, ni se muestra ni corre.
+- **Pestaña Acordes**: el **editor manual ChordPro** pasa a ser el contenido principal con una **guía visible** («Cómo usar los acordes»: importar `.cho/.pro`, formato `{title:}` / `[C]letra`, autoguardado y transporte). El intento de Spotify (análisis/preview) también queda tras la bandera.
+- **Micrófono**: conserva golpes, BPM y fase (ondas) y su guardado por pista; los acordes en vivo solo aparecen con la bandera.
+- **Tests**: `chords-flag.test.ts` (apagada por defecto, se activa con `1`) y verificación en navegador (solo editor + guía, sin detección ni micrófono en Acordes). Total: **281 unit + 7 E2E**.

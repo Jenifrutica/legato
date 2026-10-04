@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useMicStore } from '../features/musician'
+import { isChordsAutoEnabled, useMicStore } from '../features/musician'
 import type { MicError } from '../features/musician'
 import { useSpotifyStore } from '../features/sources'
 import { usePlayerStore } from '../player'
@@ -33,6 +33,7 @@ export function MicControl() {
   }
 
   const listening = status === 'listening'
+  const autoChords = isChordsAutoEnabled()
 
   return (
     <div className="flex flex-col gap-2 border-2 border-rule/40 bg-surface p-3">
@@ -61,9 +62,9 @@ export function MicControl() {
         )}
       </div>
 
-      {listening && liveChord !== null && (
+      {listening && (bpm !== null || (autoChords && liveChord !== null)) && (
         <p className="font-display text-lg font-black text-ink">
-          {liveChord}
+          {autoChords && liveChord !== null ? liveChord : null}
           {bpm !== null && (
             <span className="ml-2 font-mono text-xs font-normal text-ink-muted">
               {t('mic.bpm', { bpm })}

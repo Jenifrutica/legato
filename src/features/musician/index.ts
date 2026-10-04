@@ -30,6 +30,7 @@ export {
 export type { ChordProLine, ChordProSong, ChordToken } from './chordpro'
 export { useChordStore } from './chord-store'
 export type { ChordSheet } from './chord-store'
+export { isChordsAutoEnabled } from './chords-flag'
 export {
   BEATS_PER_BAR_OPTIONS,
   clampBeatsPerBar,
