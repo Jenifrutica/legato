@@ -2,9 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration, useLibraryStore } from '../features/library'
 import { parseChordPro, transposeSong, useChordStore } from '../features/musician'
-import { detectChordsFromBlob, useTrackAnalysisStore } from '../features/musician'
+import {
+  chordsFromSpotifySegments,
+  detectChordsFromBlob,
+  spotifyKeyName,
+  useTrackAnalysisStore,
+} from '../features/musician'
 import type { ChordProLine, ChordToken, DetectedChord } from '../features/musician'
 import { useLyrics } from '../features/lyrics'
+import { fetchSpotifyAudioAnalysis, isSpotifyConnected } from '../features/sources'
 import { usePlayerStore } from '../player'
 
 const SECTION_KEYS = {
@@ -37,11 +43,15 @@ export function ChordsPanel() {
     trackId === null ? null : (state.records[trackId] ?? null),
   )
   const setDetectedChords = useTrackAnalysisStore((state) => state.setDetectedChords)
+  const setDetectedBeats = useTrackAnalysisStore((state) => state.setDetectedBeats)
+  const setBpm = useTrackAnalysisStore((state) => state.setBpm)
+  const setKey = useTrackAnalysisStore((state) => state.setKey)
   const setText = useChordStore((state) => state.setText)
   const clearSheet = useChordStore((state) => state.clear)
   const [draft, setDraft] = useState('')
   const [semitones, setSemitones] = useState(0)
-  const [detecting, setDetecting] = useState(false)
+  const [detecting, setDetecting] = useState<'local' | 'spotify' | null>(null)
+  const [spotifyError, setSpotifyError] = useState<string | null>(null)
   const attempted = useRef<Set<string>>(new Set())
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -63,21 +73,67 @@ export function ChordsPanel() {
     libraryTrack.external !== true &&
     libraryTrack.blob.size > 0
 
+  const spotifyTrackId =
+    currentTrack?.sourceUrl.startsWith('spotify:track:') === true
+      ? currentTrack.sourceUrl.slice('spotify:track:'.length)
+      : null
+  const isSpotifyExternal = spotifyTrackId !== null && libraryTrack?.external === true
+
   async function runDetection() {
-    if (trackId === null || libraryTrack === null || detecting) {
+    if (trackId === null || libraryTrack === null || detecting !== null) {
       return
     }
 
-    setDetecting(true)
+    setDetecting('local')
+    setSpotifyError(null)
     // Deja que la UI pinte el estado antes del cálculo pesado.
     await new Promise((resolve) => setTimeout(resolve, 30))
     const chords = await detectChordsFromBlob(libraryTrack.blob)
     setDetectedChords(trackId, chords)
-    setDetecting(false)
+    setDetecting(null)
+  }
+
+  async function runSpotifyAnalysis() {
+    if (trackId === null || spotifyTrackId === null || detecting !== null) {
+      return
+    }
+
+    setDetecting('spotify')
+    setSpotifyError(null)
+
+    try {
+      const analysis = await fetchSpotifyAudioAnalysis(spotifyTrackId)
+      setDetectedChords(trackId, chordsFromSpotifySegments(analysis.segments))
+      if (analysis.beats.length > 0) {
+        setDetectedBeats(trackId, analysis.beats)
+      }
+      const current = useTrackAnalysisStore.getState().records[trackId]
+      if ((current?.bpm ?? null) === null && analysis.tempo > 0) {
+        setBpm(trackId, Math.round(analysis.tempo))
+      }
+      if ((current?.key ?? null) === null) {
+        const keyName = spotifyKeyName(analysis.key, analysis.mode)
+        if (keyName !== null) {
+          setKey(trackId, keyName)
+        }
+      }
+    } catch (error) {
+      setSpotifyError(error instanceof Error ? error.message : 'error')
+    } finally {
+      setDetecting(null)
+    }
+  }
+
+  function retryDetection() {
+    if (canDetect) {
+      void runDetection()
+    } else if (isSpotifyExternal) {
+      void runSpotifyAnalysis()
+    }
   }
 
   useEffect(() => {
-    if (trackId === null || !canDetect || detecting) {
+    if (trackId === null || detecting !== null) {
       return
     }
     if (record?.detectedChords != null) {
@@ -86,10 +142,15 @@ export function ChordsPanel() {
     if (attempted.current.has(trackId)) {
       return
     }
-    attempted.current.add(trackId)
-    void runDetection()
+    if (canDetect) {
+      attempted.current.add(trackId)
+      void runDetection()
+    } else if (isSpotifyExternal && isSpotifyConnected()) {
+      attempted.current.add(trackId)
+      void runSpotifyAnalysis()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackId, canDetect])
+  }, [trackId, canDetect, isSpotifyExternal])
 
   useEffect(() => {
     setDraft(trackId === null ? '' : (useChordStore.getState().records[trackId]?.text ?? ''))
@@ -181,16 +242,37 @@ export function ChordsPanel() {
             <p className="truncate text-xs text-ink-muted">{currentTrack?.artist}</p>
           </div>
 
-          {detecting && (
+          {detecting !== null && (
             <p className="text-xs text-ink-muted" role="status">
-              {t('chords.detecting')}
+              {detecting === 'spotify' ? t('chords.spotifyDetecting') : t('chords.detecting')}
             </p>
           )}
 
-          {!canDetect && (
+          {!canDetect && !isSpotifyExternal && (
             <p className="text-xs leading-relaxed text-ink-muted">
               {t('chords.detectUnavailable')}
             </p>
+          )}
+
+          {isSpotifyExternal && !isSpotifyConnected() && (
+            <p className="text-xs leading-relaxed text-ink-muted">
+              {t('chords.spotifyNotConnected')}
+            </p>
+          )}
+
+          {isSpotifyExternal && spotifyError !== null && (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs leading-relaxed text-ink-muted" role="status">
+                {t('chords.spotifyError', { error: spotifyError })}
+              </p>
+              <button
+                className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                onClick={() => void runSpotifyAnalysis()}
+                type="button"
+              >
+                {t('chords.spotifyDetect')}
+              </button>
+            </div>
           )}
 
           {detected !== null && detected.length > 0 && (
@@ -201,7 +283,7 @@ export function ChordsPanel() {
                 </span>
                 <button
                   className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                  onClick={() => void runDetection()}
+                  onClick={retryDetection}
                   type="button"
                 >
                   {t('chords.detectAgain')}
@@ -262,18 +344,37 @@ export function ChordsPanel() {
             </>
           )}
 
-          {canDetect && !detecting && detected !== null && detected.length === 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs leading-relaxed text-ink-muted">{t('chords.detectedEmpty')}</p>
+          {!detecting &&
+            detected !== null &&
+            detected.length === 0 &&
+            (canDetect || isSpotifyExternal) && (
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs leading-relaxed text-ink-muted">
+                  {t('chords.detectedEmpty')}
+                </p>
+                <button
+                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                  onClick={retryDetection}
+                  type="button"
+                >
+                  {t('chords.detectAgain')}
+                </button>
+              </div>
+            )}
+
+          {isSpotifyExternal &&
+            isSpotifyConnected() &&
+            detecting === null &&
+            detected === null &&
+            spotifyError === null && (
               <button
-                className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
-                onClick={() => void runDetection()}
+                className="self-start border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                onClick={() => void runSpotifyAnalysis()}
                 type="button"
               >
-                {t('chords.detectAgain')}
+                {t('chords.spotifyDetect')}
               </button>
-            </div>
-          )}
+            )}
 
           <details className="border-2 border-rule/40 bg-surface p-3">
             <summary className="cursor-pointer font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">

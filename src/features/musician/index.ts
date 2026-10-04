@@ -1,8 +1,12 @@
 export { ALL_KEY_OPTIONS, KEY_OPTIONS, useTrackAnalysisStore } from './analysis-store'
 export type { TrackAnalysis } from './analysis-store'
 export { detectBpmFromBlob, estimateBpmFromSamples } from './bpm-estimator'
-export { detectChordsFromBlob, detectChordsFromSamples } from './chord-detect'
-export type { DetectedChord } from './chord-detect'
+export {
+  chordsFromChromaFrames,
+  detectChordsFromBlob,
+  detectChordsFromSamples,
+} from './chord-detect'
+export type { ChromaFrame, DetectedChord } from './chord-detect'
 export {
   noteIndex,
   parseChordPro,
@@ -31,3 +35,4 @@ export type { Note, NoteTargetType } from './notes-store'
 export { moveSetlistItem, removeSetlistItem, toggleSetlistItem } from './setlist'
 export type { Setlist, SetlistItem } from './setlist'
 export { useSetlistStore } from './setlist-store'
+export { chordsFromSpotifySegments, spotifyKeyName } from './spotify-analysis'

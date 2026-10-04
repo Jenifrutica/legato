@@ -346,6 +346,10 @@ export const pt: typeof es = {
     noLyrics: 'Sem letra para alinhar; aqui está a linha do tempo.',
     timeline: 'Linha do tempo',
     manual: 'Editor manual (ChordPro)',
+    spotifyDetect: 'Detectar do Spotify',
+    spotifyDetecting: 'Consultando a análise do Spotify…',
+    spotifyNotConnected: 'Conecte o Spotify (⚙) para usar a análise de batidas e acordes.',
+    spotifyError: 'A análise do Spotify não está disponível: {{error}}',
     sections: {
       chorus: 'Refrão',
       verse: 'Verso',

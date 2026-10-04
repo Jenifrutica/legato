@@ -18,12 +18,12 @@ export const KEY_OPTIONS = [
 ] as const
 
 export const ALL_KEY_OPTIONS = [...KEY_OPTIONS, ...KEY_OPTIONS.map((key) => `${key}m`)] as const
-
 export type TrackAnalysis = {
   trackId: string
   bpm: number | null
   key: string | null
   detectedChords?: DetectedChord[] | null
+  detectedBeats?: number[] | null
   updatedAt: number
 }
 
@@ -33,12 +33,18 @@ type AnalysisState = {
   setBpm: (trackId: string, bpm: number | null) => void
   setKey: (trackId: string, key: string | null) => void
   setDetectedChords: (trackId: string, chords: DetectedChord[] | null) => void
+  setDetectedBeats: (trackId: string, beats: number[] | null) => void
 }
 
 function recordFor(
   current: TrackAnalysis | undefined,
   trackId: string,
-  patch: { bpm?: number | null; key?: string | null; detectedChords?: DetectedChord[] | null },
+  patch: {
+    bpm?: number | null
+    key?: string | null
+    detectedChords?: DetectedChord[] | null
+    detectedBeats?: number[] | null
+  },
 ): TrackAnalysis {
   return {
     trackId,
@@ -46,10 +52,11 @@ function recordFor(
     key: patch.key === undefined ? (current?.key ?? null) : patch.key,
     detectedChords:
       patch.detectedChords === undefined ? (current?.detectedChords ?? null) : patch.detectedChords,
+    detectedBeats:
+      patch.detectedBeats === undefined ? (current?.detectedBeats ?? null) : patch.detectedBeats,
     updatedAt: Date.now(),
   }
 }
-
 export const useTrackAnalysisStore = create<AnalysisState>((set) => ({
   records: {},
 
@@ -86,6 +93,14 @@ export const useTrackAnalysisStore = create<AnalysisState>((set) => ({
       records: {
         ...state.records,
         [trackId]: recordFor(state.records[trackId], trackId, { detectedChords: chords }),
+      },
+    })),
+
+  setDetectedBeats: (trackId, beats) =>
+    set((state) => ({
+      records: {
+        ...state.records,
+        [trackId]: recordFor(state.records[trackId], trackId, { detectedBeats: beats }),
       },
     })),
 }))

@@ -346,6 +346,10 @@ export const en: typeof es = {
     noLyrics: 'No lyrics to align; here is the timeline.',
     timeline: 'Timeline',
     manual: 'Manual editor (ChordPro)',
+    spotifyDetect: 'Detect from Spotify',
+    spotifyDetecting: 'Fetching the Spotify analysis…',
+    spotifyNotConnected: 'Connect Spotify (⚙) to use its beat and chord analysis.',
+    spotifyError: 'The Spotify analysis is not available: {{error}}',
     sections: {
       chorus: 'Chorus',
       verse: 'Verse',

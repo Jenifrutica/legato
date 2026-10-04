@@ -44,4 +44,12 @@ describe('store de análisis por pista', () => {
     expect(useTrackAnalysisStore.getState().records.d?.detectedChords).toBeNull()
     expect(useTrackAnalysisStore.getState().records.d?.bpm).toBe(100)
   })
+
+  it('guarda la rejilla de golpes sin perder los acordes', () => {
+    useTrackAnalysisStore.getState().setDetectedChords('e', [{ time: 0, duration: 1, chord: 'C' }])
+    useTrackAnalysisStore.getState().setDetectedBeats('e', [0, 0.5, 1])
+
+    expect(useTrackAnalysisStore.getState().records.e?.detectedBeats).toEqual([0, 0.5, 1])
+    expect(useTrackAnalysisStore.getState().records.e?.detectedChords).toHaveLength(1)
+  })
 })

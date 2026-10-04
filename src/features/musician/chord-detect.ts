@@ -54,7 +54,7 @@ function chromaForFrame(
   return chroma
 }
 
-function chordScore(chroma: Float32Array, root: number, triad: number[]): number {
+function chordScore(chroma: ArrayLike<number>, root: number, triad: number[]): number {
   let score = 0
   for (const interval of triad) {
     score += chroma[(root + interval) % 12] ?? 0
@@ -62,7 +62,7 @@ function chordScore(chroma: Float32Array, root: number, triad: number[]): number
   return score / triad.length
 }
 
-function bestChordForFrame(chroma: Float32Array): string {
+function bestChordForFrame(chroma: ArrayLike<number>): string {
   let best = UNKNOWN
   let bestScore = 0
 
@@ -82,50 +82,49 @@ function bestChordForFrame(chroma: Float32Array): string {
   return bestScore >= CHORD_STRENGTH ? best : UNKNOWN
 }
 
+/** Voto por mayoría en la ventana (empate: gana el primero que aparece). */
 function medianFilter(labels: string[], window: number): string[] {
   const half = Math.floor(window / 2)
   return labels.map((_, index) => {
-    const values: string[] = []
+    const counts = new Map<string, number>()
     for (let offset = -half; offset <= half; offset++) {
       const value = labels[index + offset]
       if (value !== undefined) {
-        values.push(value)
+        counts.set(value, (counts.get(value) ?? 0) + 1)
       }
     }
-    values.sort()
-    return values[Math.floor(values.length / 2)] ?? UNKNOWN
+
+    let best = labels[index] ?? UNKNOWN
+    let bestCount = 0
+    for (const [value, count] of counts) {
+      if (count > bestCount) {
+        best = value
+        bestCount = count
+      }
+    }
+    return best
   })
 }
 
+export type ChromaFrame = {
+  time: number
+  chroma: ArrayLike<number>
+}
+
 /**
- * Estima los acordes de un archivo a partir del audio: por cada cuadro calcula
- * el croma (FFT + clases de altura), prueba las 24 tríadas mayores/menores y
- * suaviza el resultado en el tiempo. Puro y testeable.
+ * Convierte una secuencia temporal de perfiles cromáticos en acordes:
+ * elige la mejor tríada por cuadro, hereda el acorde anterior cuando no hay
+ * señal clara, suaviza con mediana y funde los tramos demasiado cortos.
+ * Sirve tanto para el audio local (FFT) como para los segmentos de Spotify.
  */
-export function detectChordsFromSamples(
-  samples: Float32Array,
-  sampleRate: number,
-): DetectedChord[] {
-  if (sampleRate <= 0 || samples.length < FRAME_SIZE * 2) {
+export function chordsFromChromaFrames(frames: ChromaFrame[]): DetectedChord[] {
+  if (frames.length === 0) {
     return []
   }
 
-  const usable = Math.min(samples.length, Math.floor(sampleRate * MAX_SECONDS))
-  const frame = new Float32Array(FRAME_SIZE)
-  const hopSeconds = HOP_SIZE / sampleRate
-
-  const labels: string[] = []
-  for (let start = 0; start + FRAME_SIZE <= usable; start += HOP_SIZE) {
-    for (let index = 0; index < FRAME_SIZE; index++) {
-      frame[index] = samples[start + index] ?? 0
-    }
-    const chroma = chromaForFrame(fftMagnitudes(frame), sampleRate, FRAME_SIZE)
-    labels.push(bestChordForFrame(chroma))
-  }
-
-  if (labels.length === 0) {
-    return []
-  }
+  const hop =
+    frames.length > 1 ? Math.max(0.01, (frames[1]?.time ?? 0) - (frames[0]?.time ?? 0)) : 0.1
+  const labels = frames.map((frame) => bestChordForFrame(frame.chroma))
 
   // Los cuadros sin acorde claro heredan el anterior (los acordes duran compases).
   const filled: string[] = []
@@ -145,12 +144,12 @@ export function detectChordsFromSamples(
     if (chord === UNKNOWN) {
       continue
     }
-    const time = index * hopSeconds
+    const time = frames[index]?.time ?? index * hop
     const previous = events[events.length - 1]
     if (previous !== undefined && previous.chord === chord) {
-      previous.duration = time + hopSeconds - previous.time
+      previous.duration = time + hop - previous.time
     } else {
-      events.push({ time, duration: hopSeconds, chord })
+      events.push({ time, duration: hop, chord })
     }
   }
 
@@ -168,6 +167,36 @@ export function detectChordsFromSamples(
   }
 
   return merged
+}
+
+/**
+ * Estima los acordes de un archivo a partir del audio: por cada cuadro calcula
+ * el croma (FFT + clases de altura) y lo pasa al detector de tríadas.
+ * Puro y testeable.
+ */
+export function detectChordsFromSamples(
+  samples: Float32Array,
+  sampleRate: number,
+): DetectedChord[] {
+  if (sampleRate <= 0 || samples.length < FRAME_SIZE * 2) {
+    return []
+  }
+
+  const usable = Math.min(samples.length, Math.floor(sampleRate * MAX_SECONDS))
+  const frame = new Float32Array(FRAME_SIZE)
+  const frames: ChromaFrame[] = []
+
+  for (let start = 0; start + FRAME_SIZE <= usable; start += HOP_SIZE) {
+    for (let index = 0; index < FRAME_SIZE; index++) {
+      frame[index] = samples[start + index] ?? 0
+    }
+    frames.push({
+      time: start / sampleRate,
+      chroma: chromaForFrame(fftMagnitudes(frame), sampleRate, FRAME_SIZE),
+    })
+  }
+
+  return chordsFromChromaFrames(frames)
 }
 
 /** Decodifica el blob y estima los acordes (solo navegador). */

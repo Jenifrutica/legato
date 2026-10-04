@@ -8,6 +8,24 @@ type Inks = {
   paper: string
 }
 
+function lastIndexAtMost(values: number[], time: number): number {
+  let low = 0
+  let high = values.length - 1
+  let found = -1
+
+  while (low <= high) {
+    const mid = (low + high) >> 1
+    if ((values[mid] ?? 0) <= time) {
+      found = mid
+      low = mid + 1
+    } else {
+      high = mid - 1
+    }
+  }
+
+  return found
+}
+
 function fallbackBass(levels: Uint8Array): number {
   const bins = Math.max(1, Math.min(3, levels.length))
   let sum = 0
@@ -50,10 +68,19 @@ export function WaveRing({
   analyser,
   active,
   arc = 'full',
+  position = null,
+  beats = null,
+  bpmOverride = null,
 }: {
   analyser: AnalyserLike | null
   active: boolean
   arc?: 'full' | 'right'
+  /** Posición de la pista en segundos (para anclar el pulso sintético). */
+  position?: number | null
+  /** Rejilla de golpes (Spotify) en segundos. */
+  beats?: number[] | null
+  /** BPM de la pista que gana sobre el BPM manual global. */
+  bpmOverride?: number | null
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const activeRef = useRef(active)
@@ -66,6 +93,12 @@ export function WaveRing({
   sensitivityRef.current = sensitivity
   const bpmRef = useRef(bpm)
   bpmRef.current = bpm
+  const positionRef = useRef(position)
+  positionRef.current = position
+  const beatsRef = useRef(beats)
+  beatsRef.current = beats
+  const bpmOverrideRef = useRef(bpmOverride)
+  bpmOverrideRef.current = bpmOverride
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -84,6 +117,9 @@ export function WaveRing({
     let inks = readInks()
     const detector = new BeatDetector(sensitivityRef.current)
     const segmentSmooth: number[] = []
+    let anchorPosition = positionRef.current
+    let anchorAt = 0
+    let lastPosition = positionRef.current
 
     const reduced =
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
@@ -117,6 +153,19 @@ export function WaveRing({
       const seconds = time / 1000
       const segments = 110
 
+      // Posición estimada de la pista entre sondeos: se ancla en cada cambio
+      // real de posición y avanza con el reloj del navegador.
+      const currentPosition = positionRef.current
+      if (currentPosition !== lastPosition) {
+        lastPosition = currentPosition
+        anchorPosition = currentPosition
+        anchorAt = time
+      }
+      const estimatedPosition =
+        anchorPosition === null || anchorAt === 0
+          ? anchorPosition
+          : anchorPosition + (time - anchorAt) / 1000
+
       let beat = 0
       let pulse = 1
 
@@ -131,14 +180,28 @@ export function WaveRing({
         beat = detector.process(bass, time)
         pulse = 1 + beat * 2.4
       } else if (active) {
-        // Sin señal analizable (Spotify por DRM): pulso sintético al BPM manual
-        // o 120 BPM por defecto.
+        // Sin señal analizable (Spotify por DRM): si Spotify publicó su
+        // rejilla de golpes, el pulso cae exactamente en cada beat; si no,
+        // pulso sintético al BPM de la pista o al manual global.
         detector.reset()
-        const beatsPerSecond = (bpmRef.current ?? 120) / 60
-        const phase = ((time / 1000) * beatsPerSecond) % 1
-        const kick = Math.pow(1 - phase, 8)
-        beat = kick
-        pulse = 1 + kick * 2.2
+        const beatList = beatsRef.current
+        const now = estimatedPosition
+        if (beatList !== null && beatList.length > 0 && now !== null) {
+          const index = lastIndexAtMost(beatList, now)
+          if (index >= 0) {
+            const delta = now - (beatList[index] ?? 0)
+            beat = delta >= 0 && delta <= 0.45 ? Math.pow(0.5, delta / 0.13) : 0
+          }
+          pulse = 1 + beat * 2.2
+        } else {
+          const bpmValue = bpmOverrideRef.current ?? bpmRef.current ?? 120
+          const beatsPerSecond = bpmValue / 60
+          const base = now ?? time / 1000
+          const phase = (((base * beatsPerSecond) % 1) + 1) % 1
+          const kick = Math.pow(1 - phase, 8)
+          beat = kick
+          pulse = 1 + kick * 2.2
+        }
       } else {
         // En reposo: líneas cortas y quietas (sin movimiento por tiempo).
         detector.reset()
@@ -269,6 +332,14 @@ export function WaveRing({
       // En reposo se dibuja un único cuadro quieto y se deja de repintar.
       if (!active && !wasActive) {
         return
+      }
+
+      // Al arrancar (o reanudar) se reancla el pulso a la posición real para
+      // que la pausa no desfase los golpes.
+      if (active && !wasActive) {
+        anchorPosition = positionRef.current
+        lastPosition = positionRef.current
+        anchorAt = time
       }
 
       draw(time, active)

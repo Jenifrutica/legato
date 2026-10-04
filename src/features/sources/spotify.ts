@@ -270,6 +270,47 @@ export async function searchSpotify(query: string): Promise<SourceTrack[]> {
   return (data.tracks?.items ?? []).map(mapSpotifyTrack)
 }
 
+export type SpotifyAudioAnalysis = {
+  tempo: number
+  key: number
+  mode: number
+  beats: number[]
+  segments: Array<{ start: number; pitches: number[] }>
+}
+
+/**
+ * Análisis de audio que Spotify publica para la pista (beats y croma por
+ * segmento). Puede responder 403/404 en apps nuevas: el llamador decide.
+ */
+export async function fetchSpotifyAudioAnalysis(trackId: string): Promise<SpotifyAudioAnalysis> {
+  const token = await getAccessToken()
+  if (token === null) {
+    throw new Error('not-connected')
+  }
+
+  const response = await fetchWithRetry(`${API}/audio-analysis/${trackId}`, token)
+  if (!response.ok) {
+    throw new Error(await describeError(response))
+  }
+
+  const data = (await response.json()) as {
+    track?: { tempo?: number; key?: number; mode?: number }
+    beats?: Array<{ start: number }>
+    segments?: Array<{ start: number; pitches?: number[] }>
+  }
+
+  return {
+    tempo: typeof data.track?.tempo === 'number' ? data.track.tempo : 0,
+    key: typeof data.track?.key === 'number' ? data.track.key : -1,
+    mode: typeof data.track?.mode === 'number' ? data.track.mode : -1,
+    beats: (data.beats ?? []).map((beat) => beat.start),
+    segments: (data.segments ?? []).map((segment) => ({
+      start: segment.start,
+      pitches: segment.pitches ?? [],
+    })),
+  }
+}
+
 export type SpotifyPlaylistSummary = {
   id: string
   name: string

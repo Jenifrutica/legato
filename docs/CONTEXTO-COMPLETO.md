@@ -499,3 +499,13 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Con la letra**: si hay letra local o de LRCLIB, cada línea muestra encima el acorde vigente (sección «Acordes con la letra»); si no hay letra, se muestra la **línea de tiempo**. El editor manual ChordPro (pegar/importar/transportar) pasa a un desplegable «Editor manual (ChordPro)».
 - **Aislamiento de instrumentos**: los stems reales (Demucs) siguen post-entrega; mientras tanto se mantienen las aproximaciones por DSP: karaoke M/S (atenuar voz), aislamiento L/R, balance y **bajos de −12 a +12 dB** (ahora también atenúan).
 - **Tests** (7 nuevos): FFT (pico de un seno, DC), detección (C→G con tiempos, menores, silencio, audio corto) y store (`setDetectedChords` no pisa BPM/tono). Total: **255 unit + 6 E2E**; verificado en navegador con una pista de prueba C·G·Am·F generada con ffmpeg (`~/Downloads/legato-acordes.wav`).
+
+### C7 Análisis de Spotify para ondas y acordes (implementado; verificación pendiente con la cuenta)
+
+- **Motivo**: la autora reportó que con Spotify no salían acordes y las ondas no iban al ritmo. El audio del SDK va por DRM y no se puede analizar; la vía es el **análisis que Spotify publica por pista**.
+- **API**: `fetchSpotifyAudioAnalysis(trackId)` (`/v1/audio-analysis`) devuelve tempo, tono/modo, `beats[]` y `segments[].pitches` (croma de 12 dimensiones). Si la app no tiene acceso responde 403/404 y el panel muestra el **error exacto**.
+- **Chords**: `chordsFromSpotifySegments` reutiliza `chordsFromChromaFrames` (el detector de C6, ahora separado del audio) sobre el croma de los segmentos; `spotifyKeyName` convierte tono+modo a `C`/`Am`. Al detectar se rellenan también **BPM** y **tonalidad** si estaban vacíos.
+- **Ondas**: `WaveRing` gana `position`, `beats` y `bpmOverride`; con la rejilla de Spotify el golpe cae exactamente en cada beat y la posición se **interpola entre sondeos** (ancla + reloj del navegador) para que no vaya a saltos de 1 s. Sin rejilla, el pulso sintético usa el BPM de la pista (o el manual global) y queda **anclado a la posición** (antes usaba el reloj del rAF, así que nunca cuadraba de fase).
+- **UI**: en la pestaña Acordes, para referencias de Spotify se intenta solo al abrir si hay sesión conectada; si falla, se muestra el mensaje con botón «Detectar desde Spotify».
+- **Tests** (5 nuevos): `spotifyKeyName` (mayor/menor, inválidos), `chordsFromSpotifySegments` (secuencia C→G desde croma, segmentos vacíos) y store de beats. Total: **260 unit + 6 E2E**.
+- **Pendiente de verificar** con la cuenta real si `/v1/audio-analysis` responde 200 (apps antiguas con acceso extendido) o 403 (apps nuevas). Si es 403, en Spotify quedará el pulso por BPM (ya anclado) y el editor manual de acordes.

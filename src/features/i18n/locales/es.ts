@@ -347,6 +347,10 @@ export const es = {
     noLyrics: 'Sin letra para alinear; aquí tienes la línea de tiempo.',
     timeline: 'Línea de tiempo',
     manual: 'Editor manual (ChordPro)',
+    spotifyDetect: 'Detectar desde Spotify',
+    spotifyDetecting: 'Consultando el análisis de Spotify…',
+    spotifyNotConnected: 'Conecta Spotify (⚙) para usar su análisis de beats y acordes.',
+    spotifyError: 'El análisis de Spotify no está disponible: {{error}}',
     sections: {
       chorus: 'Coro',
       verse: 'Verso',
