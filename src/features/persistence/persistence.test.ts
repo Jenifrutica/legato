@@ -70,6 +70,7 @@ describe('persistence database', () => {
       await db.notes.clear()
       await db.users.clear()
       await db.authSessions.clear()
+      await db.tombstones.clear()
       await db.lyrics.clear()
     }
     useLibraryStore.getState().hydrate([])

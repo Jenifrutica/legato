@@ -142,6 +142,18 @@ export const pt: typeof es = {
     deleteConfirm: 'Excluir definitivamente',
     deleteCancel: 'Cancelar',
   },
+  sync: {
+    title: 'Sincronização (nuvem)',
+    enable: 'Sincronizar com a nuvem',
+    hint: 'Suas músicas, listas, sessão e anotações ficam no Firebase para tê-las em qualquer dispositivo. Os áudios vão para o Firebase Storage.',
+    notConfigured: 'Configure o Firebase para ativar a nuvem (veja docs/AUTH.md).',
+    now: 'Sincronizar agora',
+    syncing: 'Sincronizando…',
+    progress: 'Baixando áudio {{done}}/{{total}}…',
+    never: 'Ainda sem sincronizar',
+    last: 'Última: {{time}}',
+    error: 'Não foi possível sincronizar. Verifique a conexão.',
+  },
   account: {
     signIn: 'Entrar',
     signOut: 'Sair',

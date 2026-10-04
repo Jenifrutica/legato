@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { XIcon } from '../../ui/icons'
-import { useAuth } from '../auth'
+import { readAuthEnv, useAuth } from '../auth'
 import { usePlayLogStore } from '../capsule'
 import { useMusicianStore } from '../musician'
 import { deleteUserData } from '../persistence'
+import { configureCloudSync, syncNow, useSyncStore } from '../sync'
 import { isJamendoConfigured } from './jamendo'
 import { useProvidersStore } from './providers-store'
 import {
@@ -27,6 +28,12 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const musicianEnabled = useMusicianStore((state) => state.enabled)
   const setMusicianEnabled = useMusicianStore((state) => state.setEnabled)
   const { user, deleteAccount } = useAuth()
+  const syncEnabled = useSyncStore((state) => state.enabled)
+  const syncStatus = useSyncStore((state) => state.status)
+  const syncProgress = useSyncStore((state) => state.progress)
+  const syncLastAt = useSyncStore((state) => state.lastSyncAt)
+  const setSyncEnabled = useSyncStore((state) => state.setEnabled)
+  const cloudConfigured = readAuthEnv().firebase !== undefined
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletePassword, setDeletePassword] = useState('')
   const [deleteBusy, setDeleteBusy] = useState(false)
@@ -218,6 +225,57 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
               onChange={(event) => setMusicianEnabled(event.target.checked)}
               type="checkbox"
             />
+          </div>
+        </section>
+
+        <section aria-label={t('sync.title')} className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            {t('sync.title')}
+          </h3>
+
+          <div className="mt-3 border border-border bg-bg/50 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium">{t('sync.enable')}</span>
+              <input
+                aria-label={t('sync.enable')}
+                checked={syncEnabled && cloudConfigured}
+                className="size-5 accent-primary disabled:opacity-40"
+                disabled={!cloudConfigured}
+                onChange={(event) => {
+                  setSyncEnabled(event.target.checked)
+                  configureCloudSync(event.target.checked ? (user?.id ?? null) : null)
+                }}
+                type="checkbox"
+              />
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              {cloudConfigured ? t('sync.hint') : t('sync.notConfigured')}
+            </p>
+
+            {cloudConfigured && syncEnabled && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button
+                  className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink disabled:opacity-60"
+                  disabled={syncStatus === 'syncing'}
+                  onClick={() => void syncNow({ downloadFiles: false })}
+                  type="button"
+                >
+                  {syncStatus === 'syncing' ? t('sync.syncing') : t('sync.now')}
+                </button>
+                <span className="font-mono text-[0.6875rem] text-ink-muted">
+                  {syncStatus === 'error'
+                    ? t('sync.error')
+                    : syncProgress !== null
+                      ? t('sync.progress', {
+                          done: syncProgress.done,
+                          total: syncProgress.total,
+                        })
+                      : syncLastAt === null
+                        ? t('sync.never')
+                        : t('sync.last', { time: new Date(syncLastAt).toLocaleTimeString() })}
+                </span>
+              </div>
+            )}
           </div>
         </section>
 

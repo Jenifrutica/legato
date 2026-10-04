@@ -1,0 +1,8 @@
+export { configureCloudSync } from './configure'
+export { createFirebaseBackend } from './firebase-backend'
+export { mergeTable, mergeTombstones } from './merge'
+export type { MergePlan } from './merge'
+export { startCloudSync, stopCloudSync, syncNow } from './sync-engine'
+export { useSyncStore } from './sync-store'
+export { artworkPath, audioPath, SYNC_TABLES } from './types'
+export type { CloudBackend, SyncRecord, SyncTable, SyncTombstone } from './types'

@@ -41,7 +41,7 @@ export const useLibraryStore = create<LibraryState>((set) => ({
   },
 
   updateTrack: (id, patch) => {
-    library.update(id, patch)
+    library.update(id, { ...patch, updatedAt: Date.now() })
     set({ tracks: library.toArray() })
   },
 

@@ -11,6 +11,7 @@ import {
   startPersistence,
 } from '../features/persistence'
 import { setSpotifyScope, SpotifyBanner, useExternalPlayback } from '../features/sources'
+import { configureCloudSync } from '../features/sync'
 import { useAlbumTheme } from '../features/theme'
 import { useAudioFxStore } from '../player'
 import { teardownSession } from './teardown-session'
@@ -80,6 +81,7 @@ function AppShell({ userId }: { userId: string }) {
       await hydrateStores()
       startPersistence()
       useAudioFxStore.getState().resumeAmbientPlayback()
+      configureCloudSync(userId)
     })()
 
     return () => {

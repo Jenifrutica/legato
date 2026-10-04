@@ -142,6 +142,18 @@ export const en: typeof es = {
     deleteConfirm: 'Delete permanently',
     deleteCancel: 'Cancel',
   },
+  sync: {
+    title: 'Cloud sync',
+    enable: 'Sync with the cloud',
+    hint: 'Your songs, playlists, session and notes are stored in Firebase so you have them on any device. Audio files go to Firebase Storage.',
+    notConfigured: 'Configure Firebase to enable the cloud (see docs/AUTH.md).',
+    now: 'Sync now',
+    syncing: 'Syncing…',
+    progress: 'Downloading audio {{done}}/{{total}}…',
+    never: 'Not synced yet',
+    last: 'Last: {{time}}',
+    error: 'Could not sync. Check your connection.',
+  },
   account: {
     signIn: 'Sign in',
     signOut: 'Sign out',

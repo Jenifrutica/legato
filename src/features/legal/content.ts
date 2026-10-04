@@ -31,7 +31,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Dónde se guardan',
           paragraphs: [
-            'Tu biblioteca de audio en tu propio navegador (IndexedDB y almacenamiento local); los datos de tu cuenta (correo, nombre y contraseña cifrada) los gestiona Firebase Authentication. Si activas la sincronización, se almacenan en infraestructura de AWS (S3/CloudFront) con cifrado en tránsito.',
+            'Tu biblioteca de audio en tu propio navegador (IndexedDB y almacenamiento local); los datos de tu cuenta (correo, nombre y contraseña cifrada) los gestiona Firebase Authentication. Con la sincronización en la nube activada, tus canciones, listas, anotaciones y archivos de audio se guardan en Firebase (Google) para tenerlos en cualquier dispositivo.',
           ],
         },
         {

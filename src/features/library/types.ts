@@ -17,6 +17,8 @@ export type LibraryTrack = {
   external?: boolean
   dedupeKey: string
   addedAt: number
+  /** Última edición (para sincronización); los registros antiguos usan addedAt. */
+  updatedAt?: number
   sampleRate: number | null
   bitrate: number | null
   codec: string | null

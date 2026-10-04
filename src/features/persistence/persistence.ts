@@ -238,19 +238,33 @@ export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
   const existing = await db.songs.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.songs, db.analysis, db.chords, db.notes, db.lyrics, async () => {
-    if (stale.length > 0) {
-      await db.songs.bulkDelete(stale)
-      await db.analysis.bulkDelete(stale)
-      await db.chords.bulkDelete(stale)
-      await db.lyrics.bulkDelete(stale)
-      await db.notes
-        .where('[targetType+targetId]')
-        .anyOf(stale.map((id) => ['track', id]))
-        .delete()
-    }
-    await db.songs.bulkPut(records)
-  })
+  await db.transaction(
+    'rw',
+    [db.songs, db.analysis, db.chords, db.notes, db.lyrics, db.tombstones],
+    async () => {
+      if (stale.length > 0) {
+        const deletedAt = Date.now()
+        await db.songs.bulkDelete(stale)
+        await db.analysis.bulkDelete(stale)
+        await db.chords.bulkDelete(stale)
+        await db.lyrics.bulkDelete(stale)
+        await db.notes
+          .where('[targetType+targetId]')
+          .anyOf(stale.map((id) => ['track', id]))
+          .delete()
+        await db.tombstones.bulkPut(
+          stale.flatMap((id) => [
+            { id: `songs:${id}`, userId, deletedAt },
+            { id: `analysis:${id}`, userId, deletedAt },
+            { id: `chords:${id}`, userId, deletedAt },
+            { id: `lyrics:${id}`, userId, deletedAt },
+            { id: `notes:track:${id}`, userId, deletedAt },
+          ]),
+        )
+      }
+      await db.songs.bulkPut(records)
+    },
+  )
 }
 
 export async function syncAnalysis(records: Record<string, TrackAnalysis>): Promise<void> {
@@ -268,9 +282,11 @@ export async function syncAnalysis(records: Record<string, TrackAnalysis>): Prom
   const existing = await db.analysis.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.analysis, async () => {
+  await db.transaction('rw', db.analysis, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.analysis.bulkDelete(stale)
+      await db.tombstones.bulkPut(stale.map((id) => ({ id: `analysis:${id}`, userId, deletedAt })))
     }
     await db.analysis.bulkPut(values)
   })
@@ -291,9 +307,11 @@ export async function syncChords(records: Record<string, ChordSheet>): Promise<v
   const existing = await db.chords.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.chords, async () => {
+  await db.transaction('rw', db.chords, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.chords.bulkDelete(stale)
+      await db.tombstones.bulkPut(stale.map((id) => ({ id: `chords:${id}`, userId, deletedAt })))
     }
     await db.chords.bulkPut(values)
   })
@@ -314,9 +332,11 @@ export async function syncLyrics(records: Record<string, LocalLyrics>): Promise<
   const existing = await db.lyrics.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.lyrics, async () => {
+  await db.transaction('rw', db.lyrics, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.lyrics.bulkDelete(stale)
+      await db.tombstones.bulkPut(stale.map((id) => ({ id: `lyrics:${id}`, userId, deletedAt })))
     }
     await db.lyrics.bulkPut(values)
   })
@@ -334,13 +354,20 @@ export async function syncPlaylists(playlists: PlaylistRestoreRecord[]): Promise
   const existing = await db.playlists.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.playlists, db.notes, async () => {
+  await db.transaction('rw', db.playlists, db.notes, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.playlists.bulkDelete(stale)
       await db.notes
         .where('[targetType+targetId]')
         .anyOf(stale.map((id) => ['playlist', id]))
         .delete()
+      await db.tombstones.bulkPut(
+        stale.flatMap((id) => [
+          { id: `playlists:${id}`, userId, deletedAt },
+          { id: `notes:playlist:${id}`, userId, deletedAt },
+        ]),
+      )
     }
     await db.playlists.bulkPut(records)
   })
@@ -358,9 +385,11 @@ export async function syncSetlists(setlists: Setlist[]): Promise<void> {
   const existing = await db.setlists.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
-  await db.transaction('rw', db.setlists, async () => {
+  await db.transaction('rw', db.setlists, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.setlists.bulkDelete(stale)
+      await db.tombstones.bulkPut(stale.map((id) => ({ id: `setlists:${id}`, userId, deletedAt })))
     }
     await db.setlists.bulkPut(records)
   })
@@ -388,9 +417,17 @@ export async function syncNotes(records: Record<string, Note>): Promise<void> {
   const existing = await db.notes.where('userId').equals(userId).toArray()
   const stale = existing.filter((note) => !keep.has(noteKey(note.targetType, note.targetId)))
 
-  await db.transaction('rw', db.notes, async () => {
+  await db.transaction('rw', db.notes, db.tombstones, async () => {
     if (stale.length > 0) {
+      const deletedAt = Date.now()
       await db.notes.bulkDelete(stale.map((note) => [note.targetType, note.targetId]))
+      await db.tombstones.bulkPut(
+        stale.map((note) => ({
+          id: `notes:${noteKey(note.targetType, note.targetId)}`,
+          userId,
+          deletedAt,
+        })),
+      )
     }
     await db.notes.bulkPut(values)
   })
@@ -416,6 +453,7 @@ export async function saveCurrentSession(): Promise<void> {
     balance: snapshot.balance,
     channelMode: snapshot.channelMode,
     crossfadeSeconds: snapshot.crossfadeSeconds,
+    savedAt: Date.now(),
   }
 
   await db.session.put(record)
@@ -441,7 +479,8 @@ export async function deleteUserData(userId: string): Promise<void> {
       db.lyrics,
       db.authSessions,
       db.users,
-    ],
+      db.tombstones,
+    ] as never,
     async () => {
       await db.songs.where('userId').equals(userId).delete()
       await db.playlists.where('userId').equals(userId).delete()
@@ -451,6 +490,7 @@ export async function deleteUserData(userId: string): Promise<void> {
       await db.notes.where('userId').equals(userId).delete()
       await db.lyrics.where('userId').equals(userId).delete()
       await db.authSessions.where('userId').equals(userId).delete()
+      await db.tombstones.where('userId').equals(userId).delete()
       await db.session.delete(scopeKey(userId))
       await db.users.delete(userId)
     },

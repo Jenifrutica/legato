@@ -141,6 +141,18 @@ export const es = {
     deleteConfirm: 'Eliminar definitivamente',
     deleteCancel: 'Cancelar',
   },
+  sync: {
+    title: 'Sincronización (nube)',
+    enable: 'Sincronizar con la nube',
+    hint: 'Tus canciones, listas, sesión y anotaciones se guardan en Firebase para tenerlas en cualquier dispositivo. Los audios se suben a Firebase Storage.',
+    notConfigured: 'Configura Firebase para activar la nube (ver docs/AUTH.md).',
+    now: 'Sincronizar ahora',
+    syncing: 'Sincronizando…',
+    progress: 'Descargando audio {{done}}/{{total}}…',
+    never: 'Aún sin sincronizar',
+    last: 'Última: {{time}}',
+    error: 'No se pudo sincronizar. Revisa la conexión.',
+  },
   account: {
     signIn: 'Iniciar sesión',
     signOut: 'Salir',

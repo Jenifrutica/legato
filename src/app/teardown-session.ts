@@ -8,6 +8,7 @@ import {
   stopPersistence,
 } from '../features/persistence'
 import { setSpotifyScope, useSpotifyStore } from '../features/sources'
+import { stopCloudSync } from '../features/sync'
 import { useAudioFxStore, usePlayerStore } from '../player'
 
 /**
@@ -23,6 +24,7 @@ export function teardownSession(): void {
   useMicStore.getState().stop()
 
   // …y después se apagan motores y se limpia el estado.
+  stopCloudSync()
   useMetronomeStore.getState().stop()
   useAudioFxStore.getState().stopAmbientPlayback()
   useSpotifyStore.getState().disconnect()

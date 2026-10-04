@@ -63,6 +63,14 @@ export type SessionRecord = {
   balance?: number
   channelMode?: ChannelMode
   crossfadeSeconds?: number
+  savedAt?: number
+}
+
+/** Lápida de borrado para que la desaparición viaje entre dispositivos. */
+export type TombstoneRecord = {
+  id: string
+  userId?: string
+  deletedAt: number
 }
 
 class LegatoDatabase extends Dexie {
@@ -76,6 +84,7 @@ class LegatoDatabase extends Dexie {
   lyrics!: Table<LyricsRecord, string>
   users!: Table<UserRecord, string>
   authSessions!: Table<AuthSessionRecord, string>
+  tombstones!: Table<TombstoneRecord, string>
 
   constructor() {
     super('legato')
@@ -139,6 +148,19 @@ class LegatoDatabase extends Dexie {
       lyrics: 'trackId, userId',
       users: 'id, &email',
       authSessions: 'tokenHash, userId',
+    })
+    this.version(8).stores({
+      songs: 'id, userId',
+      playlists: 'id, userId',
+      session: 'key',
+      analysis: 'trackId, userId',
+      chords: 'trackId, userId',
+      setlists: 'id, userId',
+      notes: '[targetType+targetId], userId',
+      lyrics: 'trackId, userId',
+      users: 'id, &email',
+      authSessions: 'tokenHash, userId',
+      tombstones: 'id, userId',
     })
   }
 }
