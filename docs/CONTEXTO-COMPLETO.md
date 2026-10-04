@@ -549,3 +549,9 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Salidas listas para importar** en `stems/<nombre>/` (gitignored): «sin voz» (modelo de 4 stems con `--two-stems=vocals`) y, con `--guitar` (modelo `htdemucs_6s`), «sin voz», «sin guitarra», «solo batería» y «solo bajo» mezcladas con ffmpeg.
 - **Verificado end-to-end** con un clip de 8 s: separación en ~6 s y MP3s con audio (volumen medido; «solo batería» en silencio es correcto porque el clip sintético no tiene batería).
 - **`docs/STEMS.md`**: requisitos, comandos, notas de calidad/tiempos y cómo practicar en Legato (loop A–B, metrónomo, velocidad, ChordPro). La integración dentro de la web con servidor local queda como mejora futura.
+
+### T Ondas: margen dinámico del bombo (implementado)
+
+- **Diagnóstico medido**: la banda del bombo saturaba (media 0.71, pico 0.98) porque `getByteFrequencyData` con el rango por defecto (`-100..-30 dB`) recorta un bajo continuo; el flujo del golpe quedaba aplastado.
+- **Arreglo**: `beatAnalyser.minDecibels = -90`, `maxDecibels = -10` en el grafo local y en el micrófono. Verificado: en la pista de 120 BPM la media baja a 0.50 y se cuentan 15 golpes en 6 s; en la pista sin bombo, 0 golpes. El pulso del golpe sube a ×3 y la pestaña Audio explica cuándo las ondas siguen el beat real (local/micrófono) y cuándo usan el BPM marcado (Spotify sin micrófono).
+- **Metrónomo documentado para otra sesión**: `docs/METRONOMO.md` (uso paso a paso, arquitectura, problemas conocidos y criterios de aceptación).

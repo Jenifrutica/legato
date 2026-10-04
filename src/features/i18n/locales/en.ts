@@ -240,6 +240,8 @@ export const en: typeof es = {
     tap: 'Tap',
     bpmHint:
       'On Spotify the audio is protected (DRM) and the pulse is synthetic: tap the tempo with “Tap” or type it. Local files detect beats on their own.',
+    waveHint:
+      'With local files or the microphone, waves follow the real kick; on Spotify without microphone they use the tapped BPM.',
     channelMode: 'Channel isolation',
     modes: {
       stereo: 'Stereo',

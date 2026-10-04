@@ -44,6 +44,10 @@ export class AudioGraph implements AnalyserLike {
       analyser.smoothingTimeConstant = 0.68
       beatAnalyser.fftSize = 1024
       beatAnalyser.smoothingTimeConstant = 0
+      // Margen dinámico amplio: con los valores por defecto (-100..-30 dB) un
+      // bajo continuo satura los bins del bombo y aplasta el flujo del golpe.
+      beatAnalyser.minDecibels = -90
+      beatAnalyser.maxDecibels = -10
       bass.type = 'lowshelf'
       bass.frequency.value = 180
 

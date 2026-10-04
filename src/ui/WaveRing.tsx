@@ -192,12 +192,12 @@ export function WaveRing({
             : fallbackBass(levels)
         detector.setSensitivity(sensitivityRef.current)
         beat = detector.process(bass, time)
-        pulse = 1 + beat * 2.4
+        pulse = 1 + beat * 3
       } else if (active && micRef.current !== null) {
         // Micrófono en vivo: los golpes llegan de la sala (Spotify por altavoces).
         micDetector.setSensitivity(sensitivityRef.current)
         beat = micDetector.process(micRef.current.getBeatBass(), time)
-        pulse = 1 + beat * 2.4
+        pulse = 1 + beat * 3
       } else if (active) {
         // Sin señal analizable (Spotify por DRM): si Spotify publicó su
         // rejilla de golpes, el pulso cae exactamente en cada beat; si no,

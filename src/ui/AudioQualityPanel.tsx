@@ -356,6 +356,7 @@ export function AudioQualityPanel() {
         </div>
 
         <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('audio.bpmHint')}</p>
+        <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t('audio.waveHint')}</p>
       </div>
 
       <div className="mt-4">

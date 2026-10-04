@@ -89,7 +89,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 | Función | Notas de diseño |
 |---|---|
-| **Metrónomo** | **Hecho (C1)**: motor Web Audio con lookahead, BPM 30–240, compases 2/4 · 3/4 · 4/4 · 6/8 (acento en 1 y 4), tap tempo, volumen; pestaña Práctica del panel de músicos; toggle «Modo músico» en Ajustes. Verificado y con tests |
+| **Metrónomo** | **Hecho (C1), con arreglo pendiente**: motor Web Audio con lookahead, BPM 30–240, compases 2/4 · 3/4 · 4/4 · 6/8 (acento en 1 y 4), tap tempo, volumen; pestaña Práctica. La autora no entiende bien su uso y falta indicador visual/sincronía con la pista: **plan detallado en `docs/METRONOMO.md`** |
 | **BPM/tonalidad** | **Hecho (C2)**: estimador propio (paso-bajos + envolvente de ataques + autocorrelación), BPM manual y tonalidad manual persistidos por pista (IndexedDB, tabla `analysis`), botón «Usar en el metrónomo». Verificado con las pistas de prueba (120/100 exactos) |
 | **ChordPro** | **Hecho (C3/R)**: editor manual con importación `.cho/.pro`, transporte y guía visible; la **detección automática quedó archivada** tras la bandera `legato.chords.auto` (no daba acordes fiables) |
 | **Transposición** | **Hecho (C3)**: ±11 semitonos sobre ChordPro (acordes con barra y enarmonía correcta); solo cambia la vista, la hoja original no se toca |

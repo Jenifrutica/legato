@@ -240,6 +240,8 @@ export const es = {
     tap: 'Marcar',
     bpmHint:
       'Con Spotify el audio va protegido (DRM) y el pulso es sintético: marca el tempo con «Marcar» o escríbelo. Los archivos locales detectan los golpes solos.',
+    waveHint:
+      'Con archivos locales o el micrófono, las ondas siguen el golpe real del bombo; con Spotify sin micrófono usan el BPM marcado.',
     channelMode: 'Aislamiento de canales',
     modes: {
       stereo: 'Estéreo',

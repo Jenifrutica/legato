@@ -110,6 +110,10 @@ export class MicAnalyzer {
       const beat = context.createAnalyser()
       beat.fftSize = 1024
       beat.smoothingTimeConstant = 0
+      // Mismo margen dinámico que en el grafo local: evita que la banda del
+      // bombo se sature con un bajo continuo.
+      beat.minDecibels = -90
+      beat.maxDecibels = -10
 
       const silent = context.createGain()
       silent.gain.value = 0
