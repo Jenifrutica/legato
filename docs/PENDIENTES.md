@@ -97,7 +97,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 | **Pitch shift** | Cambiar tono sin cambiar tempo (fase/vocoder; considerar librería o `detune` con trade-offs); UI en el panel |
 | **Setlists** | **Hecho (C4)**: otra DLL del núcleo; crear vacía o desde playlist, reordenar con `moveNode`, marcar tocadas, quitar, duración total y reproducir; persistidas en IndexedDB (`setlists`, Dexie v4) |
 | **Notas** | **Hecho (C4)**: notas por pista y por playlist en IndexedDB (`notes`, clave compuesta) con autoguardado; pendiente post-entrega lo de marcas de tiempo por sección |
-| **Stems (Demucs)** | Post-entrega (requiere servidor/Python). Mientras tanto: aproximaciones por DSP (karaoke M/S para la voz, aislamiento de canal, balance y bajos de −12 a +12 dB) |
+| **Stems (Demucs)** | **Hecho (S)**: `scripts/practice-mix.sh` con Docker separa y genera mezclas de práctica («sin voz», «sin guitarra», «solo batería», «solo bajo»); ver `docs/STEMS.md`. La integración dentro de la web con servidor local queda como mejora futura; aproximaciones DSP (karaoke M/S, canales, bajos) siguen disponibles |
 
 **Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → ~~notas/setlists (C4, hecho)~~ → ~~LRC local (C5, hecho)~~. **Módulo de músicos completo** (+ C6: acordes automáticos con la letra); pitch shift y stems, post-entrega.
 **Criterio:** cada función en el panel de músicos, con i18n, persistencia y tests.

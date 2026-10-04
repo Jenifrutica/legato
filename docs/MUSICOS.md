@@ -34,6 +34,8 @@
 - **Setlist**: orden de concierto por playlist con notas y duración total.
 
 ### 4. Separación de instrumentos (stems)
+
+> **Hecho para practicar hoy:** `scripts/practice-mix.sh` (Demucs vía Docker) genera mezclas «sin voz», «sin guitarra», «solo batería» y «solo bajo» listas para importar en Legato. Ver `docs/STEMS.md`. La integración dentro de la web (botón «Aislar» con servidor local) queda como mejora futura.
 - Interfaz `StemProvider` (ya diseñada conceptualmente): local (Demucs en backend) o API externa.
 - UI por pista: toggles para voz/batería/bajo/otros, mezcla de stems, exportar stem.
 - Nota: el karaoke M/S actual es la aproximación inmediata; Demucs es la solución real (post-entrega).

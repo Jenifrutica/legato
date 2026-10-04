@@ -542,3 +542,10 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Pestaña Acordes**: el **editor manual ChordPro** pasa a ser el contenido principal con una **guía visible** («Cómo usar los acordes»: importar `.cho/.pro`, formato `{title:}` / `[C]letra`, autoguardado y transporte). El intento de Spotify (análisis/preview) también queda tras la bandera.
 - **Micrófono**: conserva golpes, BPM y fase (ondas) y su guardado por pista; los acordes en vivo solo aparecen con la bandera.
 - **Tests**: `chords-flag.test.ts` (apagada por defecto, se activa con `1`) y verificación en navegador (solo editor + guía, sin detección ni micrófono en Acordes). Total: **281 unit + 7 E2E**.
+
+### S Stems con Demucs para practicar (implementado)
+
+- **`scripts/practice-mix.sh`**: usa **Docker** (imagen CPU propia construida desde `scripts/demucs.Dockerfile`: python 3.12 + torch/torchaudio CPU + numpy + demucs + ffmpeg) para no depender del Python del sistema (3.14 sin wheels). Caché de modelos en `~/.cache/legato-demucs` y montajes con `:z` para **SELinux de Fedora**; el contenedor corre con el uid del usuario para que los ficheros salgan con sus permisos.
+- **Salidas listas para importar** en `stems/<nombre>/` (gitignored): «sin voz» (modelo de 4 stems con `--two-stems=vocals`) y, con `--guitar` (modelo `htdemucs_6s`), «sin voz», «sin guitarra», «solo batería» y «solo bajo» mezcladas con ffmpeg.
+- **Verificado end-to-end** con un clip de 8 s: separación en ~6 s y MP3s con audio (volumen medido; «solo batería» en silencio es correcto porque el clip sintético no tiene batería).
+- **`docs/STEMS.md`**: requisitos, comandos, notas de calidad/tiempos y cómo practicar en Legato (loop A–B, metrónomo, velocidad, ChordPro). La integración dentro de la web con servidor local queda como mejora futura.
