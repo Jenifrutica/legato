@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useSpotifyStore } from '../features/sources'
+import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { activeLineIndex, type LyricLine } from '../features/lyrics'
 import { usePlayerStore } from '../player'
 
@@ -39,9 +39,11 @@ export function Lyrics({
   const { t } = useTranslation()
   const currentTime = usePlayerStore((state) => state.currentTime)
   const status = usePlayerStore((state) => state.status)
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
 
-  const spotifyActive = spotifyPlayback !== null
+  const spotifyActive =
+    spotifyPlayback !== null && (currentTrack === null || isExternalTrack(currentTrack))
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const time = spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime
 

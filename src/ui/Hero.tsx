@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
-import { useSpotifyStore } from '../features/sources'
+import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
@@ -61,10 +61,8 @@ export function Hero() {
     setVideoOpen(false)
   }, [currentTrack?.id])
 
-  const spotifyActive = spotifyPlayback !== null
-  const externalCurrent =
-    currentTrack !== null &&
-    (currentTrack.external === true || currentTrack.sourceUrl.startsWith('spotify:'))
+  const externalCurrent = isExternalTrack(currentTrack)
+  const spotifyActive = spotifyPlayback !== null && (currentTrack === null || externalCurrent)
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const hasPlayable = spotifyActive || currentTrack !== null
 

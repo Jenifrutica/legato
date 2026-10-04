@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { setExternalPlayer, usePlayerStore } from '../../player'
 import { useSpotifyStore } from './spotify-store'
 
-function isExternal(track: { external?: boolean; sourceUrl: string }): boolean {
-  return track.external === true || track.sourceUrl.startsWith('spotify:')
+export function isExternalTrack(track: { external?: boolean; sourceUrl: string } | null): boolean {
+  return track !== null && (track.external === true || track.sourceUrl.startsWith('spotify:'))
 }
 
 /**
@@ -40,7 +40,7 @@ export function useExternalPlayback(): void {
   useEffect(() => {
     const unsubscribe = useSpotifyStore.subscribe((state, previous) => {
       const current = usePlayerStore.getState().currentTrack
-      if (current === null || !isExternal(current)) {
+      if (!isExternalTrack(current)) {
         return
       }
 

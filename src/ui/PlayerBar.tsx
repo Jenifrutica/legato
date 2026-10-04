@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
-import { useSpotifyStore } from '../features/sources'
+import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { usePlayerStore } from '../player'
 import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
@@ -48,10 +48,8 @@ export function PlayerBar() {
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
 
-  const spotifyActive = spotifyPlayback !== null
-  const externalCurrent =
-    currentTrack !== null &&
-    (currentTrack.external === true || currentTrack.sourceUrl.startsWith('spotify:'))
+  const externalCurrent = isExternalTrack(currentTrack)
+  const spotifyActive = spotifyPlayback !== null && (currentTrack === null || externalCurrent)
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const hasTrack = spotifyActive || currentTrack !== null
   const displayTitle = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? null)

@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getMicAnalyser, useMicStore, useTrackAnalysisStore } from '../features/musician'
-import { useSpotifyStore } from '../features/sources'
+import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
 import { WaveRing } from './WaveRing'
@@ -21,7 +21,8 @@ export function VinylVisual() {
   )
   const micListening = useMicStore((state) => state.status === 'listening')
 
-  const spotifyActive = spotifyPlayback !== null
+  const spotifyActive =
+    spotifyPlayback !== null && (currentTrack === null || isExternalTrack(currentTrack))
   const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const artworkUrl = spotifyActive ? spotifyPlayback.artworkUrl : (currentTrack?.artworkUrl ?? null)
   const title = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? '')
