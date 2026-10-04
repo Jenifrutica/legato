@@ -209,6 +209,36 @@ export class PlayerController {
     this.#notify()
   }
 
+  /** Al cerrar sesión: detiene todo y devuelve la reproducción a valores neutros. */
+  clearSession(): void {
+    this.#transitionToken++
+    this.#localEngine.pause()
+    if (this.#streamEngine !== this.#localEngine) {
+      this.#streamEngine.pause()
+    }
+    this.#externalPlayer?.stop()
+    this.#queue.clear()
+    this.#queue.setShuffle(false)
+    this.#queue.setLoopMode('none')
+    this.#abLoop = null
+    this.#loopPointA = null
+    this.#sourcePlaylistId = null
+    this.#lastError = null
+    this.#volume = 1
+    this.#rate = 1
+    this.#balance = 0
+    this.#channelMode = 'stereo'
+    this.#karaoke = false
+    this.#crossfadeSeconds = 2
+    this.#localEngine.setVolume(1)
+    this.#localEngine.setRate(1)
+    if (this.#streamEngine !== this.#localEngine) {
+      this.#streamEngine.setVolume(1)
+      this.#streamEngine.setRate(1)
+    }
+    this.#notify()
+  }
+
   async fadeOutAndPause(durationMs = 2500): Promise<void> {
     await this.#rampVolume(1, 0, durationMs)
     this.#engine.pause()

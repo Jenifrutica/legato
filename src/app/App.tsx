@@ -7,14 +7,13 @@ import { CookieConsent, LegalPage } from '../features/legal'
 import {
   adoptOrphanData,
   hydrateStores,
-  resetStores,
-  saveCurrentSession,
   setActiveUserId,
   startPersistence,
-  stopPersistence,
 } from '../features/persistence'
 import { setSpotifyScope, SpotifyBanner, useExternalPlayback } from '../features/sources'
 import { useAlbumTheme } from '../features/theme'
+import { useAudioFxStore } from '../player'
+import { teardownSession } from './teardown-session'
 import { Hero } from '../ui/Hero'
 import { LoginScreen, VerifyEmailScreen } from '../ui/LoginScreen'
 import { MiniPlayer } from '../ui/MiniPlayer'
@@ -67,6 +66,9 @@ function AppShell({ userId }: { userId: string }) {
   useEffect(() => {
     let cancelled = false
 
+    // Por si quedara algo de una sesión anterior (cambio rápido de cuenta).
+    teardownSession()
+
     void (async () => {
       setActiveUserId(userId)
       setSpotifyScope(userId)
@@ -77,16 +79,12 @@ function AppShell({ userId }: { userId: string }) {
       }
       await hydrateStores()
       startPersistence()
+      useAudioFxStore.getState().resumeAmbientPlayback()
     })()
 
     return () => {
       cancelled = true
-      void saveCurrentSession()
-      stopPersistence()
-      resetStores()
-      setActiveUserId(null)
-      setSpotifyScope(null)
-      usePlayLogStore.getState().setScope(null)
+      teardownSession()
     }
   }, [userId])
 

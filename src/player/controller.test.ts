@@ -45,6 +45,35 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().status).toBe('playing')
   })
 
+  it('clearSession deja la reproducción neutra y sin cola', () => {
+    const audio = new FakeAudio()
+    const controller = new PlayerController(audio)
+    controller.playTracks([track('a'), track('b')], 'a')
+    controller.setVolume(0.3)
+    controller.setRate(0.5)
+    controller.setBalance(0.4)
+    controller.setChannelMode('left')
+    controller.setKaraoke(true)
+    controller.toggleShuffle()
+    controller.setLoopPointA()
+
+    controller.clearSession()
+
+    const snapshot = controller.getSnapshot()
+    expect(snapshot.currentTrack).toBeNull()
+    expect(snapshot.queue).toHaveLength(0)
+    expect(snapshot.status).not.toBe('playing')
+    expect(snapshot.volume).toBe(1)
+    expect(snapshot.rate).toBe(1)
+    expect(snapshot.balance).toBe(0)
+    expect(snapshot.channelMode).toBe('stereo')
+    expect(snapshot.shuffle).toBe(false)
+    expect(snapshot.loopMode).toBe('none')
+    expect(snapshot.karaoke).toBe(false)
+    expect(snapshot.abLoop).toBeNull()
+    expect(snapshot.loopPointA).toBeNull()
+  })
+
   it('next y previous cambian de cancion', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

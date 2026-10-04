@@ -60,6 +60,10 @@ type AudioFxState = SavedAudioFx & {
   setBass: (db: number) => void
   setAmbient: (id: AmbientId | null) => void
   setAmbientVolume: (volume: number) => void
+  /** Para el motor sin borrar la preferencia guardada (al cerrar sesión). */
+  stopAmbientPlayback: () => void
+  /** Reanuda la cama de ambiente guardada (al entrar). */
+  resumeAmbientPlayback: () => void
 }
 
 export const useAudioFxStore = create<AudioFxState>((set, get) => ({
@@ -89,6 +93,22 @@ export const useAudioFxStore = create<AudioFxState>((set, get) => ({
     engine.setVolume(ambientVolume)
     set({ ambientVolume })
     persist({ bassDb: get().bassDb, ambient: get().ambient, ambientVolume })
+  },
+
+  stopAmbientPlayback: () => {
+    engine.stop()
+  },
+
+  resumeAmbientPlayback: () => {
+    const id = get().ambient
+    if (id === null) {
+      return
+    }
+    const context = getAnalyser().audioContext
+    if (context !== null) {
+      void context.resume()
+      engine.start(context, id, get().ambientVolume)
+    }
   },
 }))
 

@@ -66,6 +66,7 @@ type PlayerState = PlayerSnapshot & {
   clearQueue: () => void
   moveInQueue: (trackId: string, targetIndex: number) => void
   restoreSession: (record: RestoreState) => void
+  clearSession: () => void
   setBalance: (value: number) => void
   setChannelMode: (mode: ChannelMode) => void
   setRate: (value: number) => void
@@ -131,6 +132,13 @@ export const usePlayerStore = create<PlayerState>(() => ({
     const snapshot = controller.getSnapshot()
     graph.setBalance(snapshot.balance)
     graph.setChannelMode(snapshot.channelMode)
+  },
+  clearSession: () => {
+    sleepTimer.cancel()
+    controller.clearSession()
+    graph.setBalance(0)
+    graph.setChannelMode('stereo')
+    graph.setKaraoke(false)
   },
   setBalance: (value) => {
     controller.setBalance(value)
