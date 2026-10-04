@@ -564,3 +564,14 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Cuenta**: cerrar sesión (chip) y eliminar cuenta (Ajustes, con contraseña) que borra usuario y datos.
 - **Pruebas**: 290 unit (PBKDF2, cuentas locales, migración/filtrado, selección de proveedor) + **9 E2E** (auth.spec nuevo y los 7 existentes con `registerAndEnter`).
 - **Pendiente manual**: crear/pegar la configuración de Firebase (pasos con enlaces en `docs/AUTH.md`) y verificar registro con correo real, Google, recuperación y borrado.
+- **Aislamiento de sesión (bug reportado)**: al cambiar de cuenta no se limpiaba el estado transitorio (SDK de Spotify, cola interna del reproductor, undo/redo, temporizador, ambiente, metrónomo y micrófono). Se añadió `teardownSession()` en la capa app + `PlayerController.clearSession()` + `stopAmbientPlayback()`; E2E nuevo de cambio de cuenta.
+
+### N Sincronización en la nube (implementado)
+
+- **Motivo**: la autora necesita que cada usuario tenga lo suyo **en cualquier dispositivo** (móvil o PC), no por navegador.
+- **Arquitectura**: `features/sync/` con backend abstracto; **Firebase** implementa Firestore (metadatos por usuario) y Storage (audios/portadas). Backend en memoria para tests.
+- **Fusión**: por registro con `updatedAt` (gana la edición más reciente) y **lápidas** (`tombstones`) para que los borrados viajen sin resucitar; `mergeTable`/`mergeTombstones` puros y testeados.
+- **Ciclo**: al iniciar sesión se baja y aplica (con descarga de audios faltantes y progreso), se hidrata y luego se sube lo local; los cambios locales se empujan con debounce de 3 s; botón «Sincronizar ahora» y toggle en Ajustes (la sincronización solo se activa con Firebase configurado).
+- **Límites**: cuotas gratuitas de Firestore/Storage (documentadas en `docs/AUTH.md`); las referencias de Spotify viajan como metadatos y la conexión del SDK se hace por dispositivo (misma cuenta Premium).
+- **Privacidad**: con la nube activa, canciones y audios se guardan en Firebase (Google); política actualizada en ES/EN/PT.
+- **Tests**: fusión (5), motor con backend en memoria (4) y persistencia con lápidas; total **300 unit + 10 E2E**.

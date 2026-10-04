@@ -33,6 +33,40 @@
 
 > Sin esos valores, la app arranca en **modo local** (cuentas del navegador) y el E2E funciona igual. En el pie de la pantalla de acceso no se anuncia el proveedor; la política de privacidad ya declara Firebase/Google.
 
+## 2b. Activar la nube (Firestore + Storage) — para que los datos sigan al usuario
+
+La sincronización entre dispositivos vive en **Firestore** (metadatos) y **Firebase Storage** (audios y portadas). En la consola:
+
+1. **Compilación → Firestore Database → Crear base de datos** (modo producción; región `us-central1` o `nam5`).
+2. **Compilación → Storage → Comenzar** (modo producción).
+3. En **Firestore → Rules** pega y publica:
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{uid}/{document=**} {
+         allow read, write: if request.auth != null && request.auth.uid == uid;
+       }
+     }
+   }
+   ```
+4. En **Storage → Rules** pega y publica:
+   ```
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /users/{uid}/{allPaths=**} {
+         allow read, write: if request.auth != null && request.auth.uid == uid;
+       }
+     }
+   }
+   ```
+5. En la app: **Ajustes → Sincronización (nube)** debe estar activada (lo está por defecto si hay config). Al iniciar sesión se bajan los datos y audios que falten (con progreso) y los cambios se suben solos.
+
+**Cuotas gratuitas (Spark)**: Firestore ~1 GiB y 50 000 lecturas/día; Storage ~5 GiB con ~1 GB de descargas al día. Con muchos audios se agota rápido: si aparece error de cuota, desactiva la sincronización o pasa a un plan de pago.
+
+**Spotify entre dispositivos**: las referencias viajan como metadatos, pero tokens del SDK **no** (Spotify los rota y sería inseguro). En cada dispositivo se conecta Spotify una vez con la misma cuenta Premium.
+
 ## 3. Seguridad (decisiones)
 
 - La contraseña **nunca** se guarda en claro: Firebase la cifra en su backend; el respaldo local guarda PBKDF2 + salt.

@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 290 unitarios + 9 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 300 unitarios + 10 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -153,8 +153,8 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 290 unitarios
-~/.bun/bin/bun run test:e2e    # 9 E2E
+~/.bun/bin/bun run test        # 300 unitarios
+~/.bun/bin/bun run test:e2e    # 10 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint
 /home/jenifrutica/.config/opencode/skills/impeccable/scripts/impeccable detect --json src
