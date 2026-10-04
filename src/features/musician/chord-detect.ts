@@ -199,6 +199,19 @@ export function detectChordsFromSamples(
   return chordsFromChromaFrames(frames)
 }
 
+/** Índice del acorde vigente en una posición (segundos); -1 si aún no empieza. */
+export function activeChordIndex(events: DetectedChord[], position: number): number {
+  let found = -1
+  for (let index = 0; index < events.length; index++) {
+    if ((events[index]?.time ?? 0) <= position + 0.05) {
+      found = index
+    } else {
+      break
+    }
+  }
+  return found
+}
+
 /** Decodifica el blob y estima los acordes (solo navegador). */
 export async function detectChordsFromBlob(blob: Blob): Promise<DetectedChord[] | null> {
   const decoded = await decodeMono(blob, MAX_SECONDS)

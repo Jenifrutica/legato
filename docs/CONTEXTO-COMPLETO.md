@@ -517,3 +517,10 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Tap tempo con fase**: `Marcar` ya no solo fija BPM; con la posición (de Spotify, interpolada entre sondeos; o del motor local) calcula la **fase media** del compás (`offsetFromPositions`, función pura con tests) y las ondas golpean donde la autora marca. En referencias externas se guarda **BPM y fase por pista** (`analysis.bpm` / `analysis.beatOffset`) y `VinylVisual` los pasa a `WaveRing` como override.
 - **Preview de Spotify**: `GET /v1/tracks/{id}?market=from_token`; si el análisis 403 y hay preview, se descargan 30 s y se estiman acordes + BPM; el panel distingue «Spotify tampoco ofrece preview» de «el preview no se pudo descargar o analizar» en vez de un genérico.
 - **E2E**: un fallo de los smoke se debió a la **caché stale de Vite** tras muchas ediciones (`rm -rf node_modules/.vite` + reinicio), no a regresión. Total: **265 unit + 6 E2E**.
+
+### C9 Acorde en vivo (implementado)
+
+- **Contexto**: la autora veía «chords estimated from the audio» pero sin letra solo aparecía la línea de tiempo, así que la estimación no se «veía». En Spotify el 403 sin preview es definitivo.
+- **Indicador en vivo** en la pestaña Acordes: tarjeta grande con el **acorde vigente** y el **siguiente** (`Siguiente: X` / `Último acorde`), sincronizada a la posición (motor local o `positionMs` de Spotify). Resalta además la **línea de letra activa** y la **fila activa** de la línea de tiempo.
+- **Ayuda**: cuando no hay letra, el aviso invita a cargar un `.lrc` en Notas.
+- **Helper puro** `activeChordIndex` con tests (posiciones antes del primer acorde, límites y vacío). Total: **267 unit + 6 E2E**; verificado en navegador con la pista C·G·Am·F (C → G → Am → F en vivo).

@@ -2,6 +2,7 @@ export { ALL_KEY_OPTIONS, KEY_OPTIONS, useTrackAnalysisStore } from './analysis-
 export type { TrackAnalysis } from './analysis-store'
 export { detectBpmFromBlob, estimateBpmFromSamples } from './bpm-estimator'
 export {
+  activeChordIndex,
   chordsFromChromaFrames,
   detectChordsFromBlob,
   detectChordsFromSamples,

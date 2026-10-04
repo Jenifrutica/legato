@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectChordsFromSamples } from './chord-detect'
+import { activeChordIndex, detectChordsFromSamples } from './chord-detect'
 
 const SAMPLE_RATE = 8192
 
@@ -49,5 +49,25 @@ describe('detectChordsFromSamples', () => {
 
   it('con audio demasiado corto devuelve vacío', () => {
     expect(detectChordsFromSamples(new Float32Array(1000), SAMPLE_RATE)).toEqual([])
+  })
+})
+
+describe('activeChordIndex', () => {
+  const events = [
+    { time: 0, duration: 2, chord: 'C' },
+    { time: 2, duration: 2, chord: 'G' },
+    { time: 4, duration: 2, chord: 'Am' },
+  ]
+
+  it('encuentra el acorde vigente en cada posición', () => {
+    expect(activeChordIndex(events, -1)).toBe(-1)
+    expect(activeChordIndex(events, 0.5)).toBe(0)
+    expect(activeChordIndex(events, 2)).toBe(1)
+    expect(activeChordIndex(events, 3.9)).toBe(1)
+    expect(activeChordIndex(events, 100)).toBe(2)
+  })
+
+  it('sin acordes devuelve -1', () => {
+    expect(activeChordIndex([], 1)).toBe(-1)
   })
 })

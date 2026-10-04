@@ -343,7 +343,10 @@ export const pt: typeof es = {
     detectUnavailable:
       'A detecção de acordes precisa de um arquivo local (o áudio do Spotify é protegido por DRM).',
     withLyrics: 'Acordes com a letra',
-    noLyrics: 'Sem letra para alinhar; aqui está a linha do tempo.',
+    noLyrics: 'Sem letra ainda: carregue um .lrc na aba Notas ou veja a linha do tempo.',
+    nowPlaying: 'Acorde tocando',
+    nextChord: 'Próximo: {{chord}}',
+    lastChord: 'Último acorde',
     timeline: 'Linha do tempo',
     manual: 'Editor manual (ChordPro)',
     spotifyDetect: 'Detectar do Spotify',

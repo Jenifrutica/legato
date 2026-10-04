@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration, useLibraryStore } from '../features/library'
 import { parseChordPro, transposeSong, useChordStore } from '../features/musician'
 import {
+  activeChordIndex,
   chordsFromSpotifySegments,
   detectBpmFromBlob,
   detectChordsFromBlob,
@@ -15,6 +16,7 @@ import {
   fetchSpotifyAudioAnalysis,
   fetchSpotifyTrackPreview,
   isSpotifyConnected,
+  useSpotifyStore,
 } from '../features/sources'
 import { usePlayerStore } from '../player'
 
@@ -40,6 +42,8 @@ function chordAt(events: DetectedChord[], time: number): string | null {
 export function ChordsPanel() {
   const { t } = useTranslation()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const currentTime = usePlayerStore((state) => state.currentTime)
+  const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const trackId = currentTrack?.id ?? null
   const libraryTrack = useLibraryStore((state) =>
     trackId === null ? null : (state.tracks.find((item) => item.id === trackId) ?? null),
@@ -242,6 +246,17 @@ export function ChordsPanel() {
   const transposed = transposeSong(song, semitones)
   const hasSheet = draft.trim() !== ''
   const detected = record?.detectedChords ?? null
+  const position = spotifyPlayback !== null ? spotifyPlayback.positionMs / 1000 : currentTime
+  const activeIndex = detected === null ? -1 : activeChordIndex(detected, position)
+  const activeEvent = detected !== null && activeIndex >= 0 ? detected[activeIndex] : undefined
+  const nextEvent =
+    detected !== null && activeIndex + 1 < detected.length ? detected[activeIndex + 1] : undefined
+  let activeLyricIndex = -1
+  lyrics.lines.forEach((line, index) => {
+    if (line.time <= position + 0.05) {
+      activeLyricIndex = index
+    }
+  })
 
   function renderLine(line: ChordProLine, index: number) {
     if (line.type === 'empty') {
@@ -359,6 +374,20 @@ export function ChordsPanel() {
                 </button>
               </div>
 
+              <div
+                aria-label={t('chords.nowPlaying')}
+                className="flex items-center justify-between gap-3 border-2 border-rule bg-accent-soft px-3 py-2"
+              >
+                <span className="font-display text-2xl font-black text-ink">
+                  {activeEvent?.chord ?? detected[0]?.chord ?? '—'}
+                </span>
+                <span className="text-right font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase">
+                  {nextEvent === undefined
+                    ? t('chords.lastChord')
+                    : t('chords.nextChord', { chord: nextEvent.chord })}
+                </span>
+              </div>
+
               {lyrics.lines.length > 0 ? (
                 <div className="border-2 border-rule bg-surface p-3">
                   <p className="mb-2 font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
@@ -366,7 +395,10 @@ export function ChordsPanel() {
                   </p>
                   <div className="flex flex-col gap-1.5">
                     {lyrics.lines.map((line, index) => (
-                      <div key={index}>
+                      <div
+                        className={index === activeLyricIndex ? 'bg-accent-soft px-1' : ''}
+                        key={index}
+                      >
                         <span className="block font-mono text-[0.6875rem] leading-tight font-semibold text-accent-ink">
                           {chordAt(detected, line.time) ?? ' '}
                         </span>
@@ -386,7 +418,9 @@ export function ChordsPanel() {
                 <ol className="mt-2 flex flex-col">
                   {detected.map((event, index) => (
                     <li
-                      className="flex items-center justify-between border-b border-border py-1"
+                      className={`flex items-center justify-between border-b border-border py-1 ${
+                        index === activeIndex ? 'bg-accent-soft px-1' : ''
+                      }`}
                       key={`${event.time}-${index}`}
                     >
                       <span className="font-mono text-sm font-semibold text-ink">
