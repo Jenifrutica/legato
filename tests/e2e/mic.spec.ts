@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { acceptCookies } from './fixtures'
+import { acceptCookies, registerAndEnter } from './fixtures'
 
 test.use({
   launchOptions: {
@@ -13,6 +13,7 @@ test.use({
 
 test('modo micrófono: pide permiso, escucha y se detiene', async ({ page }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await page.getByRole('tab', { name: 'Audio' }).click()

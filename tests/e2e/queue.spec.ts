@@ -1,10 +1,17 @@
 import { expect, test } from '@playwright/test'
-import { acceptCookies, createPlaylist, dragHandle, importWavFiles } from './fixtures'
+import {
+  acceptCookies,
+  registerAndEnter,
+  createPlaylist,
+  dragHandle,
+  importWavFiles,
+} from './fixtures'
 
 test('cola: añadir al final, reproducir siguiente, quitar y reordenar sin cambiar lo que suena', async ({
   page,
 }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await importWavFiles(page, ['A', 'B', 'C'])

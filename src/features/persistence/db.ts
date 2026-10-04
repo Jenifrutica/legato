@@ -6,26 +6,32 @@ import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
 import type { PlaylistRestoreRecord } from '../playlists'
 import type { ChannelMode, LoopMode } from '../../player'
 
+/** Todos los datos musicales llevan el usuario dueño (los antiguos no lo tienen). */
+export type OwnedRecord = {
+  userId?: string
+}
+
 export type SongRecord = Omit<
   LibraryTrack,
   'sourceUrl' | 'artworkUrl' | 'artworkBlob' | 'blob' | 'external'
-> & {
-  externalUrl?: string | null
-  blob: Blob
-  artwork: Blob | null
-}
+> &
+  OwnedRecord & {
+    externalUrl?: string | null
+    blob: Blob
+    artwork: Blob | null
+  }
 
-export type PlaylistRecord = PlaylistRestoreRecord
+export type PlaylistRecord = PlaylistRestoreRecord & OwnedRecord
 
-export type AnalysisRecord = TrackAnalysis
+export type AnalysisRecord = TrackAnalysis & OwnedRecord
 
-export type ChordRecord = ChordSheet
+export type ChordRecord = ChordSheet & OwnedRecord
 
-export type SetlistRecord = Setlist
+export type SetlistRecord = Setlist & OwnedRecord
 
-export type NoteRecord = Note
+export type NoteRecord = Note & OwnedRecord
 
-export type LyricsRecord = LocalLyrics
+export type LyricsRecord = LocalLyrics & OwnedRecord
 
 export type UserRecord = {
   id: string
@@ -119,6 +125,18 @@ class LegatoDatabase extends Dexie {
       setlists: 'id',
       notes: '[targetType+targetId]',
       lyrics: 'trackId',
+      users: 'id, &email',
+      authSessions: 'tokenHash, userId',
+    })
+    this.version(7).stores({
+      songs: 'id, userId',
+      playlists: 'id, userId',
+      session: 'key',
+      analysis: 'trackId, userId',
+      chords: 'trackId, userId',
+      setlists: 'id, userId',
+      notes: '[targetType+targetId], userId',
+      lyrics: 'trackId, userId',
       users: 'id, &email',
       authSessions: 'tokenHash, userId',
     })

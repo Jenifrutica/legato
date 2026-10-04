@@ -11,6 +11,7 @@ import type {
 
 type AuthContextValue = {
   user: AuthUser | null
+  ready: boolean
   kind: AuthProviderKind
   supportsEmailVerification: boolean
   supportsPasswordReset: boolean
@@ -36,6 +37,7 @@ export function AuthContextProvider({
 }) {
   const authProvider = useMemo(() => provider ?? createAuthProvider(), [provider])
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -43,6 +45,7 @@ export function AuthContextProvider({
     void authProvider.init().then(() => {
       if (active) {
         setUser(authProvider.getUser())
+        setReady(true)
       }
     })
 
@@ -57,6 +60,7 @@ export function AuthContextProvider({
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      ready,
       kind: authProvider.kind,
       supportsEmailVerification: authProvider.supportsEmailVerification,
       supportsPasswordReset: authProvider.supportsPasswordReset,
@@ -70,7 +74,7 @@ export function AuthContextProvider({
       signOut: () => authProvider.signOut(),
       deleteAccount: (password) => authProvider.deleteAccount(password),
     }),
-    [authProvider, user],
+    [authProvider, user, ready],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

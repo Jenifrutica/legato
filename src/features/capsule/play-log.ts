@@ -8,7 +8,12 @@ export type PlayEntry = {
 
 export type PlayLog = Record<string, PlayEntry>
 
-const STORAGE_KEY = 'legato.plays.v1'
+const STORAGE_KEY_BASE = 'legato.plays.v1'
+let scopeSuffix = ''
+
+function storageKey(): string {
+  return `${STORAGE_KEY_BASE}${scopeSuffix}`
+}
 
 export function registerPlay(log: PlayLog, trackId: string, now: number): PlayLog {
   const previous = log[trackId]
@@ -28,7 +33,7 @@ function readLog(): PlayLog {
   }
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey())
     if (raw === null) {
       return {}
     }
@@ -45,7 +50,7 @@ function writeLog(log: PlayLog): void {
   }
 
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(log))
+    localStorage.setItem(storageKey(), JSON.stringify(log))
   } catch {
     // sin persistencia
   }
@@ -55,6 +60,7 @@ type PlayLogState = {
   log: PlayLog
   register: (trackId: string) => void
   clear: () => void
+  setScope: (userId: string | null) => void
 }
 
 export const usePlayLogStore = create<PlayLogState>((set, get) => ({
@@ -69,5 +75,24 @@ export const usePlayLogStore = create<PlayLogState>((set, get) => ({
   clear: () => {
     writeLog({})
     set({ log: {} })
+  },
+
+  setScope: (userId) => {
+    scopeSuffix = userId === null ? '' : `.${userId}`
+
+    // Los registros previos (sin cuenta) pasan al primer usuario.
+    if (userId !== null && typeof localStorage !== 'undefined') {
+      try {
+        const legacy = localStorage.getItem(STORAGE_KEY_BASE)
+        if (localStorage.getItem(storageKey()) === null && legacy !== null) {
+          localStorage.setItem(storageKey(), legacy)
+          localStorage.removeItem(STORAGE_KEY_BASE)
+        }
+      } catch {
+        // sin persistencia
+      }
+    }
+
+    set({ log: readLog() })
   },
 }))

@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
-import { acceptCookies, createPlaylist } from './fixtures'
+import { acceptCookies, createPlaylist, registerAndEnter } from './fixtures'
 
 test('carga, consentimiento, idioma y paginas legales', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('Legato').first()).toBeVisible()
 
+  await registerAndEnter(page)
   await acceptCookies(page)
   await expect(page.getByRole('button', { name: 'Solo esenciales' })).toHaveCount(0)
 
@@ -22,6 +23,7 @@ test('carga, consentimiento, idioma y paginas legales', async ({ page }) => {
 
 test('crear playlist con deshacer y rehacer', async ({ page }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await createPlaylist(page, 'E2E Set')

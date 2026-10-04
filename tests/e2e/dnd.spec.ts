@@ -1,8 +1,15 @@
 import { expect, test } from '@playwright/test'
-import { acceptCookies, createPlaylist, dragHandle, importWavFiles } from './fixtures'
+import {
+  acceptCookies,
+  registerAndEnter,
+  createPlaylist,
+  dragHandle,
+  importWavFiles,
+} from './fixtures'
 
 test('regresion #12: reordenar la playlist no cambia la cancion en curso', async ({ page }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await importWavFiles(page, ['A', 'B', 'C'])
@@ -48,6 +55,7 @@ test('regresion #12: reordenar la playlist no cambia la cancion en curso', async
 
 test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ page }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await importWavFiles(page, ['A'])
@@ -70,6 +78,7 @@ test('persistencia: biblioteca y playlists sobreviven a la recarga', async ({ pa
 
 test('crear playlist desde Agregar a… cuando aún no hay ninguna', async ({ page }) => {
   await page.goto('/')
+  await registerAndEnter(page)
   await acceptCookies(page)
 
   await importWavFiles(page, ['A'])

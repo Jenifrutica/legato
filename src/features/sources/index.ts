@@ -13,6 +13,7 @@ export {
   isSpotifyConfigured,
   isSpotifyConnected,
   searchSpotify,
+  setSpotifyScope,
 } from './spotify'
 export { SettingsPanel } from './SettingsPanel'
 export { SearchTab } from './SearchTab'

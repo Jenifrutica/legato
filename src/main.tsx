@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app/App.tsx'
 import { getMicAnalyser, useMicStore } from './features/musician'
-import { hydrateStores, startPersistence } from './features/persistence'
 import { handleSpotifyRedirect } from './features/sources'
 import { getAnalyser, getMediaElement, usePlayerStore } from './player'
 import './styles/index.css'
@@ -25,12 +24,6 @@ createRoot(document.getElementById('root')!).render(
 )
 
 void handleSpotifyRedirect()
-
-void hydrateStores().then((hydrated) => {
-  if (hydrated) {
-    startPersistence()
-  }
-})
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

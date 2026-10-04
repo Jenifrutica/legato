@@ -1,13 +1,22 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AuthContextProvider } from '../features/auth'
-import { usePlayTracker } from '../features/capsule'
-import { useExternalPlayback } from '../features/sources'
+import { AuthContextProvider, useAuth } from '../features/auth'
+import { usePlayLogStore, usePlayTracker } from '../features/capsule'
 import { useHistoryStore } from '../features/history'
 import { CookieConsent, LegalPage } from '../features/legal'
-import { SpotifyBanner } from '../features/sources'
+import {
+  adoptOrphanData,
+  hydrateStores,
+  resetStores,
+  saveCurrentSession,
+  setActiveUserId,
+  startPersistence,
+  stopPersistence,
+} from '../features/persistence'
+import { setSpotifyScope, SpotifyBanner, useExternalPlayback } from '../features/sources'
 import { useAlbumTheme } from '../features/theme'
 import { Hero } from '../ui/Hero'
+import { LoginScreen, VerifyEmailScreen } from '../ui/LoginScreen'
 import { MiniPlayer } from '../ui/MiniPlayer'
 import { MobileNav } from '../ui/MobileNav'
 import { MusiciansPanel } from '../ui/MusiciansPanel'
@@ -18,16 +27,68 @@ import { TopBar } from '../ui/TopBar'
 export default function App() {
   return (
     <AuthContextProvider>
-      <AppShell />
+      <AuthGate />
     </AuthContextProvider>
   )
 }
 
-function AppShell() {
+export function AuthGate() {
+  const { t } = useTranslation()
+  const { user, ready } = useAuth()
+
+  if (!ready) {
+    return (
+      <div
+        aria-label={t('app.loading')}
+        className="grid min-h-dvh place-items-center bg-bg text-ink"
+      >
+        <span className="font-display text-xl font-black tracking-[0.1em] uppercase">Legato</span>
+      </div>
+    )
+  }
+
+  if (user === null) {
+    return <LoginScreen />
+  }
+
+  if (!user.emailVerified) {
+    return <VerifyEmailScreen />
+  }
+
+  return <AppShell userId={user.id} />
+}
+
+function AppShell({ userId }: { userId: string }) {
   const { t } = useTranslation()
   useAlbumTheme()
   usePlayTracker()
   useExternalPlayback()
+
+  useEffect(() => {
+    let cancelled = false
+
+    void (async () => {
+      setActiveUserId(userId)
+      setSpotifyScope(userId)
+      usePlayLogStore.getState().setScope(userId)
+      await adoptOrphanData(userId)
+      if (cancelled) {
+        return
+      }
+      await hydrateStores()
+      startPersistence()
+    })()
+
+    return () => {
+      cancelled = true
+      void saveCurrentSession()
+      stopPersistence()
+      resetStores()
+      setActiveUserId(null)
+      setSpotifyScope(null)
+      usePlayLogStore.getState().setScope(null)
+    }
+  }, [userId])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

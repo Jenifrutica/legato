@@ -4,7 +4,34 @@ const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
 const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI ?? 'http://127.0.0.1:5173'
 const SCOPES =
   'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state playlist-read-private'
-const TOKENS_KEY = 'legato.spotify.tokens'
+const TOKENS_KEY_BASE = 'legato.spotify.tokens'
+let tokenScope: string | null = null
+
+/**
+ * Los tokens de Spotify viven por usuario: al cerrar sesión no se borran y
+ * vuelven al entrar con la misma cuenta (en este navegador).
+ */
+export function setSpotifyScope(userId: string | null): void {
+  tokenScope = userId
+  if (userId === null) {
+    return
+  }
+
+  try {
+    const scoped = tokensKey()
+    const legacy = localStorage.getItem(TOKENS_KEY_BASE)
+    if (localStorage.getItem(scoped) === null && legacy !== null) {
+      localStorage.setItem(scoped, legacy)
+      localStorage.removeItem(TOKENS_KEY_BASE)
+    }
+  } catch {
+    // sin persistencia
+  }
+}
+
+function tokensKey(): string {
+  return tokenScope === null ? TOKENS_KEY_BASE : `${TOKENS_KEY_BASE}.${tokenScope}`
+}
 const PKCE_KEY = 'legato.spotify.pkce'
 const ACCOUNTS = 'https://accounts.spotify.com'
 const API = 'https://api.spotify.com/v1'
@@ -24,12 +51,12 @@ export function isSpotifyConnected(): boolean {
 }
 
 export function disconnectSpotify(): void {
-  localStorage.removeItem(TOKENS_KEY)
+  localStorage.removeItem(tokensKey())
 }
 
 function readTokens(): SpotifyTokens | null {
   try {
-    const raw = localStorage.getItem(TOKENS_KEY)
+    const raw = localStorage.getItem(tokensKey())
     return raw === null ? null : (JSON.parse(raw) as SpotifyTokens)
   } catch {
     return null
@@ -37,7 +64,7 @@ function readTokens(): SpotifyTokens | null {
 }
 
 function storeTokens(tokens: SpotifyTokens): void {
-  localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens))
+  localStorage.setItem(tokensKey(), JSON.stringify(tokens))
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {

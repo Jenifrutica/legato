@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { XIcon } from '../../ui/icons'
+import { useAuth } from '../auth'
+import { usePlayLogStore } from '../capsule'
 import { useMusicianStore } from '../musician'
+import { deleteUserData } from '../persistence'
 import { isJamendoConfigured } from './jamendo'
 import { useProvidersStore } from './providers-store'
 import {
@@ -23,6 +26,30 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const [testResult, setTestResult] = useState<string | null>(null)
   const musicianEnabled = useMusicianStore((state) => state.enabled)
   const setMusicianEnabled = useMusicianStore((state) => state.setEnabled)
+  const { user, deleteAccount } = useAuth()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteBusy, setDeleteBusy] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  async function confirmDeleteAccount() {
+    if (user === null) {
+      return
+    }
+    setDeleteBusy(true)
+    setDeleteError(null)
+    try {
+      const userId = user.id
+      await deleteAccount(deletePassword === '' ? undefined : deletePassword)
+      await deleteUserData(userId)
+      usePlayLogStore.getState().clear()
+    } catch {
+      setDeleteError(t('auth.errorUnknown'))
+    } finally {
+      setDeleteBusy(false)
+      setDeletePassword('')
+    }
+  }
 
   async function testConnection() {
     setTestResult(t('settings.testing'))
@@ -179,6 +206,69 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             />
           </div>
         </section>
+
+        {user !== null && (
+          <section aria-label={t('auth.account')} className="mt-5">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              {t('auth.account')}
+            </h3>
+
+            <div className="mt-3 border border-border bg-bg/50 p-3">
+              <p className="text-sm font-medium">{user.name}</p>
+              <p className="truncate text-xs text-ink-muted">{user.email}</p>
+
+              {!deleteOpen ? (
+                <button
+                  className="mt-3 border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-danger hover:text-danger"
+                  onClick={() => setDeleteOpen(true)}
+                  type="button"
+                >
+                  {t('auth.deleteAccount')}
+                </button>
+              ) : (
+                <div className="mt-3 flex flex-col gap-2">
+                  <p className="text-xs leading-relaxed text-ink-muted">{t('auth.deleteHint')}</p>
+                  <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
+                    {t('auth.deletePassword')}
+                    <input
+                      autoComplete="current-password"
+                      className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
+                      onChange={(event) => setDeletePassword(event.target.value)}
+                      type="password"
+                      value={deletePassword}
+                    />
+                  </label>
+                  {deleteError !== null && (
+                    <p className="text-xs text-danger" role="alert">
+                      {deleteError}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      className="border-2 border-danger bg-surface px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-danger uppercase disabled:opacity-60"
+                      disabled={deleteBusy}
+                      onClick={() => void confirmDeleteAccount()}
+                      type="button"
+                    >
+                      {t('auth.deleteConfirm')}
+                    </button>
+                    <button
+                      className="border-2 border-rule/40 px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase"
+                      onClick={() => {
+                        setDeleteOpen(false)
+                        setDeletePassword('')
+                        setDeleteError(null)
+                      }}
+                      type="button"
+                    >
+                      {t('auth.deleteCancel')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )

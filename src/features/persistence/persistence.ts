@@ -13,47 +13,122 @@ import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
 import { usePlaylistsStore } from '../playlists'
 import type { PlaylistRestoreRecord } from '../playlists'
 import { usePlayerStore } from '../../player'
+import type { Table } from 'dexie'
 import { getDatabase } from './db'
 import type { SessionRecord } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
 
-export async function hydrateStores(): Promise<boolean> {
+let activeUserId: string | null = null
+let persistenceCleanup: (() => void) | null = null
+
+export function getActiveUserId(): string | null {
+  return activeUserId
+}
+
+export function setActiveUserId(userId: string | null): void {
+  activeUserId = userId
+}
+
+function scopeKey(userId: string): string {
+  return `current:${userId}`
+}
+
+/**
+ * El primer usuario adopta los datos que quedaron sin dueño (biblioteca,
+ * playlists, sesión y análisis previos a las cuentas).
+ */
+export async function adoptOrphanData(userId: string): Promise<void> {
   const db = getDatabase()
   if (db === null) {
+    return
+  }
+
+  const tables = [
+    db.songs,
+    db.playlists,
+    db.analysis,
+    db.chords,
+    db.setlists,
+    db.notes,
+    db.lyrics,
+  ] as unknown as Array<Table<{ userId?: string }>>
+
+  for (const table of tables) {
+    const records = await table.toArray()
+    const orphans = records.filter((record) => record.userId == null)
+    if (orphans.length > 0) {
+      await table.bulkPut(orphans.map((record) => ({ ...record, userId })))
+    }
+  }
+
+  const legacy = await db.session.get('current')
+  if (legacy !== undefined) {
+    await db.session.put({ ...legacy, key: scopeKey(userId) })
+    await db.session.delete('current')
+  }
+}
+
+export async function hydrateStores(): Promise<boolean> {
+  const db = getDatabase()
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return false
   }
 
-  const songRecords = await db.songs.toArray()
+  const songRecords = await db.songs.where('userId').equals(userId).toArray()
   const tracks = songRecords.map(recordToTrack)
   useLibraryStore.getState().hydrate(tracks)
 
-  const playlistRecords = await db.playlists.toArray()
+  const playlistRecords = await db.playlists.where('userId').equals(userId).toArray()
   usePlaylistsStore.getState().hydrate(playlistRecords, tracks)
 
-  const session = await db.session.get('current')
+  const session = await db.session.get(scopeKey(userId))
   if (session !== undefined) {
     usePlayerStore.getState().restoreSession(session)
   }
 
-  const analysisRecords = await db.analysis.toArray()
+  const analysisRecords = await db.analysis.where('userId').equals(userId).toArray()
   useTrackAnalysisStore.getState().hydrate(analysisRecords)
 
-  const chordRecords = await db.chords.toArray()
+  const chordRecords = await db.chords.where('userId').equals(userId).toArray()
   useChordStore.getState().hydrate(chordRecords)
 
-  const setlistRecords = await db.setlists.toArray()
+  const setlistRecords = await db.setlists.where('userId').equals(userId).toArray()
   useSetlistStore.getState().hydrate(setlistRecords)
 
-  const noteRecords = await db.notes.toArray()
+  const noteRecords = await db.notes.where('userId').equals(userId).toArray()
   useNotesStore.getState().hydrate(noteRecords)
 
-  const lyricsRecords = await db.lyrics.toArray()
+  const lyricsRecords = await db.lyrics.where('userId').equals(userId).toArray()
   useLocalLyricsStore.getState().hydrate(lyricsRecords)
 
   return true
 }
 
+/** Vacía los stores al cerrar sesión (los datos siguen en la base por usuario). */
+export function resetStores(): void {
+  usePlayerStore.getState().pause()
+  usePlayerStore.setState({
+    currentTrack: null,
+    queue: [],
+    queueStructure: [],
+    currentTime: 0,
+    duration: 0,
+  })
+  useLibraryStore.getState().hydrate([])
+  usePlaylistsStore.getState().hydrate([], [])
+  useTrackAnalysisStore.getState().hydrate([])
+  useChordStore.getState().hydrate([])
+  useSetlistStore.getState().hydrate([])
+  useNotesStore.getState().hydrate([])
+  useLocalLyricsStore.getState().hydrate([])
+}
+
 export function startPersistence(): void {
+  if (persistenceCleanup !== null || activeUserId === null) {
+    return
+  }
+
   const db = getDatabase()
   if (db === null) {
     return
@@ -68,87 +143,99 @@ export function startPersistence(): void {
   let lastLyrics = useLocalLyricsStore.getState().records
   let sessionTimer: ReturnType<typeof setTimeout> | null = null
 
-  useLibraryStore.subscribe((state) => {
-    if (state.tracks === lastTracks) {
-      return
-    }
-    lastTracks = state.tracks
-    void syncSongs(state.tracks)
-  })
+  const unsubscribers = [
+    useLibraryStore.subscribe((state) => {
+      if (state.tracks === lastTracks) {
+        return
+      }
+      lastTracks = state.tracks
+      void syncSongs(state.tracks)
+    }),
+    usePlaylistsStore.subscribe((state) => {
+      if (state.playlists === lastPlaylists) {
+        return
+      }
+      lastPlaylists = state.playlists
+      void syncPlaylists(state.playlists)
+    }),
+    useTrackAnalysisStore.subscribe((state) => {
+      if (state.records === lastAnalysis) {
+        return
+      }
+      lastAnalysis = state.records
+      void syncAnalysis(state.records)
+    }),
+    useChordStore.subscribe((state) => {
+      if (state.records === lastChords) {
+        return
+      }
+      lastChords = state.records
+      void syncChords(state.records)
+    }),
+    useSetlistStore.subscribe((state) => {
+      if (state.setlists === lastSetlists) {
+        return
+      }
+      lastSetlists = state.setlists
+      void syncSetlists(state.setlists)
+    }),
+    useNotesStore.subscribe((state) => {
+      if (state.records === lastNotes) {
+        return
+      }
+      lastNotes = state.records
+      void syncNotes(state.records)
+    }),
+    useLocalLyricsStore.subscribe((state) => {
+      if (state.records === lastLyrics) {
+        return
+      }
+      lastLyrics = state.records
+      void syncLyrics(state.records)
+    }),
+    usePlayerStore.subscribe(() => {
+      if (sessionTimer !== null) {
+        return
+      }
+      sessionTimer = setTimeout(() => {
+        sessionTimer = null
+        void saveCurrentSession()
+      }, 1500)
+    }),
+  ]
 
-  usePlaylistsStore.subscribe((state) => {
-    if (state.playlists === lastPlaylists) {
-      return
-    }
-    lastPlaylists = state.playlists
-    void syncPlaylists(state.playlists)
-  })
-
-  useTrackAnalysisStore.subscribe((state) => {
-    if (state.records === lastAnalysis) {
-      return
-    }
-    lastAnalysis = state.records
-    void syncAnalysis(state.records)
-  })
-
-  useChordStore.subscribe((state) => {
-    if (state.records === lastChords) {
-      return
-    }
-    lastChords = state.records
-    void syncChords(state.records)
-  })
-
-  useSetlistStore.subscribe((state) => {
-    if (state.setlists === lastSetlists) {
-      return
-    }
-    lastSetlists = state.setlists
-    void syncSetlists(state.setlists)
-  })
-
-  useNotesStore.subscribe((state) => {
-    if (state.records === lastNotes) {
-      return
-    }
-    lastNotes = state.records
-    void syncNotes(state.records)
-  })
-
-  useLocalLyricsStore.subscribe((state) => {
-    if (state.records === lastLyrics) {
-      return
-    }
-    lastLyrics = state.records
-    void syncLyrics(state.records)
-  })
-
-  usePlayerStore.subscribe(() => {
-    if (sessionTimer !== null) {
-      return
-    }
-
-    sessionTimer = setTimeout(() => {
-      sessionTimer = null
-      void saveCurrentSession()
-    }, 1500)
-  })
-
-  window.addEventListener('pagehide', () => {
+  const onPageHide = () => {
     void saveCurrentSession()
-  })
+  }
+  window.addEventListener('pagehide', onPageHide)
+
+  persistenceCleanup = () => {
+    for (const unsubscribe of unsubscribers) {
+      unsubscribe()
+    }
+    if (sessionTimer !== null) {
+      clearTimeout(sessionTimer)
+      sessionTimer = null
+    }
+    window.removeEventListener('pagehide', onPageHide)
+  }
+}
+
+export function stopPersistence(): void {
+  persistenceCleanup?.()
+  persistenceCleanup = null
 }
 
 export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  const records = tracks.map(trackToRecord)
+  const records = tracks.map((track) => trackToRecord(track, userId))
   const ids = new Set(records.map((record) => record.id))
-  const existing = await db.songs.toCollection().primaryKeys()
+  const existing = await db.songs.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.songs, db.analysis, db.chords, db.notes, db.lyrics, async () => {
@@ -168,15 +255,17 @@ export async function syncSongs(tracks: LibraryTrack[]): Promise<void> {
 
 export async function syncAnalysis(records: Record<string, TrackAnalysis>): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  // Solo se persiste el análisis de pistas que siguen en la biblioteca.
   const known = new Set(useLibraryStore.getState().tracks.map((track) => track.id))
-  const values = Object.values(records).filter((record) => known.has(record.trackId))
+  const values = Object.values(records)
+    .filter((record) => known.has(record.trackId))
+    .map((record) => ({ ...record, userId }))
   const ids = new Set(values.map((record) => record.trackId))
-  const existing = await db.analysis.toCollection().primaryKeys()
+  const existing = await db.analysis.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.analysis, async () => {
@@ -189,15 +278,17 @@ export async function syncAnalysis(records: Record<string, TrackAnalysis>): Prom
 
 export async function syncChords(records: Record<string, ChordSheet>): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  // Solo se persiste la hoja de acordes de pistas que siguen en la biblioteca.
   const known = new Set(useLibraryStore.getState().tracks.map((track) => track.id))
-  const values = Object.values(records).filter((record) => known.has(record.trackId))
+  const values = Object.values(records)
+    .filter((record) => known.has(record.trackId))
+    .map((record) => ({ ...record, userId }))
   const ids = new Set(values.map((record) => record.trackId))
-  const existing = await db.chords.toCollection().primaryKeys()
+  const existing = await db.chords.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.chords, async () => {
@@ -210,15 +301,17 @@ export async function syncChords(records: Record<string, ChordSheet>): Promise<v
 
 export async function syncLyrics(records: Record<string, LocalLyrics>): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  // Solo se persiste la letra local de pistas que siguen en la biblioteca.
   const known = new Set(useLibraryStore.getState().tracks.map((track) => track.id))
-  const values = Object.values(records).filter((record) => known.has(record.trackId))
+  const values = Object.values(records)
+    .filter((record) => known.has(record.trackId))
+    .map((record) => ({ ...record, userId }))
   const ids = new Set(values.map((record) => record.trackId))
-  const existing = await db.lyrics.toCollection().primaryKeys()
+  const existing = await db.lyrics.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.lyrics, async () => {
@@ -231,12 +324,14 @@ export async function syncLyrics(records: Record<string, LocalLyrics>): Promise<
 
 export async function syncPlaylists(playlists: PlaylistRestoreRecord[]): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  const ids = new Set(playlists.map((playlist) => playlist.id))
-  const existing = await db.playlists.toCollection().primaryKeys()
+  const records = playlists.map((playlist) => ({ ...playlist, userId }))
+  const ids = new Set(records.map((playlist) => playlist.id))
+  const existing = await db.playlists.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.playlists, db.notes, async () => {
@@ -247,35 +342,37 @@ export async function syncPlaylists(playlists: PlaylistRestoreRecord[]): Promise
         .anyOf(stale.map((id) => ['playlist', id]))
         .delete()
     }
-    await db.playlists.bulkPut(playlists)
+    await db.playlists.bulkPut(records)
   })
 }
 
 export async function syncSetlists(setlists: Setlist[]): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  const ids = new Set(setlists.map((setlist) => setlist.id))
-  const existing = await db.setlists.toCollection().primaryKeys()
+  const records = setlists.map((setlist) => ({ ...setlist, userId }))
+  const ids = new Set(records.map((setlist) => setlist.id))
+  const existing = await db.setlists.where('userId').equals(userId).primaryKeys()
   const stale = existing.filter((id) => !ids.has(id))
 
   await db.transaction('rw', db.setlists, async () => {
     if (stale.length > 0) {
       await db.setlists.bulkDelete(stale)
     }
-    await db.setlists.bulkPut(setlists)
+    await db.setlists.bulkPut(records)
   })
 }
 
 export async function syncNotes(records: Record<string, Note>): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
-  // Solo se persisten notas de pistas y playlists que existen.
   const known = new Set<string>()
   for (const track of useLibraryStore.getState().tracks) {
     known.add(noteKey('track', track.id))
@@ -284,11 +381,11 @@ export async function syncNotes(records: Record<string, Note>): Promise<void> {
     known.add(noteKey('playlist', playlist.id))
   }
 
-  const values = Object.values(records).filter((note) =>
-    known.has(noteKey(note.targetType, note.targetId)),
-  )
+  const values = Object.values(records)
+    .filter((note) => known.has(noteKey(note.targetType, note.targetId)))
+    .map((note) => ({ ...note, userId }))
   const keep = new Set(values.map((note) => noteKey(note.targetType, note.targetId)))
-  const existing = await db.notes.toArray()
+  const existing = await db.notes.where('userId').equals(userId).toArray()
   const stale = existing.filter((note) => !keep.has(noteKey(note.targetType, note.targetId)))
 
   await db.transaction('rw', db.notes, async () => {
@@ -301,13 +398,14 @@ export async function syncNotes(records: Record<string, Note>): Promise<void> {
 
 export async function saveCurrentSession(): Promise<void> {
   const db = getDatabase()
-  if (db === null) {
+  const userId = activeUserId
+  if (db === null || userId === null) {
     return
   }
 
   const snapshot = usePlayerStore.getState()
   const record: SessionRecord = {
-    key: 'current',
+    key: scopeKey(userId),
     trackIds: snapshot.queue.map((track) => track.id),
     currentId: snapshot.currentTrack?.id ?? null,
     currentTime: snapshot.currentTime,
@@ -321,4 +419,40 @@ export async function saveCurrentSession(): Promise<void> {
   }
 
   await db.session.put(record)
+}
+
+/** Borra todos los datos musicales de un usuario (al eliminar su cuenta). */
+export async function deleteUserData(userId: string): Promise<void> {
+  const db = getDatabase()
+  if (db === null) {
+    return
+  }
+
+  await db.transaction(
+    'rw',
+    [
+      db.songs,
+      db.playlists,
+      db.session,
+      db.analysis,
+      db.chords,
+      db.setlists,
+      db.notes,
+      db.lyrics,
+      db.authSessions,
+      db.users,
+    ],
+    async () => {
+      await db.songs.where('userId').equals(userId).delete()
+      await db.playlists.where('userId').equals(userId).delete()
+      await db.analysis.where('userId').equals(userId).delete()
+      await db.chords.where('userId').equals(userId).delete()
+      await db.setlists.where('userId').equals(userId).delete()
+      await db.notes.where('userId').equals(userId).delete()
+      await db.lyrics.where('userId').equals(userId).delete()
+      await db.authSessions.where('userId').equals(userId).delete()
+      await db.session.delete(scopeKey(userId))
+      await db.users.delete(userId)
+    },
+  )
 }

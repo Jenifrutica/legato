@@ -13,9 +13,15 @@ export type {
 } from './db'
 export { recordToTrack, trackToRecord } from './mappers'
 export {
+  adoptOrphanData,
+  deleteUserData,
+  getActiveUserId,
   hydrateStores,
+  resetStores,
   saveCurrentSession,
+  setActiveUserId,
   startPersistence,
+  stopPersistence,
   syncAnalysis,
   syncChords,
   syncLyrics,

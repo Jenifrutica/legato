@@ -31,13 +31,13 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Dónde se guardan',
           paragraphs: [
-            'En tu propio navegador (IndexedDB y almacenamiento local). Si activas la sincronización, se almacenan en infraestructura de AWS (S3/CloudFront) con cifrado en tránsito.',
+            'Tu biblioteca de audio en tu propio navegador (IndexedDB y almacenamiento local); los datos de tu cuenta (correo, nombre y contraseña cifrada) los gestiona Firebase Authentication. Si activas la sincronización, se almacenan en infraestructura de AWS (S3/CloudFront) con cifrado en tránsito.',
           ],
         },
         {
           heading: 'Terceros',
           paragraphs: [
-            'AWS como proveedor de hosting; Google para inicio de sesión, ACRCloud para reconocimiento por micrófono y LRCLIB para buscar letras sincronizadas enviando el título, artista y álbum de la canción en reproducción (lrclib.net). No vendemos ni compartimos tus datos con fines comerciales.',
+            'Firebase Authentication (Google) para crear tu cuenta y verificar tu correo, con contraseña o con Google; AWS como proveedor de hosting; ACRCloud para reconocimiento por micrófono y LRCLIB para buscar letras sincronizadas enviando el título, artista y álbum de la canción en reproducción (lrclib.net). No vendemos ni compartimos tus datos con fines comerciales.',
           ],
         },
         {
@@ -193,7 +193,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Third parties',
           paragraphs: [
-            'AWS as hosting provider; Google for sign-in, ACRCloud for microphone recognition and LRCLIB to look up synced lyrics by sending the title, artist and album of the playing song (lrclib.net). We never sell your data.',
+            'Firebase Authentication (Google) to create and verify your account, with password or Google sign-in; AWS as hosting provider; ACRCloud for microphone recognition and LRCLIB to look up synced lyrics by sending the title, artist and album of the playing song (lrclib.net). We never sell your data.',
           ],
         },
         {
@@ -347,7 +347,7 @@ export const LEGAL_DOCUMENTS: LegalDocumentsByLanguage = {
         {
           heading: 'Terceiros',
           paragraphs: [
-            'AWS como hospedagem; Google para login, ACRCloud para reconhecimento por microfone e LRCLIB para buscar letras sincronizadas enviando título, artista e álbum da música em reprodução (lrclib.net). Nunca vendemos seus dados.',
+            'Firebase Authentication (Google) para criar e verificar sua conta, com senha ou login Google; AWS como hospedagem; ACRCloud para reconhecimento por microfone e LRCLIB para buscar letras sincronizadas enviando título, artista e álbum da música em reprodução (lrclib.net). Nunca vendemos seus dados.',
           ],
         },
         {

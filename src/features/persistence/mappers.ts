@@ -1,9 +1,10 @@
 import type { LibraryTrack } from '../library'
 import type { SongRecord } from './db'
 
-export function trackToRecord(track: LibraryTrack): SongRecord {
+export function trackToRecord(track: LibraryTrack, userId?: string): SongRecord {
   return {
     id: track.id,
+    ...(userId === undefined ? {} : { userId }),
     title: track.title,
     artist: track.artist,
     album: track.album,

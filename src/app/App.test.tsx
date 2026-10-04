@@ -1,16 +1,16 @@
-import { render, screen } from '@testing-library/react'
-import App from './App'
+import { screen } from '@testing-library/react'
+import { renderApp } from './test-auth'
 
 describe('App', () => {
-  it('muestra el nombre del proyecto', () => {
-    render(<App />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Legato' })).toBeInTheDocument()
+  it('muestra el nombre del proyecto', async () => {
+    renderApp()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Legato' })).toBeInTheDocument()
   })
 
-  it('expone los landmarks principales del shell', () => {
-    render(<App />)
+  it('expone los landmarks principales del shell', async () => {
+    renderApp()
 
-    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(await screen.findByRole('main')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Saltar al contenido' })).toBeInTheDocument()
     expect(
       screen.getAllByRole('slider', { name: 'Progreso de la canción' }).length,
@@ -22,12 +22,19 @@ describe('App', () => {
     expect(screen.getAllByText('Biblioteca').length).toBeGreaterThan(0)
   })
 
-  it('ofrece las pestañas del panel lateral', () => {
-    render(<App />)
+  it('ofrece las pestañas del panel lateral', async () => {
+    renderApp()
 
-    expect(screen.getByRole('tab', { name: 'Biblioteca' })).toBeInTheDocument()
+    expect(await screen.findByRole('tab', { name: 'Biblioteca' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Playlists' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Lista' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Audio' })).toBeInTheDocument()
+  })
+
+  it('sin sesión muestra la puerta de entrada', async () => {
+    renderApp({ user: null })
+
+    expect(await screen.findByRole('tab', { name: 'Crear cuenta' })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: 'Biblioteca' })).not.toBeInTheDocument()
   })
 })

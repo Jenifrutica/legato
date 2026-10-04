@@ -1,11 +1,21 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
 import { useLocalLyricsStore } from '../lyrics'
 import { useChordStore, useNotesStore, useSetlistStore, useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
-import { syncAnalysis, syncChords, syncLyrics, syncNotes, syncSetlists } from './persistence'
+import {
+  adoptOrphanData,
+  deleteUserData,
+  hydrateStores,
+  setActiveUserId,
+  syncAnalysis,
+  syncChords,
+  syncLyrics,
+  syncNotes,
+  syncSetlists,
+} from './persistence'
 
 function track(id: string): LibraryTrack {
   return {
@@ -58,6 +68,8 @@ describe('persistence database', () => {
       await db.chords.clear()
       await db.setlists.clear()
       await db.notes.clear()
+      await db.users.clear()
+      await db.authSessions.clear()
       await db.lyrics.clear()
     }
     useLibraryStore.getState().hydrate([])
@@ -66,6 +78,11 @@ describe('persistence database', () => {
     useSetlistStore.getState().hydrate([])
     useNotesStore.getState().hydrate([])
     useLocalLyricsStore.getState().hydrate([])
+    setActiveUserId('u1')
+  })
+
+  afterEach(() => {
+    setActiveUserId(null)
   })
 
   it('guarda y carga canciones con blob', async () => {
@@ -75,7 +92,7 @@ describe('persistence database', () => {
       return
     }
 
-    await db.songs.put(trackToRecord(track('a')))
+    await db.songs.put({ ...trackToRecord(track('a')), externalUrl: 'spotify:track:a' })
     const records = await db.songs.toArray()
 
     expect(records).toHaveLength(1)
@@ -212,7 +229,13 @@ describe('persistence database', () => {
     }
 
     useLibraryStore.getState().hydrate([track('a')])
-    await db.notes.put({ targetType: 'track', targetId: 'ghost', text: 'no', updatedAt: 1 })
+    await db.notes.put({
+      targetType: 'track',
+      targetId: 'ghost',
+      text: 'no',
+      updatedAt: 1,
+      userId: 'u1',
+    })
     await syncNotes({
       'track:a': { targetType: 'track', targetId: 'a', text: 'sí', updatedAt: 1 },
     })
@@ -233,6 +256,65 @@ describe('persistence database', () => {
     const record = await db.lyrics.get('a')
 
     expect(record?.text).toBe('[00:01.00]Hola')
+  })
+
+  it('adopta los datos sin dueño y los hidrata solo para ese usuario', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.songs.put({ ...trackToRecord(track('a')), externalUrl: 'spotify:track:a' })
+    await db.analysis.put({ trackId: 'a', bpm: 120, key: null, updatedAt: 1 })
+
+    await adoptOrphanData('u1')
+    expect((await db.songs.get('a'))?.userId).toBe('u1')
+    expect((await db.analysis.get('a'))?.userId).toBe('u1')
+
+    await hydrateStores()
+    expect(useLibraryStore.getState().tracks.map((item) => item.id)).toEqual(['a'])
+    expect(useTrackAnalysisStore.getState().records.a?.bpm).toBe(120)
+
+    setActiveUserId('u2')
+    await hydrateStores()
+    expect(useLibraryStore.getState().tracks).toHaveLength(0)
+    expect(useTrackAnalysisStore.getState().records.a).toBeUndefined()
+  })
+
+  it('deleteUserData borra todo lo del usuario y respeta lo ajeno', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.users.put({
+      id: 'u1',
+      email: 'u1@legato.local',
+      name: 'Uno',
+      passwordHash: 'x',
+      salt: 'y',
+      iterations: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    })
+    await db.songs.bulkPut([trackToRecord(track('a'), 'u1'), trackToRecord(track('b'), 'u2')])
+    await db.playlists.put({
+      id: 'p1',
+      name: 'Uno',
+      createdAt: 1,
+      updatedAt: 1,
+      trackIds: ['a'],
+      userId: 'u1',
+    })
+
+    await deleteUserData('u1')
+
+    expect(await db.users.get('u1')).toBeUndefined()
+    expect(await db.songs.get('a')).toBeUndefined()
+    expect(await db.playlists.get('p1')).toBeUndefined()
+    expect((await db.songs.get('b'))?.userId).toBe('u2')
   })
 
   it('syncLyrics descarta pistas que ya no están en la biblioteca', async () => {
