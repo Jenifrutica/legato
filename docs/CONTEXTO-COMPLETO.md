@@ -466,3 +466,12 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Persistencia por pista** en IndexedDB: Dexie sube a **versión 2** con la tabla `analysis` (`trackId`); `hydrateStores` la carga y `startPersistence` la sincroniza; al borrar una canción se limpia su análisis. Tabla en ES/EN/PT.
 - **UI** (pestaña Práctica): panel «BPM y tonalidad» con BPM manual (30–240), botón **Detectar BPM**, mensaje de estimación, selector de **tonalidad** (24 mayores/menores) y botón **Usar en el metrónomo**. La detección se desactiva en referencias externas de Spotify (DRM) con aviso para escribir el BPM a mano.
 - **Tests** (9 nuevos): estimador sintético a 120/100, silencio y audio corto; store (clamp, alta/borrado de campos, conservación); persistencia (guardar/leer y `syncAnalysis` descarta pistas borradas). Total: **220 unit + 6 E2E**; verificado en navegador (detectó 120 y persistió BPM/tonalidad tras recargar).
+
+### C3 ChordPro propio y transposición (implementado)
+
+- **Parser propio** `chordpro.ts`: `[Acorde]letra`, directivas `{title}/{artist}/{key}/{comment}`, secciones (`start_of_chorus`/`soc` y equivalentes) y `#`; los metadatos desconocidos se conservan. `parseChordProLine` reparte cada acorde sobre el texto que le sigue.
+- **Transposición** `transposeChord` (±11 semitonos, enarmonía según sostenidos/bemoles del original, acordes con barra como `G/B`) y `transposeSong` (acordes + tonalidad, sin tocar la letra).
+- **Hojas por pista** en IndexedDB: Dexie sube a **versión 3** con la tabla `chords` (`trackId`); hidratación y `syncChords` en la persistencia, limpieza al borrar la canción.
+- **UI** (pestaña **Acordes**): importar `.cho/.pro` o pegar texto, editor con autoguardado (debounce 400 ms), botones − / + de transporte con «Original», y vista en `<ruby>` (acorde sobre la sílaba, en tinta directa) con título/artista y `Tono: X`. i18n ES/EN/PT.
+- **Tests** (12 nuevos): parser (tokens, secciones, comentarios, directivas desconocidas), transporte (mayores, menores, séptimas, octava, bemoles, barras, acordes inválidos), `transposeSong` y persistencia/store de hojas. Total: **232 unit + 6 E2E**; verificado en navegador (G→A con `+2`, persistencia tras recargar, sin errores).
+- Detector de impeccable: se corrigió un `text-[0.625rem]` fuera de la rampa a `0.6875rem`; resultado `[]`.

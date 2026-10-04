@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
-import { useTrackAnalysisStore } from '../musician'
+import { useChordStore, useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
-import { syncAnalysis } from './persistence'
+import { syncAnalysis, syncChords } from './persistence'
 
 function track(id: string): LibraryTrack {
   return {
@@ -54,9 +54,11 @@ describe('persistence database', () => {
       await db.playlists.clear()
       await db.session.clear()
       await db.analysis.clear()
+      await db.chords.clear()
     }
     useLibraryStore.getState().hydrate([])
     useTrackAnalysisStore.getState().hydrate([])
+    useChordStore.getState().hydrate([])
   })
 
   it('guarda y carga canciones con blob', async () => {
@@ -140,6 +142,36 @@ describe('persistence database', () => {
     })
 
     const keys = await db.analysis.toCollection().primaryKeys()
+    expect(keys).toEqual(['a'])
+  })
+
+  it('guarda y carga hojas ChordPro por pista', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    await db.chords.put({ trackId: 'a', text: '[C]Hola', updatedAt: 1 })
+    const record = await db.chords.get('a')
+
+    expect(record?.text).toBe('[C]Hola')
+  })
+
+  it('syncChords descarta pistas que ya no están en la biblioteca', async () => {
+    const db = getDatabase()
+    expect(db).not.toBeNull()
+    if (db === null) {
+      return
+    }
+
+    useLibraryStore.getState().hydrate([track('a')])
+    await syncChords({
+      a: { trackId: 'a', text: '[C]Hola', updatedAt: 1 },
+      ghost: { trackId: 'ghost', text: '[G]Fantasma', updatedAt: 1 },
+    })
+
+    const keys = await db.chords.toCollection().primaryKeys()
     expect(keys).toEqual(['a'])
   })
 })

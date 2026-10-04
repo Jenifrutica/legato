@@ -1,7 +1,7 @@
 import Dexie from 'dexie'
 import type { Table } from 'dexie'
 import type { LibraryTrack } from '../library'
-import type { TrackAnalysis } from '../musician'
+import type { ChordSheet, TrackAnalysis } from '../musician'
 import type { PlaylistRestoreRecord } from '../playlists'
 import type { ChannelMode, LoopMode } from '../../player'
 
@@ -17,6 +17,8 @@ export type SongRecord = Omit<
 export type PlaylistRecord = PlaylistRestoreRecord
 
 export type AnalysisRecord = TrackAnalysis
+
+export type ChordRecord = ChordSheet
 
 export type SessionRecord = {
   key: string
@@ -37,6 +39,7 @@ class LegatoDatabase extends Dexie {
   playlists!: Table<PlaylistRecord, string>
   session!: Table<SessionRecord, string>
   analysis!: Table<AnalysisRecord, string>
+  chords!: Table<ChordRecord, string>
 
   constructor() {
     super('legato')
@@ -50,6 +53,13 @@ class LegatoDatabase extends Dexie {
       playlists: 'id',
       session: 'key',
       analysis: 'trackId',
+    })
+    this.version(3).stores({
+      songs: 'id',
+      playlists: 'id',
+      session: 'key',
+      analysis: 'trackId',
+      chords: 'trackId',
     })
   }
 }

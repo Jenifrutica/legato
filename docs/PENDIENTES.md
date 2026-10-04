@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 220 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 232 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -90,15 +90,15 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 |---|---|
 | **Metrónomo** | **Hecho (C1)**: motor Web Audio con lookahead, BPM 30–240, compases 2/4 · 3/4 · 4/4 · 6/8 (acento en 1 y 4), tap tempo, volumen; pestaña Práctica del panel de músicos; toggle «Modo músico» en Ajustes. Verificado y con tests |
 | **BPM/tonalidad** | **Hecho (C2)**: estimador propio (paso-bajos + envolvente de ataques + autocorrelación), BPM manual y tonalidad manual persistidos por pista (IndexedDB, tabla `analysis`), botón «Usar en el metrónomo». Verificado con las pistas de prueba (120/100 exactos) |
-| **ChordPro** | Parser `[Acorde]` + letra; vista de acordes sobre la letra; archivos `.cho`/`.pro` importables; sincronía opcional |
-| **Transposición** | ±11 semitonos sobre ChordPro/LRC, con enarmonía correcta |
+| **ChordPro** | **Hecho (C3)**: parser propio `[Acorde]` + letra, directivas/secciones/comentarios; archivos `.cho`/`.pro` importables o pegados; editor con autoguardado y vista `<ruby>`; sin sincronía con audio (opcional, no pedida) |
+| **Transposición** | **Hecho (C3)**: ±11 semitonos sobre ChordPro (acordes con barra y enarmonía correcta); solo cambia la vista, la hoja original no se toca |
 | **LRC local** | Cargar `.lrc` junto al audio (File System Access API o input) y usarlo antes que LRCLIB |
 | **Pitch shift** | Cambiar tono sin cambiar tempo (fase/vocoder; considerar librería o `detune` con trade-offs); UI en el panel |
 | **Setlists** | Orden de ensayo sobre las playlists (otra DLL): reordenar, marcar tocadas |
 | **Notas** | Notas por pista/playlist en IndexedDB |
 | **Stems (Demucs)** | Post-entrega (requiere servidor/Python); dejado documentado |
 
-**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ChordPro + transposición (C3) → notas/setlists (C4) → LRC local (C5); pitch shift y stems, post-entrega.
+**Orden:** ~~metrónomo (C1, hecho)~~ → ~~BPM/tonalidad (C2, hecho)~~ → ~~ChordPro + transposición (C3, hecho)~~ → notas/setlists (C4) → LRC local (C5); pitch shift y stems, post-entrega.
 **Criterio:** cada función en el panel de músicos, con i18n, persistencia y tests.
 
 ---
@@ -150,7 +150,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 220 unitarios
+~/.bun/bin/bun run test        # 232 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint
