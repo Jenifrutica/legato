@@ -187,6 +187,7 @@ export const en: typeof es = {
     repeatOne: 'Repeat one',
     speed: 'Playback speed',
     timer: 'Sleep timer',
+    speedSpotify: 'Spotify does not allow changing the speed.',
     volume: 'Volume',
     showVideo: 'Show video',
     hideVideo: 'Hide video',

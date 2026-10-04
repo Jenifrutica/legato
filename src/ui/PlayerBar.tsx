@@ -16,6 +16,7 @@ import {
   SkipBackIcon,
   SkipForwardIcon,
   TimerIcon,
+  VolumeIcon,
 } from './icons'
 
 export function PlayerBar() {
@@ -34,10 +35,16 @@ export function PlayerBar() {
   const seek = usePlayerStore((state) => state.seek)
   const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
   const cycleLoopMode = usePlayerStore((state) => state.cycleLoopMode)
+  const volume = usePlayerStore((state) => state.volume)
+  const rate = usePlayerStore((state) => state.rate)
+  const setVolume = usePlayerStore((state) => state.setVolume)
+  const cycleRate = usePlayerStore((state) => state.cycleRate)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const spotifyToggle = useSpotifyStore((state) => state.toggle)
   const spotifyNext = useSpotifyStore((state) => state.next)
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
+  const spotifyVolume = useSpotifyStore((state) => state.volume)
+  const setSpotifyVolume = useSpotifyStore((state) => state.setVolume)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
 
@@ -199,6 +206,35 @@ export function PlayerBar() {
         <span className="w-9 text-[0.6875rem] tabular-nums text-ink-muted">
           {formatDuration(progressDuration)}
         </span>
+      </div>
+
+      <div className="flex items-center gap-2 px-3 pb-2">
+        <VolumeIcon className="size-4 shrink-0 text-ink-muted" />
+        <input
+          aria-label={t('player.volume')}
+          className="h-3 min-w-0 flex-1 cursor-pointer"
+          max={100}
+          min={0}
+          onChange={(event) => {
+            const value = Number(event.target.value) / 100
+            setVolume(value)
+            if (spotifyActive) {
+              void setSpotifyVolume(value)
+            }
+          }}
+          type="range"
+          value={Math.round((spotifyActive ? spotifyVolume : volume) * 100)}
+        />
+        <button
+          aria-label={t('player.speed')}
+          className="h-8 shrink-0 border-2 border-rule bg-surface px-3 font-mono text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={!hasTrack || spotifyActive}
+          onClick={cycleRate}
+          title={spotifyActive ? t('player.speedSpotify') : undefined}
+          type="button"
+        >
+          {rate}x
+        </button>
       </div>
     </section>
   )

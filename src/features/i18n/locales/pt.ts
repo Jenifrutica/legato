@@ -187,6 +187,7 @@ export const pt: typeof es = {
     repeatOne: 'Repetir uma',
     speed: 'Velocidade de reprodução',
     timer: 'Temporizador',
+    speedSpotify: 'O Spotify não permite alterar a velocidade.',
     volume: 'Volume',
     showVideo: 'Ver vídeo',
     hideVideo: 'Ocultar vídeo',

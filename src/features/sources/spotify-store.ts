@@ -14,6 +14,7 @@ type SpotifyStore = {
   error: string | null
   deviceId: string | null
   playback: SpotifyPlaybackState | null
+  volume: number
   connect: () => Promise<boolean>
   disconnect: () => void
   playUris: (uris: string[]) => Promise<void>
@@ -40,6 +41,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   error: null,
   deviceId: null,
   playback: null,
+  volume: 1,
 
   connect: async () => {
     if (bridge !== null) {
@@ -132,8 +134,10 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   },
 
   setVolume: async (value) => {
+    const volume = Math.min(1, Math.max(0, value))
+    set({ volume })
     if (bridge !== null) {
-      await bridge.setVolume(value)
+      await bridge.setVolume(volume)
     }
   },
 }))

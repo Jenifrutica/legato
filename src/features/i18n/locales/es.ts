@@ -186,6 +186,7 @@ export const es = {
     repeatOne: 'Repetir una',
     speed: 'Velocidad de reproducción',
     timer: 'Temporizador',
+    speedSpotify: 'Spotify no permite cambiar la velocidad.',
     volume: 'Volumen',
     showVideo: 'Ver video',
     hideVideo: 'Ocultar video',

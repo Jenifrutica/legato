@@ -48,6 +48,8 @@ export function Hero() {
   const cycleLoopMode = usePlayerStore((state) => state.cycleLoopMode)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const spotifyToggle = useSpotifyStore((state) => state.toggle)
+  const spotifyVolume = useSpotifyStore((state) => state.volume)
+  const setSpotifyVolume = useSpotifyStore((state) => state.setVolume)
   const spotifyNext = useSpotifyStore((state) => state.next)
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
@@ -249,8 +251,9 @@ export function Hero() {
               <button
                 aria-label={t('player.speed')}
                 className="h-11 border-2 border-rule bg-surface px-4 font-mono text-sm font-semibold text-ink shadow-[3px_3px_0_var(--color-rule)] transition-transform enabled:hover:-translate-y-0.5 enabled:active:translate-y-0.5 enabled:active:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={!hasPlayable}
+                disabled={!hasPlayable || spotifyActive}
                 onClick={cycleRate}
+                title={spotifyActive ? t('player.speedSpotify') : undefined}
                 type="button"
               >
                 {rate}x
@@ -289,9 +292,15 @@ export function Hero() {
                   className="h-3 w-28 cursor-pointer"
                   max={100}
                   min={0}
-                  onChange={(event) => setVolume(Number(event.target.value) / 100)}
+                  onChange={(event) => {
+                    const value = Number(event.target.value) / 100
+                    setVolume(value)
+                    if (spotifyActive) {
+                      void setSpotifyVolume(value)
+                    }
+                  }}
                   type="range"
-                  value={Math.round(volume * 100)}
+                  value={Math.round((spotifyActive ? spotifyVolume : volume) * 100)}
                 />
               </span>
 
