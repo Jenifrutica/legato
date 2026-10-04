@@ -34,6 +34,9 @@ export const es = {
     testing: 'Probando…',
     testOk: 'Conectado como {{name}}',
     testError: 'Error de conexión: {{error}}',
+    musicianMode: 'Modo músico',
+    musicianHint:
+      'Habilita el metrónomo, los acordes, los setlists y las notas en el panel de músicos.',
   },
   testConnection: 'Probar conexión',
   testing: 'Probando…',
@@ -286,6 +289,21 @@ export const es = {
     empty: 'No hay nodos que mostrar. Agrega canciones a una playlist o reproduce algo.',
     explain:
       'Nodos reales de la lista doblemente enlazada: cada tarjeta conoce su prev y su next. El nodo resaltado es el que está sonando y conserva su identidad aunque muevas o elimines otros (fix #12).',
+  },
+  musician: {
+    tabs: 'Secciones del panel de músicos',
+    subtitle: 'modo músico',
+    practice: 'Práctica',
+  },
+  metronome: {
+    title: 'Metrónomo',
+    start: 'Iniciar',
+    stop: 'Detener',
+    bpm: 'BPM',
+    tap: 'Marcar',
+    beats: 'Compás',
+    volume: 'Volumen del clic',
+    hint: 'Clic con acento en el primer tiempo (y el cuarto en 6/8). Suena sobre la música, en local o Spotify.',
   },
   legal: {
     back: 'Volver a la app',

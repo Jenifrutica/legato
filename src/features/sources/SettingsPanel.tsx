@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { XIcon } from '../../ui/icons'
+import { useMusicianStore } from '../musician'
 import { isJamendoConfigured } from './jamendo'
 import { useProvidersStore } from './providers-store'
 import {
@@ -20,6 +21,8 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const setEnabled = useProvidersStore((state) => state.setEnabled)
   const [spotifyConnected, setSpotifyConnected] = useState(isSpotifyConnected())
   const [testResult, setTestResult] = useState<string | null>(null)
+  const musicianEnabled = useMusicianStore((state) => state.enabled)
+  const setMusicianEnabled = useMusicianStore((state) => state.setEnabled)
 
   async function testConnection() {
     setTestResult(t('settings.testing'))
@@ -155,6 +158,26 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
           </div>
 
           <p className="mt-4 text-xs leading-relaxed text-ink-muted">{t('sources.hint')}</p>
+        </section>
+
+        <section aria-label={t('settings.musicianMode')} className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            {t('settings.musicianMode')}
+          </h3>
+
+          <div className="mt-3 flex items-center justify-between gap-3 border border-border bg-bg/50 p-3">
+            <div className="min-w-0">
+              <span className="text-sm font-medium">{t('settings.musicianMode')}</span>
+              <p className="mt-1 text-xs text-ink-muted">{t('settings.musicianHint')}</p>
+            </div>
+            <input
+              aria-label={t('settings.musicianMode')}
+              checked={musicianEnabled}
+              className="size-5 shrink-0 accent-primary"
+              onChange={(event) => setMusicianEnabled(event.target.checked)}
+              type="checkbox"
+            />
+          </div>
         </section>
       </div>
     </div>

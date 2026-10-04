@@ -36,6 +36,8 @@ export const pt: typeof es = {
     testing: 'Testando…',
     testOk: 'Conectado como {{name}}',
     testError: 'Erro de conexão: {{error}}',
+    musicianMode: 'Modo músico',
+    musicianHint: 'Ativa o metrônomo, os acordes, os setlists e as notas no painel de músico.',
   },
   testConnection: 'Testar conexão',
   testing: 'Testando…',
@@ -286,6 +288,21 @@ export const pt: typeof es = {
     empty: 'Nenhum nó para mostrar. Adicione músicas a uma playlist ou reproduza algo.',
     explain:
       'Nós reais da lista duplamente encadeada: cada cartão conhece seu prev e next. O nó destacado está tocando e mantém sua identidade mesmo que você mova ou remova outros (correção do bug #12).',
+  },
+  musician: {
+    tabs: 'Seções do painel de músico',
+    subtitle: 'modo músico',
+    practice: 'Prática',
+  },
+  metronome: {
+    title: 'Metrônomo',
+    start: 'Iniciar',
+    stop: 'Parar',
+    bpm: 'BPM',
+    tap: 'Marcar',
+    beats: 'Compasso',
+    volume: 'Volume do clique',
+    hint: 'Clique com acento no primeiro tempo (e no quarto em 6/8). Soa sobre a música, local ou Spotify.',
   },
   legal: {
     back: 'Voltar ao app',

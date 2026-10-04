@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLyricsStore } from '../features/lyrics'
+import { useMusicianStore } from '../features/musician'
 import { usePlayerStore } from '../player'
 import { XIcon } from './icons'
+import { MetronomePanel } from './MetronomePanel'
 import { StructureView } from './StructureView'
 
 const STORAGE_KEY = 'legato.musicians'
@@ -49,6 +51,9 @@ export function MusiciansPanel() {
   const currentTrackId = usePlayerStore((state) => state.currentTrack?.id ?? null)
   const lyricsEnabled = useLyricsStore((state) => state.enabled)
   const toggleLyrics = useLyricsStore((state) => state.toggle)
+  const musicianEnabled = useMusicianStore((state) => state.enabled)
+  const [tab, setTab] = useState<'structure' | 'practice'>('structure')
+  const activeTab = musicianEnabled ? tab : 'structure'
 
   useEffect(() => {
     try {
@@ -140,7 +145,9 @@ export function MusiciansPanel() {
                   {t('playlists.structure')}
                 </h2>
                 <p className="font-mono text-[0.6875rem] tracking-[0.16em] text-ink-muted uppercase">
-                  {queueStructure.length} nodos · doble enlace
+                  {activeTab === 'structure'
+                    ? `${queueStructure.length} nodos · doble enlace`
+                    : t('musician.subtitle')}
                 </p>
               </div>
               <button
@@ -163,8 +170,47 @@ export function MusiciansPanel() {
               </button>
             </header>
 
+            {musicianEnabled && (
+              <div
+                aria-label={t('musician.tabs')}
+                className="flex border-b-2 border-rule"
+                role="tablist"
+              >
+                <button
+                  aria-selected={activeTab === 'structure'}
+                  className={`px-4 py-2 font-mono text-[0.6875rem] tracking-[0.12em] uppercase transition-colors ${
+                    activeTab === 'structure'
+                      ? 'bg-accent text-on-accent'
+                      : 'text-ink-muted hover:text-ink'
+                  }`}
+                  onClick={() => setTab('structure')}
+                  role="tab"
+                  type="button"
+                >
+                  {t('playlists.structure')}
+                </button>
+                <button
+                  aria-selected={activeTab === 'practice'}
+                  className={`px-4 py-2 font-mono text-[0.6875rem] tracking-[0.12em] uppercase transition-colors ${
+                    activeTab === 'practice'
+                      ? 'bg-accent text-on-accent'
+                      : 'text-ink-muted hover:text-ink'
+                  }`}
+                  onClick={() => setTab('practice')}
+                  role="tab"
+                  type="button"
+                >
+                  {t('musician.practice')}
+                </button>
+              </div>
+            )}
+
             <div className="min-h-0 flex-1 overflow-y-auto">
-              <StructureView currentId={currentTrackId} nodes={queueStructure} />
+              {activeTab === 'structure' ? (
+                <StructureView currentId={currentTrackId} nodes={queueStructure} />
+              ) : (
+                <MetronomePanel />
+              )}
             </div>
           </div>
         </div>

@@ -451,3 +451,10 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 
 - Validación auditiva de la autora con las pistas de prueba (picos a ojo en los golpes, reposo quieto) y afinar presets si hace falta.
 - Documentar en `docs/PENDIENTES.md` §2.
+
+### C1 Metrónomo (fase C, implementado)
+
+- Módulo nuevo `src/features/musician/`: `metronome.ts` (programador puro con lookahead + motor Web Audio + clic sintetizado con oscilador cuadrado y envolvente), `metronome-store.ts` (BPM 30–240, compás, volumen; persistido en `legato.metronome.v1`), `musician-store.ts` (modo músico en `legato.musician.v1`).
+- Compases 2/4, 3/4, 4/4 y 6/8 (acento en el 1 y el 4); tap tempo reutiliza `nextTap` de las ondas; el cambio de BPM reagenda el siguiente pulso desde el último clic; si el reloj se atrasa, se resincroniza sin perder la fase.
+- UI: toggle **«Modo músico»** en Ajustes (apagado por defecto) y pestaña **Práctica** en el panel de músicos (Estructura sigue siempre disponible). i18n ES/EN/PT.
+- Tests: `metronome.test.ts` (acentos, programación a 120 BPM, cambio de BPM, resincronización, motor con contexto falso y sin contexto). Total: **211 unit + 6 E2E**; verificado en navegador con Playwright (inicia/detiene sin errores).

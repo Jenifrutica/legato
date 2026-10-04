@@ -36,6 +36,8 @@ export const en: typeof es = {
     testing: 'Testing…',
     testOk: 'Connected as {{name}}',
     testError: 'Connection error: {{error}}',
+    musicianMode: 'Musician mode',
+    musicianHint: 'Enables the metronome, chords, setlists and notes in the musicians panel.',
   },
   testConnection: 'Test connection',
   testing: 'Testing…',
@@ -286,7 +288,22 @@ export const en: typeof es = {
     next: 'next: {{title}}',
     empty: 'No nodes to show. Add songs to a playlist or play something.',
     explain:
-      'Real doubly linked list nodes: each card knows its prev and next. The highlighted node is playing and keeps its identity even if you move or remove others (bug #12 fix).',
+      'Real nodes of the doubly linked list: each card knows its prev and its next. The highlighted node is the one playing and keeps its identity even if you move or delete others (fix #12).',
+  },
+  musician: {
+    tabs: 'Musician panel sections',
+    subtitle: 'musician mode',
+    practice: 'Practice',
+  },
+  metronome: {
+    title: 'Metronome',
+    start: 'Start',
+    stop: 'Stop',
+    bpm: 'BPM',
+    tap: 'Tap',
+    beats: 'Time signature',
+    volume: 'Click volume',
+    hint: 'Click with an accent on the first beat (and the fourth in 6/8). Plays over the music, locally or on Spotify.',
   },
   legal: {
     back: 'Back to the app',

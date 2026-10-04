@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 202 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 211 unitarios + 6 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -88,7 +88,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 | Función | Notas de diseño |
 |---|---|
-| **Metrónomo** | Click sintético con Web Audio (oscillator + envelope), BPM 30–240, compases 2/4-3/4-4/4, acento en el 1; opción «solo click» o «click sobre la música»; encaja en el panel de músicos |
+| **Metrónomo** | **Hecho (C1)**: motor Web Audio con lookahead, BPM 30–240, compases 2/4 · 3/4 · 4/4 · 6/8 (acento en 1 y 4), tap tempo, volumen; pestaña Práctica del panel de músicos; toggle «Modo músico» en Ajustes. Verificado y con tests |
 | **BPM/tonalidad** | BPM manual por pista (persistido) + estimación por análisis (Web Audio: autocorrelación de onsets); tonalidad manual; sin backend |
 | **ChordPro** | Parser `[Acorde]` + letra; vista de acordes sobre la letra; archivos `.cho`/`.pro` importables; sincronía opcional |
 | **Transposición** | ±11 semitonos sobre ChordPro/LRC, con enarmonía correcta |
@@ -98,7 +98,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 | **Notas** | Notas por pista/playlist en IndexedDB |
 | **Stems (Demucs)** | Post-entrega (requiere servidor/Python); dejado documentado |
 
-**Orden sugerido:** metrónomo → BPM/tonalidad manual → ChordPro + transposición → notas/setlists → LRC local → pitch shift → stems.
+**Orden:** ~~metrónomo (C1, hecho)~~ → BPM/tonalidad manual (C2) → ChordPro + transposición (C3) → notas/setlists (C4) → LRC local (C5); pitch shift y stems, post-entrega.
 **Criterio:** cada función en el panel de músicos, con i18n, persistencia y tests.
 
 ---
@@ -150,7 +150,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 202 unitarios
+~/.bun/bin/bun run test        # 211 unitarios
 ~/.bun/bin/bun run test:e2e    # 6 E2E
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint
