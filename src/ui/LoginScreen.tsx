@@ -34,6 +34,7 @@ export function LoginScreen() {
   const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -49,7 +50,7 @@ export function LoginScreen() {
 
     try {
       if (mode === 'signup') {
-        await signUp({ email, password, name: '' })
+        await signUp({ email, password, name })
       } else if (mode === 'signin') {
         await signIn(email, password)
       } else {
@@ -105,6 +106,21 @@ export function LoginScreen() {
           </div>
 
           <form className="mt-4 flex flex-col gap-3" onSubmit={(event) => void submit(event)}>
+            {mode === 'signup' && (
+              <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
+                {t('auth.name')}
+                <input
+                  autoComplete="name"
+                  autoCorrect="off"
+                  className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
+                  onChange={(event) => setName(event.target.value)}
+                  spellCheck={false}
+                  type="text"
+                  value={name}
+                />
+              </label>
+            )}
+
             <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
               {t('auth.email')}
               <input

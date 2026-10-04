@@ -108,6 +108,7 @@ export const es = {
   auth: {
     signIn: 'Entrar',
     signUp: 'Crear cuenta',
+    name: 'Nombre visible',
     reset: 'Recuperar',
     email: 'Correo',
     password: 'Contraseña',

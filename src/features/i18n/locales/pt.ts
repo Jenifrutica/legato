@@ -109,6 +109,7 @@ export const pt: typeof es = {
   auth: {
     signIn: 'Entrar',
     signUp: 'Criar conta',
+    name: 'Nome visível',
     reset: 'Recuperar',
     email: 'E-mail',
     password: 'Senha',

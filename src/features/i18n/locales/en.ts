@@ -109,6 +109,7 @@ export const en: typeof es = {
   auth: {
     signIn: 'Sign in',
     signUp: 'Create account',
+    name: 'Display name',
     reset: 'Reset',
     email: 'Email',
     password: 'Password',
