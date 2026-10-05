@@ -117,7 +117,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     setSpotifyNeedsScope(false)
 
     try {
-      const tracks = await fetchSpotifyPlaylistTracks(playlist.id)
+      const tracks = await fetchSpotifyPlaylistTracks(playlist.id, 5000)
       const localId = createPlaylist(playlist.name)
       let imported = 0
 

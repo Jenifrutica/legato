@@ -574,6 +574,15 @@ async function searchPlaylistFallback(
   playlistId: string,
   limit: number,
 ): Promise<SourceTrack[]> {
+  // 1) Vía directa: leer las pistas con su `id` por `fields` (funciona en dev
+  //    mode aunque `/tracks` esté bloqueado). Es exacta y rápida.
+  const direct = await fetchPlaylistTracksDirect(token, playlistId, limit)
+  if (direct !== null && direct.length > 0) {
+    console.info('[spotify-import] fallback directo: pistas con id =', direct.length)
+    return direct
+  }
+
+  // 2) Vía de búsqueda: nombres + artista resueltos con `/search`.
   const items = await fetchPlaylistTrackNames(token, playlistId)
   console.info('[spotify-import] fallback: nombres de pistas leídos =', items.length)
 
@@ -581,10 +590,16 @@ async function searchPlaylistFallback(
     throw new Error('dev-mode-restricted')
   }
 
+  // Buscar 1 a 1 es lento y topa con el límite de peticiones: se acota.
+  const searchCap = Math.min(limit, 500)
+  if (items.length > searchCap) {
+    console.info('[spotify-import] fallback: se buscarán solo', searchCap, 'de', items.length)
+  }
+
   const results: SourceTrack[] = []
   const seen = new Set<string>()
 
-  for (const item of items.slice(0, limit)) {
+  for (const item of items.slice(0, searchCap)) {
     const query = item.artist === '' ? item.name : `${item.name} ${item.artist}`
     const matches = await searchSpotify(query, token)
     const best = pickBestMatch(matches, item.name)
@@ -595,6 +610,77 @@ async function searchPlaylistFallback(
   }
 
   return results
+}
+
+type PlaylistFullEntry = {
+  track?: SpotifyTrack | null
+  item?: SpotifyTrack | null
+}
+
+/**
+ * Lee las pistas completas (con `id`) por `fields`. Devuelve null si la vía no
+ * está disponible (para caer a la búsqueda por nombre).
+ */
+async function fetchPlaylistTracksDirect(
+  token: string,
+  playlistId: string,
+  limit: number,
+): Promise<SourceTrack[] | null> {
+  const shapes = [
+    'tracks.items(track(id,name,duration_ms,preview_url,external_urls,album(images),artists(name)))',
+    'items.items(item(id,name,duration_ms,preview_url,external_urls,album(images),artists(name)))',
+  ]
+  const pageSize = 100
+  const max = Math.max(limit, pageSize)
+
+  for (const fields of shapes) {
+    const tracks: SourceTrack[] = []
+    let entries: Array<PlaylistFullEntry | null> = []
+
+    for (let offset = 0; offset < max; offset += pageSize) {
+      const response = await fetchWithRetry(
+        `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}&limit=${pageSize}&offset=${offset}`,
+        token,
+      )
+      if (!response.ok) {
+        entries = []
+        break
+      }
+
+      const data = (await response.json()) as {
+        tracks?: { items?: Array<PlaylistFullEntry | null> | null } | null
+        items?: { items?: Array<PlaylistFullEntry | null> | null } | null
+      }
+      entries = (data.tracks?.items ?? data.items?.items ?? []) as Array<PlaylistFullEntry | null>
+
+      for (const entry of entries) {
+        const track = entry?.track ?? entry?.item
+        if (
+          track !== null &&
+          track !== undefined &&
+          typeof track.id === 'string' &&
+          track.id !== ''
+        ) {
+          tracks.push(mapSpotifyTrack(track))
+        }
+      }
+
+      if (entries.length < pageSize) {
+        break
+      }
+    }
+
+    if (tracks.length > 0) {
+      return tracks.slice(0, limit)
+    }
+    // La forma respondió pero sin `id`: no sirve, no hace falta la otra.
+    if (entries.length > 0) {
+      return null
+    }
+    // Vacía o no soportada: se prueba la otra forma.
+  }
+
+  return null
 }
 
 /** Nombres de las pistas de una playlist sin tocar `/tracks`. */

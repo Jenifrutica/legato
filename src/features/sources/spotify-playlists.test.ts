@@ -98,50 +98,74 @@ describe('playlists de Spotify', () => {
     expect(await fetchSpotifyTrackPreview('t1')).toBeNull()
   })
 
-  it('con 403 cae a búsqueda por nombres de la playlist', async () => {
+  it('con 403 lee los ids por fields (directo, sin búsqueda)', async () => {
     const fetchMock = vi
       .fn()
-      // /playlists/p1/tracks responde 403 (Development mode)
       .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
-      // nombres de pistas sin tocar /tracks
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [{ track: trackPayload }] } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tracks = await fetchSpotifyPlaylistTracks('p1', 5000)
+
+    expect(tracks).toHaveLength(1)
+    expect(tracks[0]?.id).toBe('t1')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('si fields no da ids, cae a búsqueda por nombres + artista', async () => {
+    const fetchMock = vi
+      .fn()
+      // /tracks 403
+      .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
+      // directo: las dos formas responden vacío (sin ids)
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ items: { items: [] } }))
+      // nombres por fields
       .mockResolvedValueOnce(
-        jsonResponse({ tracks: { items: [{ track: { name: 'Tema' } }] } }) as Response,
+        jsonResponse({
+          tracks: { items: [{ track: { name: 'Tema', artists: [{ name: 'A' }] } }] },
+        }),
       )
-      // /search resuelve el nombre
+      // /search resuelve
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    const tracks = await fetchSpotifyPlaylistTracks('p1')
+    const tracks = await fetchSpotifyPlaylistTracks('p1', 5000)
 
     expect(tracks).toHaveLength(1)
     expect(tracks[0]?.externalUrl).toBe('https://open.spotify.com/track/t1')
-    expect(String(fetchMock.mock.calls[2]?.[0])).toContain('/search')
+    expect(String(fetchMock.mock.calls[4]?.[0])).toContain('/search')
   })
 
   it('acepta la forma nueva items/item al leer nombres', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
-      // primera forma (tracks) vacía, segunda forma (items) con el nombre
+      // directo vacío
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ items: { items: [] } }))
+      // nombres: forma tracks vacía, forma items con el nombre
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
       .mockResolvedValueOnce(jsonResponse({ items: { items: [{ item: { name: 'Tema' } }] } }))
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    const tracks = await fetchSpotifyPlaylistTracks('p1')
+    const tracks = await fetchSpotifyPlaylistTracks('p1', 5000)
 
     expect(tracks).toHaveLength(1)
   })
 
-  it('con 403 y sin nombres lanza dev-mode-restricted', async () => {
+  it('con 403 y sin nada lanza dev-mode-restricted', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
       .mockResolvedValueOnce(jsonResponse({ items: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ items: { items: [] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    await expect(fetchSpotifyPlaylistTracks('p1')).rejects.toThrow('dev-mode-restricted')
+    await expect(fetchSpotifyPlaylistTracks('p1', 5000)).rejects.toThrow('dev-mode-restricted')
   })
 
   it('ignora pistas locales, nulas o sin id', async () => {
