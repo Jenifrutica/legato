@@ -614,6 +614,7 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Cuadrado del disco más contenido**: `.disc-field` pasa a `1.08×` el ancho del disco (pegado a los lados) y la zona baja a `0.62×` para recortar el fondo por abajo; el recorte de las ondas en el canvas (`fieldBottom`) se sincronizó a `0.35`.
 - **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
+- **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
 
 ### Z Ocultar la velocidad en Spotify (implementado)
 
