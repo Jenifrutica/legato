@@ -356,6 +356,61 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().currentTrack?.id).toBe('b')
   })
 
+  it('crossfade local con solape: los dos decks suenan a la vez', async () => {
+    vi.useFakeTimers()
+    const a = new FakeAudio()
+    const b = new FakeAudio()
+    const controller = new PlayerController(a, undefined, b)
+    controller.setCrossfade(0.2)
+    controller.playTracks([track('a'), track('b')])
+
+    controller.next()
+
+    // El nuevo deck arranca sin parar el anterior (solape real).
+    expect(b.src).toBe('blob:b')
+    expect(b.paused).toBe(false)
+    expect(a.paused).toBe(false)
+
+    await vi.runAllTimersAsync()
+
+    expect(a.paused).toBe(true)
+    expect(b.volume).toBe(1)
+    expect(a.volume).toBe(1)
+    expect(controller.getSnapshot().currentTrack?.id).toBe('b')
+  })
+
+  it('crossfade externo (Spotify) funde el volumen y lo restaura', async () => {
+    vi.useFakeTimers()
+    const a = new FakeAudio()
+    const controller = new PlayerController(a)
+    let externalVolume = 1
+    const setVolume = vi.fn((value: number) => {
+      externalVolume = value
+    })
+    controller.setExternalPlayer({
+      play: vi.fn(),
+      stop: vi.fn(),
+      setVolume,
+      getVolume: () => externalVolume,
+    })
+    controller.setCrossfade(0.2)
+
+    const external = (id: string): QueueTrack => ({
+      ...track(id),
+      external: true,
+      sourceUrl: `spotify:track:${id}`,
+    })
+
+    controller.playTracks([external('s1'), external('s2')])
+    controller.next()
+    await vi.runAllTimersAsync()
+
+    const values = setVolume.mock.calls.map((call) => call[0] as number)
+    expect(values.some((value) => value === 0)).toBe(true)
+    expect(values[values.length - 1]).toBeCloseTo(1)
+    expect(controller.getSnapshot().currentTrack?.id).toBe('s2')
+  })
+
   it('restoreSession recupera el crossfade', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)

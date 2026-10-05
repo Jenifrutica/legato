@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BEATS_PER_BAR_OPTIONS, useMetronomeStore } from '../features/musician'
-import { MAX_BPM, MIN_BPM, nextTap } from '../player'
+import { clampBpm, MAX_BPM, MIN_BPM, nextTap } from '../player'
 
 export function MetronomePanel() {
   const { t } = useTranslation()
@@ -14,6 +14,27 @@ export function MetronomePanel() {
   const setBeatsPerBar = useMetronomeStore((state) => state.setBeatsPerBar)
   const setVolume = useMetronomeStore((state) => state.setVolume)
   const [taps, setTaps] = useState<number[]>([])
+  const [bpmDraft, setBpmDraft] = useState(String(bpm))
+  const [editing, setEditing] = useState(false)
+
+  // Sincroniza el texto cuando el BPM cambia por fuera (tap, sesión) y no se edita.
+  useEffect(() => {
+    if (!editing) {
+      setBpmDraft(String(bpm))
+    }
+  }, [bpm, editing])
+
+  function commitBpm() {
+    setEditing(false)
+    const parsed = Number(bpmDraft)
+    if (bpmDraft.trim() === '' || Number.isNaN(parsed)) {
+      setBpmDraft(String(bpm))
+      return
+    }
+    const value = clampBpm(parsed)
+    setBpm(value)
+    setBpmDraft(String(value))
+  }
 
   function handleTap() {
     const result = nextTap(taps, performance.now())
@@ -47,14 +68,23 @@ export function MetronomePanel() {
           <input
             className="mt-1 w-24 border-2 border-rule bg-surface px-2 py-1.5 font-mono text-lg text-ink focus:border-accent focus:outline-none"
             id="metronome-bpm"
+            inputMode="numeric"
             max={MAX_BPM}
             min={MIN_BPM}
-            onChange={(event) =>
-              setBpm(event.target.value === '' ? 120 : Number(event.target.value))
-            }
+            onBlur={commitBpm}
+            onChange={(event) => {
+              setEditing(true)
+              setBpmDraft(event.target.value)
+            }}
+            onFocus={() => setEditing(true)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.currentTarget.blur()
+              }
+            }}
             step={1}
             type="number"
-            value={bpm}
+            value={bpmDraft}
           />
         </div>
         <button

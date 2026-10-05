@@ -8,18 +8,29 @@ const OPTIONS: Array<{ value: Language; label: string }> = [
   { value: 'pt', label: 'Português' },
 ]
 
-export function LanguageSelector({ compact = false }: { compact?: boolean }) {
+export function LanguageSelector({
+  compact = false,
+  onDark = false,
+}: {
+  compact?: boolean
+  /** Sobre fondo oscuro (barra superior): texto claro. Si no, tinta sobre claro. */
+  onDark?: boolean
+}) {
   const { i18n, t } = useTranslation()
 
   return (
     <select
       aria-label={t('language.label')}
-      className="cursor-pointer appearance-none border-2 border-bg/40 bg-transparent px-2.5 py-1 text-xs font-semibold text-bg transition-colors hover:border-bg/70 focus:border-accent focus:outline-none"
+      className={`cursor-pointer appearance-none border-2 bg-transparent px-2.5 py-1 text-xs font-semibold transition-colors focus:border-accent focus:outline-none ${
+        onDark
+          ? 'border-bg/40 text-bg hover:border-bg/70'
+          : 'border-ink/40 text-ink hover:border-ink/70'
+      }`}
       onChange={(event) => setLanguage(event.target.value as Language)}
       value={i18n.language}
     >
       {OPTIONS.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option className="bg-surface text-ink" key={option.value} value={option.value}>
           {compact ? option.value.toUpperCase() : option.label}
         </option>
       ))}

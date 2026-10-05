@@ -18,7 +18,7 @@ También puedes consultar:
 
 PASO 2: verifica el estado real (no asumas):
   cd /home/jenifrutica/Proyectos/legato
-  ~/.bun/bin/bun run test        # deben pasar 321
+  ~/.bun/bin/bun run test        # deben pasar 323
   ~/.bun/bin/bun run test:e2e    # deben pasar 13 (modo local, puerto 5174)
   ~/.bun/bin/bun run build
   # Para probar (solo si lo pido):

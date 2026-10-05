@@ -22,7 +22,7 @@ export class AudioGraph implements AnalyserLike {
   #karaoke = false
   #bassDb = 0
 
-  constructor(audio: HTMLAudioElement) {
+  constructor(audio: HTMLAudioElement, secondAudio?: HTMLAudioElement) {
     if (typeof AudioContext === 'undefined') {
       return
     }
@@ -31,6 +31,12 @@ export class AudioGraph implements AnalyserLike {
       const context = new AudioContext()
       const source = context.createMediaElementSource(audio)
       const splitter = context.createChannelSplitter(2)
+
+      // Segundo deck local (para el crossfade con solape): también pasa por el
+      // grafo para conservar balance, karaoke, bajos y analizador.
+      if (secondAudio !== undefined) {
+        context.createMediaElementSource(secondAudio).connect(splitter)
+      }
       const leftGain = context.createGain()
       const rightGain = context.createGain()
       const merger = context.createChannelMerger(2)

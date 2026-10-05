@@ -38,9 +38,11 @@ export type RestoreState = {
 }
 
 export class PlayerController {
-  #localEngine: PlayerEngine
+  #localEngines: PlayerEngine[]
+  #localIndex = 0
   #streamEngine: PlayerEngine
   #engine: PlayerEngine
+  #externalActive = false
   #queue = new PlaybackQueue()
   #listeners = new Set<(snapshot: PlayerSnapshot) => void>()
   #trackEndedListeners = new Set<() => boolean | void>()
@@ -58,15 +60,19 @@ export class PlayerController {
   #externalPlayer: {
     play: (uri: string) => Promise<void> | void
     stop: () => void
+    setVolume?: (value: number) => void
+    getVolume?: () => number
   } | null = null
 
-  constructor(audio?: AudioLike, streamAudio?: AudioLike) {
-    this.#localEngine = new PlayerEngine(audio)
-    this.#streamEngine =
-      streamAudio === undefined ? this.#localEngine : new PlayerEngine(streamAudio)
-    this.#engine = this.#localEngine
+  constructor(audio?: AudioLike, streamAudio?: AudioLike, secondAudio?: AudioLike) {
+    const localA = new PlayerEngine(audio)
+    // Segundo deck local: si no se pasa, se usa el mismo (sin solape posible).
+    const localB = secondAudio === undefined ? localA : new PlayerEngine(secondAudio)
+    this.#localEngines = [localA, localB]
+    this.#streamEngine = streamAudio === undefined ? localA : new PlayerEngine(streamAudio)
+    this.#engine = localA
 
-    const engines = new Set([this.#localEngine, this.#streamEngine])
+    const engines = new Set([...this.#localEngines, this.#streamEngine])
     for (const engine of engines) {
       engine.on('status', () => {
         if (engine === this.#engine) {
@@ -94,7 +100,12 @@ export class PlayerController {
   }
 
   setExternalPlayer(
-    player: { play: (uri: string) => Promise<void> | void; stop: () => void } | null,
+    player: {
+      play: (uri: string) => Promise<void> | void
+      stop: () => void
+      setVolume?: (value: number) => void
+      getVolume?: () => number
+    } | null,
   ): void {
     this.#externalPlayer = player
   }
@@ -103,22 +114,31 @@ export class PlayerController {
     return track.external === true || track.sourceUrl.startsWith('spotify:')
   }
 
+  get #localEngine(): PlayerEngine {
+    return this.#localEngines[this.#localIndex] ?? this.#localEngines[0]
+  }
+
+  get #otherLocal(): PlayerEngine {
+    return this.#localEngines[1 - this.#localIndex] ?? this.#localEngine
+  }
+
+  /** ¿El track se reproduce con un deck local (archivo o blob)? */
+  #isLocalTrack(track: QueueTrack): boolean {
+    if (track.sourceUrl.startsWith('blob:')) {
+      return true
+    }
+    try {
+      return new URL(track.sourceUrl, window.location.href).origin === window.location.origin
+    } catch {
+      return false
+    }
+  }
+
   #engineFor(track: QueueTrack): PlayerEngine {
     if (this.#streamEngine === this.#localEngine) {
       return this.#localEngine
     }
-
-    if (track.sourceUrl.startsWith('blob:')) {
-      return this.#localEngine
-    }
-
-    try {
-      return new URL(track.sourceUrl, window.location.href).origin === window.location.origin
-        ? this.#localEngine
-        : this.#streamEngine
-    } catch {
-      return this.#streamEngine
-    }
+    return this.#isLocalTrack(track) ? this.#localEngine : this.#streamEngine
   }
 
   #selectEngine(track: QueueTrack): void {
@@ -127,7 +147,7 @@ export class PlayerController {
       return
     }
 
-    for (const candidate of new Set([this.#localEngine, this.#streamEngine])) {
+    for (const candidate of new Set([...this.#localEngines, this.#streamEngine])) {
       if (candidate !== engine) {
         candidate.pause()
       }
@@ -212,10 +232,14 @@ export class PlayerController {
   /** Al cerrar sesión: detiene todo y devuelve la reproducción a valores neutros. */
   clearSession(): void {
     this.#transitionToken++
-    this.#localEngine.pause()
-    if (this.#streamEngine !== this.#localEngine) {
+    for (const engine of this.#localEngines) {
+      engine.pause()
+    }
+    if (!this.#localEngines.includes(this.#streamEngine)) {
       this.#streamEngine.pause()
     }
+    this.#externalActive = false
+    this.#localIndex = 0
     this.#externalPlayer?.stop()
     this.#queue.clear()
     this.#queue.setShuffle(false)
@@ -230,11 +254,9 @@ export class PlayerController {
     this.#channelMode = 'stereo'
     this.#karaoke = false
     this.#crossfadeSeconds = 2
-    this.#localEngine.setVolume(1)
-    this.#localEngine.setRate(1)
-    if (this.#streamEngine !== this.#localEngine) {
-      this.#streamEngine.setVolume(1)
-      this.#streamEngine.setRate(1)
+    for (const engine of new Set([...this.#localEngines, this.#streamEngine])) {
+      engine.setVolume(1)
+      engine.setRate(1)
     }
     this.#notify()
   }
@@ -490,12 +512,41 @@ export class PlayerController {
 
   async #transitionTo(track: QueueTrack, fadeOutCurrent: boolean): Promise<void> {
     const token = ++this.#transitionToken
+    const crossfade = this.#crossfadeSeconds
+    const nextExternal = this.#isExternal(track)
+    const prevExternal = this.#externalActive
+    const hasAudio = !this.#engine.paused || this.#externalActive
+    const shouldFade = fadeOutCurrent && crossfade > 0 && hasAudio
+    // Volumen objetivo de Spotify/stream: se respeta el que tenga el usuario.
+    const externalVolume = this.#externalPlayer?.getVolume?.() ?? 1
 
-    if (this.#isExternal(track)) {
+    // Crossfade con solape: local → local, dos decks a la vez.
+    if (
+      shouldFade &&
+      !nextExternal &&
+      !prevExternal &&
+      this.#localEngines[0] !== this.#localEngines[1] &&
+      this.#isLocalTrack(track) &&
+      this.#localEngines.includes(this.#engine)
+    ) {
+      await this.#localOverlap(track, crossfade, token)
+      return
+    }
+
+    // Fundido de salida del output que esté sonando (local o Spotify/stream).
+    if (shouldFade) {
+      await this.#fadeCurrentOut(crossfade, prevExternal)
+      if (token !== this.#transitionToken) {
+        return
+      }
+    }
+
+    if (nextExternal) {
       this.#resetAbLoop()
       this.#lastError = null
       this.#engine.pause()
-      this.#notify()
+      this.#externalActive = true
+      this.#externalPlayer?.setVolume?.(shouldFade ? 0 : externalVolume)
 
       try {
         await this.#externalPlayer?.play(track.sourceUrl)
@@ -503,23 +554,22 @@ export class PlayerController {
         this.#lastError = 'No se pudo reproducir en Spotify'
       }
 
-      if (token === this.#transitionToken) {
-        this.#notify()
+      if (token !== this.#transitionToken) {
+        return
       }
+
+      if (shouldFade) {
+        await this.#rampExternal(0, externalVolume, crossfade * 1000)
+        if (token !== this.#transitionToken) {
+          return
+        }
+      }
+      this.#notify()
       return
     }
 
     this.#externalPlayer?.stop()
-    const crossfade = this.#crossfadeSeconds
-    const shouldFade = fadeOutCurrent && crossfade > 0 && !this.#engine.paused
-
-    if (shouldFade) {
-      await this.#rampVolume(1, 0, crossfade * 1000)
-      if (token !== this.#transitionToken) {
-        return
-      }
-    }
-
+    this.#externalActive = false
     this.#resetAbLoop()
     this.#lastError = null
     this.#selectEngine(track)
@@ -543,7 +593,89 @@ export class PlayerController {
     this.#notify()
   }
 
+  /** Crossfade real: la nueva pista arranca en el otro deck y ambos se cruzan. */
+  async #localOverlap(track: QueueTrack, crossfade: number, token: number): Promise<void> {
+    const from = this.#localEngine
+    const to = this.#otherLocal
+
+    // El motor activo pasa ya al nuevo deck (tiempo/fin los reporta él).
+    this.#localIndex = 1 - this.#localIndex
+    this.#engine = to
+
+    this.#resetAbLoop()
+    this.#lastError = null
+    to.load(track)
+    to.setRate(this.#rate)
+    to.setVolume(0)
+    await to.play()
+
+    if (token !== this.#transitionToken) {
+      return
+    }
+
+    await this.#rampPair(from, to, crossfade * 1000)
+    if (token !== this.#transitionToken) {
+      return
+    }
+
+    from.pause()
+    from.setVolume(this.#volume)
+    to.setVolume(this.#volume)
+    this.#notify()
+  }
+
+  async #fadeCurrentOut(crossfade: number, prevExternal: boolean): Promise<void> {
+    if (prevExternal) {
+      const current = this.#externalPlayer?.getVolume?.() ?? 1
+      await this.#rampExternal(current, 0, crossfade * 1000)
+      this.#externalPlayer?.setVolume?.(0)
+      return
+    }
+
+    await this.#rampVolume(1, 0, crossfade * 1000)
+    this.#engine.setVolume(0)
+  }
+
   #rampVolume(fromFactor: number, toFactor: number, durationMs: number): Promise<void> {
+    return this.#ramp((value) => this.#engine.setVolume(value), fromFactor, toFactor, durationMs)
+  }
+
+  #rampExternal(fromFactor: number, toFactor: number, durationMs: number): Promise<void> {
+    const setVolume = this.#externalPlayer?.setVolume
+    if (setVolume === undefined) {
+      return Promise.resolve()
+    }
+    // El volumen de Spotify/stream es absoluto (no se escala por #volume).
+    return this.#ramp((value) => setVolume(value), fromFactor, toFactor, durationMs, 1)
+  }
+
+  /** Cruza dos decks locales a la vez (volumen del usuario repartido). */
+  #rampPair(from: PlayerEngine, to: PlayerEngine, durationMs: number): Promise<void> {
+    const steps = Math.max(1, Math.round(durationMs / 50))
+    const stepMs = durationMs / steps
+
+    return new Promise((resolve) => {
+      let step = 0
+      const timer = setInterval(() => {
+        step++
+        const t = step / steps
+        from.setVolume(Math.min(1, Math.max(0, this.#volume * (1 - t))))
+        to.setVolume(Math.min(1, Math.max(0, this.#volume * t)))
+        if (step >= steps) {
+          clearInterval(timer)
+          resolve()
+        }
+      }, stepMs)
+    })
+  }
+
+  #ramp(
+    setVolume: (value: number) => void,
+    fromFactor: number,
+    toFactor: number,
+    durationMs: number,
+    base = this.#volume,
+  ): Promise<void> {
     const steps = Math.max(1, Math.round(durationMs / 50))
     const stepMs = durationMs / steps
 
@@ -552,8 +684,7 @@ export class PlayerController {
       const timer = setInterval(() => {
         step++
         const factor = fromFactor + ((toFactor - fromFactor) * step) / steps
-        this.#engine.setVolume(Math.min(1, Math.max(0, this.#volume * factor)))
-
+        setVolume(Math.min(1, Math.max(0, base * factor)))
         if (step >= steps) {
           clearInterval(timer)
           resolve()

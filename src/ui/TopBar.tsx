@@ -146,7 +146,7 @@ export function TopBar() {
         >
           <SettingsIcon className="size-5" />
         </button>
-        <LanguageSelector compact />
+        <LanguageSelector compact onDark />
         <div className="hidden min-w-0 max-w-44 sm:block">
           <AccountChip />
         </div>

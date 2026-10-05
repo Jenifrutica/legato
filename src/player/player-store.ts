@@ -17,6 +17,8 @@ function createLocalMedia(): HTMLVideoElement {
 }
 
 const audio = createLocalMedia()
+// Segundo deck local para el crossfade con solape (mismo grafo de audio).
+const audioB = createLocalMedia()
 
 const streamAudio = new Audio()
 streamAudio.preload = 'metadata'
@@ -26,13 +28,18 @@ export function getMediaElement(): HTMLMediaElement {
 }
 
 export function setExternalPlayer(
-  player: { play: (uri: string) => Promise<void> | void; stop: () => void } | null,
+  player: {
+    play: (uri: string) => Promise<void> | void
+    stop: () => void
+    setVolume?: (value: number) => void
+    getVolume?: () => number
+  } | null,
 ): void {
   controller.setExternalPlayer(player)
 }
 
-const controller = new PlayerController(audio, streamAudio)
-const graph = new AudioGraph(audio)
+const controller = new PlayerController(audio, streamAudio, audioB)
+const graph = new AudioGraph(audio, audioB)
 const sleepTimer = new SleepTimer(() => {
   void controller.fadeOutAndPause()
 })

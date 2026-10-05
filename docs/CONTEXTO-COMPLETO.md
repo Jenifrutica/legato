@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 321 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 323 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 321 unitarios
+~/.bun/bin/bun run test        # 323 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -631,6 +631,13 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
 - **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
+
+### AC Crossfade, selector de idioma y BPM editable (implementado)
+
+- **Crossfade real (local)**: se añadió un **segundo deck local** (`audioB`) enrutado por el mismo `AudioGraph` (`AudioGraph(audio, audioB)`), y el controlador alterna decks cruzando los dos volúmenes **a la vez** (solape). El motor activo cambia al nuevo deck al empezar el cruce (tiempo/fin los reporta él). Antes era secuencial (fade-out, luego carga y fade-in): sonaba a hueco y duraba el doble.
+- **Fundido en Spotify/streams**: el SDK reproduce **una sola pista** (DRM), así que **no puede solapar**; se hace **fade-out del volumen actual y fade-in del nuevo** por `setVolume` del SDK (el puente externo expone `setVolume`/`getVolume` y respeta el volumen del usuario). Audius/Jamendo (elemento de stream) usan el mismo camino.
+- **Selector de idioma**: `LanguageSelector` gana `onDark`; antes usaba colores de la barra oscura y en el **login** (fondo claro) quedaba **invisible**, y las **opciones** del desplegable no se leían. Ahora el login lo muestra en tinta y las opciones llevan fondo/tinta explícitos.
+- **BPM del metrónomo editable**: el input era controlado con clamp por tecla, así que no se podía escribir (saltaba a 120/30). Ahora usa un borrador local y aplica el clamp al **soltar el foco o Enter** (permite vaciar y teclear, p. ej. 80). Tests del crossfade local (solape), del fundido externo y del clamp.
 
 ### Z Ocultar la velocidad en Spotify (implementado)
 
