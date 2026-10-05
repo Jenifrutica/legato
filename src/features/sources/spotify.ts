@@ -574,19 +574,20 @@ async function searchPlaylistFallback(
   playlistId: string,
   limit: number,
 ): Promise<SourceTrack[]> {
-  const names = await fetchPlaylistTrackNames(token, playlistId)
-  console.info('[spotify-import] fallback: nombres de pistas leídos =', names.length)
+  const items = await fetchPlaylistTrackNames(token, playlistId)
+  console.info('[spotify-import] fallback: nombres de pistas leídos =', items.length)
 
-  if (names.length === 0) {
+  if (items.length === 0) {
     throw new Error('dev-mode-restricted')
   }
 
   const results: SourceTrack[] = []
   const seen = new Set<string>()
 
-  for (const name of names.slice(0, limit)) {
-    const matches = await searchSpotify(name, token)
-    const best = pickBestMatch(matches, name)
+  for (const item of items.slice(0, limit)) {
+    const query = item.artist === '' ? item.name : `${item.name} ${item.artist}`
+    const matches = await searchSpotify(query, token)
+    const best = pickBestMatch(matches, item.name)
     if (best !== null && !seen.has(best.id)) {
       seen.add(best.id)
       results.push(best)
@@ -597,35 +598,71 @@ async function searchPlaylistFallback(
 }
 
 /** Nombres de las pistas de una playlist sin tocar `/tracks`. */
-async function fetchPlaylistTrackNames(token: string, playlistId: string): Promise<string[]> {
+type PlaylistTrackRef = { name: string; artist: string }
+
+type PlaylistNameEntry = {
+  track?: { name?: string; artists?: Array<{ name?: string }> } | null
+  item?: { name?: string; artists?: Array<{ name?: string }> } | null
+}
+
+async function fetchPlaylistTrackNames(
+  token: string,
+  playlistId: string,
+): Promise<PlaylistTrackRef[]> {
   // Spotify renombró `tracks`/`track` a `items`/`item`; se prueban ambas formas.
-  const shapes = ['tracks.items(track(name))', 'items.items(item(name))']
+  const shapes = [
+    'tracks.items(track(name,artists(name)))',
+    'items.items(item(name,artists(name)))',
+  ]
+  // Sin `limit` explícito Spotify devuelve solo la primera página (~20).
+  const pageSize = 100
 
   for (const fields of shapes) {
-    const response = await fetchWithRetry(
-      `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}`,
-      token,
-    )
-    if (!response.ok) {
-      console.info('[spotify-import] fields', fields, '→', response.status)
-      continue
+    const refs: PlaylistTrackRef[] = []
+
+    for (let offset = 0; offset < 2000; offset += pageSize) {
+      const response = await fetchWithRetry(
+        `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}&limit=${pageSize}&offset=${offset}`,
+        token,
+      )
+      if (!response.ok) {
+        console.info('[spotify-import] fields', fields, '→', response.status)
+        break
+      }
+
+      const data = (await response.json()) as {
+        tracks?: { items?: Array<PlaylistNameEntry | null> | null } | null
+        items?: { items?: Array<PlaylistNameEntry | null> | null } | null
+      }
+
+      const entries = (data.tracks?.items ??
+        data.items?.items ??
+        []) as Array<PlaylistNameEntry | null>
+
+      for (const entry of entries) {
+        const name = entry?.track?.name ?? entry?.item?.name
+        if (typeof name !== 'string' || name.trim() === '') {
+          continue
+        }
+        const artists = entry?.track?.artists ?? entry?.item?.artists ?? []
+        refs.push({
+          name,
+          artist: artists
+            .map((artist) => artist.name ?? '')
+            .filter(Boolean)
+            .join(', '),
+        })
+      }
+
+      // Página incompleta: no hay más.
+      if (entries.length < pageSize) {
+        break
+      }
     }
 
-    const data = (await response.json()) as {
-      tracks?: { items?: Array<{ track?: { name?: string } | null } | null> | null } | null
-      items?: { items?: Array<{ item?: { name?: string } | null } | null> | null } | null
-    }
-
-    const entries = (data.tracks?.items ?? data.items?.items ?? []) as Array<{
-      track?: { name?: string } | null
-      item?: { name?: string } | null
-    } | null>
-    const names = entries
-      .map((entry) => entry?.track?.name ?? entry?.item?.name)
-      .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
-
-    if (names.length > 0) {
-      return names
+    if (refs.length > 0) {
+      console.info('[spotify-import] fallback: nombres totales =', refs.length)
+      return refs
     }
   }
 
