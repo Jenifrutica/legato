@@ -44,16 +44,31 @@ export function QueueActions({ track }: { track: QueueTrack }) {
   }, [notice])
 
   return (
-    <div className="relative" ref={rootRef}>
+    <div className="relative flex shrink-0 items-center" ref={rootRef}>
+      <button
+        aria-label={t('queue.addToList', { title: track.title })}
+        className="grid size-8 shrink-0 place-items-center border-2 border-rule/40 bg-surface text-ink-muted transition-colors hover:text-ink"
+        onClick={() => {
+          enqueue(track)
+          setNotice('end')
+        }}
+        title={t('queue.addToList', { title: track.title })}
+        type="button"
+      >
+        <ListMusicIcon className="size-4" />
+      </button>
+
       <button
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={t('queue.actionsLabel', { title: track.title })}
-        className="grid size-8 shrink-0 place-items-center border-2 border-rule/40 bg-surface text-ink-muted transition-colors hover:text-ink"
+        className="grid h-8 w-5 shrink-0 place-items-center border-2 border-l-0 border-rule/40 bg-surface text-ink-muted transition-colors hover:text-ink"
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
-        <ListMusicIcon className="size-4" />
+        <span aria-hidden="true" className="font-mono text-[0.6875rem]">
+          ▾
+        </span>
       </button>
 
       {open && (

@@ -24,7 +24,7 @@ export const es = {
     importing: 'Importando pistas…',
     importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} pistas importadas',
-    importedOf: '{{imported}} de {{total}} pistas importadas (las demás ya estaban)',
+    importedOf: '{{imported}} de {{total}} pistas importadas',
     importEmpty:
       'No se pudieron reconocer las pistas de esa playlist. Añade tu cuenta en User Management para importarlas exactas.',
     importError: 'No se pudieron traer tus playlists de Spotify.',
@@ -95,6 +95,7 @@ export const es = {
     empty: 'La lista está vacía. Reproduce algo desde tu biblioteca o una playlist.',
     add: 'Lista',
     actionsLabel: 'Opciones de lista para {{title}}',
+    addToList: 'Añadir {{title}} a la Lista',
     addToEndLabel: 'Añadir {{title}} a la cola',
     addToEnd: 'Añadir al final',
     playNext: 'Reproducir siguiente',

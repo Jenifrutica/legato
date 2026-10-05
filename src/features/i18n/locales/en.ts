@@ -26,7 +26,7 @@ export const en: typeof es = {
     importing: 'Importing tracks…',
     importProgress: 'Importing {{done}}/{{total}}…',
     imported: '{{count}} tracks imported',
-    importedOf: '{{imported}} of {{total}} tracks imported (the rest were already there)',
+    importedOf: '{{imported}} of {{total}} tracks imported',
     importEmpty:
       'Could not recognize the tracks in that playlist. Add your account in User Management to import them exactly.',
     importError: 'Could not fetch your Spotify playlists.',
@@ -96,6 +96,7 @@ export const en: typeof es = {
     empty: 'The list is empty. Play something from your library or a playlist.',
     add: 'List',
     actionsLabel: 'List options for {{title}}',
+    addToList: 'Add {{title}} to the List',
     addToEndLabel: 'Add {{title}} to the queue',
     addToEnd: 'Add to end',
     playNext: 'Play next',

@@ -632,6 +632,12 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
 - **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
 
+### AE Lista desde la biblioteca e import completo (implementado)
+
+- **Botón directo «Añadir a la Lista»** en cada fila (biblioteca y playlist): `QueueActions` ahora tiene un botón de un clic (`enqueue`, cola) y una **flecha ▾** para el menú (añadir al final / reproducir siguiente). La **Lista (cola) ya se persiste por sesión** (`saveCurrentSession` guarda `queue` + `restoreSession` la restaura al abrir).
+- **Import de Spotify completo**: antes, las pistas que ya existían en la biblioteca se **omitían de la playlist nueva**; ahora se agregan **todas** las pistas de la playlist de Spotify a la playlist local (en lote), y solo se evita el duplicado en la **biblioteca** (`addTracks(newTracks)` vs `addTracksToPlaylist(allTracks)`).
+- **Borrar playlist**: confirmación **en línea** (Eliminar/Cancelar) en vez de `window.confirm`, que Brave puede bloquear.
+
 ### AD Import por lotes, arranque a prueba de bloqueos y recuperación (implementado)
 
 - **Síntoma**: al importar una playlist grande la pestaña se **congeló**; después la app se quedaba en la pantalla de carga (`LEGATO`) y no dejaba entrar.

@@ -26,7 +26,7 @@ export const pt: typeof es = {
     importing: 'Importando faixas…',
     importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} faixas importadas',
-    importedOf: '{{imported}} de {{total}} faixas importadas (as outras já estavam)',
+    importedOf: '{{imported}} de {{total}} faixas importadas',
     importEmpty:
       'Não foi possível reconhecer as faixas dessa playlist. Adicione sua conta em User Management para importá-las exatas.',
     importError: 'Não foi possível buscar suas playlists do Spotify.',
@@ -96,6 +96,7 @@ export const pt: typeof es = {
     empty: 'A lista está vazia. Reproduza algo da sua biblioteca ou de uma playlist.',
     add: 'Lista',
     actionsLabel: 'Opções de lista para {{title}}',
+    addToList: 'Adicionar {{title}} à Lista',
     addToEndLabel: 'Adicionar {{title}} à fila',
     addToEnd: 'Adicionar ao final',
     playNext: 'Reproduzir a seguir',

@@ -128,13 +128,19 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       // Dedupe una sola vez y guarda los cambios en lote (antes era O(n²) y
       // congelaba la pestaña en playlists grandes).
       const keys = existingDedupeKeys()
+      const allTracks: LibraryTrack[] = []
       const newTracks: LibraryTrack[] = []
 
       for (let index = 0; index < tracks.length; index++) {
         const saved = await saveSourceTrack(tracks[index], keys)
-        if (saved !== null && !keys.has(saved.dedupeKey)) {
-          keys.add(saved.dedupeKey)
-          newTracks.push(saved)
+        if (saved !== null) {
+          // A la playlist van TODAS las pistas de la playlist de Spotify,
+          // aunque ya estuvieran en la biblioteca (no se duplican allí).
+          allTracks.push(saved)
+          if (!keys.has(saved.dedupeKey)) {
+            keys.add(saved.dedupeKey)
+            newTracks.push(saved)
+          }
         }
         if (index % 25 === 0 || index === tracks.length - 1) {
           setSpotifyProgress({ done: index + 1, total: tracks.length })
@@ -143,10 +149,17 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
 
       const localId = createPlaylist(playlist.name)
       addTracks(newTracks)
-      const imported = usePlaylistsStore.getState().addTracksToPlaylist(localId, newTracks)
+      const imported = usePlaylistsStore.getState().addTracksToPlaylist(localId, allTracks)
       setSpotifyProgress(null)
 
-      console.info('[spotify-import] recibidas =', tracks.length, '· nuevas =', imported)
+      console.info(
+        '[spotify-import] recibidas =',
+        tracks.length,
+        '· en la playlist =',
+        imported,
+        '· nuevas en biblioteca =',
+        newTracks.length,
+      )
       if (imported === 0) {
         setSpotifyMessage(t('spotify.importEmpty'))
       } else if (imported < tracks.length) {
