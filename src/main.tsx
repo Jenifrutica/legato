@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './app/App.tsx'
 import { getMicAnalyser, useMicStore } from './features/musician'
 import { wipeLocalData } from './features/persistence'
-import { handleSpotifyRedirect } from './features/sources'
+import { handleSpotifyRedirect, useSpotifyStore } from './features/sources'
 import { getAnalyser, getMediaElement, usePlayerStore } from './player'
 import './styles/index.css'
 
@@ -37,6 +37,7 @@ if (import.meta.env.DEV) {
     getMicAnalyser,
     useMicStore,
     usePlayerStore,
+    useSpotifyStore,
   }
 }
 

@@ -33,9 +33,14 @@ export class AudioGraph implements AnalyserLike {
       const splitter = context.createChannelSplitter(2)
 
       // Segundo deck local (para el crossfade con solape): también pasa por el
-      // grafo para conservar balance, karaoke, bajos y analizador.
+      // grafo para conservar balance, karaoke, bajos y analizador. Si falla,
+      // el deck A sigue sonando (el crossfade cae a modo secuencial).
       if (secondAudio !== undefined) {
-        context.createMediaElementSource(secondAudio).connect(splitter)
+        try {
+          context.createMediaElementSource(secondAudio).connect(splitter)
+        } catch (error) {
+          console.warn('[audio-graph] no se pudo enrutar el segundo deck', error)
+        }
       }
       const leftGain = context.createGain()
       const rightGain = context.createGain()
