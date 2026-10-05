@@ -2,10 +2,10 @@
 
 > **Lee este documento completo antes de tocar nada.** Está escrito para que una sesión nueva (o un agente distinto) continúe el proyecto exactamente donde quedó, sin releer toda la conversación anterior.
 
-- **Última actualización:** 4 de octubre de 2026, sesión 4 (cierre).
+- **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 191 unitarios + 6 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
-- **Pendientes detallados:** `docs/PENDIENTES.md` (import de playlists, ondas al ritmo, módulo de músicos, login obligatorio con base de datos, deploy).
+- **Tests:** 312 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
 ---
@@ -72,8 +72,8 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 154 unitarios
-~/.bun/bin/bun run test:e2e    # 4 E2E (levanta el server solo)
+~/.bun/bin/bun run test        # 312 unitarios
+~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
 ~/.bun/bin/bun run typecheck   # tsc -b
@@ -575,3 +575,28 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Límites**: cuotas gratuitas de Firestore (documentadas en `docs/AUTH.md`); las referencias de Spotify viajan como metadatos y la conexión del SDK se hace por dispositivo (misma cuenta Premium).
 - **Privacidad**: con la nube activa, canciones y audios se guardan en Firebase (Google); política actualizada en ES/EN/PT.
 - **Tests**: fusión (5), motor con backend en memoria (4) y persistencia con lápidas; total **300 unit + 10 E2E**.
+
+## Sesión 6 (4 oct 2026) — Audio en Firestore, arreglos del reproductor y cierre
+
+### U Audio en Firestore, sin Storage (implementado)
+
+- **Problema**: activar Firebase Storage obliga al plan **Blaze** (tarjeta de crédito); la autora lo rechazó. Los audios no caben solo en Firestore como documento.
+- **Solución**: guardar los archivos **troceados** en Firestore tras la misma abstracción de backend (`firebase-backend.ts`): un documento **manifiesto** (`fileManifests`: nombre, tipo, tamaño, nº de trozos) y **trozos** (`fileChunks`: 700 KB en base64 por documento). El motor de sincronización (`sync-engine.ts`) sube y baja los trozos como si fuera un blob; al leer reconstruye el `Blob` y lo persiste en IndexedDB. Commit `75a11d4` (`feat(sync): store audio chunks in firestore and enable firebase auth`).
+- **Estado del panel**: si falta configuración de Firebase o las reglas de Firestore, el panel de sincronización se muestra como **«Pendiente de configurar»** en vez de ofrecer un botón que fallará.
+- **Reglas de Firestore** publicadas en la consola (`docs/AUTH.md`), con rutas por usuario para manifiestos y trozos.
+
+### V Volumen/velocidad con Spotify y escape del bug «local = Spotify» (implementado)
+
+- **Volumen con Spotify**: el control de volumen se conecta al volumen del **Web Playback SDK** (no pasa por el `GainNode` del DSP local); en móvil el control queda disponible en la barra inferior. Commit `a5b7b54` (`fix(player): spotify volume and speed controls on mobile`).
+- **Velocidades ampliadas**: el ciclo del control pasa a **1× → 1.25× → 1.5× → 2× → 0.9× → 0.75× → 0.5×** (`PlayerController.cycleRate`); el panel de ensayo lista todas las tasas. Commit `2884b8b` (`feat(player): add faster playback speeds up to 2x`).
+- **Bug corregido**: con Spotify **en pausa** y una pista **local** sonando, la app trataba la pista local como si fuera de Spotify (afectaba ondas/velocidad). Ahora `spotifyActive` depende de la pista **externa** real. Commit `da0303a` (`fix(player): local playback is not treated as spotify when spotify is paused`).
+- **Velocidad en Spotify = imposible**: el SDK/DRM no permite cambiar la velocidad de reproducción; en su lugar se añadió un **aviso** explicativo en vez de dejar el control deshabilitado sin explicación. Commit `f1b1114` (`fix(player): explain that spotify cannot change speed instead of disabling`).
+
+### W Estado y bloqueos al cierre de la sesión 6
+
+- **Tests**: **312 unitarios + 13 E2E** en verde (incluye `spotify-store`, `external-track` y el E2E de reproducción), typecheck/lint/format/build en verde, detector de impeccable `[]`.
+- **Firebase real**: la autora creó su cuenta, pero **el correo de verificación no llega** (probable spam; remitente `*firebaseapp.com`). Con la regla de que **sin correo verificado no hay sesión**, la vía recomendada para la demo es **entrar con Google**; configurar SMTP propio queda para después.
+- **«Error de conexión»**: reportado por la autora pero **no reproducido** al cargar la app ni con Google (sin errores en consola). Pendiente localizar el mensaje exacto.
+- **Decisión abierta (velocidad)**: la autora pidió **ocultar** el control de velocidad cuando la fuente es Spotify en vez de mostrar el aviso del commit `f1b1114`; queda pendiente confirmarlo e implementarlo.
+- **Fase A (import de playlists de Spotify)**: aplazada a justo antes del deploy; pendiente de diagnóstico con la cuenta real. Detalle en `docs/PENDIENTES.md` §1.
+- **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.

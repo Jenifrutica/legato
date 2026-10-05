@@ -2,9 +2,9 @@
 
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
-- **Fecha:** 4 de octubre de 2026 (actualizado tras la fase B de la sesión 5).
-- **Estado base:** 305 unitarios + 10 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
-- **Orden actual:** B → C (músicos) → D (login) → A (import de Spotify, justo antes del deploy) → E (deploy).
+- **Fecha:** 4 de octubre de 2026 (sesión 6: cierre de login/sincronización y arreglos de reproductor).
+- **Estado base:** 312 unitarios + 13 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Orden actual:** B → C (músicos) → D (login) → **N (sync, hecho)** → A (import de Spotify, justo antes del deploy) → E (deploy). B, C, D y N están cerrados; solo quedan A, E y las verificaciones manuales de login.
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
 
@@ -106,7 +106,14 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 ## 4. Login obligatorio con base de datos (IMPLEMENTADO)
 
-> **Hecho (D)**: Firebase Auth (correo/contraseña + Google, verificación y recuperación) con respaldo local PBKDF2 en IndexedDB; puerta obligatoria, datos por usuario con migración al primero, tokens de Spotify por usuario, eliminar cuenta. Configuración paso a paso en **`docs/AUTH.md`**. Pendiente solo la verificación manual con la cuenta real de Firebase.
+> **Hecho (D)**: Firebase Auth (correo/contraseña + Google, verificación y recuperación) con respaldo local PBKDF2 en IndexedDB; puerta obligatoria, datos por usuario con migración al primero, tokens de Spotify por usuario, eliminar cuenta. Configuración paso a paso en **`docs/AUTH.md`**.
+>
+> **Hecho (N)**: sincronización en la nube por usuario en Firestore; audios/portadas **troceados en Firestore** (`fileManifests` + `fileChunks`, 700 KB) porque Storage exige el plan Blaze; fusión por `updatedAt` + lápidas, subida con debounce, bajada al entrar (con progreso) y toggle en Ajustes.
+>
+> **Bloqueos al cierre (sesión 6):**
+> - **Correo de verificación de Firebase**: no llega a la bandeja de la autora (probable spam; remitente `*firebaseapp.com`). Como **sin correo verificado no hay sesión**, la vía recomendada para la demo es **entrar con Google**; configurar SMTP propio queda post-demo.
+> - **«Error de conexión»**: reportado por la autora pero no reproducido (ni al cargar la app ni con Google; sin errores en consola). Pendiente localizar el mensaje exacto y corregirlo.
+> - **Verificación manual** pendiente: registro con correo real, Google, recuperación, cambio de cuenta y eliminación.
 
 **Requisito de la autora:** para usar la app **debe iniciarse sesión**; los usuarios quedan en **la base de datos**.
 
@@ -127,6 +134,18 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 **Criterio de cierre:** sin sesión no se accede a la app; registro/login/logout funcionan; la contraseña nunca se guarda en claro; tests de hash/verify y de gate; i18n ES/EN/PT.
 
 **Archivos:** `src/features/auth/` (AuthProvider, AccountChip), nuevo `src/features/auth/local-auth.ts` + store, `src/features/persistence/db.ts` (tabla `users`), `src/app/App.tsx` (gate).
+
+---
+
+## 4b. Ocultar el control de velocidad en Spotify (IMPLEMENTAR)
+
+**Motivo:** el Web Playback SDK de Spotify reproduce por DRM y **no permite cambiar la velocidad**; el control nunca surte efecto en una pista de Spotify.
+
+**Decisión de la autora:** **ocultar** el control de velocidad cuando la fuente es Spotify, en vez de mostrarlo deshabilitado o con un aviso. El commit `f1b1114` dejó un **aviso** explicativo; confirmar con la autora cuál se queda.
+
+**Alcance si se oculta:** `src/ui/Hero.tsx`, `src/ui/PlayerBar.tsx` (barra móvil) y la sección de velocidad de `src/ui/PracticePanel.tsx`, condicionado a `spotifyActive` (`isExternalTrack`). En archivos locales se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5**.
+
+**Criterio de cierre:** con una pista local el control aparece y cambia la velocidad; con una referencia de Spotify el control no aparece (o, si se decide, se muestra el aviso). i18n ES/EN/PT sin claves huérfanas; axe 0.
 
 ---
 
@@ -153,8 +172,8 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 305 unitarios
-~/.bun/bin/bun run test:e2e    # 10 E2E
+~/.bun/bin/bun run test        # 312 unitarios
+~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174)
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint
 /home/jenifrutica/.config/opencode/skills/impeccable/scripts/impeccable detect --json src
