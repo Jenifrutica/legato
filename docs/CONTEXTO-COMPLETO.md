@@ -637,6 +637,7 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Botón directo «Añadir a la Lista»** en cada fila (biblioteca y playlist): `QueueActions` ahora tiene un botón de un clic (`enqueue`, cola) y una **flecha ▾** para el menú (añadir al final / reproducir siguiente). La **Lista (cola) ya se persiste por sesión** (`saveCurrentSession` guarda `queue` + `restoreSession` la restaura al abrir).
 - **Import de Spotify completo**: antes, las pistas que ya existían en la biblioteca se **omitían de la playlist nueva**; ahora se agregan **todas** las pistas de la playlist de Spotify a la playlist local (en lote), y solo se evita el duplicado en la **biblioteca** (`addTracks(newTracks)` vs `addTracksToPlaylist(allTracks)`).
 - **Borrar playlist**: confirmación **en línea** (Eliminar/Cancelar) en vez de `window.confirm`, que Brave puede bloquear.
+- **Bug «no suena» con Spotify (corregido)**: el fundido del crossfade del camino externo usaba `setVolume` del store, que **escribía 0 en `volume`** (el volumen del usuario); en la siguiente reproducción `getVolume()` devolvía 0 y Spotify sonaba mudo. Ahora el fundido usa `applyVolume` (solo aplica al SDK) y conserva `volume` como intención del usuario; `toggle` de Spotify también restaura el volumen antes de sonar. El audio local nunca se vio afectado.
 
 ### AD Import por lotes, arranque a prueba de bloqueos y recuperación (implementado)
 
