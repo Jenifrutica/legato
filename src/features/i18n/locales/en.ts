@@ -28,9 +28,11 @@ export const en: typeof es = {
     importError: 'Could not fetch your Spotify playlists.',
     emptyPlaylists: 'You have no playlists on Spotify.',
     importScope: 'Reconnect Spotify to grant access to your playlists.',
+    importForbidden:
+      'Spotify denied access to the tracks (403). Reconnect; if it persists, check User Management below.',
     reconnectButton: 'Reconnect Spotify',
     importScopeHint:
-      'If the 403 persists after reconnecting, your Spotify app is in development mode: add your account at developer.spotify.com → your app → User Management.',
+      'Important: at developer.spotify.com → your Legato app → User Management press "Add user" and add your Spotify account. Without it, Spotify blocks tracks in development mode.',
   },
   settings: {
     title: 'Settings',

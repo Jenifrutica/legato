@@ -28,9 +28,11 @@ export const pt: typeof es = {
     importError: 'Não foi possível buscar suas playlists do Spotify.',
     emptyPlaylists: 'Você não tem playlists no Spotify.',
     importScope: 'Reconecte o Spotify para permitir acesso às suas playlists.',
+    importForbidden:
+      'O Spotify negou acesso às faixas (403). Reconecte; se persistir, veja User Management abaixo.',
     reconnectButton: 'Conectar o Spotify novamente',
     importScopeHint:
-      'Se o 403 persistir após reconectar, seu app do Spotify está em modo de desenvolvimento: adicione sua conta em developer.spotify.com → seu app → User Management.',
+      'Importante: em developer.spotify.com → seu app Legato → User Management, clique em "Add user" e adicione sua conta do Spotify. Sem isso, o Spotify bloqueia as faixas no modo de desenvolvimento.',
   },
   settings: {
     title: 'Configurações',

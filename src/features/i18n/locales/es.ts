@@ -26,9 +26,11 @@ export const es = {
     importError: 'No se pudieron traer tus playlists de Spotify.',
     emptyPlaylists: 'No tienes playlists en Spotify.',
     importScope: 'Vuelve a conectar Spotify para dar permiso a tus playlists.',
+    importForbidden:
+      'Spotify no dio acceso a las pistas (403). Conecta de nuevo; si sigue, revisa User Management abajo.',
     reconnectButton: 'Conectar Spotify de nuevo',
     importScopeHint:
-      'Si al reconectar sigue el 403, tu app de Spotify está en modo desarrollo: añade tu cuenta en developer.spotify.com → tu app → User Management.',
+      'Importante: en developer.spotify.com → tu app Legato → User Management pulsa «Add user» y añade tu cuenta de Spotify (nombre y correo). Sin eso, Spotify bloquea las pistas en modo desarrollo.',
   },
   settings: {
     title: 'Ajustes',

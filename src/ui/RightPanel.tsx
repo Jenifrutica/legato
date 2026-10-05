@@ -23,6 +23,7 @@ import { usePlaylistsStore } from '../features/playlists'
 import {
   fetchSpotifyPlaylistTracks,
   fetchSpotifyPlaylists,
+  handleSpotifyRedirect,
   importSourceTrackToPlaylist,
   isSpotifyConfigured,
   isSpotifyConnected,
@@ -81,6 +82,8 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     setSpotifyMessage(null)
     setSpotifyNeedsScope(false)
 
+    // El redirect de reconexión puede haber llegado después del primer render.
+    await handleSpotifyRedirect().catch(() => false)
     const connected = isSpotifyConnected()
     setSpotifyConnectedState(connected)
     if (!connected) {
@@ -133,16 +136,17 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
       if (message.includes('403')) {
-        // Permiso de playlists: se ofrece reconectar con autorización limpia.
+        // 403: o falta el scope de playlists o la app está en Development mode
+        // con el usuario fuera de User Management. Se ofrece reconectar limpio.
         setSpotifyNeedsScope(true)
-        setSpotifyMessage(`${t('spotify.importScope')} ${message}`.trim())
+        setSpotifyMessage(t('spotify.importForbidden'))
       } else if (message.includes('401') || message.includes('not-connected')) {
         setSpotifyNeedsScope(true)
         setSpotifyMessage(t('spotify.reconnect'))
       } else {
         setSpotifyMessage(`${t('spotify.importError')} ${message}`.trim())
       }
-      console.warn('[spotify-import]', error)
+      console.warn('[spotify-import]', `status=${message}`, error)
     }
   }
 
