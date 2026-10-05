@@ -25,6 +25,8 @@ export const en: typeof es = {
     loadingPlaylists: 'Loading your playlists…',
     importing: 'Importing tracks…',
     imported: '{{count}} tracks imported',
+    importEmpty:
+      'Could not recognize the tracks in that playlist. Add your account in User Management to import them exactly.',
     importError: 'Could not fetch your Spotify playlists.',
     emptyPlaylists: 'You have no playlists on Spotify.',
     importScope: 'Reconnect Spotify to grant access to your playlists.',

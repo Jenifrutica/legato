@@ -117,7 +117,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     setSpotifyNeedsScope(false)
 
     try {
-      const tracks = await fetchSpotifyPlaylistTracks(playlist.id)
+      const tracks = await fetchSpotifyPlaylistTracks(playlist.id, 100, playlist.name)
       const localId = createPlaylist(playlist.name)
       let imported = 0
 
@@ -130,7 +130,11 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
         }
       }
 
-      setSpotifyMessage(t('spotify.imported', { count: imported }))
+      if (imported === 0) {
+        setSpotifyMessage(t('spotify.importEmpty'))
+      } else {
+        setSpotifyMessage(t('spotify.imported', { count: imported }))
+      }
       setSpotifyStatus('idle')
     } catch (error) {
       const message = error instanceof Error ? error.message : ''

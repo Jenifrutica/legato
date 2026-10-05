@@ -98,6 +98,50 @@ describe('playlists de Spotify', () => {
     expect(await fetchSpotifyTrackPreview('t1')).toBeNull()
   })
 
+  it('con 403 cae a búsqueda por nombres de la playlist', async () => {
+    const fetchMock = vi
+      .fn()
+      // /playlists/p1/tracks responde 403 (Development mode)
+      .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
+      // nombres de pistas sin tocar /tracks
+      .mockResolvedValueOnce(
+        jsonResponse({ tracks: { items: [{ track: { name: 'Tema' } }] } }) as Response,
+      )
+      // /search resuelve el nombre
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tracks = await fetchSpotifyPlaylistTracks('p1', 100, 'Fiesta')
+
+    expect(tracks).toHaveLength(1)
+    expect(tracks[0]?.externalUrl).toBe('https://open.spotify.com/track/t1')
+    expect(String(fetchMock.mock.calls[2]?.[0])).toContain('/search')
+  })
+
+  it('con 403 y sin nombres usa el nombre de la playlist como consulta', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tracks = await fetchSpotifyPlaylistTracks('p1', 100, 'Champetas bailables')
+
+    expect(tracks).toHaveLength(1)
+    expect(String(fetchMock.mock.calls[2]?.[0])).toContain('Champetas')
+  })
+
+  it('con 403 y sin nombres ni nombre de playlist, lanza el error', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
+      .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(fetchSpotifyPlaylistTracks('p1', 100, '')).rejects.toThrow('403')
+  })
+
   it('ignora pistas locales, nulas o sin id', async () => {
     vi.stubGlobal(
       'fetch',

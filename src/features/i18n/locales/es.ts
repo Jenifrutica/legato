@@ -23,6 +23,8 @@ export const es = {
     loadingPlaylists: 'Cargando tus playlists…',
     importing: 'Importando pistas…',
     imported: '{{count}} pistas importadas',
+    importEmpty:
+      'No se pudieron reconocer las pistas de esa playlist. Añade tu cuenta en User Management para importarlas exactas.',
     importError: 'No se pudieron traer tus playlists de Spotify.',
     emptyPlaylists: 'No tienes playlists en Spotify.',
     importScope: 'Vuelve a conectar Spotify para dar permiso a tus playlists.',

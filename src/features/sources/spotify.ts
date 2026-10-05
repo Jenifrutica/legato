@@ -315,9 +315,9 @@ export function mapSpotifyTrack(track: SpotifyTrack): SourceTrack {
   }
 }
 
-export async function searchSpotify(query: string): Promise<SourceTrack[]> {
-  const token = await getAccessToken()
-  if (token === null) {
+export async function searchSpotify(query: string, tokenOverride?: string): Promise<SourceTrack[]> {
+  const token = tokenOverride ?? (await getAccessToken())
+  if (token === null || token === undefined) {
     throw new Error('not-connected')
   }
 
@@ -466,10 +466,36 @@ export async function fetchSpotifyPlaylists(): Promise<SpotifyPlaylistSummary[]>
     }))
 }
 
-/** Pistas de una playlist de Spotify como referencias externas (con tope). */
+type SpotifyPlaylistTrackEntry = {
+  track?: (SpotifyTrack & { is_local?: boolean }) | null
+  item?: (SpotifyTrack & { is_local?: boolean }) | null
+}
+
+function trackFromEntry(entry: SpotifyPlaylistTrackEntry | null): SourceTrack | null {
+  const track = entry?.track ?? entry?.item
+  if (
+    track === null ||
+    track === undefined ||
+    track.is_local === true ||
+    typeof track.id !== 'string' ||
+    track.id === ''
+  ) {
+    return null
+  }
+  return mapSpotifyTrack(track)
+}
+
+/**
+ * Pistas de una playlist de Spotify como referencias externas (con tope).
+ *
+ * En Development mode sin el usuario en la lista, Spotify responde **403** al
+ * endpoint de pistas. Aquí se intenta primero la vía directa (IDs exactos) y,
+ * si la bloquea, se cae a un **modo por búsqueda** para no romper el import.
+ */
 export async function fetchSpotifyPlaylistTracks(
   playlistId: string,
   limit = 100,
+  playlistName = '',
 ): Promise<SourceTrack[]> {
   const token = await getAccessToken()
   if (token === null) {
@@ -505,30 +531,27 @@ export async function fetchSpotifyPlaylistTracks(
       response = await fetchPage('items', 10)
     }
 
+    // 403: la app está en Development mode y el endpoint de pistas está
+    // bloqueado. Se intenta el fallback por búsqueda (nombres resueltos con
+    // /search, que sí funciona con el token concedido).
+    if (response.status === 403) {
+      return searchPlaylistFallback(token, playlistId, playlistName, limit)
+    }
+
     if (!response.ok) {
       throw new Error(await describeError(response))
     }
 
     const data = (await response.json()) as {
-      items?: Array<{
-        track?: (SpotifyTrack & { is_local?: boolean }) | null
-        item?: (SpotifyTrack & { is_local?: boolean }) | null
-      } | null>
+      items?: Array<SpotifyPlaylistTrackEntry | null>
       next?: string | null
     }
 
     for (const entry of data.items ?? []) {
-      const track = entry?.track ?? entry?.item
-      if (
-        track === null ||
-        track === undefined ||
-        track.is_local === true ||
-        typeof track.id !== 'string' ||
-        track.id === ''
-      ) {
-        continue
+      const mapped = trackFromEntry(entry)
+      if (mapped !== null) {
+        tracks.push(mapped)
       }
-      tracks.push(mapSpotifyTrack(track))
     }
 
     if (data.next === null || data.next === undefined) {
@@ -538,4 +561,101 @@ export async function fetchSpotifyPlaylistTracks(
   }
 
   return tracks.slice(0, limit)
+}
+
+/**
+ * Fallback de import para Development mode: lee los NOMBRES de las pistas de
+ * la playlist (`/playlists/{id}?fields=...`, que no es el endpoint bloqueado)
+ * y resuelve cada uno con `/search`. Si tampoco se pueden leer los nombres,
+ * usa el nombre de la playlist como consulta.
+ */
+async function searchPlaylistFallback(
+  token: string,
+  playlistId: string,
+  playlistName: string,
+  limit: number,
+): Promise<SourceTrack[]> {
+  const names = await fetchPlaylistTrackNames(token, playlistId)
+
+  if (names.length === 0) {
+    if (playlistName.trim() === '') {
+      throw new Error('HTTP 403: Spotify denied access to this playlist (development mode)')
+    }
+    return searchSpotify(playlistName, token).then((found) => found.slice(0, limit))
+  }
+
+  const results: SourceTrack[] = []
+  const seen = new Set<string>()
+
+  for (const name of names.slice(0, limit)) {
+    const matches = await searchSpotify(name, token)
+    const best = pickBestMatch(matches, name)
+    if (best !== null && !seen.has(best.id)) {
+      seen.add(best.id)
+      results.push(best)
+    }
+  }
+
+  return results
+}
+
+/** Nombres de las pistas de una playlist sin tocar `/tracks` (evita el 403). */
+async function fetchPlaylistTrackNames(token: string, playlistId: string): Promise<string[]> {
+  const fields = 'tracks.items(track(name))'
+  const response = await fetchWithRetry(
+    `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}`,
+    token,
+  )
+  if (!response.ok) {
+    return []
+  }
+
+  const data = (await response.json()) as {
+    tracks?: { items?: Array<{ track?: { name?: string } | null } | null> | null } | null
+  }
+
+  return (data.tracks?.items ?? [])
+    .map((entry) => entry?.track?.name)
+    .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+}
+
+function normalize(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Elige el resultado de búsqueda cuyo título se parece más a la consulta. */
+function pickBestMatch(matches: SourceTrack[], query: string): SourceTrack | null {
+  const target = normalize(query)
+  if (target === '') {
+    return null
+  }
+
+  let best: SourceTrack | null = null
+  let bestScore = 0
+
+  for (const track of matches) {
+    const title = normalize(track.title)
+    let score = 0
+    if (title === target) {
+      score = 3
+    } else if (title.includes(target) || target.includes(title)) {
+      score = 2
+    } else {
+      const targetWords = new Set(target.split(' '))
+      const shared = title.split(' ').filter((word) => targetWords.has(word)).length
+      score = shared > 0 ? 1 + shared * 0.1 : 0
+    }
+    if (score > bestScore) {
+      bestScore = score
+      best = track
+    }
+  }
+
+  return bestScore >= 1 ? best : null
 }

@@ -25,6 +25,8 @@ export const pt: typeof es = {
     loadingPlaylists: 'Carregando suas playlists…',
     importing: 'Importando faixas…',
     imported: '{{count}} faixas importadas',
+    importEmpty:
+      'Não foi possível reconhecer as faixas dessa playlist. Adicione sua conta em User Management para importá-las exatas.',
     importError: 'Não foi possível buscar suas playlists do Spotify.',
     emptyPlaylists: 'Você não tem playlists no Spotify.',
     importScope: 'Reconecte o Spotify para permitir acesso às suas playlists.',

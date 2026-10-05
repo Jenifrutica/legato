@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 317 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 320 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 317 unitarios
+~/.bun/bin/bun run test        # 320 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -605,6 +605,14 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Diagnóstico con la cuenta `Chenife`**: `/me/playlists` → **200** (la lista carga) pero `/playlists/{id}/tracks` → **403**. El dashboard muestra la app en **Development mode** con **User Management vacío (`0/5 added`)**: sin añadir el usuario, Spotify bloquea la lectura de pistas. **Solución principal: `Add user` en el dashboard** (acción de la autora).
 - **Arreglo de código** (`spotify.ts`, `RightPanel.tsx`): `fetchWithRetry` reintenta una vez **tras refrescar el token en 401** (antes solo 429); `reconnectSpotify()` borra los tokens y reautoriza para garantizar `playlist-read-private`; el panel ofrece **botón de reconexión limpia** y muestra el **error crudo** de Spotify + una pista sobre User Management cuando es 403. Claves i18n `spotify.importScopeHint` en ES/EN/PT.
 - **Cierre pendiente**: tras añadir la cuenta en User Management, importar «Champetas bailables» (33 pistas) → playlist local + referencias `SPOTIFY` en la Lista + reproducción por SDK.
+
+### AB Import sin `Add user`: fallback por búsqueda (implementado)
+
+- **Motivo**: la autora (y su profesor) pueden usar otras cuentas; se prefiere que el import funcione **sin añadir usuarios** al dashboard cuando sea posible.
+- **Fallback**: si `/playlists/{id}/tracks` responde **403** (Development mode), `fetchSpotifyPlaylistTracks` lee los **nombres** de las pistas con `/playlists/{id}?fields=tracks.items(track(name))` (que no es el endpoint bloqueado) y resuelve cada uno con **`/search`** (que sí funciona con el token), eligiendo el mejor título por parecido normalizado (sin acentos/puntuación). Si no hay nombres, usa el **nombre de la playlist** como consulta. Si tampoco hay nada, lanza el 403 con el mensaje crudo.
+- **UI**: el import avisa cuando no reconoció pistas (`spotify.importEmpty`) y recuerda que `User Management` da import exacto. `searchSpotify` acepta un token opcional.
+- **Cobertura**: 3 tests nuevos del fallback (por nombres, por nombre de playlist, y sin nada → error). Total **320 unit + 13 E2E**.
+- **Límite**: el fallback resuelve por texto (no por ID), así que puede traer otra versión del tema; es un puente hasta `Add user` o Extended Quota.
 - **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.
 
 ### X Google como vía principal y verificación alcanzable (implementado)
