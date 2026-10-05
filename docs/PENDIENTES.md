@@ -43,7 +43,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 - `fetchWithRetry` reintenta una vez tras el refresco del token ante **401** (reloj desfasado), no solo en 429.
 - `reconnectSpotify()` fuerza autorización limpia para garantizar `playlist-read-private`.
 - El panel distingue 403 (permiso / Development) de 401 y muestra el **error crudo** de Spotify + pista de User Management.
-- **Fallback por búsqueda (opción B, sin `Add user`)**: si `/playlists/{id}/tracks` da 403, se leen los **nombres** de las pistas (`?fields=tracks.items(track(name))`) y se resuelven con **`/search`** (mejor título por parecido normalizado); si no hay nombres, se busca por el **nombre de la playlist**. Funciona sin añadir usuarios, a cambio de resolver por texto (puede traer otra versión del tema); si no reconoce nada, avisa (`spotify.importEmpty`). 3 tests nuevos.
+- **Fallback por búsqueda (opción B) — verificado y descartado**: se intentó leer los nombres de las pistas por `/playlists/{id}?fields=…` y resolverlos con `/search`. Con la cuenta real el resultado fue **`nombres leídos = 0`**: Spotify **también bloquea** esa vía en Development mode. Se retiró la búsqueda por nombre de playlist (traía temas que no eran); ahora se lanza `dev-mode-restricted` y el panel explica que hay que **añadir la cuenta en User Management** (hasta 5) o pedir **Extended Quota** (uso abierto, tarda días). 3 tests del fallback (nombres, forma nueva, restricción).
 
 **Lo implementado como respuesta (en este cierre):**
 - Si el *refresh token* falla, los tokens se **borran** (`disconnectSpotify`) para no fingir sesión; el panel muestra un botón **«Conectar Spotify de nuevo»**.

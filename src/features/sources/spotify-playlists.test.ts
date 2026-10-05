@@ -111,35 +111,37 @@ describe('playlists de Spotify', () => {
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    const tracks = await fetchSpotifyPlaylistTracks('p1', 100, 'Fiesta')
+    const tracks = await fetchSpotifyPlaylistTracks('p1')
 
     expect(tracks).toHaveLength(1)
     expect(tracks[0]?.externalUrl).toBe('https://open.spotify.com/track/t1')
     expect(String(fetchMock.mock.calls[2]?.[0])).toContain('/search')
   })
 
-  it('con 403 y sin nombres usa el nombre de la playlist como consulta', async () => {
+  it('acepta la forma nueva items/item al leer nombres', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
+      // primera forma (tracks) vacía, segunda forma (items) con el nombre
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ items: { items: [{ item: { name: 'Tema' } }] } }))
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [trackPayload] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    const tracks = await fetchSpotifyPlaylistTracks('p1', 100, 'Champetas bailables')
+    const tracks = await fetchSpotifyPlaylistTracks('p1')
 
     expect(tracks).toHaveLength(1)
-    expect(String(fetchMock.mock.calls[2]?.[0])).toContain('Champetas')
   })
 
-  it('con 403 y sin nombres ni nombre de playlist, lanza el error', async () => {
+  it('con 403 y sin nombres lanza dev-mode-restricted', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: { message: 'Forbidden' } }, false, 403))
       .mockResolvedValueOnce(jsonResponse({ tracks: { items: [] } }))
+      .mockResolvedValueOnce(jsonResponse({ items: { items: [] } }))
     vi.stubGlobal('fetch', fetchMock)
 
-    await expect(fetchSpotifyPlaylistTracks('p1', 100, '')).rejects.toThrow('403')
+    await expect(fetchSpotifyPlaylistTracks('p1')).rejects.toThrow('dev-mode-restricted')
   })
 
   it('ignora pistas locales, nulas o sin id', async () => {

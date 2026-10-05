@@ -495,7 +495,6 @@ function trackFromEntry(entry: SpotifyPlaylistTrackEntry | null): SourceTrack | 
 export async function fetchSpotifyPlaylistTracks(
   playlistId: string,
   limit = 100,
-  playlistName = '',
 ): Promise<SourceTrack[]> {
   const token = await getAccessToken()
   if (token === null) {
@@ -536,7 +535,7 @@ export async function fetchSpotifyPlaylistTracks(
     // /search, que sí funciona con el token concedido).
     if (response.status === 403) {
       console.info('[spotify-import] 403 en /tracks; usando fallback por búsqueda')
-      return searchPlaylistFallback(token, playlistId, playlistName, limit)
+      return searchPlaylistFallback(token, playlistId, limit)
     }
 
     if (!response.ok) {
@@ -565,26 +564,21 @@ export async function fetchSpotifyPlaylistTracks(
 }
 
 /**
- * Fallback de import para Development mode: lee los NOMBRES de las pistas de
- * la playlist (`/playlists/{id}?fields=...`, que no es el endpoint bloqueado)
- * y resuelve cada uno con `/search`. Si tampoco se pueden leer los nombres,
- * usa el nombre de la playlist como consulta.
+ * Fallback de import para Development mode: intenta leer los NOMBRES de las
+ * pistas de la playlist por una vía que no sea `/tracks` y los resuelve con
+ * `/search`. Si Spotify también bloquea esa lectura (Development mode lo hace),
+ * se lanza `dev-mode-restricted` para que la UI explique qué hacer.
  */
 async function searchPlaylistFallback(
   token: string,
   playlistId: string,
-  playlistName: string,
   limit: number,
 ): Promise<SourceTrack[]> {
   const names = await fetchPlaylistTrackNames(token, playlistId)
   console.info('[spotify-import] fallback: nombres de pistas leídos =', names.length)
 
   if (names.length === 0) {
-    if (playlistName.trim() === '') {
-      throw new Error('HTTP 403: Spotify denied access to this playlist (development mode)')
-    }
-    console.info('[spotify-import] fallback: sin nombres, buscando por nombre de playlist')
-    return searchSpotify(playlistName, token).then((found) => found.slice(0, limit))
+    throw new Error('dev-mode-restricted')
   }
 
   const results: SourceTrack[] = []
@@ -602,24 +596,40 @@ async function searchPlaylistFallback(
   return results
 }
 
-/** Nombres de las pistas de una playlist sin tocar `/tracks` (evita el 403). */
+/** Nombres de las pistas de una playlist sin tocar `/tracks`. */
 async function fetchPlaylistTrackNames(token: string, playlistId: string): Promise<string[]> {
-  const fields = 'tracks.items(track(name))'
-  const response = await fetchWithRetry(
-    `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}`,
-    token,
-  )
-  if (!response.ok) {
-    return []
+  // Spotify renombró `tracks`/`track` a `items`/`item`; se prueban ambas formas.
+  const shapes = ['tracks.items(track(name))', 'items.items(item(name))']
+
+  for (const fields of shapes) {
+    const response = await fetchWithRetry(
+      `${API}/playlists/${playlistId}?fields=${encodeURIComponent(fields)}`,
+      token,
+    )
+    if (!response.ok) {
+      console.info('[spotify-import] fields', fields, '→', response.status)
+      continue
+    }
+
+    const data = (await response.json()) as {
+      tracks?: { items?: Array<{ track?: { name?: string } | null } | null> | null } | null
+      items?: { items?: Array<{ item?: { name?: string } | null } | null> | null } | null
+    }
+
+    const entries = (data.tracks?.items ?? data.items?.items ?? []) as Array<{
+      track?: { name?: string } | null
+      item?: { name?: string } | null
+    } | null>
+    const names = entries
+      .map((entry) => entry?.track?.name ?? entry?.item?.name)
+      .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+
+    if (names.length > 0) {
+      return names
+    }
   }
 
-  const data = (await response.json()) as {
-    tracks?: { items?: Array<{ track?: { name?: string } | null } | null> | null } | null
-  }
-
-  return (data.tracks?.items ?? [])
-    .map((entry) => entry?.track?.name)
-    .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+  return []
 }
 
 function normalize(value: string): string {

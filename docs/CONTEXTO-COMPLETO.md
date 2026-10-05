@@ -611,8 +611,8 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Motivo**: la autora (y su profesor) pueden usar otras cuentas; se prefiere que el import funcione **sin añadir usuarios** al dashboard cuando sea posible.
 - **Fallback**: si `/playlists/{id}/tracks` responde **403** (Development mode), `fetchSpotifyPlaylistTracks` lee los **nombres** de las pistas con `/playlists/{id}?fields=tracks.items(track(name))` (que no es el endpoint bloqueado) y resuelve cada uno con **`/search`** (que sí funciona con el token), eligiendo el mejor título por parecido normalizado (sin acentos/puntuación). Si no hay nombres, usa el **nombre de la playlist** como consulta. Si tampoco hay nada, lanza el 403 con el mensaje crudo.
 - **UI**: el import avisa cuando no reconoció pistas (`spotify.importEmpty`) y recuerda que `User Management` da import exacto. `searchSpotify` acepta un token opcional.
-- **Cobertura**: 3 tests nuevos del fallback (por nombres, por nombre de playlist, y sin nada → error). Total **320 unit + 13 E2E**.
-- **Límite**: el fallback resuelve por texto (no por ID), así que puede traer otra versión del tema; es un puente hasta `Add user` o Extended Quota.
+- **Cobertura**: 3 tests del fallback (nombres, forma nueva `items/item`, y `dev-mode-restricted`). Total **320 unit + 13 E2E**.
+- **Verificado con la cuenta real**: el fallback **NO funciona** en Development mode — Spotify también bloquea `/playlists/{id}?fields=…` (`nombres leídos = 0`). Conclusión: en Development mode **no hay forma de importar sin añadir la cuenta**. Se retiró la búsqueda por nombre de playlist (traía temas que no eran) y ahora se lanza `dev-mode-restricted`, con mensaje claro de **User Management** (hasta 5 cuentas) o **Extended Quota** (uso abierto, tarda unos días).
 - **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.
 
 ### X Google como vía principal y verificación alcanzable (implementado)

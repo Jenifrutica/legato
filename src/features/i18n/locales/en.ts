@@ -31,10 +31,12 @@ export const en: typeof es = {
     emptyPlaylists: 'You have no playlists on Spotify.',
     importScope: 'Reconnect Spotify to grant access to your playlists.',
     importForbidden:
-      'Spotify denied access to the tracks (403). Reconnect; if it persists, check User Management below.',
+      'Spotify denied access to the tracks (403). Reconnect; if it persists, see the note below.',
+    devMode:
+      'Spotify blocks tracks in development mode. Add your account (or your teacher’s) in User Management; otherwise they cannot be imported.',
     reconnectButton: 'Reconnect Spotify',
     importScopeHint:
-      'Important: at developer.spotify.com → your Legato app → User Management press "Add user" and add your Spotify account. Without it, Spotify blocks tracks in development mode.',
+      'At developer.spotify.com → your Legato app → User Management, press "Add user" and add the Spotify account email (up to 5 accounts). For open use without a list, request "Extended Quota" from Spotify (takes a few days).',
   },
   settings: {
     title: 'Settings',

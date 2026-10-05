@@ -117,7 +117,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     setSpotifyNeedsScope(false)
 
     try {
-      const tracks = await fetchSpotifyPlaylistTracks(playlist.id, 100, playlist.name)
+      const tracks = await fetchSpotifyPlaylistTracks(playlist.id)
       const localId = createPlaylist(playlist.name)
       let imported = 0
 
@@ -139,9 +139,12 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
-      if (message.includes('403')) {
-        // 403: o falta el scope de playlists o la app está en Development mode
-        // con el usuario fuera de User Management. Se ofrece reconectar limpio.
+      if (message.includes('dev-mode-restricted')) {
+        // Spotify bloquea la lectura de pistas: la app está en Development
+        // mode y esta cuenta no está en User Management.
+        setSpotifyNeedsScope(true)
+        setSpotifyMessage(t('spotify.devMode'))
+      } else if (message.includes('403')) {
         setSpotifyNeedsScope(true)
         setSpotifyMessage(t('spotify.importForbidden'))
       } else if (message.includes('401') || message.includes('not-connected')) {

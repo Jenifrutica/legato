@@ -29,10 +29,12 @@ export const es = {
     emptyPlaylists: 'No tienes playlists en Spotify.',
     importScope: 'Vuelve a conectar Spotify para dar permiso a tus playlists.',
     importForbidden:
-      'Spotify no dio acceso a las pistas (403). Conecta de nuevo; si sigue, revisa User Management abajo.',
+      'Spotify no dio acceso a las pistas (403). Conecta de nuevo; si sigue, revisa la nota de abajo.',
+    devMode:
+      'Spotify bloquea las pistas en modo desarrollo. Añade tu cuenta (o la de tu profe) en User Management; si no, no se pueden importar.',
     reconnectButton: 'Conectar Spotify de nuevo',
     importScopeHint:
-      'Importante: en developer.spotify.com → tu app Legato → User Management pulsa «Add user» y añade tu cuenta de Spotify (nombre y correo). Sin eso, Spotify bloquea las pistas en modo desarrollo.',
+      'En developer.spotify.com → tu app Legato → User Management, pulsa «Add user» y añade el correo de la cuenta de Spotify (hasta 5 cuentas). Para uso abierto sin lista, solicita «Extended Quota» a Spotify (tarda unos días).',
   },
   settings: {
     title: 'Ajustes',

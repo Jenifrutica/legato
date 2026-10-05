@@ -31,10 +31,12 @@ export const pt: typeof es = {
     emptyPlaylists: 'Você não tem playlists no Spotify.',
     importScope: 'Reconecte o Spotify para permitir acesso às suas playlists.',
     importForbidden:
-      'O Spotify negou acesso às faixas (403). Reconecte; se persistir, veja User Management abaixo.',
+      'O Spotify negou acesso às faixas (403). Reconecte; se persistir, veja a nota abaixo.',
+    devMode:
+      'O Spotify bloqueia as faixas no modo de desenvolvimento. Adicione sua conta (ou a do professor) em User Management; sem isso, não é possível importar.',
     reconnectButton: 'Conectar o Spotify novamente',
     importScopeHint:
-      'Importante: em developer.spotify.com → seu app Legato → User Management, clique em "Add user" e adicione sua conta do Spotify. Sem isso, o Spotify bloqueia as faixas no modo de desenvolvimento.',
+      'Em developer.spotify.com → seu app Legato → User Management, clique em "Add user" e adicione o e-mail da conta do Spotify (até 5 contas). Para uso aberto sem lista, solicite "Extended Quota" ao Spotify (leva alguns dias).',
   },
   settings: {
     title: 'Configurações',
