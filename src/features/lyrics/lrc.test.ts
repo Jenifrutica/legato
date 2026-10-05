@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeLineIndex, parseLrc } from './lrc'
+import { activeLineIndex, displayLineIndex, lyricLead, parseLrc } from './lrc'
 
 describe('parser LRC', () => {
   it('convierte marcas de tiempo y ordena las líneas', () => {
@@ -52,5 +52,43 @@ describe('línea activa', () => {
 
   it('devuelve -1 antes de la primera línea', () => {
     expect(activeLineIndex([{ time: 4, text: 'x' }], 1)).toBe(-1)
+  })
+})
+
+describe('avance de la letra', () => {
+  const lines = [
+    { time: 0, text: 'a' },
+    { time: 10, text: 'b' },
+    { time: 20, text: 'c' },
+  ]
+
+  it('la primera línea arranca suavemente y arranca en 0 como muy pronto', () => {
+    expect(lyricLead(lines, 0)).toBe(0)
+    expect(lyricLead([{ time: 5, text: 'x' }], 0)).toBe(4.75)
+  })
+
+  it('el avance no adelanta a la línea anterior', () => {
+    expect(lyricLead(lines, 1)).toBe(9.75)
+    expect(
+      lyricLead(
+        [
+          { time: 10, text: 'a' },
+          { time: 10.1, text: 'b' },
+        ],
+        1,
+      ),
+    ).toBe(10)
+  })
+
+  it('cambia de línea hasta 0.25 s antes de la marca para evitar el retraso', () => {
+    expect(displayLineIndex(lines, 9.6)).toBe(0)
+    expect(displayLineIndex(lines, 9.85)).toBe(1)
+    expect(displayLineIndex(lines, 10.1)).toBe(1)
+    expect(displayLineIndex(lines, 19.85)).toBe(2)
+    expect(displayLineIndex(lines, 5)).toBe(0)
+  })
+
+  it('antes de la primera línea el héroe enseña la primera', () => {
+    expect(displayLineIndex([{ time: 4, text: 'x' }], 1)).toBe(0)
   })
 })

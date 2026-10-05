@@ -9,7 +9,7 @@ import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
 import { VideoOverlay } from './VideoOverlay'
 import { VinylVisual } from './VinylVisual'
-import { useLyrics, useLyricsStore } from '../features/lyrics'
+import { activeLineIndex, useLyrics, useLyricsStore } from '../features/lyrics'
 import { Lyrics, useDemoLyrics } from './Lyrics'
 import { QueueStrip } from './QueueStrip'
 import { NostalgiaCapsule } from './NostalgiaCapsule'
@@ -88,6 +88,19 @@ export function Hero() {
   const toggleLyrics = useLyricsStore((state) => state.toggle)
   const lyricsLines = lyricsVisible ? (demoLyrics.length > 0 ? demoLyrics : lyricsState.lines) : []
   const lyricsSource = lyricsVisible && demoLyrics.length === 0 ? lyricsState.source : null
+
+  // Línea secundaria del héroe: si la vigente no ha entrado y la siguiente
+  // está pronta, se enseña la siguiente. Se decide en los cambios de posición
+  // (no cada cuadro) para que el componente no se recree en cada render.
+  const heroTime =
+    spotifyActive && spotifyPlayback !== null ? spotifyPlayback.positionMs / 1000 : currentTime
+  const heroActive = activeLineIndex(lyricsLines, heroTime)
+  const lyricsNext =
+    heroActive >= 0
+      ? heroActive + 1 < lyricsLines.length && lyricsLines[heroActive + 1].time - heroTime <= 1.2
+        ? lyricsLines[heroActive + 1]
+        : null
+      : null
   const displayTitle = spotifyActive
     ? spotifyPlayback.title
     : (currentTrack?.title ?? t('vinyl.idleTitle'))
@@ -166,7 +179,7 @@ export function Hero() {
             </p>
           )}
 
-          <Lyrics lines={lyricsLines} source={lyricsSource} />
+          <Lyrics lines={lyricsLines} next={lyricsNext} source={lyricsSource} />
 
           {lyricsLines.length === 0 && <QueueStrip />}
 

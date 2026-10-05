@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 313 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 317 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 313 unitarios
+~/.bun/bin/bun run test        # 317 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -609,7 +609,13 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Accesibilidad**: test de axe nuevo para la pantalla de verificación (`App.a11y.test.tsx`, `emailVerified: false`).
 - **E2E**: los proveedores locales no verifican, así que los 13 E2E siguen igual.
 
-### Y Ocultar la velocidad en Spotify (implementado)
+### Y Zona del vinilo y letras sin retraso (implementado)
+
+- **Cuadrado del disco más contenido**: `.disc-field` pasa a `1.08×` el ancho del disco (pegado a los lados) y la zona baja a `0.62×` para recortar el fondo por abajo; el recorte de las ondas en el canvas (`fieldBottom`) se sincronizó a `0.35`.
+- **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
+- **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
+
+### Z Ocultar la velocidad en Spotify (implementado)
 
 - **Decisión de la autora**: en Spotify el control de velocidad no hace nada (SDK/DRM); se **oculta** en vez de mostrar un aviso.
 - **Cambios**: `Hero.tsx`, `PlayerBar.tsx` (barra móvil) y la sección de velocidad de `PracticePanel.tsx` solo aparecen con `!spotifyActive`. En local se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5** (`controller.cycleRate`). Se retiran el estado `speedNotice` y la clave i18n `player.speedSpotify` (ES/EN/PT) para no dejar huérfanas.

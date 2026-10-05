@@ -1,4 +1,4 @@
-export { activeLineIndex, parseLrc } from './lrc'
+export { activeLineIndex, displayLineIndex, lyricLead, parseLrc, LYRIC_LEAD_SECONDS } from './lrc'
 export type { LyricLine } from './lrc'
 export { useLocalLyricsStore } from './local-lyrics-store'
 export type { LocalLyrics } from './local-lyrics-store'

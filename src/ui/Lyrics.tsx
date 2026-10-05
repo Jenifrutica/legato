@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { isExternalTrack, useSpotifyStore } from '../features/sources'
-import { activeLineIndex, type LyricLine } from '../features/lyrics'
+import { displayLineIndex, type LyricLine } from '../features/lyrics'
 import { usePlayerStore } from '../player'
 
 export type { LyricLine }
@@ -31,9 +31,12 @@ function demoEnabled(): boolean {
 
 export function Lyrics({
   lines = [],
+  next = null,
   source = null,
 }: {
   lines?: LyricLine[]
+  /** Línea a mostrar como secundaria fuera del componente (si el héroe la calcula). */
+  next?: LyricLine | null
   source?: 'lrclib' | 'local' | null
 }) {
   const { t } = useTranslation()
@@ -51,9 +54,9 @@ export function Lyrics({
     return null
   }
 
-  const active = activeLineIndex(lines, time)
+  const active = displayLineIndex(lines, time)
   const current = active >= 0 ? lines[active] : lines[0]
-  const next = lines[active + 1] ?? null
+  const follow = next ?? lines[active + 1] ?? null
 
   return (
     <div aria-label={t('lyrics.region')} className="relative mt-8 max-w-3xl">
@@ -65,9 +68,9 @@ export function Lyrics({
         {current.text}
       </p>
       <div className="relative mt-3 flex flex-wrap items-baseline gap-x-4">
-        {next !== null && (
+        {follow !== null && (
           <p className="font-serif text-base text-ink-muted sm:text-lg" lang="es">
-            {next.text}
+            {follow.text}
           </p>
         )}
         {source === 'lrclib' && (
