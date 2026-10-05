@@ -24,6 +24,7 @@ export const pt: typeof es = {
     importPlaylists: 'Importar do Spotify',
     loadingPlaylists: 'Carregando suas playlists…',
     importing: 'Importando faixas…',
+    importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} faixas importadas',
     importEmpty:
       'Não foi possível reconhecer as faixas dessa playlist. Adicione sua conta em User Management para importá-las exatas.',
@@ -250,6 +251,7 @@ export const pt: typeof es = {
     emptyText:
       'Adicione arquivos de áudio do seu dispositivo para começar a ouvir e organizar sua música.',
     noResults: 'Sem resultados para “{{query}}”.',
+    showMore: 'Mostrar mais {{count}}',
     importedCount: '{{count}} faixa(s) importada(s)',
     addTo: 'Adicionar a…',
     addToLabel: 'Adicionar {{title}} a uma playlist',

@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -152,21 +152,40 @@ export function LibraryPanel() {
   const selectedPlaylist = playlists.find((playlist) => playlist.id === selectedPlaylistId) ?? null
   const isPlaylistView = selectedPlaylist !== null
 
-  const viewTracks: LibraryTrack[] = isPlaylistView
-    ? selectedPlaylist.trackIds
-        .map((id) => tracks.find((track) => track.id === id))
-        .filter((track): track is LibraryTrack => track !== undefined)
-    : tracks
+  const tracksById = useMemo(() => new Map(tracks.map((track) => [track.id, track])), [tracks])
+
+  const viewTracks: LibraryTrack[] = useMemo(
+    () =>
+      isPlaylistView && selectedPlaylist !== null
+        ? selectedPlaylist.trackIds
+            .map((id) => tracksById.get(id))
+            .filter((track): track is LibraryTrack => track !== undefined)
+        : tracks,
+    [isPlaylistView, selectedPlaylist, tracksById, tracks],
+  )
 
   const normalizedQuery = normalizeText(query)
-  const filtered =
-    normalizedQuery === ''
-      ? viewTracks
-      : viewTracks.filter((track) =>
-          normalizeText(`${track.title} ${track.artist} ${track.album ?? ''}`).includes(
-            normalizedQuery,
+  const filtered = useMemo(
+    () =>
+      normalizedQuery === ''
+        ? viewTracks
+        : viewTracks.filter((track) =>
+            normalizeText(`${track.title} ${track.artist} ${track.album ?? ''}`).includes(
+              normalizedQuery,
+            ),
           ),
-        )
+    [viewTracks, normalizedQuery],
+  )
+
+  // Render por tramos: bibliotecas enormes no deben colgar el navegador.
+  const PAGE_SIZE = 200
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [normalizedQuery, selectedPlaylistId])
+
+  const visible = filtered.slice(0, visibleCount)
 
   async function handleFiles(files: FileList | File[]) {
     const list = Array.from(files)
@@ -473,11 +492,11 @@ export function LibraryPanel() {
               sensors={sensors}
             >
               <SortableContext
-                items={filtered.map((track) => track.id)}
+                items={visible.map((track) => track.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <ul className="divide-y divide-border">
-                  {filtered.map((track, index) => (
+                  {visible.map((track, index) => (
                     <SortableTrackRow
                       disabled={normalizedQuery !== ''}
                       index={index}
@@ -508,7 +527,7 @@ export function LibraryPanel() {
             </DndContext>
           ) : (
             <ul className="divide-y divide-border">
-              {filtered.map((track, index) => (
+              {visible.map((track, index) => (
                 <li
                   className="flex items-center gap-3 px-5 py-3"
                   draggable
@@ -546,6 +565,18 @@ export function LibraryPanel() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {filtered.length > visible.length && (
+            <div className="p-3 text-center">
+              <button
+                className="border-2 border-rule/40 px-4 py-2 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+                type="button"
+              >
+                {t('library.showMore', { count: filtered.length - visible.length })}
+              </button>
+            </div>
           )}
         </div>
       )}

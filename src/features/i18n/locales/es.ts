@@ -22,6 +22,7 @@ export const es = {
     importPlaylists: 'Importar de Spotify',
     loadingPlaylists: 'Cargando tus playlists…',
     importing: 'Importando pistas…',
+    importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} pistas importadas',
     importEmpty:
       'No se pudieron reconocer las pistas de esa playlist. Añade tu cuenta en User Management para importarlas exactas.',
@@ -250,6 +251,7 @@ export const es = {
     emptyText:
       'Agrega archivos de audio desde tu equipo para empezar a escuchar y organizar tu música.',
     noResults: 'Sin resultados para «{{query}}».',
+    showMore: 'Mostrar {{count}} más',
     importedCount: '{{count}} canción(es) importada(s)',
     addTo: 'Agregar a…',
     addToLabel: 'Agregar {{title}} a una playlist',

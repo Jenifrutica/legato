@@ -24,6 +24,7 @@ export const en: typeof es = {
     importPlaylists: 'Import from Spotify',
     loadingPlaylists: 'Loading your playlists…',
     importing: 'Importing tracks…',
+    importProgress: 'Importing {{done}}/{{total}}…',
     imported: '{{count}} tracks imported',
     importEmpty:
       'Could not recognize the tracks in that playlist. Add your account in User Management to import them exactly.',
@@ -250,6 +251,7 @@ export const en: typeof es = {
     emptyTitle: 'Your library is empty',
     emptyText: 'Add audio files from your device to start listening and organizing your music.',
     noResults: 'No results for “{{query}}”.',
+    showMore: 'Show {{count}} more',
     importedCount: '{{count}} track(s) imported',
     addTo: 'Add to…',
     addToLabel: 'Add {{title}} to a playlist',

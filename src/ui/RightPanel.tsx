@@ -73,6 +73,9 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   )
   const [spotifyMessage, setSpotifyMessage] = useState<string | null>(null)
   const [spotifyNeedsScope, setSpotifyNeedsScope] = useState(false)
+  const [spotifyProgress, setSpotifyProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  )
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
   const [spotifyConnectedState, setSpotifyConnectedState] = useState(isSpotifyConnected)
@@ -115,20 +118,32 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     setSpotifyStatus('importing')
     setSpotifyMessage(null)
     setSpotifyNeedsScope(false)
+    setSpotifyProgress(null)
 
     try {
       const tracks = await fetchSpotifyPlaylistTracks(playlist.id, 5000)
-      const localId = createPlaylist(playlist.name)
-      let imported = 0
+      setSpotifyProgress({ done: 0, total: tracks.length })
 
-      for (const track of tracks) {
-        const saved = await saveSourceTrack(track, existingDedupeKeys())
-        if (saved !== null) {
-          addTracks([saved])
-          usePlaylistsStore.getState().addTrackToPlaylist(localId, saved)
-          imported++
+      // Dedupe una sola vez y guarda los cambios en lote (antes era O(n²) y
+      // congelaba la pestaña en playlists grandes).
+      const keys = existingDedupeKeys()
+      const newTracks: LibraryTrack[] = []
+
+      for (let index = 0; index < tracks.length; index++) {
+        const saved = await saveSourceTrack(tracks[index], keys)
+        if (saved !== null && !keys.has(saved.dedupeKey)) {
+          keys.add(saved.dedupeKey)
+          newTracks.push(saved)
+        }
+        if (index % 25 === 0 || index === tracks.length - 1) {
+          setSpotifyProgress({ done: index + 1, total: tracks.length })
         }
       }
+
+      const localId = createPlaylist(playlist.name)
+      addTracks(newTracks)
+      const imported = usePlaylistsStore.getState().addTracksToPlaylist(localId, newTracks)
+      setSpotifyProgress(null)
 
       if (imported === 0) {
         setSpotifyMessage(t('spotify.importEmpty'))
@@ -137,6 +152,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       }
       setSpotifyStatus('idle')
     } catch (error) {
+      setSpotifyProgress(null)
       const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
       if (message.includes('dev-mode-restricted')) {
@@ -241,7 +257,26 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
             <p className="mt-2 text-xs text-ink-muted">{t('spotify.loadingPlaylists')}</p>
           )}
           {spotifyStatus === 'importing' && (
-            <p className="mt-2 text-xs text-ink-muted">{t('spotify.importing')}</p>
+            <div className="mt-2">
+              <p className="text-xs text-ink-muted">
+                {spotifyProgress !== null
+                  ? t('spotify.importProgress', {
+                      done: spotifyProgress.done,
+                      total: spotifyProgress.total,
+                    })
+                  : t('spotify.importing')}
+              </p>
+              {spotifyProgress !== null && spotifyProgress.total > 0 && (
+                <div className="mt-1 h-1.5 w-full bg-border" aria-hidden="true">
+                  <div
+                    className="h-full bg-accent transition-[width] duration-150"
+                    style={{
+                      width: `${Math.round((spotifyProgress.done / spotifyProgress.total) * 100)}%`,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           )}
           {spotifyMessage !== null && (
             <p className="mt-2 text-xs text-ink-muted" role="status">

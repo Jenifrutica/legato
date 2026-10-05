@@ -39,6 +39,8 @@ type PlaylistsState = {
   removePlaylist: (id: string) => void
   selectPlaylist: (id: string | null) => void
   addTrackToPlaylist: (playlistId: string, track: LibraryTrack) => boolean
+  /** Agrega muchas pistas con un solo paso de historial (importaciones). */
+  addTracksToPlaylist: (playlistId: string, tracks: LibraryTrack[]) => number
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => void
   moveTrackInPlaylist: (playlistId: string, trackId: string, targetIndex: number) => void
 }
@@ -108,6 +110,26 @@ export const usePlaylistsStore = create<PlaylistsState>((set, get) => ({
       const after = collection.toSnapshots()
       set({ playlists: after })
       registerHistory('add-track', before, beforeSelected, after, beforeSelected)
+    }
+
+    return added
+  },
+
+  addTracksToPlaylist: (playlistId, tracks) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+    let added = 0
+
+    for (const track of tracks) {
+      if (collection.addTrack(playlistId, track)) {
+        added++
+      }
+    }
+
+    if (added > 0) {
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('add-tracks', before, beforeSelected, after, beforeSelected)
     }
 
     return added

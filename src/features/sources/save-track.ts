@@ -37,15 +37,9 @@ export async function saveSourceTrack(
   existingKeys: Set<string>,
 ): Promise<LibraryTrack | null> {
   if (!track.downloadable) {
-    const external = buildExternalTrack(track)
-    if (external === null) {
-      return null
-    }
-
-    const existing = useLibraryStore
-      .getState()
-      .tracks.find((item) => item.dedupeKey === external.dedupeKey)
-    return existing ?? external
+    // Referencia externa (Spotify): la biblioteca deduplica por id al agregar,
+    // así que no hace falta buscar en toda la lista (era O(n) por pista).
+    return buildExternalTrack(track)
   }
 
   if (track.streamUrl === null) {

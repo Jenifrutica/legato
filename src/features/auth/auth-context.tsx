@@ -42,7 +42,13 @@ export function AuthContextProvider({
   useEffect(() => {
     let active = true
 
-    void authProvider.init().then(() => {
+    // La inicialización de Firebase puede no resolver si la red la bloquea
+    // (p. ej. escudos del navegador): nunca dejamos la puerta colgada.
+    const timeout = new Promise<void>((resolve) => {
+      setTimeout(resolve, 5000)
+    })
+
+    void Promise.race([authProvider.init().catch(() => undefined), timeout]).then(() => {
       if (active) {
         setUser(authProvider.getUser())
         setReady(true)

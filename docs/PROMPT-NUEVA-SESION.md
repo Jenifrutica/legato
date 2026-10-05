@@ -4,7 +4,7 @@
 
 ## Resumen
 
-La próxima sesión arranca en **modo plan**: leer `docs/CONTEXTO-COMPLETO.md` y `docs/PENDIENTES.md`, verificar **323 tests unitarios + 13 E2E + build**, y planificar los pendientes antes de tocar código:
+La próxima sesión arranca en **modo plan**: leer `docs/CONTEXTO-COMPLETO.md` y `docs/PENDIENTES.md`, verificar **324 tests unitarios + 13 E2E + build**, y planificar los pendientes antes de tocar código:
 
 1. **Login / perfil (Firebase)**: el correo de verificación no llega (spam); decidir Google vs SMTP propio y confirmar el flujo registro → verificación → entrada → recuperación → borrado.
 2. **«Error de conexión»** reportado: localizar el mensaje exacto (entrada, Ajustes → Spotify, sincronización o banner) y corregirlo.

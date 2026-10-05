@@ -71,6 +71,17 @@ describe('playlists store with history', () => {
     expect(usePlaylistsStore.getState().playlists[0]?.trackIds).toEqual(['a', 'b', 'c'])
   })
 
+  it('agrega muchas pistas en un solo paso de historial (importación)', () => {
+    const id = usePlaylistsStore.getState().createPlaylist('Set')
+    const added = usePlaylistsStore.getState().addTracksToPlaylist(id, [A, B, C, A])
+
+    expect(added).toBe(3)
+    expect(usePlaylistsStore.getState().playlists[0]?.trackIds).toEqual(['a', 'b', 'c'])
+
+    useHistoryStore.getState().undo()
+    expect(usePlaylistsStore.getState().playlists[0]?.trackIds).toEqual([])
+  })
+
   it('deshace eliminar una playlist con sus canciones', () => {
     const id = usePlaylistsStore.getState().createPlaylist('Set')
     usePlaylistsStore.getState().addTrackToPlaylist(id, A)
