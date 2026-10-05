@@ -66,6 +66,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [renameDraft, setRenameDraft] = useState('')
   const [dropMessage, setDropMessage] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [spotifyOpen, setSpotifyOpen] = useState(false)
   const [spotifyPlaylists, setSpotifyPlaylists] = useState<SpotifyPlaylistSummary[]>([])
   const [spotifyStatus, setSpotifyStatus] = useState<'idle' | 'loading' | 'importing' | 'error'>(
@@ -145,8 +146,11 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
       const imported = usePlaylistsStore.getState().addTracksToPlaylist(localId, newTracks)
       setSpotifyProgress(null)
 
+      console.info('[spotify-import] recibidas =', tracks.length, '· nuevas =', imported)
       if (imported === 0) {
         setSpotifyMessage(t('spotify.importEmpty'))
+      } else if (imported < tracks.length) {
+        setSpotifyMessage(t('spotify.importedOf', { imported, total: tracks.length }))
       } else {
         setSpotifyMessage(t('spotify.imported', { count: imported }))
       }
@@ -460,18 +464,36 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
                     >
                       <CopyIcon className="size-3.5" />
                     </button>
-                    <button
-                      aria-label={`${t('playlists.delete')} ${playlist.name}`}
-                      className=" p-1.5 text-ink-muted transition-colors hover:text-danger"
-                      onClick={() => {
-                        if (window.confirm(t('playlists.confirmDelete', { name: playlist.name }))) {
-                          removePlaylist(playlist.id)
-                        }
-                      }}
-                      type="button"
-                    >
-                      <TrashIcon className="size-3.5" />
-                    </button>
+                    {confirmDeleteId === playlist.id ? (
+                      <>
+                        <button
+                          className="border-2 border-danger px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-danger uppercase"
+                          onClick={() => {
+                            removePlaylist(playlist.id)
+                            setConfirmDeleteId(null)
+                          }}
+                          type="button"
+                        >
+                          {t('playlists.deleteConfirm')}
+                        </button>
+                        <button
+                          className="px-2 py-1 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-muted uppercase"
+                          onClick={() => setConfirmDeleteId(null)}
+                          type="button"
+                        >
+                          {t('playlists.deleteCancel')}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        aria-label={`${t('playlists.delete')} ${playlist.name}`}
+                        className=" p-1.5 text-ink-muted transition-colors hover:text-danger"
+                        onClick={() => setConfirmDeleteId(playlist.id)}
+                        type="button"
+                      >
+                        <TrashIcon className="size-3.5" />
+                      </button>
+                    )}
                   </div>
                 )}
               </li>

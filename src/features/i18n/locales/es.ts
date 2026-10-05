@@ -24,6 +24,7 @@ export const es = {
     importing: 'Importando pistas…',
     importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} pistas importadas',
+    importedOf: '{{imported}} de {{total}} pistas importadas (las demás ya estaban)',
     importEmpty:
       'No se pudieron reconocer las pistas de esa playlist. Añade tu cuenta en User Management para importarlas exactas.',
     importError: 'No se pudieron traer tus playlists de Spotify.',
@@ -277,6 +278,8 @@ export const es = {
     duplicate: 'Duplicar',
     delete: 'Eliminar',
     confirmDelete: '¿Eliminar la playlist «{{name}}»?',
+    deleteConfirm: 'Eliminar',
+    deleteCancel: 'Cancelar',
     trackCount:
       '{{count}} canción(es). Arrastra con el asa o usa el teclado (espacio, flechas y espacio).',
     trackCountPlain: '{{count}} canción(es) en la playlist.',

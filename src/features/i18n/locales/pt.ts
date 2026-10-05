@@ -26,6 +26,7 @@ export const pt: typeof es = {
     importing: 'Importando faixas…',
     importProgress: 'Importando {{done}}/{{total}}…',
     imported: '{{count}} faixas importadas',
+    importedOf: '{{imported}} de {{total}} faixas importadas (as outras já estavam)',
     importEmpty:
       'Não foi possível reconhecer as faixas dessa playlist. Adicione sua conta em User Management para importá-las exatas.',
     importError: 'Não foi possível buscar suas playlists do Spotify.',
@@ -277,6 +278,8 @@ export const pt: typeof es = {
     duplicate: 'Duplicar',
     delete: 'Excluir',
     confirmDelete: 'Excluir a playlist “{{name}}”?',
+    deleteConfirm: 'Excluir',
+    deleteCancel: 'Cancelar',
     trackCount: '{{count}} faixa(s). Arraste pela alça ou use o teclado (espaço, setas, espaço).',
     trackCountPlain: '{{count}} faixa(s) na playlist.',
     emptyTitle: 'Esta playlist está vazia',

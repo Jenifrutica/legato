@@ -26,6 +26,7 @@ export const en: typeof es = {
     importing: 'Importing tracks…',
     importProgress: 'Importing {{done}}/{{total}}…',
     imported: '{{count}} tracks imported',
+    importedOf: '{{imported}} of {{total}} tracks imported (the rest were already there)',
     importEmpty:
       'Could not recognize the tracks in that playlist. Add your account in User Management to import them exactly.',
     importError: 'Could not fetch your Spotify playlists.',
@@ -277,6 +278,8 @@ export const en: typeof es = {
     duplicate: 'Duplicate',
     delete: 'Delete',
     confirmDelete: 'Delete the playlist “{{name}}”?',
+    deleteConfirm: 'Delete',
+    deleteCancel: 'Cancel',
     trackCount:
       '{{count}} track(s). Drag with the handle or use the keyboard (space, arrows, space).',
     trackCountPlain: '{{count}} track(s) in the playlist.',
