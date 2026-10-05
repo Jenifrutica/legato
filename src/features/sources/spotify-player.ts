@@ -108,13 +108,26 @@ export async function createSpotifyBridge(options: {
   })
 
   const deviceId = await new Promise<string>((resolve, reject) => {
+    const fail = (message: string) => {
+      console.error('[spotify-sdk]', message)
+      reject(new Error(message))
+    }
+    // El SDK puede quedarse colgado (DRM/red): no esperamos para siempre.
+    const timer = setTimeout(
+      () => fail('Tiempo de espera agotado al iniciar Spotify (¿DRM/Widevine o red?)'),
+      10_000,
+    )
     player.addListener('ready', (payload) => {
+      clearTimeout(timer)
+      console.info('[spotify-sdk] dispositivo listo')
       resolve((payload as { device_id: string }).device_id)
     })
-    player.addListener('not_ready', () => reject(new Error('Dispositivo no disponible')))
-    player.addListener('authentication_error', () => reject(new Error('Error de autenticación')))
-    player.addListener('account_error', () => reject(new Error('Se requiere Spotify Premium')))
-    player.addListener('initialization_error', () => reject(new Error('Error al iniciar Spotify')))
+    player.addListener('not_ready', () => fail('Dispositivo no disponible'))
+    player.addListener('authentication_error', () => fail('Error de autenticación de Spotify'))
+    player.addListener('account_error', () => fail('Se requiere Spotify Premium'))
+    player.addListener('initialization_error', () =>
+      fail('Error al iniciar Spotify (¿DRM/Widevine no disponible en este navegador?)'),
+    )
     void player.connect()
   })
 

@@ -82,7 +82,9 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
 
       return true
     } catch (error) {
-      set({ status: 'error', error: error instanceof Error ? error.message : 'error' })
+      const message = error instanceof Error ? error.message : 'error'
+      console.error('[spotify-sdk] no se pudo iniciar el reproductor:', message)
+      set({ status: 'error', error: message })
       return false
     }
   },
@@ -98,7 +100,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
   playUris: async (uris) => {
     const ready = await get().connect()
     if (!ready || bridge === null) {
-      return
+      throw new Error(get().error ?? 'No se pudo iniciar Spotify')
     }
 
     usePlayerStore.getState().pause()

@@ -552,8 +552,9 @@ export class PlayerController {
 
       try {
         await this.#externalPlayer?.play(track.sourceUrl)
-      } catch {
-        this.#lastError = 'No se pudo reproducir en Spotify'
+      } catch (error) {
+        this.#lastError =
+          error instanceof Error ? `Spotify: ${error.message}` : 'No se pudo reproducir en Spotify'
       }
 
       if (token !== this.#transitionToken) {
