@@ -39,6 +39,16 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 - La app está en **Development mode** y **User Management está vacío (`0/5 added`)**: en ese estado Spotify bloquea la lectura de pistas a apps nuevas. La solución principal es **añadir la cuenta** en `developer.spotify.com → app Legato → User Management → Add user`. Es una acción en el dashboard (la autora), no en el código.
 - Fallback de código: si el 403 persistiera (scope), el panel ahora ofrece un botón de **reconexión limpia** (`reconnectSpotify` borra tokens y vuelve a autorizar) e indica el caso Development mode.
 
+**Cómo añadir una cuenta en User Management (paso a paso):**
+1. Entra a **https://developer.spotify.com/dashboard** e inicia sesión con la cuenta **dueña de la app** (`Chenife`).
+2. Abre la app **Legato** (`Client ID af94497d…`).
+3. Pestaña **User Management**.
+4. En **Full Name** escribe el nombre; en **Email**, el correo **de la cuenta de Spotify** que quieres autorizar (la tuya o la de tu profe).
+5. Pulsa **Add user**. Debe aparecer en la tabla y el contador subir a **1/5**, **2/5**…
+6. En la app: recarga (`Ctrl+Shift+R`) y **Playlists → Importar de Spotify**. El import ya funciona **exacto** (por ID).
+- **Límite:** 5 cuentas. Para uso abierto sin lista, en la misma app pide **Extended Quota** (revisión de Spotify, tarda días).
+- Importante: la cuenta que autoriza la app (login de Spotify en la app) **debe** estar en esta lista, si no, `/playlists/{id}/tracks` da 403.
+
 **Arreglo aplicado (código):**
 - `fetchWithRetry` reintenta una vez tras el refresco del token ante **401** (reloj desfasado), no solo en 429.
 - `reconnectSpotify()` fuerza autorización limpia para garantizar `playlist-read-private`.
