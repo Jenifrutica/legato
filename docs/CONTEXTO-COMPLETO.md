@@ -599,6 +599,12 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **«Error de conexión»**: reportado por la autora pero **no reproducido** al cargar la app ni con Google (sin errores en consola). Pendiente localizar el mensaje exacto.
 - **Decisión abierta (velocidad)**: la autora pidió **ocultar** el control de velocidad cuando la fuente es Spotify en vez de mostrar el aviso del commit `f1b1114`; queda pendiente confirmarlo e implementarlo.
 - **Fase A (import de playlists de Spotify)**: aplazada a justo antes del deploy; pendiente de diagnóstico con la cuenta real. Detalle en `docs/PENDIENTES.md` §1.
+
+### AA Import de Spotify: diagnóstico real y arreglo (implementado)
+
+- **Diagnóstico con la cuenta `Chenife`**: `/me/playlists` → **200** (la lista carga) pero `/playlists/{id}/tracks` → **403**. El dashboard muestra la app en **Development mode** con **User Management vacío (`0/5 added`)**: sin añadir el usuario, Spotify bloquea la lectura de pistas. **Solución principal: `Add user` en el dashboard** (acción de la autora).
+- **Arreglo de código** (`spotify.ts`, `RightPanel.tsx`): `fetchWithRetry` reintenta una vez **tras refrescar el token en 401** (antes solo 429); `reconnectSpotify()` borra los tokens y reautoriza para garantizar `playlist-read-private`; el panel ofrece **botón de reconexión limpia** y muestra el **error crudo** de Spotify + una pista sobre User Management cuando es 403. Claves i18n `spotify.importScopeHint` en ES/EN/PT.
+- **Cierre pendiente**: tras añadir la cuenta en User Management, importar «Champetas bailables» (33 pistas) → playlist local + referencias `SPOTIFY` en la Lista + reproducción por SDK.
 - **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.
 
 ### X Google como vía principal y verificación alcanzable (implementado)

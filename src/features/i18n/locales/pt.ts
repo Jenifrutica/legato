@@ -29,6 +29,8 @@ export const pt: typeof es = {
     emptyPlaylists: 'Você não tem playlists no Spotify.',
     importScope: 'Reconecte o Spotify para permitir acesso às suas playlists.',
     reconnectButton: 'Conectar o Spotify novamente',
+    importScopeHint:
+      'Se o 403 persistir após reconectar, seu app do Spotify está em modo de desenvolvimento: adicione sua conta em developer.spotify.com → seu app → User Management.',
   },
   settings: {
     title: 'Configurações',

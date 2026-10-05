@@ -21,12 +21,12 @@ import { formatDuration, useLibraryStore } from '../features/library'
 import type { LibraryTrack } from '../features/library'
 import { usePlaylistsStore } from '../features/playlists'
 import {
-  connectSpotify,
   fetchSpotifyPlaylistTracks,
   fetchSpotifyPlaylists,
   importSourceTrackToPlaylist,
   isSpotifyConfigured,
   isSpotifyConnected,
+  reconnectSpotify,
   saveSourceTrack,
   SearchTab,
 } from '../features/sources'
@@ -71,6 +71,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     'idle',
   )
   const [spotifyMessage, setSpotifyMessage] = useState<string | null>(null)
+  const [spotifyNeedsScope, setSpotifyNeedsScope] = useState(false)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
   const [spotifyConnectedState, setSpotifyConnectedState] = useState(isSpotifyConnected)
@@ -78,6 +79,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   async function openSpotifyImport() {
     setSpotifyOpen(true)
     setSpotifyMessage(null)
+    setSpotifyNeedsScope(false)
 
     const connected = isSpotifyConnected()
     setSpotifyConnectedState(connected)
@@ -109,6 +111,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   async function importSpotifyPlaylist(playlist: SpotifyPlaylistSummary) {
     setSpotifyStatus('importing')
     setSpotifyMessage(null)
+    setSpotifyNeedsScope(false)
 
     try {
       const tracks = await fetchSpotifyPlaylistTracks(playlist.id)
@@ -129,13 +132,16 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
       setSpotifyStatus('error')
-      setSpotifyMessage(
-        message.includes('403')
-          ? t('spotify.importScope')
-          : message.includes('401') || message.includes('not-connected')
-            ? t('spotify.reconnect')
-            : `${t('spotify.importError')} ${message}`.trim(),
-      )
+      if (message.includes('403')) {
+        // Permiso de playlists: se ofrece reconectar con autorización limpia.
+        setSpotifyNeedsScope(true)
+        setSpotifyMessage(`${t('spotify.importScope')} ${message}`.trim())
+      } else if (message.includes('401') || message.includes('not-connected')) {
+        setSpotifyNeedsScope(true)
+        setSpotifyMessage(t('spotify.reconnect'))
+      } else {
+        setSpotifyMessage(`${t('spotify.importError')} ${message}`.trim())
+      }
       console.warn('[spotify-import]', error)
     }
   }
@@ -203,7 +209,17 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
           {spotifyStatus === 'error' && !spotifyConnectedState && (
             <button
               className="mt-2 border-2 border-rule bg-accent px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.08em] text-on-accent uppercase"
-              onClick={() => void connectSpotify()}
+              onClick={() => void reconnectSpotify()}
+              type="button"
+            >
+              {t('spotify.reconnectButton')}
+            </button>
+          )}
+
+          {spotifyNeedsScope && (
+            <button
+              className="mt-2 border-2 border-rule bg-accent px-3 py-1.5 font-mono text-[0.6875rem] tracking-[0.08em] text-on-accent uppercase"
+              onClick={() => void reconnectSpotify()}
               type="button"
             >
               {t('spotify.reconnectButton')}
@@ -219,6 +235,11 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
           {spotifyMessage !== null && (
             <p className="mt-2 text-xs text-ink-muted" role="status">
               {spotifyMessage}
+            </p>
+          )}
+          {spotifyNeedsScope && (
+            <p className="mt-1 text-[0.6875rem] leading-relaxed text-ink-muted">
+              {t('spotify.importScopeHint')}
             </p>
           )}
 

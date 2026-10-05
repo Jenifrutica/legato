@@ -12,6 +12,7 @@ export {
   handleSpotifyRedirect,
   isSpotifyConfigured,
   isSpotifyConnected,
+  reconnectSpotify,
   searchSpotify,
   setSpotifyScope,
 } from './spotify'

@@ -104,6 +104,16 @@ async function createChallenge(verifier: string): Promise<string> {
   return base64UrlEncode(new Uint8Array(digest))
 }
 
+/**
+ * Autorización limpia: borra los tokens actuales y vuelve a pedir permisos,
+ * garantizando que el token nuevo traiga los scopes pedidos (p. ej. si el
+ * token viejo se guardó antes de añadir `playlist-read-private`).
+ */
+export async function reconnectSpotify(): Promise<void> {
+  disconnectSpotify()
+  await connectSpotify()
+}
+
 export async function connectSpotify(): Promise<void> {
   if (!isSpotifyConfigured()) {
     return
@@ -253,6 +263,16 @@ export async function getSpotifyProfile(): Promise<{ name: string } | null> {
 
 async function fetchWithRetry(url: string, token: string): Promise<Response> {
   let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+
+  // Token caducado (reloj desfasado): se fuerza un refresco y se reintenta una vez.
+  if (response.status === 401) {
+    disconnectSpotify()
+    const fresh = await getAccessToken()
+    if (fresh !== null) {
+      response = await fetch(url, { headers: { Authorization: `Bearer ${fresh}` } })
+    }
+  }
+
   if (response.status === 429) {
     await new Promise((resolve) => setTimeout(resolve, 1200))
     response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })

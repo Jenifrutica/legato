@@ -34,7 +34,15 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 **Qué hay:** en la pestaña **Playlists** → botón **«Importar de Spotify»** → lista las playlists de la cuenta (nombre + nº de pistas) → al elegir una crea una **playlist local** con esas canciones como **referencias externas** (metadatos + URI `spotify:track:...`, sin audio; se reproducen con el Web Playback SDK). Tope actual: 100 pistas por playlist; paginación de la lista hasta 200 playlists.
 
-**Problema reportado por la autora:** el panel mostró «Could not fetch your Spotify playlists» y luego «reconnect to Spotify» incluso después de reconectar.
+**Diagnóstico confirmado (sesión 7, con la cuenta real):**
+- `/me/playlists` responde **200** (la lista de playlists carga) pero `/playlists/{id}/tracks` responde **403** al importar.
+- La app está en **Development mode** y **User Management está vacío (`0/5 added`)**: en ese estado Spotify bloquea la lectura de pistas a apps nuevas. La solución principal es **añadir la cuenta** en `developer.spotify.com → app Legato → User Management → Add user`. Es una acción en el dashboard (la autora), no en el código.
+- Fallback de código: si el 403 persistiera (scope), el panel ahora ofrece un botón de **reconexión limpia** (`reconnectSpotify` borra tokens y vuelve a autorizar) e indica el caso Development mode.
+
+**Arreglo aplicado (código):**
+- `fetchWithRetry` reintenta una vez tras el refresco del token ante **401** (reloj desfasado), no solo en 429.
+- `reconnectSpotify()` fuerza autorización limpia para garantizar `playlist-read-private`.
+- El panel distingue 403 (permiso / Development) de 401 y muestra el **error crudo** de Spotify + pista de User Management.
 
 **Lo implementado como respuesta (en este cierre):**
 - Si el *refresh token* falla, los tokens se **borran** (`disconnectSpotify`) para no fingir sesión; el panel muestra un botón **«Conectar Spotify de nuevo»**.
