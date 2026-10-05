@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
+import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { usePlayerStore } from '../player'
 
 const RATES = [0.5, 0.75, 0.9, 1, 1.25, 1.5, 2]
@@ -9,7 +10,11 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
   const rate = usePlayerStore((state) => state.rate)
   const abLoop = usePlayerStore((state) => state.abLoop)
   const loopPointA = usePlayerStore((state) => state.loopPointA)
-  const hasTrack = usePlayerStore((state) => state.currentTrack !== null)
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const spotifyPlayback = useSpotifyStore((state) => state.playback)
+  const hasTrack = currentTrack !== null
+  const spotifyActive =
+    spotifyPlayback !== null && (currentTrack === null || isExternalTrack(currentTrack))
   const setRate = usePlayerStore((state) => state.setRate)
   const setLoopPointA = usePlayerStore((state) => state.setLoopPointA)
   const setLoopPointB = usePlayerStore((state) => state.setLoopPointB)
@@ -40,7 +45,7 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
                   ? 'border-accent bg-accent-soft text-ink'
                   : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
               }`}
-              disabled={!hasTrack}
+              disabled={!hasTrack || spotifyActive}
               key={value}
               onClick={() => setRate(value)}
               type="button"
@@ -49,6 +54,9 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
             </button>
           ))}
         </div>
+        {spotifyActive && (
+          <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('player.speedSpotify')}</p>
+        )}
       </div>
 
       <div className="mt-4">
