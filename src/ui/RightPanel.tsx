@@ -277,6 +277,10 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
               </li>
             ))}
           </ul>
+
+          <p className="mt-3 border-t border-border pt-2 text-[0.6875rem] leading-relaxed text-ink-muted">
+            {t('spotify.requestAccess')}
+          </p>
         </div>
       )}
 

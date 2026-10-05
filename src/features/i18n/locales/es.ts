@@ -35,6 +35,8 @@ export const es = {
     reconnectButton: 'Conectar Spotify de nuevo',
     importScopeHint:
       'En developer.spotify.com → tu app Legato → User Management, pulsa «Add user» y añade el correo de la cuenta de Spotify (hasta 5 cuentas). Para uso abierto sin lista, solicita «Extended Quota» a Spotify (tarda unos días).',
+    requestAccess:
+      '¿No puedes importar una playlist? Pídele acceso a Jenifer en jenifer.urbano@campusucc.edu.co enviando tu nombre y el correo de tu cuenta de Spotify, y te añade para importar directamente.',
   },
   settings: {
     title: 'Ajustes',
