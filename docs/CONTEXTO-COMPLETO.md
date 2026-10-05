@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 320 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 321 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 320 unitarios
+~/.bun/bin/bun run test        # 321 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -612,7 +612,9 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Fallback**: si `/playlists/{id}/tracks` responde **403** (Development mode), `fetchSpotifyPlaylistTracks` lee los **nombres** de las pistas con `/playlists/{id}?fields=tracks.items(track(name))` (que no es el endpoint bloqueado) y resuelve cada uno con **`/search`** (que sí funciona con el token), eligiendo el mejor título por parecido normalizado (sin acentos/puntuación). Si no hay nombres, usa el **nombre de la playlist** como consulta. Si tampoco hay nada, lanza el 403 con el mensaje crudo.
 - **UI**: el import avisa cuando no reconoció pistas (`spotify.importEmpty`) y recuerda que `User Management` da import exacto. `searchSpotify` acepta un token opcional.
 - **Cobertura**: 3 tests del fallback (nombres, forma nueva `items/item`, y `dev-mode-restricted`). Total **320 unit + 13 E2E**.
-- **Verificado con la cuenta real**: el fallback **NO funciona** en Development mode — Spotify también bloquea `/playlists/{id}?fields=…` (`nombres leídos = 0`). Conclusión: en Development mode **no hay forma de importar sin añadir la cuenta**. Se retiró la búsqueda por nombre de playlist (traía temas que no eran) y ahora se lanza `dev-mode-restricted`, con mensaje claro de **User Management** (hasta 5 cuentas) o **Extended Quota** (uso abierto, tarda unos días).
+- **Verificado con la cuenta real**: `?fields=` **sí** funciona en Development mode (leyó 2000 nombres), pero sin `limit` solo traía la primera página (~20). Se añadió **paginación** (`limit=100`+`offset`) y se incluyó el **artista** en la búsqueda.
+- **Vía directa (preferida)**: `fetchPlaylistTracksDirect` pide `?fields=tracks.items(track(id,name,…))` y, si vienen los `id`, construye las referencias **exactas** sin `/search` ni tope. Si no hay ids, cae a búsqueda por nombre+artista (acotada a 500 para no saturar `/search`). El tope de import subió de 100 a **5000**.
+- **Cierre pendiente**: si tras añadir la cuenta/reconectar el `/tracks` deja de dar 403, el import vuelve a ser el camino normal (IDs, paginado). Mientras, la vía directa cubre playlists grandes (probado: 2000 nombres leídos).
 - **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.
 
 ### X Google como vía principal y verificación alcanzable (implementado)
