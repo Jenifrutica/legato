@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (sesión 6: cierre de login/sincronización y arreglos de reproductor).
-- **Estado base:** 312 unitarios + 13 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 313 unitarios + 13 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → **N (sync, hecho)** → A (import de Spotify, justo antes del deploy) → E (deploy). B, C, D y N están cerrados; solo quedan A, E y las verificaciones manuales de login.
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -110,10 +110,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 >
 > **Hecho (N)**: sincronización en la nube por usuario en Firestore; audios/portadas **troceados en Firestore** (`fileManifests` + `fileChunks`, 700 KB) porque Storage exige el plan Blaze; fusión por `updatedAt` + lápidas, subida con debounce, bajada al entrar (con progreso) y toggle en Ajustes.
 >
-> **Bloqueos al cierre (sesión 6):**
-> - **Correo de verificación de Firebase**: no llega a la bandeja de la autora (probable spam; remitente `*firebaseapp.com`). Como **sin correo verificado no hay sesión**, la vía recomendada para la demo es **entrar con Google**; configurar SMTP propio queda post-demo.
-> - **«Error de conexión»**: reportado por la autora pero no reproducido (ni al cargar la app ni con Google; sin errores en consola). Pendiente localizar el mensaje exacto y corregirlo.
-> - **Verificación manual** pendiente: registro con correo real, Google, recuperación, cambio de cuenta y eliminación.
+> **Resuelto en la sesión 7 (Google principal):** el correo de verificación de Firebase no llega (spam, remitente `*firebaseapp.com`), así que **Google pasa a ser la acción principal** del login y la **pantalla de verificación** (reenviar / «ya lo confirmé» / Google) ahora sí es alcanzable al crear cuenta o entrar con correo sin confirmar. Configurar SMTP propio queda post-demo. El «error de conexión» reportado **no se pudo reproducir y la autora lo descartó**. Pendiente solo la verificación manual del flujo con la cuenta real (Google, recuperación, cambio de cuenta y eliminación).
 
 **Requisito de la autora:** para usar la app **debe iniciarse sesión**; los usuarios quedan en **la base de datos**.
 
@@ -137,15 +134,11 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 
 ---
 
-## 4b. Ocultar el control de velocidad en Spotify (IMPLEMENTAR)
+## 4b. Ocultar el control de velocidad en Spotify (HECHO)
 
 **Motivo:** el Web Playback SDK de Spotify reproduce por DRM y **no permite cambiar la velocidad**; el control nunca surte efecto en una pista de Spotify.
 
-**Decisión de la autora:** **ocultar** el control de velocidad cuando la fuente es Spotify, en vez de mostrarlo deshabilitado o con un aviso. El commit `f1b1114` dejó un **aviso** explicativo; confirmar con la autora cuál se queda.
-
-**Alcance si se oculta:** `src/ui/Hero.tsx`, `src/ui/PlayerBar.tsx` (barra móvil) y la sección de velocidad de `src/ui/PracticePanel.tsx`, condicionado a `spotifyActive` (`isExternalTrack`). En archivos locales se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5**.
-
-**Criterio de cierre:** con una pista local el control aparece y cambia la velocidad; con una referencia de Spotify el control no aparece (o, si se decide, se muestra el aviso). i18n ES/EN/PT sin claves huérfanas; axe 0.
+**Hecho:** el control de velocidad se **oculta** cuando la fuente es Spotify (`!spotifyActive`) en `src/ui/Hero.tsx`, `src/ui/PlayerBar.tsx` (barra móvil) y la sección de velocidad de `src/ui/PracticePanel.tsx`; en archivos locales se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5**. Se retiraron el estado `speedNotice` y la clave i18n `player.speedSpotify` (ES/EN/PT). Verificado con los E2E de velocidad en local y detector `[]`.
 
 ---
 
@@ -172,7 +165,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 312 unitarios
+~/.bun/bin/bun run test        # 313 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174)
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

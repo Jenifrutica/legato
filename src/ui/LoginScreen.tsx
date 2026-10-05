@@ -110,6 +110,31 @@ export function LoginScreen() {
             ))}
           </div>
 
+          {supportsGoogle && mode !== 'reset' && signInWithGoogle !== undefined && (
+            <div className="mt-4">
+              <button
+                className="w-full border-2 border-rule bg-accent px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-on-accent uppercase transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
+                disabled={busy}
+                onClick={() => {
+                  setBusy(true)
+                  setError(null)
+                  void signInWithGoogle()
+                    .catch((caught: unknown) => setError(t(errorKey(caught))))
+                    .finally(() => setBusy(false))
+                }}
+                type="button"
+              >
+                {t('auth.google')}
+              </button>
+              <p className="mt-1 text-[0.6875rem] leading-relaxed text-ink-muted">
+                {t('auth.googleHint')}
+              </p>
+              <p className="mt-3 border-t-2 border-rule/20 pt-3 text-center font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
+                {t('auth.orEmail')}
+              </p>
+            </div>
+          )}
+
           <form
             autoComplete="off"
             className="mt-4 flex flex-col gap-3"
@@ -188,23 +213,6 @@ export function LoginScreen() {
                   : t('auth.submitSignIn')}
             </button>
           </form>
-
-          {supportsGoogle && mode !== 'reset' && signInWithGoogle !== undefined && (
-            <button
-              className="mt-3 w-full border-2 border-rule bg-surface px-4 py-2 font-mono text-xs font-semibold tracking-[0.1em] text-ink uppercase transition-colors hover:border-accent"
-              disabled={busy}
-              onClick={() => {
-                setBusy(true)
-                setError(null)
-                void signInWithGoogle()
-                  .catch((caught: unknown) => setError(t(errorKey(caught))))
-                  .finally(() => setBusy(false))
-              }}
-              type="button"
-            >
-              {t('auth.google')}
-            </button>
-          )}
 
           <p className="mt-4 text-[0.6875rem] leading-relaxed text-ink-muted">
             {t('auth.privacy')}

@@ -89,10 +89,12 @@ Actualizado: 4 de octubre de 2026 (sesión 6, cierre de login/sincronización y 
 | 92 | **Velocidades más rápidas**: ciclo del control a **1→1.25→1.5→2→0.9→0.75→0.5** (antes máximo 1×); el panel de ensayo lista todas las tasas | Cerrada: typecheck + lint + build |
 | 93 | **Local no confundido con Spotify**: con Spotify en pausa y una pista local sonando, `spotifyActive` dependía del proveedor y no de la pista externa real; ahora solo las referencias externas cuentan | Cerrada: +1 test (`external-track`), typecheck + lint + build |
 | 94 | **Aviso de velocidad en Spotify**: el SDK/DRM no permite cambiar la velocidad; en vez de dejar el control deshabilitado sin explicación, se muestra un aviso | Cerrada: 312 unit + 13 E2E, build, detector 0 (pendiente decidir si se **oculta** el control en Spotify, pedido de la autora) |
+| 95 | **Google como vía principal + verificación alcanzable (D)**: el botón de Google pasa a ser la acción principal con nota «sin correo de verificación»; al crear cuenta o entrar con correo sin confirmar se mantiene la sesión y se muestra la pantalla de verificación (reenviar, «ya lo confirmé», Google) en lugar de cerrar la sesión. axe de la pantalla de verificación añadido | Cerrada: 313 unit (axe nuevo) + typecheck + lint + build + E2E, detector 0 |
+| 96 | **Ocultar la velocidad en Spotify**: el control de velocidad desaparece en héroe, barra móvil y panel de ensayo cuando la fuente es Spotify (el SDK/DRM no permite cambiarla); en archivos locales se mantiene el ciclo 1→1.25→1.5→2→0.9→0.75→0.5. Se retira el aviso y la clave i18n huérfana | Cerrada: 313 unit + typecheck + lint + build + E2E, detector 0 |
 
 ## Estado técnico
 
-- **Tests:** 312 unitarios + 13 E2E (Playwright) en verde.
+- **Tests:** 313 unitarios + 13 E2E (Playwright) en verde.
 - **Calidad:** typecheck + oxlint + Prettier + build en verde en cada commit.
 - **Diseño:** paleta nueva **violeta/teal** (ya no crema/terracota) con **modo oscuro opcional** (botón sol/luna en la barra, persistido, el tema por portada se adapta a oscuro). Vinilo 2D grande con la portada completa, **mostrando ~1/4 sangrando por la izquierda**; ondas de barras y anillo **siempre animadas** (sintéticas sin datos del analizador, reales al reproducir local); controles del héroe con `flex-wrap` para no superponerse al panel derecho.
 - **Fuentes:** Spotify (PKCE + previews + SDK Premium con banner), Audius y Jamendo con toggles; por defecto solo Spotify. **Errores de búsqueda visibles por proveedor** + botón "Probar conexión" en Ajustes. En resultados: agregar a playlist (guardar+agregar), crear playlist inline y **drag & drop** de resultados (Audius/Jamendo) sobre las playlists.
@@ -104,7 +106,7 @@ Actualizado: 4 de octubre de 2026 (sesión 6, cierre de login/sincronización y 
 
 ## Próximo paso
 
-Leer **`docs/PENDIENTES.md`** y **`docs/PROMPT-PLAN-NUEVA-SESION.md`**. La próxima sesión arranca en **modo plan** y debe proponer plan para: (1) verificación de login con Firebase (el correo de verificación no llega; decidir Google vs SMTP), (2) localizar y corregir el **«error de conexión»** reportado, (3) **ocultar el control de velocidad** cuando la fuente es Spotify, (4) **fase A**: diagnosticar el import de playlists de Spotify, (5) **fase E**: refinar + deploy S3/CloudFront y rotar la access key. Entorno: sin tokens de IA y sin sesión de Spotify (verificar en el navegador de la autora).
+Pendiente: (1) **fase A**: diagnosticar el import de playlists de Spotify en el navegador de la autora (403 scope / 401 refresh); (2) **fase E**: refinar + deploy S3/CloudFront + `app.jenilarper.dev` y rotar la access key. La verificación de login con Firebase se resuelve con **Google** como vía principal (el correo propio queda post-demo). El «error de conexión» reportado no se pudo reproducir y la autora lo dio por descartado. Detalle en **`docs/PENDIENTES.md`**.
 
 ## Handoff
 

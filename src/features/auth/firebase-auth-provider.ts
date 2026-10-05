@@ -100,14 +100,9 @@ export class FirebaseAuthProvider implements AuthProvider {
   async init(): Promise<void> {
     await this.#firstAuthState
 
-    // Una sesión sin correo confirmado no cuenta como registrada.
-    if (this.#auth.currentUser !== null && !this.#auth.currentUser.emailVerified) {
-      await firebaseSignOut(this.#auth)
-      this.#removeLoginAt()
-      this.#setUser(null)
-      return
-    }
-
+    // La sesión sin correo confirmado se conserva para mostrar la pantalla de
+    // verificación (con reenvío y la salida por Google); la puerta impide
+    // entrar al reproductor hasta confirmar.
     const loginAt = this.#readLoginAt()
     if (this.#auth.currentUser !== null && loginAt !== null && Date.now() - loginAt > SESSION_MS) {
       await firebaseSignOut(this.#auth)
@@ -134,12 +129,11 @@ export class FirebaseAuthProvider implements AuthProvider {
       if (input.name.trim() !== '') {
         await updateProfile(credential.user, { displayName: input.name.trim() })
       }
+      // Se mantiene la sesión, pero la puerta deja al usuario en la pantalla
+      // de verificación hasta confirmar el correo.
+      this.#writeLoginAt()
+      this.#setUser(mapUser(credential.user))
       await sendEmailVerification(credential.user, emailActionSettings())
-      // Sin correo confirmado no queda sesión abierta: la cuenta está creada,
-      // pero no «registrada» en la app hasta verificar.
-      await firebaseSignOut(this.#auth)
-      this.#removeLoginAt()
-      this.#setUser(null)
       return { needsEmailVerification: true }
     } catch (error) {
       throw toAuthError(error)
@@ -149,16 +143,12 @@ export class FirebaseAuthProvider implements AuthProvider {
   async signIn(email: string, password: string): Promise<void> {
     try {
       const credential = await signInWithEmailAndPassword(this.#auth, email.trim(), password)
-      if (!credential.user.emailVerified) {
-        // Reenvía el enlace y cierra la sesión: sin verificar no se entra.
-        await sendEmailVerification(credential.user, emailActionSettings()).catch(() => undefined)
-        await firebaseSignOut(this.#auth)
-        this.#removeLoginAt()
-        this.#setUser(null)
-        throw new AuthError('email-not-verified')
-      }
       this.#writeLoginAt()
       this.#setUser(mapUser(credential.user))
+      if (!credential.user.emailVerified) {
+        // La puerta mostrará la pantalla de verificación; reenvía el enlace.
+        await sendEmailVerification(credential.user, emailActionSettings()).catch(() => undefined)
+      }
     } catch (error) {
       throw error instanceof AuthError ? error : toAuthError(error)
     }

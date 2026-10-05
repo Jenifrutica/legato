@@ -34,30 +34,29 @@ export function PracticePanel({ onClose }: { onClose: () => void }) {
     >
       <h3 className="font-display text-sm font-semibold">{t('practice.title')}</h3>
 
-      <div className="mt-3">
-        <p className="text-xs font-medium text-ink-muted">{t('practice.speed')}</p>
-        <div className="mt-2 grid grid-cols-4 gap-2">
-          {RATES.map((value) => (
-            <button
-              aria-pressed={rate === value}
-              className={` border px-2 py-1.5 font-mono text-xs font-semibold transition-colors ${
-                rate === value
-                  ? 'border-accent bg-accent-soft text-ink'
-                  : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
-              }`}
-              disabled={!hasTrack || spotifyActive}
-              key={value}
-              onClick={() => setRate(value)}
-              type="button"
-            >
-              {value}x
-            </button>
-          ))}
+      {!spotifyActive && (
+        <div className="mt-3">
+          <p className="text-xs font-medium text-ink-muted">{t('practice.speed')}</p>
+          <div className="mt-2 grid grid-cols-4 gap-2">
+            {RATES.map((value) => (
+              <button
+                aria-pressed={rate === value}
+                className={` border px-2 py-1.5 font-mono text-xs font-semibold transition-colors ${
+                  rate === value
+                    ? 'border-accent bg-accent-soft text-ink'
+                    : 'border-border text-ink-muted hover:border-accent hover:text-accent-ink'
+                }`}
+                disabled={!hasTrack}
+                key={value}
+                onClick={() => setRate(value)}
+                type="button"
+              >
+                {value}x
+              </button>
+            ))}
+          </div>
         </div>
-        {spotifyActive && (
-          <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('player.speedSpotify')}</p>
-        )}
-      </div>
+      )}
 
       <div className="mt-4">
         <p className="text-xs font-medium text-ink-muted">{t('practice.abLoop')}</p>

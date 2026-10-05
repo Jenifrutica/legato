@@ -54,15 +54,6 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
-  const [speedNotice, setSpeedNotice] = useState(false)
-
-  useEffect(() => {
-    if (!speedNotice) {
-      return
-    }
-    const id = setTimeout(() => setSpeedNotice(false), 2600)
-    return () => clearTimeout(id)
-  }, [speedNotice])
   const [videoOpen, setVideoOpen] = useState(false)
   const demoLyrics = useDemoLyrics()
 
@@ -255,22 +246,17 @@ export function Hero() {
 
               <span aria-hidden="true" className="mx-1 h-8 w-0.5 bg-rule/20" />
 
-              <button
-                aria-label={t('player.speed')}
-                className="h-11 border-2 border-rule bg-surface px-4 font-mono text-sm font-semibold text-ink shadow-[3px_3px_0_var(--color-rule)] transition-transform enabled:hover:-translate-y-0.5 enabled:active:translate-y-0.5 enabled:active:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={!hasPlayable}
-                onClick={() => {
-                  if (spotifyActive) {
-                    setSpeedNotice(true)
-                  } else {
-                    cycleRate()
-                  }
-                }}
-                title={spotifyActive ? t('player.speedSpotify') : undefined}
-                type="button"
-              >
-                {rate}x
-              </button>
+              {!spotifyActive && (
+                <button
+                  aria-label={t('player.speed')}
+                  className="h-11 border-2 border-rule bg-surface px-4 font-mono text-sm font-semibold text-ink shadow-[3px_3px_0_var(--color-rule)] transition-transform enabled:hover:-translate-y-0.5 enabled:active:translate-y-0.5 enabled:active:shadow-none disabled:cursor-not-allowed disabled:opacity-40"
+                  disabled={!hasPlayable}
+                  onClick={cycleRate}
+                  type="button"
+                >
+                  {rate}x
+                </button>
+              )}
 
               <div className="relative">
                 <TransportButton
@@ -343,12 +329,6 @@ export function Hero() {
                 >
                   {videoOpen ? t('player.hideVideo') : t('player.showVideo')}
                 </button>
-              )}
-
-              {speedNotice && (
-                <p className="w-full font-mono text-xs text-ink-muted" role="status">
-                  {t('player.speedSpotify')}
-                </p>
               )}
             </div>
           </div>

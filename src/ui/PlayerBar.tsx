@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { isExternalTrack, useSpotifyStore } from '../features/sources'
@@ -47,15 +47,6 @@ export function PlayerBar() {
   const setSpotifyVolume = useSpotifyStore((state) => state.setVolume)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
-  const [speedNotice, setSpeedNotice] = useState(false)
-
-  useEffect(() => {
-    if (!speedNotice) {
-      return
-    }
-    const id = setTimeout(() => setSpeedNotice(false), 2600)
-    return () => clearTimeout(id)
-  }, [speedNotice])
 
   const externalCurrent = isExternalTrack(currentTrack)
   const spotifyActive = spotifyPlayback !== null && (currentTrack === null || externalCurrent)
@@ -232,29 +223,18 @@ export function PlayerBar() {
           type="range"
           value={Math.round((spotifyActive ? spotifyVolume : volume) * 100)}
         />
-        <button
-          aria-label={t('player.speed')}
-          className="h-8 shrink-0 border-2 border-rule bg-surface px-3 font-mono text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={!hasTrack}
-          onClick={() => {
-            if (spotifyActive) {
-              setSpeedNotice(true)
-            } else {
-              cycleRate()
-            }
-          }}
-          title={spotifyActive ? t('player.speedSpotify') : undefined}
-          type="button"
-        >
-          {rate}x
-        </button>
+        {!spotifyActive && (
+          <button
+            aria-label={t('player.speed')}
+            className="h-8 shrink-0 border-2 border-rule bg-surface px-3 font-mono text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!hasTrack}
+            onClick={cycleRate}
+            type="button"
+          >
+            {rate}x
+          </button>
+        )}
       </div>
-
-      {speedNotice && (
-        <p className="px-3 pb-2 font-mono text-[0.6875rem] text-ink-muted" role="status">
-          {t('player.speedSpotify')}
-        </p>
-      )}
     </section>
   )
 }

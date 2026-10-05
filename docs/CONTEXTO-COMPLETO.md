@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 312 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 313 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 312 unitarios
+~/.bun/bin/bun run test        # 313 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -600,3 +600,17 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Decisión abierta (velocidad)**: la autora pidió **ocultar** el control de velocidad cuando la fuente es Spotify en vez de mostrar el aviso del commit `f1b1114`; queda pendiente confirmarlo e implementarlo.
 - **Fase A (import de playlists de Spotify)**: aplazada a justo antes del deploy; pendiente de diagnóstico con la cuenta real. Detalle en `docs/PENDIENTES.md` §1.
 - **Fase E (deploy)**: pendiente S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key** expuesta.
+
+### X Google como vía principal y verificación alcanzable (implementado)
+
+- **Motivo**: el correo de verificación de Firebase no llega a la bandeja de la autora (spam). Con la verificación obligatoria, la vía fiable para la demo es **entrar con Google**.
+- **Login** (`LoginScreen.tsx`): el botón de Google sube al principio y pasa a ser la **acción principal** (acento) con la nota «Sin correo de verificación; entras al instante» y un separador «o con tu correo». Claves nuevas `auth.googleHint` y `auth.orEmail` en ES/EN/PT.
+- **Pantalla de verificación alcanzable** (`firebase-auth-provider.ts`): antes `signUp`/`signIn` sin verificar hacían `signOut` y la pantalla de verificación era inalcanzable. Ahora se mantiene la sesión y `AuthGate` muestra `VerifyEmailScreen` (reenviar, «ya lo confirmé» y salida por Google). Semántica: **sin correo verificado no se entra al reproductor, pero sí se puede estar en la pantalla de verificación**. `init()` ya no cierra la sesión no verificada; se conserva la política de 7 días.
+- **Accesibilidad**: test de axe nuevo para la pantalla de verificación (`App.a11y.test.tsx`, `emailVerified: false`).
+- **E2E**: los proveedores locales no verifican, así que los 13 E2E siguen igual.
+
+### Y Ocultar la velocidad en Spotify (implementado)
+
+- **Decisión de la autora**: en Spotify el control de velocidad no hace nada (SDK/DRM); se **oculta** en vez de mostrar un aviso.
+- **Cambios**: `Hero.tsx`, `PlayerBar.tsx` (barra móvil) y la sección de velocidad de `PracticePanel.tsx` solo aparecen con `!spotifyActive`. En local se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5** (`controller.cycleRate`). Se retiran el estado `speedNotice` y la clave i18n `player.speedSpotify` (ES/EN/PT) para no dejar huérfanas.
+- **Verificación**: `player.spec.ts` (velocidad en local) sigue verde; detector de impeccable `[]`.
