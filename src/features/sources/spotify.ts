@@ -535,6 +535,7 @@ export async function fetchSpotifyPlaylistTracks(
     // bloqueado. Se intenta el fallback por búsqueda (nombres resueltos con
     // /search, que sí funciona con el token concedido).
     if (response.status === 403) {
+      console.info('[spotify-import] 403 en /tracks; usando fallback por búsqueda')
       return searchPlaylistFallback(token, playlistId, playlistName, limit)
     }
 
@@ -576,11 +577,13 @@ async function searchPlaylistFallback(
   limit: number,
 ): Promise<SourceTrack[]> {
   const names = await fetchPlaylistTrackNames(token, playlistId)
+  console.info('[spotify-import] fallback: nombres de pistas leídos =', names.length)
 
   if (names.length === 0) {
     if (playlistName.trim() === '') {
       throw new Error('HTTP 403: Spotify denied access to this playlist (development mode)')
     }
+    console.info('[spotify-import] fallback: sin nombres, buscando por nombre de playlist')
     return searchSpotify(playlistName, token).then((found) => found.slice(0, limit))
   }
 
