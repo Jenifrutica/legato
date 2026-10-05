@@ -41,16 +41,15 @@ export function Lyrics({
 }) {
   const { t } = useTranslation()
   const currentTime = usePlayerStore((state) => state.currentTime)
-  const status = usePlayerStore((state) => state.status)
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
 
   const spotifyActive =
     spotifyPlayback !== null && (currentTrack === null || isExternalTrack(currentTrack))
-  const isPlaying = spotifyActive ? !spotifyPlayback.paused : status === 'playing'
   const time = spotifyActive ? spotifyPlayback.positionMs / 1000 : currentTime
 
-  if (lines.length === 0 || !isPlaying) {
+  // La letra no desaparece al pausar: solo se oculta si no hay líneas.
+  if (lines.length === 0) {
     return null
   }
 
