@@ -23,6 +23,8 @@ type SpotifyStore = {
   previous: () => Promise<void>
   seek: (positionMs: number) => Promise<void>
   setVolume: (value: number) => Promise<void>
+  /** Volumen transitorio (fundido del crossfade) sin tocar el del usuario. */
+  applyVolume: (value: number) => Promise<void>
 }
 
 let bridge: SpotifyBridge | null = null
@@ -138,6 +140,13 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     set({ volume })
     if (bridge !== null) {
       await bridge.setVolume(volume)
+    }
+  },
+
+  applyVolume: async (value) => {
+    // Solo aplica al SDK; conserva `volume` como la intención del usuario.
+    if (bridge !== null) {
+      await bridge.setVolume(Math.min(1, Math.max(0, value)))
     }
   },
 }))

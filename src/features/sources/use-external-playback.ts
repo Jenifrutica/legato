@@ -33,8 +33,9 @@ export function useExternalPlayback(): void {
         }
       },
       // Fundido del crossfade sobre el volumen del SDK (Spotify no solapa).
+      // Usa el volumen transitorio para no pisar el volumen del usuario.
       setVolume: (value: number) => {
-        void useSpotifyStore.getState().setVolume(value)
+        void useSpotifyStore.getState().applyVolume(value)
       },
       getVolume: () => useSpotifyStore.getState().volume,
     })

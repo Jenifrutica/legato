@@ -187,6 +187,8 @@ export class PlayerController {
     }
 
     if (this.#isExternal(current)) {
+      // Restaura el volumen del usuario (un fundido anterior pudo dejarlo en 0).
+      this.#externalPlayer?.setVolume?.(this.#externalPlayer?.getVolume?.() ?? 1)
       try {
         await this.#externalPlayer?.play(current.sourceUrl)
       } catch {
