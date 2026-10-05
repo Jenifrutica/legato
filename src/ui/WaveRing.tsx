@@ -192,12 +192,12 @@ export function WaveRing({
             : fallbackBass(levels)
         detector.setSensitivity(sensitivityRef.current)
         beat = detector.process(bass, time)
-        pulse = 1 + beat * 3
+        pulse = 1 + beat * 3.4
       } else if (active && micRef.current !== null) {
         // Micrófono en vivo: los golpes llegan de la sala (Spotify por altavoces).
         micDetector.setSensitivity(sensitivityRef.current)
         beat = micDetector.process(micRef.current.getBeatBass(), time)
-        pulse = 1 + beat * 3
+        pulse = 1 + beat * 3.4
       } else if (active) {
         // Sin señal analizable (Spotify por DRM): si Spotify publicó su
         // rejilla de golpes, el pulso cae exactamente en cada beat; si no,
@@ -252,9 +252,11 @@ export function WaveRing({
             : active
               ? 0.14 + 0.12 * Math.sin(seconds * 1.5 + index * 0.42) + 0.35 * beat
               : 0.24 + 0.08 * Math.sin(index * 0.7)
-        const smoothed = (segmentSmooth[index] ?? 0) * 0.6 + raw * 0.4
+        // Suavizado temporal más marcado y gamma >1: los golpes flojos quedan
+        // cortos y los fuertes destacan (más rango dinámico).
+        const smoothed = (segmentSmooth[index] ?? 0) * 0.65 + raw * 0.35
         segmentSmooth[index] = smoothed
-        const intensity = Math.max(0.1, Math.min(1, Math.sqrt(smoothed)))
+        const intensity = Math.max(0.06, Math.min(1, Math.pow(smoothed, 1.55)))
         const downScale = 1 - Math.max(0, Math.sin(angle)) * 0.7
         const wavePart = active ? 0.05 : 0.02
         const length = (8 + intensity * size * wavePart) * pulse * downScale
@@ -278,7 +280,7 @@ export function WaveRing({
       const paint = (color: (segment: Segment) => string, curveColor: string) => {
         context.lineCap = 'butt'
         for (const segment of drawn) {
-          context.globalAlpha = 0.2 + segment.intensity * 0.2 + beat * 0.6
+          context.globalAlpha = 0.16 + segment.intensity * 0.24 + beat * 0.64
           context.strokeStyle = color(segment)
           context.lineWidth = segment.width
           context.beginPath()
@@ -309,8 +311,10 @@ export function WaveRing({
       }
 
       // Sobre el campo de tinta directa las líneas van en papel; fuera, en tinta/acento.
-      const fieldHalfWidth = size * 0.341
-      const fieldBottom = center + size * 0.235
+      // Debe coincidir con .disc-field (ancho 1.08·disco) y llegar hasta el
+      // borde inferior de la zona (el disco mide 1.7· el ancho del canvas).
+      const fieldHalfWidth = size * 0.318
+      const fieldBottom = center + size * 0.49
 
       context.save()
       context.beginPath()

@@ -130,7 +130,7 @@
   .disc-zone {
     position: relative;
     overflow: hidden;
-    height: calc(var(--disc) * 0.72);
+    height: calc(var(--disc) * 0.78);
   }
 
   .disc-field {
@@ -138,7 +138,7 @@
     left: 50%;
     top: calc(var(--disc) * -0.54);
     bottom: -1rem;
-    width: calc(var(--disc) * 1.16);
+    width: calc(var(--disc) * 1.08);
     transform: translateX(-50%);
     background: var(--color-accent);
     box-shadow: 8px 8px 0 var(--color-rule);
