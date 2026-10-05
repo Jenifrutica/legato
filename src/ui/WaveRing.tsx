@@ -314,7 +314,7 @@ export function WaveRing({
       // Debe coincidir con .disc-field (ancho 1.08·disco) y llegar hasta el
       // borde inferior de la zona (el disco mide 1.7· el ancho del canvas).
       const fieldHalfWidth = size * 0.318
-      const fieldBottom = center + size * 0.49
+      const fieldBottom = center + size * 0.35
 
       context.save()
       context.beginPath()

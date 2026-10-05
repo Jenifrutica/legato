@@ -130,7 +130,7 @@
   .disc-zone {
     position: relative;
     overflow: hidden;
-    height: calc(var(--disc) * 0.78);
+    height: calc(var(--disc) * 0.62);
   }
 
   .disc-field {
