@@ -133,6 +133,8 @@ export const en: typeof es = {
     google: 'Continue with Google',
     googleHint: 'No verification email; you are in instantly.',
     orEmail: 'or with your email',
+    guest: 'Enter as guest',
+    guestHint: 'The session is not saved: reloading returns to the sign-in screen.',
     resetSent: 'If the email exists, we sent you a reset link.',
     errorInvalidCredentials: 'Wrong email or password.',
     errorInvalidEmail: 'That email does not look valid.',

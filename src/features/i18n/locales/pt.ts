@@ -133,6 +133,8 @@ export const pt: typeof es = {
     google: 'Continuar com Google',
     googleHint: 'Sem e-mail de verificação; você entra na hora.',
     orEmail: 'ou com o seu e-mail',
+    guest: 'Entrar como convidado',
+    guestHint: 'A sessão não é salva: ao recarregar você volta à tela de entrada.',
     resetSent: 'Se o e-mail existir, enviamos um link de redefinição.',
     errorInvalidCredentials: 'E-mail ou senha incorretos.',
     errorInvalidEmail: 'Esse e-mail não parece válido.',

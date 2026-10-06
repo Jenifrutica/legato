@@ -132,6 +132,8 @@ export const es = {
     google: 'Continuar con Google',
     googleHint: 'Sin correo de verificación; entras al instante.',
     orEmail: 'o con tu correo',
+    guest: 'Entrar como invitado',
+    guestHint: 'No se guarda la sesión: al recargar vuelves a la puerta de entrada.',
     resetSent: 'Si el correo existe, te enviamos un enlace para restablecer la contraseña.',
     errorInvalidCredentials: 'Correo o contraseña incorrectos.',
     errorInvalidEmail: 'Ese correo no parece válido.',

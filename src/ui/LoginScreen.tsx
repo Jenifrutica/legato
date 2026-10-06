@@ -30,8 +30,18 @@ function errorKey(
 
 export function LoginScreen() {
   const { t } = useTranslation()
-  const { supportsPasswordReset, supportsGoogle, signUp, signIn, signInWithGoogle, resetPassword } =
-    useAuth()
+  const {
+    kind,
+    supportsPasswordReset,
+    supportsGoogle,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signInAsGuest,
+    resetPassword,
+  } = useAuth()
+  // El correo/contraseña solo se usa en el respaldo local (sin Firebase).
+  const emailEnabled = kind === 'local'
   const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -89,26 +99,28 @@ export function LoginScreen() {
         </div>
 
         <div className="border-2 border-rule bg-surface p-5 shadow-[6px_6px_0_var(--color-rule)]">
-          <div className="flex border-b-2 border-rule" role="tablist">
-            {tabs.map((tab) => (
-              <button
-                aria-selected={mode === tab.id}
-                className={`px-3 py-2 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-colors ${
-                  mode === tab.id ? 'bg-accent text-on-accent' : 'text-ink-muted hover:text-ink'
-                }`}
-                key={tab.id}
-                onClick={() => {
-                  setMode(tab.id)
-                  setError(null)
-                  setNotice(null)
-                }}
-                role="tab"
-                type="button"
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {emailEnabled && (
+            <div className="flex border-b-2 border-rule" role="tablist">
+              {tabs.map((tab) => (
+                <button
+                  aria-selected={mode === tab.id}
+                  className={`px-3 py-2 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-colors ${
+                    mode === tab.id ? 'bg-accent text-on-accent' : 'text-ink-muted hover:text-ink'
+                  }`}
+                  key={tab.id}
+                  onClick={() => {
+                    setMode(tab.id)
+                    setError(null)
+                    setNotice(null)
+                  }}
+                  role="tab"
+                  type="button"
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {supportsGoogle && mode !== 'reset' && signInWithGoogle !== undefined && (
             <div className="mt-4">
@@ -129,90 +141,119 @@ export function LoginScreen() {
               <p className="mt-1 text-[0.6875rem] leading-relaxed text-ink-muted">
                 {t('auth.googleHint')}
               </p>
-              <p className="mt-3 border-t-2 border-rule/20 pt-3 text-center font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
-                {t('auth.orEmail')}
-              </p>
             </div>
           )}
 
-          <form
-            autoComplete="off"
-            className="mt-4 flex flex-col gap-3"
-            onSubmit={(event) => void submit(event)}
-          >
-            {mode === 'signup' && (
-              <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
-                {t('auth.name')}
-                <input
-                  autoComplete="name"
-                  autoCorrect="off"
-                  className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
-                  onChange={(event) => setName(event.target.value)}
-                  spellCheck={false}
-                  type="text"
-                  value={name}
-                />
-              </label>
-            )}
+          {supportsGoogle && signInWithGoogle !== undefined && emailEnabled && (
+            <p className="mt-3 border-t-2 border-rule/20 pt-3 text-center font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase">
+              {t('auth.orEmail')}
+            </p>
+          )}
 
-            <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
-              {t('auth.email')}
-              <input
-                autoComplete="off"
-                autoCorrect="off"
-                className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
-                inputMode="email"
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                spellCheck={false}
-                type="text"
-                value={email}
-              />
-            </label>
+          {!emailEnabled && (error !== null || notice !== null) && (
+            <p
+              className={`mt-3 text-xs ${error !== null ? 'text-danger' : 'text-ink'}`}
+              role={error !== null ? 'alert' : 'status'}
+            >
+              {error ?? notice}
+            </p>
+          )}
 
-            {mode !== 'reset' && (
+          {emailEnabled && (
+            <form
+              autoComplete="off"
+              className="mt-4 flex flex-col gap-3"
+              onSubmit={(event) => void submit(event)}
+            >
+              {mode === 'signup' && (
+                <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
+                  {t('auth.name')}
+                  <input
+                    autoComplete="name"
+                    autoCorrect="off"
+                    className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
+                    onChange={(event) => setName(event.target.value)}
+                    spellCheck={false}
+                    type="text"
+                    value={name}
+                  />
+                </label>
+              )}
+
               <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
-                {t('auth.password')}
+                {t('auth.email')}
                 <input
                   autoComplete="off"
+                  autoCorrect="off"
                   className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
-                  minLength={mode === 'signup' ? PASSWORD_MIN_LENGTH : undefined}
-                  onChange={(event) => setPassword(event.target.value)}
+                  inputMode="email"
+                  onChange={(event) => setEmail(event.target.value)}
                   required
-                  type="password"
-                  value={password}
+                  spellCheck={false}
+                  type="text"
+                  value={email}
                 />
-                {mode === 'signup' && (
-                  <span className="font-mono text-[0.6875rem] text-ink-muted">
-                    {t('auth.passwordHint', { count: PASSWORD_MIN_LENGTH })}
-                  </span>
-                )}
               </label>
-            )}
 
-            {error !== null && (
-              <p className="text-xs text-danger" role="alert">
-                {error}
-              </p>
-            )}
-            {notice !== null && (
-              <p className="text-xs text-ink" role="status">
-                {notice}
-              </p>
-            )}
+              {mode !== 'reset' && (
+                <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
+                  {t('auth.password')}
+                  <input
+                    autoComplete="off"
+                    className="border-2 border-rule bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none"
+                    minLength={mode === 'signup' ? PASSWORD_MIN_LENGTH : undefined}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    type="password"
+                    value={password}
+                  />
+                  {mode === 'signup' && (
+                    <span className="font-mono text-[0.6875rem] text-ink-muted">
+                      {t('auth.passwordHint', { count: PASSWORD_MIN_LENGTH })}
+                    </span>
+                  )}
+                </label>
+              )}
 
+              {error !== null && (
+                <p className="text-xs text-danger" role="alert">
+                  {error}
+                </p>
+              )}
+              {notice !== null && (
+                <p className="text-xs text-ink" role="status">
+                  {notice}
+                </p>
+              )}
+
+              <button
+                className="border-2 border-rule bg-accent px-4 py-2 font-mono text-xs font-semibold tracking-[0.12em] text-on-accent uppercase transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
+                disabled={busy}
+                type="submit"
+              >
+                {mode === 'signup'
+                  ? t('auth.submitSignUp')
+                  : mode === 'reset'
+                    ? t('auth.submitReset')
+                    : t('auth.submitSignIn')}
+              </button>
+            </form>
+          )}
+
+          <div
+            className={`border-t-2 border-rule/20 pt-4 ${supportsGoogle || emailEnabled ? 'mt-4' : ''}`}
+          >
             <button
-              className="border-2 border-rule bg-accent px-4 py-2 font-mono text-xs font-semibold tracking-[0.12em] text-on-accent uppercase transition-transform hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
-              disabled={busy}
-              type="submit"
+              className="w-full border-2 border-rule bg-surface px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-ink uppercase transition-colors hover:border-accent"
+              onClick={signInAsGuest}
+              type="button"
             >
-              {mode === 'signup'
-                ? t('auth.submitSignUp')
-                : mode === 'reset'
-                  ? t('auth.submitReset')
-                  : t('auth.submitSignIn')}
+              {t('auth.guest')}
             </button>
-          </form>
+            <p className="mt-1 text-[0.6875rem] leading-relaxed text-ink-muted">
+              {t('auth.guestHint')}
+            </p>
+          </div>
 
           <p className="mt-4 text-[0.6875rem] leading-relaxed text-ink-muted">
             {t('auth.privacy')}

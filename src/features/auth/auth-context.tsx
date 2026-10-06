@@ -13,12 +13,15 @@ type AuthContextValue = {
   user: AuthUser | null
   ready: boolean
   kind: AuthProviderKind
+  /** Sesión de invitado: no se guarda (se pierde al recargar) ni se sincroniza. */
+  isGuest: boolean
   supportsEmailVerification: boolean
   supportsPasswordReset: boolean
   supportsGoogle: boolean
   signUp: (input: AuthSignUpInput) => Promise<AuthSignUpResult>
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle?: () => Promise<void>
+  signInAsGuest: () => void
   resendVerificationEmail?: () => Promise<void>
   refreshUser?: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
@@ -28,6 +31,16 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+/** Invitado: usuario local efímero, nunca se persiste. */
+const GUEST_USER: AuthUser = {
+  id: 'guest',
+  name: 'Invitado',
+  email: null,
+  pictureUrl: null,
+  emailVerified: true,
+  provider: 'local',
+}
+
 export function AuthContextProvider({
   children,
   provider,
@@ -36,7 +49,8 @@ export function AuthContextProvider({
   provider?: AuthProvider
 }) {
   const authProvider = useMemo(() => provider ?? createAuthProvider(), [provider])
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const [providerUser, setProviderUser] = useState<AuthUser | null>(null)
+  const [guestUser, setGuestUser] = useState<AuthUser | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -50,12 +64,12 @@ export function AuthContextProvider({
 
     void Promise.race([authProvider.init().catch(() => undefined), timeout]).then(() => {
       if (active) {
-        setUser(authProvider.getUser())
+        setProviderUser(authProvider.getUser())
         setReady(true)
       }
     })
 
-    const unsubscribe = authProvider.subscribe(setUser)
+    const unsubscribe = authProvider.subscribe(setProviderUser)
 
     return () => {
       active = false
@@ -63,24 +77,31 @@ export function AuthContextProvider({
     }
   }, [authProvider])
 
+  const user = guestUser ?? providerUser
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       ready,
       kind: authProvider.kind,
+      isGuest: guestUser !== null,
       supportsEmailVerification: authProvider.supportsEmailVerification,
       supportsPasswordReset: authProvider.supportsPasswordReset,
       supportsGoogle: authProvider.supportsGoogle,
       signUp: (input) => authProvider.signUp(input),
       signIn: (email, password) => authProvider.signIn(email, password),
       signInWithGoogle: authProvider.signInWithGoogle?.bind(authProvider),
+      signInAsGuest: () => setGuestUser(GUEST_USER),
       resendVerificationEmail: authProvider.resendVerificationEmail?.bind(authProvider),
       refreshUser: authProvider.refreshUser?.bind(authProvider),
       resetPassword: (email) => authProvider.resetPassword(email),
-      signOut: () => authProvider.signOut(),
+      signOut: () => {
+        setGuestUser(null)
+        return authProvider.signOut()
+      },
       deleteAccount: (password) => authProvider.deleteAccount(password),
     }),
-    [authProvider, user, ready],
+    [authProvider, user, guestUser, ready],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

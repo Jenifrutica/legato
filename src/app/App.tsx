@@ -35,7 +35,7 @@ export default function App() {
 
 export function AuthGate() {
   const { t } = useTranslation()
-  const { user, ready, kind } = useAuth()
+  const { user, ready, kind, isGuest } = useAuth()
   // La verificación de correo es recomendada pero no obligatoria (el correo
   // de Firebase puede no llegar): se puede entrar sin confirmar.
   const [skipVerification, setSkipVerification] = useState(false)
@@ -63,10 +63,18 @@ export function AuthGate() {
     return <VerifyEmailScreen onContinue={() => setSkipVerification(true)} />
   }
 
-  return <AppShell authKind={kind} userId={user.id} />
+  return <AppShell authKind={kind} guest={isGuest} userId={user.id} />
 }
 
-function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
+function AppShell({
+  authKind,
+  userId,
+  guest,
+}: {
+  authKind: string
+  userId: string
+  guest: boolean
+}) {
   const { t } = useTranslation()
   useAlbumTheme()
   usePlayTracker()
@@ -82,7 +90,10 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
       setActiveUserId(userId)
       setSpotifyScope(userId)
       usePlayLogStore.getState().setScope(userId)
-      await adoptOrphanData(userId, { inheritLocalAccounts: authKind !== 'local' })
+      // El invitado no adopta huérfanos ni sincroniza en la nube.
+      if (!guest) {
+        await adoptOrphanData(userId, { inheritLocalAccounts: authKind !== 'local' })
+      }
       if (cancelled) {
         return
       }
@@ -90,7 +101,7 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
       hydrated = true
       startPersistence()
       useAudioFxStore.getState().resumeAmbientPlayback()
-      configureCloudSync(userId)
+      configureCloudSync(guest ? null : userId)
     })()
 
     return () => {
@@ -101,7 +112,7 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
         stopPersistence()
       }
     }
-  }, [userId, authKind])
+  }, [userId, authKind, guest])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
