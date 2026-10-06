@@ -26,7 +26,11 @@ export function MobileNav() {
   }
 
   return (
-    <nav aria-label={t('nav.main')} className="border-t-2 border-rule bg-surface lg:hidden">
+    <nav
+      aria-label={t('nav.main')}
+      className="border-t-2 border-rule bg-surface lg:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <ul className="grid grid-cols-5">
         {PANEL_TABS.map((candidate) => {
           const active = tab === candidate
