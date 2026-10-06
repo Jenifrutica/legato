@@ -102,8 +102,9 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
 
     usePlayerStore.getState().pause()
-    // Garantiza el volumen del usuario: un fundido anterior pudo dejarlo bajo.
-    await bridge.setVolume(get().volume)
+    // No se toca el volumen aquí: el crossfade lo controla (si se pusiera el
+    // volumen del usuario justo antes, la pista nueva daría un golpe al bajar
+    // luego a 0 para el fundido de entrada).
     await bridge.playUris(uris)
   },
 
