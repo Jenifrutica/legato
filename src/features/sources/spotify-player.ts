@@ -89,10 +89,38 @@ function toPlaybackState(state: SdkState | null): SpotifyPlaybackState | null {
   }
 }
 
+/**
+ * El Web Playback SDK de Spotify exige DRM (Widevine). Si el navegador no lo
+ * tiene activo (p. ej. Firefox sin «contenido DRM» o Brave sin Widevine), no
+ * hay forma de reproducir: mejor avisar con claridad que fallar en silencio.
+ */
+export async function supportsProtectedAudio(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.requestMediaKeySystemAccess) {
+    return false
+  }
+  try {
+    await navigator.requestMediaKeySystemAccess('com.widevine.alpha', [
+      {
+        initDataTypes: ['cenc'],
+        audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"' }],
+      },
+    ])
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function createSpotifyBridge(options: {
   getToken: () => Promise<string | null>
   onState: (state: SpotifyPlaybackState | null) => void
 }): Promise<{ bridge: SpotifyBridge; deviceId: string; disconnect: () => void }> {
+  if (!(await supportsProtectedAudio())) {
+    throw new Error(
+      'DRM (Widevine) no disponible: activa la reproducción protegida o usa Chrome/Edge',
+    )
+  }
+
   await loadSpotifySdk()
   const sdk = window.Spotify
   if (sdk === undefined) {
