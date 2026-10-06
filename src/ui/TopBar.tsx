@@ -6,7 +6,8 @@ import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import { SettingsPanel } from '../features/sources'
 import { useThemeStore } from '../features/theme'
-import { AccessibilityIcon, DiscMark, MoonIcon, SettingsIcon, SunIcon } from './icons'
+import { AccessibilityIcon, DiscMark, MoonIcon, SettingsIcon, SunIcon, TimerIcon } from './icons'
+import { useMusiciansPanelStore } from './panel-tabs'
 
 export function TopBar() {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ export function TopBar() {
   const selectedPlaylistId = usePlaylistsStore((state) => state.selectedPlaylistId)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
   const openA11yPanel = useA11yStore((state) => state.openPanel)
+  const openMusicians = useMusiciansPanelStore((state) => state.setOpen)
   const themeMode = useThemeStore((state) => state.mode)
   const toggleTheme = useThemeStore((state) => state.toggle)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -122,6 +124,14 @@ export function TopBar() {
           aria-hidden="true"
           className="ml-auto size-3 border border-bg/50 bg-accent transition-colors duration-300"
         />
+        <button
+          aria-label={t('musician.title')}
+          className="p-2 text-bg/70 transition-colors hover:text-bg"
+          onClick={() => openMusicians(true)}
+          type="button"
+        >
+          <TimerIcon className="size-5" />
+        </button>
         <button
           aria-label={t('a11y.title')}
           className="p-2 text-bg/70 transition-colors hover:text-bg"

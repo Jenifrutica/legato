@@ -210,7 +210,7 @@ export function PlayerBar() {
         <VolumeIcon className="size-4 shrink-0 text-ink-muted" />
         <input
           aria-label={t('player.volume')}
-          className="h-3 min-w-0 flex-1 cursor-pointer"
+          className="h-3 min-w-0 max-w-32 flex-1 cursor-pointer"
           max={100}
           min={0}
           onChange={(event) => {
@@ -226,7 +226,7 @@ export function PlayerBar() {
         {!spotifyActive && (
           <button
             aria-label={t('player.speed')}
-            className="h-8 shrink-0 border-2 border-rule bg-surface px-3 font-mono text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            className="ml-auto h-8 shrink-0 border-2 border-rule bg-surface px-3 font-mono text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40"
             disabled={!hasTrack}
             onClick={cycleRate}
             type="button"

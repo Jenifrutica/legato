@@ -6,6 +6,7 @@ import { useMusicianStore } from '../features/musician'
 import { usePlayerStore } from '../player'
 import { ChordsPanel } from './ChordsPanel'
 import { XIcon } from './icons'
+import { useMusiciansPanelStore } from './panel-tabs'
 import { MetronomePanel } from './MetronomePanel'
 import { NotesPanel } from './NotesPanel'
 import { SetlistPanel } from './SetlistPanel'
@@ -46,7 +47,8 @@ function readSaved(): SavedState {
 export function MusiciansPanel() {
   const { t } = useTranslation()
   const saved = useRef(readSaved())
-  const [open, setOpen] = useState(saved.current.open)
+  const open = useMusiciansPanelStore((state) => state.open)
+  const setOpen = useMusiciansPanelStore((state) => state.setOpen)
   const [tabTop, setTabTop] = useState(saved.current.top)
   const drag = useRef<{ startY: number; startTop: number; moved: boolean } | null>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -60,6 +62,14 @@ export function MusiciansPanel() {
     'structure',
   )
   const activeTab = musicianEnabled ? tab : 'structure'
+
+  useEffect(() => {
+    if (saved.current.open) {
+      setOpen(true)
+    }
+    // Solo al montar: restaura el estado guardado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     try {
@@ -111,7 +121,7 @@ export function MusiciansPanel() {
     const current = drag.current
     drag.current = null
     if (current !== null && !current.moved) {
-      setOpen((value) => !value)
+      setOpen(!open)
     }
   }
 
@@ -132,14 +142,14 @@ export function MusiciansPanel() {
 
       {open && (
         <div
-          className="fixed inset-0 z-40 hidden bg-ink/20 lg:block"
+          className="fixed inset-0 z-40 bg-ink/20"
           onClick={() => setOpen(false)}
           role="presentation"
         >
           <div
             aria-label={t('structure.region')}
             aria-modal="true"
-            className="absolute top-0 right-0 flex h-dvh w-[min(32rem,92vw)] flex-col border-l-2 border-rule bg-surface"
+            className="absolute top-0 right-0 flex h-dvh w-full flex-col border-l-2 border-rule bg-surface lg:w-[min(32rem,92vw)]"
             onClick={(event) => event.stopPropagation()}
             ref={sheetRef}
             role="dialog"

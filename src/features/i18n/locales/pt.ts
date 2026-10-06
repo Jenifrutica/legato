@@ -378,6 +378,7 @@ export const pt: typeof es = {
       'Nós reais da lista duplamente encadeada: cada cartão conhece seu prev e next. O nó destacado está tocando e mantém sua identidade mesmo que você mova ou remova outros (correção do bug #12).',
   },
   musician: {
+    title: 'Painel de músicos',
     tabs: 'Seções do painel de músico',
     subtitle: 'modo músico',
     practice: 'Prática',

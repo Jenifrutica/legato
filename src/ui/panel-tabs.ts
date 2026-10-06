@@ -22,3 +22,14 @@ export const usePanelTabStore = create<PanelTabState>((set) => ({
   tab: 'library',
   setTab: (tab) => set({ tab }),
 }))
+
+type MusiciansPanelState = {
+  open: boolean
+  setOpen: (open: boolean) => void
+}
+
+/** Visibilidad del panel de músicos (hoja), para abrirlo también desde la barra superior en móvil. */
+export const useMusiciansPanelStore = create<MusiciansPanelState>((set) => ({
+  open: false,
+  setOpen: (open) => set({ open }),
+}))

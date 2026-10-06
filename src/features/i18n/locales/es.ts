@@ -379,6 +379,7 @@ export const es = {
       'Nodos reales de la lista doblemente enlazada: cada tarjeta conoce su prev y su next. El nodo resaltado es el que está sonando y conserva su identidad aunque muevas o elimines otros (fix #12).',
   },
   musician: {
+    title: 'Panel de músicos',
     tabs: 'Secciones del panel de músicos',
     subtitle: 'modo músico',
     practice: 'Práctica',

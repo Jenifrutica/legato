@@ -379,6 +379,7 @@ export const en: typeof es = {
       'Real nodes of the doubly linked list: each card knows its prev and its next. The highlighted node is the one playing and keeps its identity even if you move or delete others (fix #12).',
   },
   musician: {
+    title: 'Musicians panel',
     tabs: 'Musician panel sections',
     subtitle: 'musician mode',
     practice: 'Practice',
