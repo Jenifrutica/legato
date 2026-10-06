@@ -2,8 +2,8 @@
 
 > **Lee este documento completo antes de tocar nada.** Está escrito para que una sesión nueva (o un agente distinto) continúe el proyecto exactamente donde quedó, sin releer toda la conversación anterior.
 
-- **Última actualización:** 5 de octubre de 2026, sesión 7 (cierre, versión **v0.2.0**).
-- **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado. Etiqueta **`v0.2.0`**.
+- **Última actualización:** 5 de octubre de 2026, sesión 7 (cierre, versión **v1.0.0**).
+- **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado. Etiqueta **`v1.0.0`** (base estable previa al rediseño de front).
 - **Tests:** 318 unitarios + 17 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (**import de playlists de Spotify** — casi resuelto, falta confirmar; **despliegue** S3+CloudFront y **rotar la access key**). Lo demás (login con Google, sync, músicos, reproductor) está cerrado.
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).

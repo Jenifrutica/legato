@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.0 — 5 de octubre de 2026
+
+Versión estable previa al rediseño de front (móvil ya reorganizado). Base: **318 unit + 17 E2E**, typecheck/oxlint/build OK, axe 0, detector `[]`.
+
+- **Login**: solo **Google** o **invitado** (el invitado no guarda la sesión); el correo/contraseña queda solo en el respaldo local (E2E/offline).
+- **Setlist retirada** (redundante): el panel de músicos queda Estructura · Práctica · Acordes · Notas; esquema Dexie v9 borra la tabla.
+- **Calidad de audio**: la **salida de audio** se aplica a todos los elementos locales (dos decks + streaming); **balance** con botón Centro y slider más cómodo; aviso de que balance/aislamiento/bajos **no aplican a Spotify** (DRM).
+- **Móvil**: una sola navegación inferior funcional (5 paneles), panel de músicos a pantalla completa desde la barra superior, volumen acotado, safe-area.
+- Todo lo de v0.2.0 incluido (crossfade real, import de Spotify, biblioteca vaciar, lista persistente, etc.).
+
 ## v0.2.0 — 5 de octubre de 2026
 
 Cierre de reproductor, import de Spotify, herramientas de biblioteca y base para el rediseño móvil.
