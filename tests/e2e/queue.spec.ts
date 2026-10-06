@@ -54,3 +54,21 @@ test('cola: añadir al final, reproducir siguiente, quitar y reordenar sin cambi
   await expect(page.locator('main h1')).toContainText('A')
   await expect(page.getByRole('button', { name: 'Pausar', exact: true }).last()).toBeVisible()
 })
+
+test('la Lista se guarda y se restaura al recargar', async ({ page }) => {
+  await page.goto('/')
+  await registerAndEnter(page)
+  await acceptCookies(page)
+  await importWavFiles(page, ['A', 'B'])
+
+  await page.getByRole('button', { name: 'Añadir A a la Lista' }).click()
+  await page.getByRole('button', { name: 'Añadir B a la Lista' }).click()
+  await page.getByRole('tab', { name: 'Lista' }).click()
+  await expect(page.getByRole('list', { name: 'Lista' }).getByRole('listitem')).toHaveCount(2)
+
+  await page.waitForTimeout(2500)
+  await page.reload()
+
+  await page.getByRole('tab', { name: 'Lista' }).click()
+  await expect(page.getByRole('list', { name: 'Lista' }).getByRole('listitem')).toHaveCount(2)
+})

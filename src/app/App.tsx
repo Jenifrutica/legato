@@ -9,6 +9,7 @@ import {
   hydrateStores,
   setActiveUserId,
   startPersistence,
+  stopPersistence,
 } from '../features/persistence'
 import { setSpotifyScope, SpotifyBanner, useExternalPlayback } from '../features/sources'
 import { configureCloudSync } from '../features/sync'
@@ -66,9 +67,9 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
 
   useEffect(() => {
     let cancelled = false
-
-    // Por si quedara algo de una sesión anterior (cambio rápido de cuenta).
-    teardownSession()
+    // Solo se puede guardar/limpiar la sesión si de verdad se llegó a hidratar;
+    // si no, al montar se guardaría un estado vacío y pisaría la Lista guardada.
+    let hydrated = false
 
     void (async () => {
       setActiveUserId(userId)
@@ -79,6 +80,7 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
         return
       }
       await hydrateStores()
+      hydrated = true
       startPersistence()
       useAudioFxStore.getState().resumeAmbientPlayback()
       configureCloudSync(userId)
@@ -86,7 +88,11 @@ function AppShell({ authKind, userId }: { authKind: string; userId: string }) {
 
     return () => {
       cancelled = true
-      teardownSession()
+      if (hydrated) {
+        teardownSession()
+      } else {
+        stopPersistence()
+      }
     }
   }, [userId, authKind])
 

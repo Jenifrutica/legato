@@ -4,7 +4,7 @@
 
 - **Última actualización:** 4 de octubre de 2026, sesión 6 (cierre).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado.
-- **Tests:** 324 unitarios + 13 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 325 unitarios + 15 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (verificación de login con Firebase, «error de conexión», ocultar velocidad en Spotify, import de playlists, deploy).
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -72,7 +72,7 @@ cd /home/jenifrutica/Proyectos/legato
 #   matar el proceso del puerto 5173, rm -rf node_modules/.vite, reiniciar.
 # No afecta al build de producción.
 
-~/.bun/bin/bun run test        # 324 unitarios
+~/.bun/bin/bun run test        # 325 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174; levanta el server solo)
 ~/.bun/bin/bun run build       # build producción
 ~/.bun/bin/bun run preview     # probar PWA/offline (SW solo en prod)
@@ -631,6 +631,11 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
 - **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
+
+### AF Lista persistente y vaciar biblioteca (implementado)
+
+- **La Lista no se guardaba (bug)**: `AppShell` llamaba `teardownSession()` al **montar**, que hace `saveCurrentSession()`; como aún no se había hidratado, escribía el reproductor **vacío** y **pisaba** la sesión guardada. Ahora `teardownSession` solo se llama si el efecto llegó a **hidratar** (`hydrated`); al montar no se guarda. Test E2E nuevo: la Lista vuelve tras recargar.
+- **Vaciar biblioteca**: botón **«Eliminar todo»** en la cabecera de la biblioteca con **confirmación en línea** (Eliminar/Cancelar). Al confirmar: `clearLibrary()` (nueva acción del `library-store`) + `clearQueue()`; la persistencia borra las canciones y sus análisis/acordes/letras/notas (tombstones). Test E2E nuevo.
 
 ### AE Lista desde la biblioteca e import completo (implementado)
 

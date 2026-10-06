@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (sesión 6: cierre de login/sincronización y arreglos de reproductor).
-- **Estado base:** 324 unitarios + 13 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 325 unitarios + 15 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → **N (sync, hecho)** → A (import de Spotify, justo antes del deploy) → E (deploy). B, C, D y N están cerrados; solo quedan A, E y las verificaciones manuales de login.
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -184,7 +184,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 ```bash
 cd /home/jenifrutica/Proyectos/legato
 ~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # abrir http://127.0.0.1:5173
-~/.bun/bin/bun run test        # 324 unitarios
+~/.bun/bin/bun run test        # 325 unitarios
 ~/.bun/bin/bun run test:e2e    # 13 E2E (modo local, puerto 5174)
 ~/.bun/bin/bun run build
 ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint

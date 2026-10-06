@@ -117,6 +117,7 @@ export function LibraryPanel() {
   const lastErrors = useLibraryStore((state) => state.lastErrors)
   const addTracks = useLibraryStore((state) => state.addTracks)
   const removeTrack = useLibraryStore((state) => state.removeTrack)
+  const clearLibrary = useLibraryStore((state) => state.clearLibrary)
   const setImporting = useLibraryStore((state) => state.setImporting)
   const setErrors = useLibraryStore((state) => state.setErrors)
   const existingDedupeKeys = useLibraryStore((state) => state.existingDedupeKeys)
@@ -142,6 +143,7 @@ export function LibraryPanel() {
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameDraft, setRenameDraft] = useState('')
   const [showStructure, setShowStructure] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
   const [playlistDragOver, setPlaylistDragOver] = useState(false)
 
   const sensors = useSensors(
@@ -417,6 +419,38 @@ export function LibraryPanel() {
                 ref={inputRef}
                 type="file"
               />
+              {tracks.length > 0 &&
+                (confirmClear ? (
+                  <>
+                    <button
+                      className="border-2 border-danger px-3 py-2 text-xs font-semibold text-danger transition-colors hover:bg-danger hover:text-on-danger"
+                      onClick={() => {
+                        usePlayerStore.getState().clearQueue()
+                        clearLibrary()
+                        setConfirmClear(false)
+                        setNotice(t('library.cleared'))
+                      }}
+                      type="button"
+                    >
+                      {t('library.clearConfirm', { count: tracks.length })}
+                    </button>
+                    <button
+                      className="border-2 border-rule/40 px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:text-ink"
+                      onClick={() => setConfirmClear(false)}
+                      type="button"
+                    >
+                      {t('library.clearCancel')}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="border-2 border-rule/40 px-3 py-2 text-xs font-semibold text-ink-muted transition-colors hover:border-danger hover:text-danger"
+                    onClick={() => setConfirmClear(true)}
+                    type="button"
+                  >
+                    {t('library.clearAll')}
+                  </button>
+                ))}
             </>
           )}
         </div>
