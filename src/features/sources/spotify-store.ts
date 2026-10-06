@@ -82,9 +82,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
 
       return true
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'error'
-      console.error('[spotify-sdk] no se pudo iniciar el reproductor:', message)
-      set({ status: 'error', error: message })
+      set({ status: 'error', error: error instanceof Error ? error.message : 'error' })
       return false
     }
   },

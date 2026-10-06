@@ -89,38 +89,10 @@ function toPlaybackState(state: SdkState | null): SpotifyPlaybackState | null {
   }
 }
 
-/**
- * El Web Playback SDK de Spotify exige DRM (Widevine). Si el navegador no lo
- * tiene activo (p. ej. Firefox sin «contenido DRM» o Brave sin Widevine), no
- * hay forma de reproducir: mejor avisar con claridad que fallar en silencio.
- */
-export async function supportsProtectedAudio(): Promise<boolean> {
-  if (typeof navigator === 'undefined' || !navigator.requestMediaKeySystemAccess) {
-    return false
-  }
-  try {
-    await navigator.requestMediaKeySystemAccess('com.widevine.alpha', [
-      {
-        initDataTypes: ['cenc'],
-        audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"' }],
-      },
-    ])
-    return true
-  } catch {
-    return false
-  }
-}
-
 export async function createSpotifyBridge(options: {
   getToken: () => Promise<string | null>
   onState: (state: SpotifyPlaybackState | null) => void
 }): Promise<{ bridge: SpotifyBridge; deviceId: string; disconnect: () => void }> {
-  if (!(await supportsProtectedAudio())) {
-    throw new Error(
-      'DRM (Widevine) no disponible: activa la reproducción protegida o usa Chrome/Edge',
-    )
-  }
-
   await loadSpotifySdk()
   const sdk = window.Spotify
   if (sdk === undefined) {
@@ -136,26 +108,17 @@ export async function createSpotifyBridge(options: {
   })
 
   const deviceId = await new Promise<string>((resolve, reject) => {
-    const fail = (message: string) => {
-      console.error('[spotify-sdk]', message)
-      reject(new Error(message))
-    }
-    // El SDK puede quedarse colgado (DRM/red): no esperamos para siempre.
-    const timer = setTimeout(
-      () => fail('Tiempo de espera agotado al iniciar Spotify (¿DRM/Widevine o red?)'),
-      10_000,
-    )
+    const fail = (message: string) => reject(new Error(message))
+    // El SDK puede quedarse colgado (red): no esperamos para siempre.
+    const timer = setTimeout(() => fail('Tiempo de espera agotado al iniciar Spotify'), 10_000)
     player.addListener('ready', (payload) => {
       clearTimeout(timer)
-      console.info('[spotify-sdk] dispositivo listo')
       resolve((payload as { device_id: string }).device_id)
     })
     player.addListener('not_ready', () => fail('Dispositivo no disponible'))
     player.addListener('authentication_error', () => fail('Error de autenticación de Spotify'))
     player.addListener('account_error', () => fail('Se requiere Spotify Premium'))
-    player.addListener('initialization_error', () =>
-      fail('Error al iniciar Spotify (¿DRM/Widevine no disponible en este navegador?)'),
-    )
+    player.addListener('initialization_error', () => fail('Error al iniciar Spotify'))
     void player.connect()
   })
 
