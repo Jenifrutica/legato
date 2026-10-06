@@ -2,11 +2,13 @@
 
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
-- **Fecha:** 4 de octubre de 2026 (sesión 6: cierre de login/sincronización y arreglos de reproductor).
+- **Fecha:** 5 de octubre de 2026 (cierre **v1.0.0**).
 - **Estado base:** 318 unitarios + 17 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
-- **Orden actual:** B → C (músicos) → D (login) → **N (sync, hecho)** → A (import de Spotify, justo antes del deploy) → E (deploy). B, C, D y N están cerrados; solo quedan A, E y las verificaciones manuales de login.
+- **Lo único pendiente:** (1) **rediseño de front** para que no se vea genérico (usar los skills instalados; modo plan; prompt en `docs/PROMPT-PLAN-NUEVA-SESION.md`); (2) **despliegue** (S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key**).
+- **Respaldo:** tag **`v1.0.0`**. El **backend y las funcionalidades están completos**; el móvil, reorganizado.
+- **Skills instalados en el proyecto** (`.agents/skills/`): **awwwards-animations**, **animejs**, **manus**.
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
-- **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
+- **Tokens/entorno:** no hay tokens de IA válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
 
 ---
 

@@ -5,7 +5,7 @@
 - **Última actualización:** 5 de octubre de 2026, sesión 7 (cierre, versión **v1.0.0**).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado. Etiqueta **`v1.0.0`** (base estable previa al rediseño de front).
 - **Tests:** 318 unitarios + 17 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
-- **Pendientes detallados:** `docs/PENDIENTES.md` (**import de playlists de Spotify** — casi resuelto, falta confirmar; **despliegue** S3+CloudFront y **rotar la access key**). Lo demás (login con Google, sync, músicos, reproductor) está cerrado.
+- **Pendientes:** (1) **rediseño de front** para que no se vea genérico, usando los **skills** instalados; (2) **despliegue** (S3+CloudFront+ACM+`app.jenilarper.dev` y rotar la access key). El **backend y las funcionalidades están completos**; el móvil, reorganizado. Detalle en `docs/PENDIENTES.md` y el prompt `docs/PROMPT-PLAN-NUEVA-SESION.md`.
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
 ---
@@ -631,6 +631,16 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
 - **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
+
+### AH Cierre v1.0.0, skills de front y siguiente paso (implementado)
+
+- **Versión de respaldo `v1.0.0`**: backend y funcionalidades completos y estables; queda como base previa al rediseño de front. `package.json` 1.0.0, `CHANGELOG.md` y tag `v1.0.0`.
+- **Skills instalados en el proyecto** (`~/.bun/bin` vía `npx skills add`, quedan en `.agents/skills/` + `skills-lock.json`):
+  - **awwwards-animations** (`devmartinese/awwwards-animations-skill`): animaciones premium con GSAP/Motion/Anime.js/Lenis (scroll, transiciones, micro-interacciones, cursores).
+  - **animejs** (`freshtechbro/claudedesignskills`): motor Anime.js (timelines, stagger, SVG).
+  - **manus** (`sanjay3290/ai-skills`): delegar investigación/diseño largo al agente Manus AI.
+  - Nota: `open.manus.ai@manus-api` no clonaba (no es repo git); se usó el de `sanjay3290`.
+- **Siguiente paso**: **rediseño de front** (modo plan) usando estos skills, manteniendo el estilo Duotono 62 y **todas** las funciones; después, **despliegue**. Prompt canónico: `docs/PROMPT-PLAN-NUEVA-SESION.md`.
 
 ### AG Setlist retirada y calidad de audio (implementado)
 

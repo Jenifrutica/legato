@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "animejs": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/animejs/SKILL.md",
+      "computedHash": "1ccd0229d51e46aaa5e0d7033f1160c9f21440af470fbaab25fb68d9190c3edb"
+    },
+    "awwwards-animations": {
+      "source": "devmartinese/awwwards-animations-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "03ea7b6b4daf3de348c530ec0670cd63c21bc060591f5ca7f193234008a941b6"
+    },
+    "manus": {
+      "source": "sanjay3290/ai-skills",
+      "sourceType": "github",
+      "skillPath": "skills/manus/SKILL.md",
+      "computedHash": "498f2fa26c1b93e7e4449773a20ab715df7ec7d60b26cf45edbfe6acf6596c27"
+    }
+  }
+}

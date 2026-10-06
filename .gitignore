@@ -43,3 +43,6 @@ Thumbs.db
 
 # Salidas del separador de stems (Demucs)
 stems/
+
+# Copia duplicada de skills que genera el CLI (la canónica es .agents/skills)
+agent/
