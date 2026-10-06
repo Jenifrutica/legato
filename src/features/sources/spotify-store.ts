@@ -104,6 +104,8 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
 
     usePlayerStore.getState().pause()
+    // Garantiza el volumen del usuario: un fundido anterior pudo dejarlo bajo.
+    await bridge.setVolume(get().volume)
     await bridge.playUris(uris)
   },
 
@@ -113,6 +115,7 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     }
 
     if (get().playback?.paused === true) {
+      await bridge.setVolume(get().volume)
       await bridge.resume()
     } else {
       await bridge.pause()
@@ -121,12 +124,14 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
 
   next: async () => {
     if (bridge !== null) {
+      await bridge.setVolume(get().volume)
       await bridge.next()
     }
   },
 
   previous: async () => {
     if (bridge !== null) {
+      await bridge.setVolume(get().volume)
       await bridge.previous()
     }
   },

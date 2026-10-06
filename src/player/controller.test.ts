@@ -411,6 +411,38 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().currentTrack?.id).toBe('s2')
   })
 
+  it('el fundido externo no deja el volumen del usuario en 0', async () => {
+    vi.useFakeTimers()
+    const a = new FakeAudio()
+    const controller = new PlayerController(a)
+    // Como el puente real: setVolume es transitorio (SDK) y getVolume es la
+    // intención del usuario (no se toca).
+    let sdkVolume = 1
+    const userVolume = 1
+    controller.setExternalPlayer({
+      play: vi.fn(),
+      stop: vi.fn(),
+      setVolume: (value: number) => {
+        sdkVolume = value
+      },
+      getVolume: () => userVolume,
+    })
+    controller.setCrossfade(0.2)
+
+    const external = (id: string): QueueTrack => ({
+      ...track(id),
+      external: true,
+      sourceUrl: `spotify:track:${id}`,
+    })
+
+    controller.playTracks([external('s1'), external('s2')])
+    controller.next()
+    await vi.runAllTimersAsync()
+
+    expect(sdkVolume).toBe(1)
+    expect(userVolume).toBe(1)
+  })
+
   it('restoreSession recupera el crossfade', () => {
     const audio = new FakeAudio()
     const controller = new PlayerController(audio)
