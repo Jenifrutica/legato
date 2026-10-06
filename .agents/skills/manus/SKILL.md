@@ -4,7 +4,7 @@ description: Delegate complex, long-running tasks to Manus AI agent for autonomo
 license: Apache-2.0
 metadata:
   author: sanjay3290
-  version: "1.0"
+  version: '1.0'
 ---
 
 # Manus
@@ -25,6 +25,7 @@ Manus is an autonomous AI agent that handles complex tasks asynchronously. Parti
 Effective research prompts are specific about scope, sources, and desired output:
 
 **Product comparison:**
+
 ```
 Find the best 4K monitors for Mac with Thunderbolt connectivity and 120Hz+ refresh rate.
 Focus on BenQ, Samsung, Dell, LG. Only include models released in the last year.
@@ -32,18 +33,21 @@ Compare specs, prices, and Mac-specific features. Output a comparison table.
 ```
 
 **Stock/company analysis:**
+
 ```
 Analyze [TICKER] stock: company profile, recent performance, technical indicators,
 valuation metrics, and insider activity. Include a price chart for the past year.
 ```
 
 **Market research:**
+
 ```
 Research the [industry] market: key players, market size, growth trends,
 recent developments, and competitive landscape. Focus on [region/segment].
 ```
 
 **Competitive analysis:**
+
 ```
 Compare [Product A] vs [Product B] vs [Product C]: features, pricing,
 user reviews, pros/cons. Create a decision matrix for [use case].
@@ -66,13 +70,15 @@ curl -s -X POST "https://api.manus.ai/v1/tasks" -H "API_KEY:$MANUS_API_KEY" -H "
 ```
 
 **Agent Profiles:**
+
 - `manus-1.6-lite` - Fast, simple tasks (quick lookups, simple questions)
 - `manus-1.6` - Standard (default, good for most research)
 - `manus-1.6-max` - Complex reasoning (deep research, multi-source analysis, detailed reports)
 
 **Response:**
+
 ```json
-{"task_id":"abc123","task_title":"...","task_url":"https://manus.im/app/abc123"}
+{ "task_id": "abc123", "task_title": "...", "task_url": "https://manus.im/app/abc123" }
 ```
 
 ## Checking Task Status
@@ -86,11 +92,13 @@ curl -s -X GET "https://api.manus.ai/v1/tasks/{task_id}" -H "API_KEY:$MANUS_API_
 Poll every 5-10 seconds until completed.
 
 **Extract text output:**
+
 ```bash
 curl -s -X GET "https://api.manus.ai/v1/tasks/{task_id}" -H "API_KEY:$MANUS_API_KEY" | jq -r '.output[] | select(.role=="assistant") | .content[] | select(.type=="output_text") | .text'
 ```
 
 **Extract file attachments:**
+
 ```bash
 curl -s -X GET "https://api.manus.ai/v1/tasks/{task_id}" -H "API_KEY:$MANUS_API_KEY" | jq -r '.output[] | select(.role=="assistant") | .content[] | select(.type=="output_file") | "\(.fileName): \(.fileUrl)"'
 ```
@@ -117,41 +125,52 @@ curl -s -X DELETE "https://api.manus.ai/v1/tasks/{task_id}" -H "API_KEY:$MANUS_A
 
 ## Advanced Options
 
-| Parameter | Description |
-|-----------|-------------|
-| `taskMode` | `chat`, `adaptive`, or `agent` |
-| `projectId` | Associate with project for shared instructions |
-| `attachments` | Array of file objects (see below) |
-| `connectors` | Pre-configured connector IDs (Gmail, Calendar, Notion) |
-| `createShareableLink` | Enable public access URL |
+| Parameter             | Description                                            |
+| --------------------- | ------------------------------------------------------ |
+| `taskMode`            | `chat`, `adaptive`, or `agent`                         |
+| `projectId`           | Associate with project for shared instructions         |
+| `attachments`         | Array of file objects (see below)                      |
+| `connectors`          | Pre-configured connector IDs (Gmail, Calendar, Notion) |
+| `createShareableLink` | Enable public access URL                               |
 
 ## File Attachments
 
 Attach files using one of three formats:
 
 **URL attachment:**
+
 ```json
-{"prompt":"Analyze this","attachments":[{"type":"url","url":"https://example.com/doc.pdf"}]}
+{
+  "prompt": "Analyze this",
+  "attachments": [{ "type": "url", "url": "https://example.com/doc.pdf" }]
+}
 ```
 
 **Base64 attachment:**
+
 ```json
-{"prompt":"What's in this image?","attachments":[{"type":"base64","data":"<base64>","mime_type":"image/png"}]}
+{
+  "prompt": "What's in this image?",
+  "attachments": [{ "type": "base64", "data": "<base64>", "mime_type": "image/png" }]
+}
 ```
 
 **File ID (after upload):**
+
 ```json
-{"prompt":"Review this file","attachments":[{"type":"file","file_id":"file-xxx"}]}
+{ "prompt": "Review this file", "attachments": [{ "type": "file", "file_id": "file-xxx" }] }
 ```
 
 ## Projects
 
 Create a project with shared instructions:
+
 ```bash
 curl -s -X POST "https://api.manus.ai/v1/projects" -H "API_KEY:$MANUS_API_KEY" -H "Content-Type:application/json" -d '{"name":"My Project","instruction":"Always respond concisely"}'
 ```
 
 Use project in task:
+
 ```bash
 curl -s -X POST "https://api.manus.ai/v1/tasks" -H "API_KEY:$MANUS_API_KEY" -H "Content-Type:application/json" -d '{"prompt":"...","projectId":"proj_xxx","agentProfile":"manus-1.6"}'
 ```
@@ -170,11 +189,13 @@ curl -s -X POST "https://api.manus.ai/v1/tasks" -H "API_KEY:$MANUS_API_KEY" -H "
 ## Error Handling
 
 Check for failed tasks:
+
 ```bash
 curl -s -X GET "https://api.manus.ai/v1/tasks/{task_id}" -H "API_KEY:$MANUS_API_KEY" | jq '{status, error}'
 ```
 
 If `status` is `failed`, the `error` field contains the reason. Common issues:
+
 - Invalid API key → Check `MANUS_API_KEY` is set
 - Task timeout → Simplify prompt or use `manus-1.6-max`
 - Rate limited → Wait and retry

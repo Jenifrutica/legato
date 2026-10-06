@@ -44,9 +44,9 @@ Guidelines for brutalist, minimalist, and abstract design styles — and how to 
 
 ```tsx
 // Brutalist: instant, hard, no easing
-gsap.to(el, { x: 500, duration: 0, ease: 'none' })  // teleport
-gsap.to(el, { rotation: 90, duration: 0.1, ease: 'steps(3)' })  // stepped
-gsap.to(el, { scale: 3, duration: 0.05 })  // jarring snap
+gsap.to(el, { x: 500, duration: 0, ease: 'none' }) // teleport
+gsap.to(el, { rotation: 90, duration: 0.1, ease: 'steps(3)' }) // stepped
+gsap.to(el, { scale: 3, duration: 0.05 }) // jarring snap
 ```
 
 ---
@@ -176,64 +176,65 @@ Algorithmic art with raw presentation.
 
 ### Brutalist
 
-| Name | Hex | Use |
-|------|-----|-----|
-| Pure Black | `#000000` | Background, text |
-| Pure White | `#FFFFFF` | Background, text |
-| Acid Green | `#BAFF39` | Accent |
+| Name          | Hex       | Use                |
+| ------------- | --------- | ------------------ |
+| Pure Black    | `#000000` | Background, text   |
+| Pure White    | `#FFFFFF` | Background, text   |
+| Acid Green    | `#BAFF39` | Accent             |
 | Electric Blue | `#0000FF` | Accent alternative |
-| Warning Red | `#FF0000` | Accent alternative |
+| Warning Red   | `#FF0000` | Accent alternative |
 
 ### Minimalist
 
-| Name | Hex | Use |
-|------|-----|-----|
-| Off White | `#FAFAF9` | Background |
-| Warm Gray | `#A8A29E` | Secondary text |
-| Charcoal | `#1C1917` | Primary text |
-| Stone | `#E7E5E4` | Borders, dividers |
-| Subtle Accent | `#D4D4D8` | Hover states |
+| Name          | Hex       | Use               |
+| ------------- | --------- | ----------------- |
+| Off White     | `#FAFAF9` | Background        |
+| Warm Gray     | `#A8A29E` | Secondary text    |
+| Charcoal      | `#1C1917` | Primary text      |
+| Stone         | `#E7E5E4` | Borders, dividers |
+| Subtle Accent | `#D4D4D8` | Hover states      |
 
 ### Abstract / Generative
 
-| Name | Hex | Use |
-|------|-----|-----|
-| Deep Space | `#0A0A0F` | Background |
-| Nebula Purple | `#7C3AED` | Primary |
-| Plasma Cyan | `#06B6D4` | Secondary |
-| Solar Gold | `#F59E0B` | Accent |
-| Void Gray | `#1E1E2E` | Surfaces |
+| Name          | Hex       | Use        |
+| ------------- | --------- | ---------- |
+| Deep Space    | `#0A0A0F` | Background |
+| Nebula Purple | `#7C3AED` | Primary    |
+| Plasma Cyan   | `#06B6D4` | Secondary  |
+| Solar Gold    | `#F59E0B` | Accent     |
+| Void Gray     | `#1E1E2E` | Surfaces   |
 
 ### Neo-Brutalist
 
-| Name | Hex | Use |
-|------|-----|-----|
-| Black | `#000000` | Borders, text |
-| Cream | `#FEF3C7` | Background |
-| Lime | `#BAFF39` | Primary accent |
-| Peach | `#FECACA` | Secondary accent |
-| Lavender | `#DDD6FE` | Tertiary accent |
+| Name     | Hex       | Use              |
+| -------- | --------- | ---------------- |
+| Black    | `#000000` | Borders, text    |
+| Cream    | `#FEF3C7` | Background       |
+| Lime     | `#BAFF39` | Primary accent   |
+| Peach    | `#FECACA` | Secondary accent |
+| Lavender | `#DDD6FE` | Tertiary accent  |
 
 ### Retro Fantastical (Wonka / Oz / PS2 / MTV)
 
 Saturated, whimsical, nostalgic. Inspired by 1971 Willy Wonka's candy psychedelia, Wizard of Oz technicolor, PS2-era warm gradients, and MTV Y2K maximalism.
 
-| Name | Hex | Use |
-|------|-----|-----|
-| Wonka Purple | `#7B2D8E` | Primary, headers, hero backgrounds |
-| Chocolate | `#5C3317` | Rich warm backgrounds, borders |
-| Emerald City | `#2D8E57` | Accents, CTAs, success states |
-| Ruby Slipper | `#C62828` | Highlights, hover states |
-| Yellow Brick | `#E8A317` | Gold accents, badges, links |
-| Candy Pink | `#E84393` | Secondary accent, MTV energy |
-| MTV Lime | `#A3E635` | Neon pop, interactive elements |
-| PS2 Sky | `#5B9BD5` | Soft backgrounds, cards |
-| Sepia Warm | `#D4A574` | Nostalgic overlays, text secondary |
-| Technicolor Cyan | `#00BCD4` | Splash color, borders |
-| Chrome Silver | `#C0C0C0` | Y2K metallic, disabled states |
-| Deep Velvet | `#1A0A2E` | Dark mode background |
+| Name             | Hex       | Use                                |
+| ---------------- | --------- | ---------------------------------- |
+| Wonka Purple     | `#7B2D8E` | Primary, headers, hero backgrounds |
+| Chocolate        | `#5C3317` | Rich warm backgrounds, borders     |
+| Emerald City     | `#2D8E57` | Accents, CTAs, success states      |
+| Ruby Slipper     | `#C62828` | Highlights, hover states           |
+| Yellow Brick     | `#E8A317` | Gold accents, badges, links        |
+| Candy Pink       | `#E84393` | Secondary accent, MTV energy       |
+| MTV Lime         | `#A3E635` | Neon pop, interactive elements     |
+| PS2 Sky          | `#5B9BD5` | Soft backgrounds, cards            |
+| Sepia Warm       | `#D4A574` | Nostalgic overlays, text secondary |
+| Technicolor Cyan | `#00BCD4` | Splash color, borders              |
+| Chrome Silver    | `#C0C0C0` | Y2K metallic, disabled states      |
+| Deep Velvet      | `#1A0A2E` | Dark mode background               |
 
 **Usage tips**:
+
 - Pair Deep Velvet + Wonka Purple + Yellow Brick for Wonka vibes
 - Emerald City + Ruby Slipper + Yellow Brick for Oz palette
 - PS2 Sky + Sepia Warm + Chocolate for nostalgic warmth

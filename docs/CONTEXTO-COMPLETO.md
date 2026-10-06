@@ -640,6 +640,8 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
   - **animejs** (`freshtechbro/claudedesignskills`): motor Anime.js (timelines, stagger, SVG).
   - **manus** (`sanjay3290/ai-skills`): delegar investigación/diseño largo al agente Manus AI.
   - Nota: `open.manus.ai@manus-api` no clonaba (no es repo git); se usó el de `sanjay3290`.
+- **Crossfade automático al final de pista (corregido)**: el cambio de canción **manual** ya fundía, pero al pasar de canción **consecutiva** empezaba de golpe: al llegar al final, el motor ya está en pausa y no hay nada que fundir. Ahora `#maybeAutoCrossfade` (en el handler de tiempo) dispara el cruce cuando faltan `crossfadeSeconds` para el final, arrancando la siguiente en el **otro deck** y cruzando ambas (misma vía que el manual). Con Spotify no hay solape (DRM), solo fundido de volumen.
+- **Falta un buen logo**: hoy hay un **marcador Duotono temporal**; en el rediseño de front hay que crear el logo/icono definitivo (wordmark + símbolo + favicon/icono PWA).
 - **Siguiente paso**: **rediseño de front** (modo plan) usando estos skills, manteniendo el estilo Duotono 62 y **todas** las funciones; después, **despliegue**. Prompt canónico: `docs/PROMPT-PLAN-NUEVA-SESION.md`.
 
 ### AG Setlist retirada y calidad de audio (implementado)

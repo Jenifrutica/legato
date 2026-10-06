@@ -3,6 +3,7 @@
 Best practices for 60fps animations in React.
 
 ## Table of Contents
+
 1. [Core Principles](#core-principles)
 2. [GPU Acceleration](#gpu-acceleration)
 3. [ScrollTrigger Optimization](#scrolltrigger-optimization)
@@ -23,14 +24,14 @@ Best practices for 60fps animations in React.
 
 ### What Triggers What
 
-| Property | Paint | Layout | Composite |
-|----------|-------|--------|-----------|
-| `transform` | No | No | Yes |
-| `opacity` | No | No | Yes |
-| `filter` | Yes | No | Yes |
-| `width/height` | Yes | Yes | Yes |
-| `top/left` | Yes | Yes | Yes |
-| `background-color` | Yes | No | Yes |
+| Property           | Paint | Layout | Composite |
+| ------------------ | ----- | ------ | --------- |
+| `transform`        | No    | No     | Yes       |
+| `opacity`          | No    | No     | Yes       |
+| `filter`           | Yes   | No     | Yes       |
+| `width/height`     | Yes   | Yes    | Yes       |
+| `top/left`         | Yes   | Yes    | Yes       |
+| `background-color` | Yes   | No     | Yes       |
 
 ## GPU Acceleration
 
@@ -60,7 +61,7 @@ function AnimatedElement() {
       onComplete: () => {
         // Remove after animation
         gsap.set(ref.current, { willChange: 'auto' })
-      }
+      },
     })
   })
 
@@ -90,8 +91,8 @@ function AnimatedElement() {
 ```tsx
 // Configure once in your app
 ScrollTrigger.config({
-  limitCallbacks: true,        // Limit callback frequency
-  ignoreMobileResize: true,    // Ignore mobile address bar resize
+  limitCallbacks: true, // Limit callback frequency
+  ignoreMobileResize: true, // Ignore mobile address bar resize
 })
 
 // Normalize scroll behavior
@@ -102,10 +103,10 @@ ScrollTrigger.normalizeScroll(true)
 
 ```tsx
 // Bad: Individual ScrollTriggers
-items.forEach(item => {
+items.forEach((item) => {
   gsap.from(item, {
     opacity: 0,
-    scrollTrigger: { trigger: item }
+    scrollTrigger: { trigger: item },
   })
 })
 
@@ -113,7 +114,7 @@ items.forEach(item => {
 ScrollTrigger.batch('.batch-item', {
   onEnter: (elements) => {
     gsap.from(elements, { opacity: 0, stagger: 0.1 })
-  }
+  },
 })
 ```
 
@@ -132,26 +133,29 @@ function LazySection({ children }: { children: React.ReactNode }) {
           observer.disconnect()
         }
       },
-      { rootMargin: '200px' } // Start 200px before visible
+      { rootMargin: '200px' }, // Start 200px before visible
     )
 
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
   }, [])
 
-  useGSAP(() => {
-    if (!isNearViewport) return
+  useGSAP(
+    () => {
+      if (!isNearViewport) return
 
-    // Create ScrollTrigger only when near viewport
-    gsap.from('.lazy-item', {
-      opacity: 0,
-      y: 50,
-      scrollTrigger: {
-        trigger: ref.current,
-        start: 'top 80%',
-      }
-    })
-  }, { dependencies: [isNearViewport], scope: ref })
+      // Create ScrollTrigger only when near viewport
+      gsap.from('.lazy-item', {
+        opacity: 0,
+        y: 50,
+        scrollTrigger: {
+          trigger: ref.current,
+          start: 'top 80%',
+        },
+      })
+    },
+    { dependencies: [isNearViewport], scope: ref },
+  )
 
   return <div ref={ref}>{children}</div>
 }
@@ -165,8 +169,8 @@ const isDev = process.env.NODE_ENV === 'development'
 
 gsap.to('.element', {
   scrollTrigger: {
-    markers: isDev,  // Only in development
-  }
+    markers: isDev, // Only in development
+  },
 })
 ```
 
@@ -179,10 +183,10 @@ gsap.to('.element', {
 useEffect(() => {
   const st = ScrollTrigger.create({
     trigger: '.element',
-    onEnter: () => console.log('enter')
+    onEnter: () => console.log('enter'),
   })
 
-  return () => st.kill()  // Important!
+  return () => st.kill() // Important!
 }, [])
 ```
 
@@ -202,7 +206,7 @@ export function ScrollTriggerCleanup() {
   useEffect(() => {
     return () => {
       // Kill all ScrollTriggers on route change
-      ScrollTrigger.getAll().forEach(st => st.kill())
+      ScrollTrigger.getAll().forEach((st) => st.kill())
     }
   }, [pathname])
 
@@ -255,21 +259,24 @@ function LazyImage({ src, alt }: { src: string; alt: string }) {
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    if (!loaded) return
+  useGSAP(
+    () => {
+      if (!loaded) return
 
-    gsap.from(containerRef.current, {
-      clipPath: 'inset(100% 0% 0% 0%)',
-      duration: 1.2,
-      ease: 'power4.inOut',
-    })
+      gsap.from(containerRef.current, {
+        clipPath: 'inset(100% 0% 0% 0%)',
+        duration: 1.2,
+        ease: 'power4.inOut',
+      })
 
-    gsap.from(imgRef.current, {
-      scale: 1.3,
-      duration: 1.5,
-      ease: 'power2.out',
-    })
-  }, { dependencies: [loaded] })
+      gsap.from(imgRef.current, {
+        scale: 1.3,
+        duration: 1.5,
+        ease: 'power2.out',
+      })
+    },
+    { dependencies: [loaded] },
+  )
 
   return (
     <div ref={containerRef} className="overflow-hidden">
@@ -290,13 +297,10 @@ function LazyImage({ src, alt }: { src: string; alt: string }) {
 
 ```tsx
 // Dynamically import heavy animation libraries
-const ThreeScene = dynamic(
-  () => import('@/components/ThreeScene'),
-  {
-    loading: () => <div>Loading 3D...</div>,
-    ssr: false
-  }
-)
+const ThreeScene = dynamic(() => import('@/components/ThreeScene'), {
+  loading: () => <div>Loading 3D...</div>,
+  ssr: false,
+})
 ```
 
 ## Monitoring & Debugging
@@ -336,7 +340,7 @@ function measureAnimation() {
       performance.mark('animation-end')
       performance.measure('animation', 'animation-start', 'animation-end')
       console.log(performance.getEntriesByName('animation'))
-    }
+    },
   })
 }
 ```
@@ -372,11 +376,7 @@ export function FPSMonitor() {
     return () => cancelAnimationFrame(id)
   }, [])
 
-  return (
-    <div className="fixed top-4 right-4 bg-black text-white p-2 z-50">
-      {fps} FPS
-    </div>
-  )
+  return <div className="fixed top-4 right-4 bg-black text-white p-2 z-50">{fps} FPS</div>
 }
 ```
 
@@ -398,7 +398,7 @@ function useIsLowEndDevice() {
 
     // Check for battery saver
     if ('getBattery' in navigator) {
-      (navigator as any).getBattery().then((battery: any) => {
+      ;(navigator as any).getBattery().then((battery: any) => {
         if (battery.charging === false && battery.level < 0.2) {
           setIsLowEnd(true)
         }
@@ -430,7 +430,7 @@ function OptimizedAnimation() {
         y: 50,
         rotation: 10,
         duration: 0.8,
-        ease: 'back.out(1.7)'
+        ease: 'back.out(1.7)',
       })
     }
   }, [shouldSimplify])

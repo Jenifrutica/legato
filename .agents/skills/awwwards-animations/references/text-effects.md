@@ -26,8 +26,12 @@ RGB split, scan lines, and random character swapping.
 import { useRef, useEffect, useState } from 'react'
 import { gsap } from '@/lib/gsap'
 
-export function GlitchText({ text, intensity = 'medium' }: {
-  text: string; intensity?: 'low' | 'medium' | 'high'
+export function GlitchText({
+  text,
+  intensity = 'medium',
+}: {
+  text: string
+  intensity?: 'low' | 'medium' | 'high'
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -47,13 +51,19 @@ export function GlitchText({ text, intensity = 'medium' }: {
       .to(layers[1], { x: -offset, duration: 0.05, ease: 'none' }, 0.07)
       .to(layers[1], { x: 0, duration: 0.05, ease: 'none' }, 0.12)
       // Clip-path glitch
-      .to(el, {
-        clipPath: `inset(${Math.random() * 40}% 0 ${Math.random() * 40}% 0)`,
-        duration: 0.05,
-      }, 0.15)
+      .to(
+        el,
+        {
+          clipPath: `inset(${Math.random() * 40}% 0 ${Math.random() * 40}% 0)`,
+          duration: 0.05,
+        },
+        0.15,
+      )
       .to(el, { clipPath: 'inset(0 0 0 0)', duration: 0.05 }, 0.2)
 
-    return () => { tl.kill() }
+    return () => {
+      tl.kill()
+    }
   }, [intensity])
 
   return (
@@ -77,7 +87,8 @@ export function GlitchText({ text, intensity = 'medium' }: {
       <div
         className="absolute inset-0 pointer-events-none z-20"
         style={{
-          background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px)',
+          background:
+            'repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px)',
         }}
         aria-hidden
       />
@@ -117,11 +128,23 @@ export function GlitchText({ text, intensity = 'medium' }: {
 }
 
 @keyframes glitch-shift {
-  0%, 90%, 100% { transform: translateX(0); }
-  92% { transform: translateX(-5px); }
-  94% { transform: translateX(5px); }
-  96% { transform: translateX(-3px); }
-  98% { transform: translateX(3px); }
+  0%,
+  90%,
+  100% {
+    transform: translateX(0);
+  }
+  92% {
+    transform: translateX(-5px);
+  }
+  94% {
+    transform: translateX(5px);
+  }
+  96% {
+    transform: translateX(-3px);
+  }
+  98% {
+    transform: translateX(3px);
+  }
 }
 ```
 
@@ -134,24 +157,35 @@ Letters that orbit, wave, and bounce independently.
 import { useRef } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
 
-export function WaveText({ text, amplitude = 20, frequency = 0.15, speed = 2 }: {
-  text: string; amplitude?: number; frequency?: number; speed?: number
+export function WaveText({
+  text,
+  amplitude = 20,
+  frequency = 0.15,
+  speed = 2,
+}: {
+  text: string
+  amplitude?: number
+  frequency?: number
+  speed?: number
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const chars = containerRef.current!.querySelectorAll('.wave-char')
-    chars.forEach((char, i) => {
-      gsap.to(char, {
-        y: `+=${amplitude}`,
-        duration: speed,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: i * frequency,
+  useGSAP(
+    () => {
+      const chars = containerRef.current!.querySelectorAll('.wave-char')
+      chars.forEach((char, i) => {
+        gsap.to(char, {
+          y: `+=${amplitude}`,
+          duration: speed,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: i * frequency,
+        })
       })
-    })
-  }, { scope: containerRef })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="text-6xl font-bold flex">
@@ -171,8 +205,14 @@ export function WaveText({ text, amplitude = 20, frequency = 0.15, speed = 2 }: 
 'use client'
 import { useRef, useEffect } from 'react'
 
-export function OrbitText({ text, radius = 120, speed = 0.01 }: {
-  text: string; radius?: number; speed?: number
+export function OrbitText({
+  text,
+  radius = 120,
+  speed = 0.01,
+}: {
+  text: string
+  radius?: number
+  speed?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number>(0)
@@ -251,18 +291,24 @@ export function MorphText({ words, interval = 3000 }: { words: string[]; interva
       filter: 'blur(8px)',
       duration: 0.8,
       ease: 'power2.in',
-    })
-    .fromTo(el2, {
-      opacity: 0,
-      filter: 'blur(8px)',
-    }, {
-      opacity: 1,
-      filter: 'blur(0px)',
-      duration: 0.8,
-      ease: 'power2.out',
-    }, '-=0.4')
+    }).fromTo(
+      el2,
+      {
+        opacity: 0,
+        filter: 'blur(8px)',
+      },
+      {
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '-=0.4',
+    )
 
-    return () => { tl.kill() }
+    return () => {
+      tl.kill()
+    }
   }, [index, words, interval])
 
   return (
@@ -270,7 +316,7 @@ export function MorphText({ words, interval = 3000 }: { words: string[]; interva
       <span ref={text1Ref} className="absolute inset-0" />
       <span ref={text2Ref} className="absolute inset-0 opacity-0" />
       {/* Invisible spacer */}
-      <span className="invisible">{words.reduce((a, b) => a.length > b.length ? a : b)}</span>
+      <span className="invisible">{words.reduce((a, b) => (a.length > b.length ? a : b))}</span>
     </div>
   )
 }
@@ -298,15 +344,21 @@ export function TypewriterDistortion({ text, speed = 50 }: { text: string; speed
 
         // Distortion shake on each character
         if (containerRef.current) {
-          gsap.fromTo(containerRef.current, {
-            x: (Math.random() - 0.5) * 4,
-            y: (Math.random() - 0.5) * 2,
-            skewX: (Math.random() - 0.5) * 2,
-          }, {
-            x: 0, y: 0, skewX: 0,
-            duration: 0.15,
-            ease: 'power2.out',
-          })
+          gsap.fromTo(
+            containerRef.current,
+            {
+              x: (Math.random() - 0.5) * 4,
+              y: (Math.random() - 0.5) * 2,
+              skewX: (Math.random() - 0.5) * 2,
+            },
+            {
+              x: 0,
+              y: 0,
+              skewX: 0,
+              duration: 0.15,
+              ease: 'power2.out',
+            },
+          )
         }
       } else {
         clearInterval(timer)
@@ -349,15 +401,23 @@ export function TextExplosion({ text, trigger = false }: { text: string; trigger
           <motion.span
             key={i}
             className="inline-block"
-            animate={trigger ? {
-              x: targetX,
-              y: targetY,
-              rotate: Math.random() * 720 - 360,
-              opacity: 0,
-              scale: 0,
-            } : {
-              x: 0, y: 0, rotate: 0, opacity: 1, scale: 1,
-            }}
+            animate={
+              trigger
+                ? {
+                    x: targetX,
+                    y: targetY,
+                    rotate: Math.random() * 720 - 360,
+                    opacity: 0,
+                    scale: 0,
+                  }
+                : {
+                    x: 0,
+                    y: 0,
+                    rotate: 0,
+                    opacity: 1,
+                    scale: 1,
+                  }
+            }
             transition={{
               duration: 0.8 + Math.random() * 0.4,
               ease: [0.16, 1, 0.3, 1],
@@ -381,8 +441,14 @@ SVG textPath for text on a circular path.
 'use client'
 import { motion } from 'motion/react'
 
-export function CircularText({ text, radius = 100, speed = 20 }: {
-  text: string; radius?: number; speed?: number
+export function CircularText({
+  text,
+  radius = 100,
+  speed = 20,
+}: {
+  text: string
+  radius?: number
+  speed?: number
 }) {
   const id = `circle-path-${Math.random().toString(36).slice(2)}`
 
@@ -427,7 +493,8 @@ export function SpiralText({ text, turns = 3 }: { text: string; turns?: number }
     canvas.height = h * 2
     ctx.scale(2, 2)
 
-    const cx = w / 2, cy = h / 2
+    const cx = w / 2,
+      cy = h / 2
     const chars = text.split('')
     const maxRadius = Math.min(w, h) * 0.4
 
@@ -524,23 +591,30 @@ import { gsap, useGSAP } from '@/lib/gsap'
 export function WeightReveal({ text }: { text: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const chars = containerRef.current!.querySelectorAll('span')
-    gsap.fromTo(chars, {
-      fontWeight: 100,
-      opacity: 0.3,
-    }, {
-      fontWeight: 700,
-      opacity: 1,
-      duration: 1,
-      stagger: 0.05,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top 80%',
-      },
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      const chars = containerRef.current!.querySelectorAll('span')
+      gsap.fromTo(
+        chars,
+        {
+          fontWeight: 100,
+          opacity: 0.3,
+        },
+        {
+          fontWeight: 700,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.05,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top 80%',
+          },
+        },
+      )
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="text-5xl tracking-wide">
@@ -565,8 +639,14 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
 const BINARY = '01'
 
-export function MatrixDecode({ text, mode = 'matrix', revealSpeed = 30 }: {
-  text: string; mode?: 'matrix' | 'binary' | 'glyphs'; revealSpeed?: number
+export function MatrixDecode({
+  text,
+  mode = 'matrix',
+  revealSpeed = 30,
+}: {
+  text: string
+  mode?: 'matrix' | 'binary' | 'glyphs'
+  revealSpeed?: number
 }) {
   const [display, setDisplay] = useState('')
   const revealed = useRef(0)
@@ -605,9 +685,7 @@ export function MatrixDecode({ text, mode = 'matrix', revealSpeed = 30 }: {
     }
   }, [text, revealSpeed, scramble])
 
-  return (
-    <span className="font-mono text-green-400 whitespace-pre">{display}</span>
-  )
+  return <span className="font-mono text-green-400 whitespace-pre">{display}</span>
 }
 ```
 
@@ -619,8 +697,14 @@ SVG text with animated stroke.
 'use client'
 import { motion } from 'motion/react'
 
-export function StrokeText({ text, fontSize = 80, duration = 2 }: {
-  text: string; fontSize?: number; duration?: number
+export function StrokeText({
+  text,
+  fontSize = 80,
+  duration = 2,
+}: {
+  text: string
+  fontSize?: number
+  duration?: number
 }) {
   return (
     <svg width="100%" height={fontSize * 1.5} className="overflow-visible">
@@ -665,13 +749,13 @@ export function StrokeText({ text, fontSize = 80, duration = 2 }: {
 
 ## Choosing the Right Effect
 
-| Context | Effect | Why |
-|---------|--------|-----|
-| Hero heading | Stroke Drawing or Morph | Dramatic first impression |
-| Error/404 page | Glitch | Fits the broken theme |
-| Loading/processing | Scramble/Decode | Communicates computation |
-| Creative portfolio | Kinetic/Orbit | Shows motion design skill |
-| Brand statement | Brutalist or Minimal | Strong identity signal |
-| Interactive element | Explosion | Satisfying user feedback |
-| Narrative section | Typewriter | Builds anticipation |
-| Navigation | Circular | Unique, memorable |
+| Context             | Effect                  | Why                       |
+| ------------------- | ----------------------- | ------------------------- |
+| Hero heading        | Stroke Drawing or Morph | Dramatic first impression |
+| Error/404 page      | Glitch                  | Fits the broken theme     |
+| Loading/processing  | Scramble/Decode         | Communicates computation  |
+| Creative portfolio  | Kinetic/Orbit           | Shows motion design skill |
+| Brand statement     | Brutalist or Minimal    | Strong identity signal    |
+| Interactive element | Explosion               | Satisfying user feedback  |
+| Narrative section   | Typewriter              | Builds anticipation       |
+| Navigation          | Circular                | Unique, memorable         |

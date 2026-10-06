@@ -45,6 +45,8 @@ preguntas con el question tool. Requisitos:
   - MANTENER: una sola barra de reproducción por vista, cero superposiciones,
     portada completa en el disco, UI teñida por el álbum, i18n ES/EN/PT.
   - Mejorar el MÓVIL (ya reorganizado) y el ESCRITORIO.
+  - **Falta un buen logo/icono**: hoy es un marcador Duotono temporal; hay que
+    crear el logo/icono definitivo (wordmark + símbolo + favicon e icono PWA).
   - Accesibilidad: axe 0.
   - Usar las animaciones de forma con criterio (micro-interacciones, transiciones,
     reveals) sin sacrificar rendimiento (60fps) ni el fallback de reducción de

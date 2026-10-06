@@ -411,6 +411,30 @@ describe('PlayerController', () => {
     expect(controller.getSnapshot().currentTrack?.id).toBe('s2')
   })
 
+  it('crossfade automático al acercarse el final arranca la siguiente con solape', async () => {
+    vi.useFakeTimers()
+    const a = new FakeAudio()
+    const b = new FakeAudio()
+    const controller = new PlayerController(a, undefined, b)
+    controller.setCrossfade(0.2)
+    controller.playTracks([track('a'), track('b')])
+
+    // Faltan 0.05 s para el final (dentro de la ventana de crossfade).
+    a.duration = 10
+    a.currentTime = 9.95
+    a.dispatch('timeupdate')
+
+    // La siguiente arranca en el otro deck sin parar la anterior.
+    expect(b.src).toBe('blob:b')
+    expect(b.paused).toBe(false)
+    expect(a.paused).toBe(false)
+
+    await vi.runAllTimersAsync()
+
+    expect(a.paused).toBe(true)
+    expect(controller.getSnapshot().currentTrack?.id).toBe('b')
+  })
+
   it('el fundido externo no deja el volumen del usuario en 0', async () => {
     vi.useFakeTimers()
     const a = new FakeAudio()

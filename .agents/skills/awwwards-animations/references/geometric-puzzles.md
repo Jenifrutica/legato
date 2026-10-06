@@ -28,8 +28,16 @@ import { gsap, useGSAP } from '@/lib/gsap'
 const TRIANGLE_PIECES = [
   { id: 'A', tri: 'M 0,173.2 L 50,86.6 L 100,173.2 Z', sq: 'M 0,0 L 100,0 L 100,86.6 L 0,86.6 Z' },
   { id: 'B', tri: 'M 50,86.6 L 100,0 L 150,86.6 Z', sq: 'M 100,0 L 200,0 L 200,86.6 L 100,86.6 Z' },
-  { id: 'C', tri: 'M 100,173.2 L 150,86.6 L 200,173.2 Z', sq: 'M 0,86.6 L 100,86.6 L 100,173.2 L 0,173.2 Z' },
-  { id: 'D', tri: 'M 50,86.6 L 100,173.2 L 150,86.6 L 100,0 Z', sq: 'M 100,86.6 L 200,86.6 L 200,173.2 L 100,173.2 Z' },
+  {
+    id: 'C',
+    tri: 'M 100,173.2 L 150,86.6 L 200,173.2 Z',
+    sq: 'M 0,86.6 L 100,86.6 L 100,173.2 L 0,173.2 Z',
+  },
+  {
+    id: 'D',
+    tri: 'M 50,86.6 L 100,173.2 L 150,86.6 L 100,0 Z',
+    sq: 'M 100,86.6 L 200,86.6 L 200,173.2 L 100,173.2 Z',
+  },
 ]
 
 const COLORS = ['#f43f5e', '#8b5cf6', '#06b6d4', '#f59e0b']
@@ -38,15 +46,18 @@ export function DudeneyDissection() {
   const svgRef = useRef<SVGSVGElement>(null)
   const [isSquare, setIsSquare] = useState(false)
 
-  useGSAP(() => {
-    // Initial setup — start as triangle
-    TRIANGLE_PIECES.forEach((piece, i) => {
-      const el = svgRef.current!.querySelector(`#piece-${piece.id}`)
-      if (el) {
-        gsap.set(el, { attr: { d: piece.tri } })
-      }
-    })
-  }, { scope: svgRef })
+  useGSAP(
+    () => {
+      // Initial setup — start as triangle
+      TRIANGLE_PIECES.forEach((piece, i) => {
+        const el = svgRef.current!.querySelector(`#piece-${piece.id}`)
+        if (el) {
+          gsap.set(el, { attr: { d: piece.tri } })
+        }
+      })
+    },
+    { scope: svgRef },
+  )
 
   const morph = () => {
     const target = !isSquare
@@ -100,30 +111,113 @@ import { useRef, useState, useCallback } from 'react'
 import { gsap } from '@/lib/gsap'
 
 interface TangramPiece {
-  id: string; name: string; points: string; color: string
-  homeX: number; homeY: number; homeRotate: number
+  id: string
+  name: string
+  points: string
+  color: string
+  homeX: number
+  homeY: number
+  homeRotate: number
 }
 
 const PIECES: TangramPiece[] = [
-  { id: 'lg1', name: 'Large Triangle 1', points: '0,0 200,0 100,100', color: '#ef4444', homeX: 0, homeY: 0, homeRotate: 0 },
-  { id: 'lg2', name: 'Large Triangle 2', points: '0,0 100,100 0,200', color: '#f97316', homeX: 0, homeY: 0, homeRotate: 0 },
-  { id: 'md', name: 'Medium Triangle', points: '0,0 100,0 50,50', color: '#eab308', homeX: 100, homeY: 100, homeRotate: 0 },
-  { id: 'sm1', name: 'Small Triangle 1', points: '0,0 100,0 50,50', color: '#22c55e', homeX: 100, homeY: 0, homeRotate: 90 },
-  { id: 'sm2', name: 'Small Triangle 2', points: '0,0 100,0 50,50', color: '#06b6d4', homeX: 50, homeY: 150, homeRotate: 180 },
-  { id: 'sq', name: 'Square', points: '0,0 50,0 50,50 0,50', color: '#8b5cf6', homeX: 100, homeY: 50, homeRotate: 45 },
-  { id: 'par', name: 'Parallelogram', points: '0,0 50,0 100,50 50,50', color: '#ec4899', homeX: 50, homeY: 50, homeRotate: 0 },
+  {
+    id: 'lg1',
+    name: 'Large Triangle 1',
+    points: '0,0 200,0 100,100',
+    color: '#ef4444',
+    homeX: 0,
+    homeY: 0,
+    homeRotate: 0,
+  },
+  {
+    id: 'lg2',
+    name: 'Large Triangle 2',
+    points: '0,0 100,100 0,200',
+    color: '#f97316',
+    homeX: 0,
+    homeY: 0,
+    homeRotate: 0,
+  },
+  {
+    id: 'md',
+    name: 'Medium Triangle',
+    points: '0,0 100,0 50,50',
+    color: '#eab308',
+    homeX: 100,
+    homeY: 100,
+    homeRotate: 0,
+  },
+  {
+    id: 'sm1',
+    name: 'Small Triangle 1',
+    points: '0,0 100,0 50,50',
+    color: '#22c55e',
+    homeX: 100,
+    homeY: 0,
+    homeRotate: 90,
+  },
+  {
+    id: 'sm2',
+    name: 'Small Triangle 2',
+    points: '0,0 100,0 50,50',
+    color: '#06b6d4',
+    homeX: 50,
+    homeY: 150,
+    homeRotate: 180,
+  },
+  {
+    id: 'sq',
+    name: 'Square',
+    points: '0,0 50,0 50,50 0,50',
+    color: '#8b5cf6',
+    homeX: 100,
+    homeY: 50,
+    homeRotate: 45,
+  },
+  {
+    id: 'par',
+    name: 'Parallelogram',
+    points: '0,0 50,0 100,50 50,50',
+    color: '#ec4899',
+    homeX: 50,
+    homeY: 50,
+    homeRotate: 0,
+  },
 ]
 
 // Target shapes: each piece's target transform
 const TARGETS = {
-  house: { lg1: { x: 50, y: 100, r: 0 }, lg2: { x: 0, y: 200, r: -90 }, md: { x: 25, y: 50, r: 0 }, sm1: { x: 0, y: 100, r: 90 }, sm2: { x: 150, y: 100, r: 0 }, sq: { x: 75, y: 150, r: 0 }, par: { x: 100, y: 100, r: 0 } },
-  cat: { lg1: { x: 30, y: 80, r: 45 }, lg2: { x: 30, y: 80, r: -45 }, md: { x: 80, y: 180, r: 180 }, sm1: { x: 0, y: 0, r: 0 }, sm2: { x: 120, y: 0, r: 90 }, sq: { x: 60, y: 30, r: 0 }, par: { x: 60, y: 130, r: 0 } },
+  house: {
+    lg1: { x: 50, y: 100, r: 0 },
+    lg2: { x: 0, y: 200, r: -90 },
+    md: { x: 25, y: 50, r: 0 },
+    sm1: { x: 0, y: 100, r: 90 },
+    sm2: { x: 150, y: 100, r: 0 },
+    sq: { x: 75, y: 150, r: 0 },
+    par: { x: 100, y: 100, r: 0 },
+  },
+  cat: {
+    lg1: { x: 30, y: 80, r: 45 },
+    lg2: { x: 30, y: 80, r: -45 },
+    md: { x: 80, y: 180, r: 180 },
+    sm1: { x: 0, y: 0, r: 0 },
+    sm2: { x: 120, y: 0, r: 90 },
+    sq: { x: 60, y: 30, r: 0 },
+    par: { x: 60, y: 130, r: 0 },
+  },
 }
 
 export function Tangram() {
   const svgRef = useRef<SVGSVGElement>(null)
   const [activeTarget, setActiveTarget] = useState<keyof typeof TARGETS | null>(null)
-  const dragState = useRef<{ id: string; startX: number; startY: number; offsetX: number; offsetY: number } | null>(null)
+  const dragState = useRef<{
+    id: string
+    startX: number
+    startY: number
+    offsetX: number
+    offsetY: number
+  } | null>(null)
 
   const animateToTarget = useCallback((target: keyof typeof TARGETS) => {
     const t = TARGETS[target]
@@ -209,11 +303,11 @@ export function Tangram() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {PIECES.map(piece => (
+        {PIECES.map((piece) => (
           <g
             key={piece.id}
             id={`tangram-${piece.id}`}
-            onPointerDown={e => handlePointerDown(e, piece.id)}
+            onPointerDown={(e) => handlePointerDown(e, piece.id)}
             className="cursor-grab active:cursor-grabbing"
           >
             <polygon
@@ -227,7 +321,7 @@ export function Tangram() {
         ))}
       </svg>
       <div className="flex gap-3">
-        {Object.keys(TARGETS).map(target => (
+        {Object.keys(TARGETS).map((target) => (
           <button
             key={target}
             onClick={() => animateToTarget(target as keyof typeof TARGETS)}
@@ -236,7 +330,10 @@ export function Tangram() {
             {target}
           </button>
         ))}
-        <button onClick={scatter} className="px-4 py-2 text-sm font-mono uppercase border border-white/30 text-white/70">
+        <button
+          onClick={scatter}
+          className="px-4 py-2 text-sm font-mono uppercase border border-white/30 text-white/70"
+        >
           Scatter
         </button>
       </div>
@@ -255,8 +352,12 @@ import { useRef, useEffect } from 'react'
 
 type TessType = 'triangular' | 'hexagonal' | 'cairo'
 
-export function Tessellation({ type = 'hexagonal', animate = true }: {
-  type?: TessType; animate?: boolean
+export function Tessellation({
+  type = 'hexagonal',
+  animate = true,
+}: {
+  type?: TessType
+  animate?: boolean
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number>(0)
@@ -304,7 +405,7 @@ export function Tessellation({ type = 'hexagonal', animate = true }: {
 
     const drawTriGrid = (t: number) => {
       const size = 35
-      const height = size * Math.sqrt(3) / 2
+      const height = (size * Math.sqrt(3)) / 2
 
       for (let row = -1; row < h / height + 1; row++) {
         for (let col = -1; col < w / size + 1; col++) {
@@ -324,7 +425,7 @@ export function Tessellation({ type = 'hexagonal', animate = true }: {
           }
           ctx.closePath()
 
-          const hue = ((row * 40 + col * 20) + t * 30) % 360
+          const hue = (row * 40 + col * 20 + t * 30) % 360
           ctx.fillStyle = `hsla(${hue}, 50%, 55%, 0.8)`
           ctx.fill()
           ctx.strokeStyle = 'rgba(0,0,0,0.2)'
@@ -364,9 +465,15 @@ export function Tessellation({ type = 'hexagonal', animate = true }: {
       const t = animate ? time : 0
 
       switch (type) {
-        case 'hexagonal': drawHexGrid(t); break
-        case 'triangular': drawTriGrid(t); break
-        case 'cairo': drawCairo(t); break
+        case 'hexagonal':
+          drawHexGrid(t)
+          break
+        case 'triangular':
+          drawTriGrid(t)
+          break
+        case 'cairo':
+          drawCairo(t)
+          break
       }
 
       if (animate) {
@@ -398,15 +505,15 @@ function generatePenrose(depth: number, cx: number, cy: number, radius: number):
   // Start with a sun (10 kites)
   let tiles: PenroseTile[] = []
   for (let i = 0; i < 10; i++) {
-    const a1 = ((i * 36) * Math.PI) / 180
-    const a2 = (((i + 1) * 36) * Math.PI) / 180
-    const mid = (((i * 36 + 18)) * Math.PI) / 180
+    const a1 = (i * 36 * Math.PI) / 180
+    const a2 = ((i + 1) * 36 * Math.PI) / 180
+    const mid = ((i * 36 + 18) * Math.PI) / 180
     tiles.push({
       type: 'kite',
       vertices: [
         [cx, cy],
         [cx + Math.cos(a1) * radius, cy + Math.sin(a1) * radius],
-        [cx + Math.cos(mid) * radius / PHI, cy + Math.sin(mid) * radius / PHI],
+        [cx + (Math.cos(mid) * radius) / PHI, cy + (Math.sin(mid) * radius) / PHI],
         [cx + Math.cos(a2) * radius, cy + Math.sin(a2) * radius],
       ],
     })
@@ -463,9 +570,8 @@ export function PenroseTiling({ depth = 3 }: { depth?: number }) {
         })
         ctx.closePath()
 
-        ctx.fillStyle = tile.type === 'kite'
-          ? `hsla(220, 60%, 50%, 0.7)`
-          : `hsla(40, 70%, 55%, 0.7)`
+        ctx.fillStyle =
+          tile.type === 'kite' ? `hsla(220, 60%, 50%, 0.7)` : `hsla(40, 70%, 55%, 0.7)`
         ctx.fill()
         ctx.strokeStyle = 'rgba(0,0,0,0.4)'
         ctx.lineWidth = 0.5
@@ -496,18 +602,138 @@ import { gsap, useGSAP } from '@/lib/gsap'
 
 // All 12 pentomino shapes (relative cell positions)
 const PENTOMINOES: { name: string; cells: [number, number][]; color: string }[] = [
-  { name: 'F', cells: [[0,1],[1,0],[1,1],[1,2],[2,2]], color: '#ef4444' },
-  { name: 'I', cells: [[0,0],[0,1],[0,2],[0,3],[0,4]], color: '#f97316' },
-  { name: 'L', cells: [[0,0],[1,0],[2,0],[3,0],[3,1]], color: '#eab308' },
-  { name: 'N', cells: [[0,0],[1,0],[1,1],[2,1],[3,1]], color: '#22c55e' },
-  { name: 'P', cells: [[0,0],[0,1],[1,0],[1,1],[2,0]], color: '#06b6d4' },
-  { name: 'T', cells: [[0,0],[0,1],[0,2],[1,1],[2,1]], color: '#8b5cf6' },
-  { name: 'U', cells: [[0,0],[0,2],[1,0],[1,1],[1,2]], color: '#ec4899' },
-  { name: 'V', cells: [[0,0],[1,0],[2,0],[2,1],[2,2]], color: '#14b8a6' },
-  { name: 'W', cells: [[0,0],[1,0],[1,1],[2,1],[2,2]], color: '#f43f5e' },
-  { name: 'X', cells: [[0,1],[1,0],[1,1],[1,2],[2,1]], color: '#a855f7' },
-  { name: 'Y', cells: [[0,0],[1,0],[1,1],[2,0],[3,0]], color: '#fb923c' },
-  { name: 'Z', cells: [[0,0],[0,1],[1,1],[2,1],[2,2]], color: '#38bdf8' },
+  {
+    name: 'F',
+    cells: [
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+      [2, 2],
+    ],
+    color: '#ef4444',
+  },
+  {
+    name: 'I',
+    cells: [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [0, 4],
+    ],
+    color: '#f97316',
+  },
+  {
+    name: 'L',
+    cells: [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [3, 0],
+      [3, 1],
+    ],
+    color: '#eab308',
+  },
+  {
+    name: 'N',
+    cells: [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+    ],
+    color: '#22c55e',
+  },
+  {
+    name: 'P',
+    cells: [
+      [0, 0],
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [2, 0],
+    ],
+    color: '#06b6d4',
+  },
+  {
+    name: 'T',
+    cells: [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [1, 1],
+      [2, 1],
+    ],
+    color: '#8b5cf6',
+  },
+  {
+    name: 'U',
+    cells: [
+      [0, 0],
+      [0, 2],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+    ],
+    color: '#ec4899',
+  },
+  {
+    name: 'V',
+    cells: [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [2, 1],
+      [2, 2],
+    ],
+    color: '#14b8a6',
+  },
+  {
+    name: 'W',
+    cells: [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [2, 1],
+      [2, 2],
+    ],
+    color: '#f43f5e',
+  },
+  {
+    name: 'X',
+    cells: [
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+      [2, 1],
+    ],
+    color: '#a855f7',
+  },
+  {
+    name: 'Y',
+    cells: [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [2, 0],
+      [3, 0],
+    ],
+    color: '#fb923c',
+  },
+  {
+    name: 'Z',
+    cells: [
+      [0, 0],
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [2, 2],
+    ],
+    color: '#38bdf8',
+  },
 ]
 
 const CELL_SIZE = 28
@@ -515,18 +741,21 @@ const CELL_SIZE = 28
 export function PentominoShowcase() {
   const svgRef = useRef<SVGSVGElement>(null)
 
-  useGSAP(() => {
-    const pieces = svgRef.current!.querySelectorAll('.pentomino-group')
-    gsap.from(pieces, {
-      scale: 0,
-      rotation: 180,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.1,
-      ease: 'back.out(1.7)',
-      transformOrigin: 'center center',
-    })
-  }, { scope: svgRef })
+  useGSAP(
+    () => {
+      const pieces = svgRef.current!.querySelectorAll('.pentomino-group')
+      gsap.from(pieces, {
+        scale: 0,
+        rotation: 180,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+        transformOrigin: 'center center',
+      })
+    },
+    { scope: svgRef },
+  )
 
   return (
     <svg ref={svgRef} viewBox="0 0 500 200" className="w-full max-w-2xl">
@@ -549,11 +778,7 @@ export function PentominoShowcase() {
                 strokeWidth={1}
               />
             ))}
-            <text
-              x={offsetX + 10}
-              y={offsetY - 5}
-              className="text-xs fill-white/50 font-mono"
-            >
+            <text x={offsetX + 10} y={offsetY - 5} className="text-xs fill-white/50 font-mono">
               {piece.name}
             </text>
           </g>
@@ -591,21 +816,70 @@ export function GeometricTransform({ type = 'rotate' }: { type?: TransformType }
 
     switch (type) {
       case 'rotate':
-        tl.to(shape, { rotation: 90, duration: 1.5, ease: 'power2.inOut', transformOrigin: '200 200' })
-          .to(shape, { rotation: 0, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200', delay: 0.5 })
+        tl.to(shape, {
+          rotation: 90,
+          duration: 1.5,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+        }).to(shape, {
+          rotation: 0,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+          delay: 0.5,
+        })
         break
       case 'reflect':
-        tl.to(shape, { scaleX: -1, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200' })
-          .to(shape, { scaleX: 1, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200', delay: 0.5 })
+        tl.to(shape, {
+          scaleX: -1,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+        }).to(shape, {
+          scaleX: 1,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+          delay: 0.5,
+        })
         break
       case 'dilate':
-        tl.to(shape, { scale: 1.8, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200' })
-          .to(shape, { scale: 1, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200', delay: 0.5 })
+        tl.to(shape, {
+          scale: 1.8,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+        }).to(shape, {
+          scale: 1,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+          delay: 0.5,
+        })
         break
       case 'compose':
-        tl.to(shape, { rotation: 45, scale: 1.3, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200' })
-          .to(shape, { scaleX: -1, duration: 0.8, ease: 'power2.inOut', transformOrigin: '200 200' })
-          .to(shape, { rotation: 0, scale: 1, scaleX: 1, duration: 1, ease: 'power2.inOut', transformOrigin: '200 200', delay: 0.5 })
+        tl.to(shape, {
+          rotation: 45,
+          scale: 1.3,
+          duration: 1,
+          ease: 'power2.inOut',
+          transformOrigin: '200 200',
+        })
+          .to(shape, {
+            scaleX: -1,
+            duration: 0.8,
+            ease: 'power2.inOut',
+            transformOrigin: '200 200',
+          })
+          .to(shape, {
+            rotation: 0,
+            scale: 1,
+            scaleX: 1,
+            duration: 1,
+            ease: 'power2.inOut',
+            transformOrigin: '200 200',
+            delay: 0.5,
+          })
         break
     }
   }
@@ -614,20 +888,39 @@ export function GeometricTransform({ type = 'rotate' }: { type?: TransformType }
     <div className="flex flex-col items-center gap-4">
       <svg ref={svgRef} viewBox="0 0 400 400" className="w-80 h-80">
         {/* Axes */}
-        <line x1="200" y1="0" x2="200" y2="400" stroke="rgba(255,255,255,0.1)" strokeDasharray="4" />
-        <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255,255,255,0.1)" strokeDasharray="4" />
+        <line
+          x1="200"
+          y1="0"
+          x2="200"
+          y2="400"
+          stroke="rgba(255,255,255,0.1)"
+          strokeDasharray="4"
+        />
+        <line
+          x1="0"
+          y1="200"
+          x2="400"
+          y2="200"
+          stroke="rgba(255,255,255,0.1)"
+          strokeDasharray="4"
+        />
         {/* Ghost (original position) */}
         <polygon
           id="transform-ghost"
           points="160,140 240,140 260,200 240,260 160,260 140,200"
-          fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="1"
+          strokeDasharray="4"
           opacity="0"
         />
         {/* Shape */}
         <polygon
           id="transform-shape"
           points="160,140 240,140 260,200 240,260 160,260 140,200"
-          fill="rgba(139, 92, 246, 0.6)" stroke="#8b5cf6" strokeWidth="2"
+          fill="rgba(139, 92, 246, 0.6)"
+          stroke="#8b5cf6"
+          strokeWidth="2"
         />
         {/* Center marker */}
         <circle cx="200" cy="200" r="3" fill="#fff" />
@@ -655,7 +948,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 
 interface PuzzlePiece {
   id: string
-  path: string          // SVG path data
+  path: string // SVG path data
   color: string
   states: Record<string, { x: number; y: number; rotation: number; scale?: number }>
 }
@@ -667,53 +960,64 @@ interface DissectionPuzzleProps {
   className?: string
 }
 
-export function DissectionPuzzle({ pieces, viewBox = '0 0 400 400', initialState, className }: DissectionPuzzleProps) {
+export function DissectionPuzzle({
+  pieces,
+  viewBox = '0 0 400 400',
+  initialState,
+  className,
+}: DissectionPuzzleProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const currentState = useRef(initialState)
 
-  useGSAP(() => {
-    pieces.forEach(piece => {
-      const el = svgRef.current!.querySelector(`#dp-${piece.id}`)
-      const state = piece.states[initialState]
-      if (el && state) {
-        gsap.set(el, {
-          x: state.x,
-          y: state.y,
-          rotation: state.rotation,
-          scale: state.scale ?? 1,
-          transformOrigin: 'center center',
-        })
-      }
-    })
-  }, { scope: svgRef })
+  useGSAP(
+    () => {
+      pieces.forEach((piece) => {
+        const el = svgRef.current!.querySelector(`#dp-${piece.id}`)
+        const state = piece.states[initialState]
+        if (el && state) {
+          gsap.set(el, {
+            x: state.x,
+            y: state.y,
+            rotation: state.rotation,
+            scale: state.scale ?? 1,
+            transformOrigin: 'center center',
+          })
+        }
+      })
+    },
+    { scope: svgRef },
+  )
 
-  const transitionTo = useCallback((targetState: string) => {
-    if (currentState.current === targetState) return
-    pieces.forEach((piece, i) => {
-      const el = svgRef.current!.querySelector(`#dp-${piece.id}`)
-      const state = piece.states[targetState]
-      if (el && state) {
-        gsap.to(el, {
-          x: state.x,
-          y: state.y,
-          rotation: state.rotation,
-          scale: state.scale ?? 1,
-          duration: 1.2,
-          ease: 'power2.inOut',
-          delay: i * 0.1,
-          transformOrigin: 'center center',
-        })
-      }
-    })
-    currentState.current = targetState
-  }, [pieces])
+  const transitionTo = useCallback(
+    (targetState: string) => {
+      if (currentState.current === targetState) return
+      pieces.forEach((piece, i) => {
+        const el = svgRef.current!.querySelector(`#dp-${piece.id}`)
+        const state = piece.states[targetState]
+        if (el && state) {
+          gsap.to(el, {
+            x: state.x,
+            y: state.y,
+            rotation: state.rotation,
+            scale: state.scale ?? 1,
+            duration: 1.2,
+            ease: 'power2.inOut',
+            delay: i * 0.1,
+            transformOrigin: 'center center',
+          })
+        }
+      })
+      currentState.current = targetState
+    },
+    [pieces],
+  )
 
   const availableStates = pieces[0] ? Object.keys(pieces[0].states) : []
 
   return (
     <div className={`flex flex-col items-center gap-4 ${className ?? ''}`}>
       <svg ref={svgRef} viewBox={viewBox} className="w-80 h-80">
-        {pieces.map(piece => (
+        {pieces.map((piece) => (
           <path
             key={piece.id}
             id={`dp-${piece.id}`}
@@ -726,7 +1030,7 @@ export function DissectionPuzzle({ pieces, viewBox = '0 0 400 400', initialState
         ))}
       </svg>
       <div className="flex gap-2">
-        {availableStates.map(state => (
+        {availableStates.map((state) => (
           <button
             key={state}
             onClick={() => transitionTo(state)}
@@ -760,11 +1064,11 @@ export function DissectionPuzzle({ pieces, viewBox = '0 0 400 400', initialState
 
 ## Choosing the Right Puzzle
 
-| Puzzle | Best For | Complexity |
-|--------|----------|------------|
-| Dudeney | Math demonstrations, educational | Medium |
-| Tangram | Interactive play, creativity | Low-Medium |
-| Tessellation | Backgrounds, patterns | Low |
-| Penrose | Mathematical beauty, wow factor | High |
-| Polyominoes | Game-like interactions | Medium |
-| Transformations | Educational, geometric concepts | Low |
+| Puzzle          | Best For                         | Complexity |
+| --------------- | -------------------------------- | ---------- |
+| Dudeney         | Math demonstrations, educational | Medium     |
+| Tangram         | Interactive play, creativity     | Low-Medium |
+| Tessellation    | Backgrounds, patterns            | Low        |
+| Penrose         | Mathematical beauty, wow factor  | High       |
+| Polyominoes     | Game-like interactions           | Medium     |
+| Transformations | Educational, geometric concepts  | Low        |

@@ -34,6 +34,7 @@ anime(options)
 Specify what to animate.
 
 **CSS Selector:**
+
 ```javascript
 targets: '.element'
 targets: '#myId'
@@ -41,18 +42,21 @@ targets: 'div.className'
 ```
 
 **DOM Element/NodeList:**
+
 ```javascript
 targets: document.querySelector('.element')
 targets: document.querySelectorAll('.elements')
 ```
 
 **JavaScript Object:**
+
 ```javascript
 const obj = { prop: 0 }
 anime({ targets: obj, prop: 100 })
 ```
 
 **Array:**
+
 ```javascript
 targets: [el1, el2, el3]
 targets: [obj1, obj2]
@@ -65,23 +69,25 @@ targets: [obj1, obj2]
 ### CSS Properties
 
 **Transform (individual):**
+
 ```javascript
-translateX: 250         // pixels
-translateY: '10em'     // units
+translateX: 250 // pixels
+translateY: '10em' // units
 translateZ: '50vh'
-rotate: '1turn'        // turns, deg, rad
-rotateX, rotateY, rotateZ
+rotate: '1turn' // turns, deg, rad
+;(rotateX, rotateY, rotateZ)
 scale: 2
-scaleX, scaleY, scaleZ
+;(scaleX, scaleY, scaleZ)
 skew: '10deg'
-skewX, skewY
+;(skewX, skewY)
 perspective: 1000
 ```
 
 **Other CSS:**
+
 ```javascript
 opacity: 0.5
-backgroundColor: '#FFF'  // colors
+backgroundColor: '#FFF' // colors
 borderRadius: '50%'
 width: '100px'
 left: '50%'
@@ -91,21 +97,21 @@ left: '50%'
 ### SVG Attributes
 
 ```javascript
-d: 'M10 80 Q 77.5 10, 145 80'  // Path morphing
-points: '64 68 8 400 ...'       // Polygon points
+d: 'M10 80 Q 77.5 10, 145 80' // Path morphing
+points: '64 68 8 400 ...' // Polygon points
 strokeDashoffset: 100
 fill: '#FF0000'
-r: 50                           // Circle radius
-cx, cy                          // Circle center
+r: 50 // Circle radius
+;(cx, cy) // Circle center
 // Any SVG attribute
 ```
 
 ### DOM Attributes
 
 ```javascript
-value: 100              // Input value
-volume: 0.5            // Audio/video
-textContent: 'Hello'   // Text content
+value: 100 // Input value
+volume: 0.5 // Audio/video
+textContent: 'Hello' // Text content
 innerHTML: '<div></div>'
 // Any DOM attribute
 ```
@@ -117,7 +123,7 @@ const obj = { x: 0, y: 0 }
 anime({
   targets: obj,
   x: 100,
-  y: 200
+  y: 200,
 })
 ```
 
@@ -130,58 +136,62 @@ Define how each property animates.
 ### Value Formats
 
 **Single Value:**
+
 ```javascript
-translateX: 250  // Animate from current to 250
+translateX: 250 // Animate from current to 250
 ```
 
 **From-To Array:**
+
 ```javascript
-translateX: [0, 250]  // Explicit from/to
+translateX: [0, 250] // Explicit from/to
 opacity: [0, 1]
 ```
 
 **Function-Based:**
+
 ```javascript
-translateX: (el, i) => 50 + (i * 50)  // Different per element
+translateX: (el, i) => 50 + i * 50 // Different per element
 delay: (el, i, total) => i * 100
 ```
 
 **Keyframes:**
+
 ```javascript
 translateX: [
   { value: 100, duration: 500 },
   { value: 200, duration: 500 },
-  { value: 0, duration: 500 }
+  { value: 0, duration: 500 },
 ]
 ```
 
 ### Units
 
 ```javascript
-'250px'      // Pixels
-'10em'       // Ems
-'50%'        // Percentage
-'100vh'      // Viewport
-'1turn'      // Turns
-'45deg'      // Degrees
-'1.5rad'     // Radians
+'250px' // Pixels
+'10em' // Ems
+'50%' // Percentage
+'100vh' // Viewport
+'1turn' // Turns
+'45deg' // Degrees
+'1.5rad' // Radians
 ```
 
 ### Relative Values
 
 ```javascript
-translateX: '+=250'   // Add 250 to current
-translateX: '-=100'   // Subtract 100
-translateX: '*=2'     // Multiply by 2
+translateX: '+=250' // Add 250 to current
+translateX: '-=100' // Subtract 100
+translateX: '*=2' // Multiply by 2
 ```
 
 ### Colors
 
 ```javascript
-'#FF0000'               // Hex
-'rgb(255, 0, 0)'       // RGB
+'#FF0000' // Hex
+'rgb(255, 0, 0)' // RGB
 'rgba(255, 0, 0, 0.5)' // RGBA
-'hsl(0, 100%, 50%)'    // HSL
+'hsl(0, 100%, 50%)' // HSL
 ```
 
 ---
@@ -232,7 +242,7 @@ Chain multiple animations with precise control.
 const tl = anime.timeline({
   duration: 1000,
   easing: 'easeOutExpo',
-  loop: true
+  loop: true,
 })
 ```
 
@@ -241,12 +251,14 @@ const tl = anime.timeline({
 ```javascript
 tl.add({
   targets: '.el1',
-  translateX: 250
-})
-.add({
-  targets: '.el2',
-  translateX: 250
-}, '-=500')  // Offset
+  translateX: 250,
+}).add(
+  {
+    targets: '.el2',
+    translateX: 250,
+  },
+  '-=500',
+) // Offset
 ```
 
 ### Timeline Parameters
@@ -255,12 +267,12 @@ All animation parameters plus:
 
 ```javascript
 anime.timeline({
-  duration: 1000,        // Default duration
-  delay: 500,            // Default delay
-  easing: 'linear',      // Default easing
+  duration: 1000, // Default duration
+  delay: 500, // Default delay
+  easing: 'linear', // Default easing
   direction: 'normal',
   loop: false,
-  autoplay: true
+  autoplay: true,
 })
 ```
 
@@ -269,9 +281,9 @@ anime.timeline({
 Control when animations start:
 
 ```javascript
-'+=500'   // Start 500ms after previous ends
-'-=500'   // Start 500ms before previous ends
-500       // Start at absolute time 500ms
+'+=500' // Start 500ms after previous ends
+'-=500' // Start 500ms before previous ends
+500 // Start at absolute time 500ms
 ```
 
 ### Timeline Methods
@@ -281,8 +293,8 @@ tl.play()
 tl.pause()
 tl.restart()
 tl.reverse()
-tl.seek(1000)          // Seek to 1000ms
-tl.add(animation)      // Add animation
+tl.seek(1000) // Seek to 1000ms
+tl.add(animation) // Add animation
 ```
 
 ---
@@ -294,19 +306,19 @@ Distribute delays across multiple elements.
 ### Basic Stagger
 
 ```javascript
-delay: anime.stagger(100)  // Increment by 100ms
+delay: anime.stagger(100) // Increment by 100ms
 ```
 
 ### Stagger Options
 
 ```javascript
 delay: anime.stagger(100, {
-  start: 500,              // Start delay
-  from: 'center',          // 'first', 'last', 'center', index, [x, y]
-  direction: 'normal',     // 'normal', 'reverse'
-  easing: 'easeOutQuad',   // Easing for delay
-  grid: [10, 10],          // Grid dimensions
-  axis: 'x'                // 'x', 'y', null
+  start: 500, // Start delay
+  from: 'center', // 'first', 'last', 'center', index, [x, y]
+  direction: 'normal', // 'normal', 'reverse'
+  easing: 'easeOutQuad', // Easing for delay
+  grid: [10, 10], // Grid dimensions
+  axis: 'x', // 'x', 'y', null
 })
 ```
 
@@ -331,8 +343,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(50, {
     grid: [14, 5],
-    from: 'center'
-  })
+    from: 'center',
+  }),
 })
 ```
 
@@ -343,43 +355,49 @@ anime({
 ### Built-in Easings
 
 **Linear:**
+
 ```javascript
 'linear'
 ```
 
 **Ease In/Out:**
+
 ```javascript
-'easeInQuad', 'easeOutQuad', 'easeInOutQuad'
-'easeInCubic', 'easeOutCubic', 'easeInOutCubic'
-'easeInQuart', 'easeOutQuart', 'easeInOutQuart'
-'easeInQuint', 'easeOutQuint', 'easeInOutQuint'
-'easeInSine', 'easeOutSine', 'easeInOutSine'
-'easeInExpo', 'easeOutExpo', 'easeInOutExpo'
-'easeInCirc', 'easeOutCirc', 'easeInOutCirc'
-'easeInBack', 'easeOutBack', 'easeInOutBack'
-'easeInElastic', 'easeOutElastic', 'easeInOutElastic'
-'easeInBounce', 'easeOutBounce', 'easeInOutBounce'
+;('easeInQuad', 'easeOutQuad', 'easeInOutQuad')
+;('easeInCubic', 'easeOutCubic', 'easeInOutCubic')
+;('easeInQuart', 'easeOutQuart', 'easeInOutQuart')
+;('easeInQuint', 'easeOutQuint', 'easeInOutQuint')
+;('easeInSine', 'easeOutSine', 'easeInOutSine')
+;('easeInExpo', 'easeOutExpo', 'easeInOutExpo')
+;('easeInCirc', 'easeOutCirc', 'easeInOutCirc')
+;('easeInBack', 'easeOutBack', 'easeInOutBack')
+;('easeInElastic', 'easeOutElastic', 'easeInOutElastic')
+;('easeInBounce', 'easeOutBounce', 'easeInOutBounce')
 ```
 
 ### Custom Easings
 
 **Cubic Bezier:**
+
 ```javascript
 easing: 'cubicBezier(.5, .05, .1, .3)'
 ```
 
 **Spring Physics:**
+
 ```javascript
 easing: 'spring(1, 80, 10, 0)'
 // mass, stiffness, damping, velocity
 ```
 
 **Steps:**
+
 ```javascript
-easing: 'steps(5)'  // 5 steps
+easing: 'steps(5)' // 5 steps
 ```
 
 **Linear Keyframes:**
+
 ```javascript
 easing: 'linear(0, 0.5, 1)'
 ```
@@ -395,7 +413,7 @@ Calculate strokeDashoffset for line drawing:
 ```javascript
 anime({
   targets: 'path',
-  strokeDashoffset: [anime.setDashoffset, 0]
+  strokeDashoffset: [anime.setDashoffset, 0],
 })
 ```
 
@@ -410,7 +428,7 @@ anime({
   targets: '.element',
   translateX: path('x'),
   translateY: path('y'),
-  rotate: path('angle')
+  rotate: path('angle'),
 })
 ```
 
@@ -475,22 +493,23 @@ anime({
 
   changeComplete: (anim) => {
     console.log('Direction change completes')
-  }
+  },
 })
 ```
 
 ### Callback Parameters
 
 **anim Object:**
+
 ```javascript
-anim.progress      // Animation progress (0-100)
-anim.currentTime   // Current time (ms)
-anim.duration      // Total duration (ms)
-anim.remaining     // Remaining loops
-anim.reversed      // Direction reversed?
-anim.paused        // Animation paused?
-anim.began         // Animation began?
-anim.finished      // Animation finished?
+anim.progress // Animation progress (0-100)
+anim.currentTime // Current time (ms)
+anim.duration // Total duration (ms)
+anim.remaining // Remaining loops
+anim.reversed // Direction reversed?
+anim.paused // Animation paused?
+anim.began // Animation began?
+anim.finished // Animation finished?
 ```
 
 ---
@@ -521,8 +540,8 @@ animation.play()
 animation.pause()
 animation.restart()
 animation.reverse()
-animation.seek(time)       // Seek to time (ms or %)
-animation.tick(time)       // Manual tick
+animation.seek(time) // Seek to time (ms or %)
+animation.tick(time) // Manual tick
 ```
 
 ---
@@ -537,7 +556,7 @@ anime({
   translateX: 250,
   rotate: '1turn',
   duration: 800,
-  easing: 'easeInOutQuad'
+  easing: 'easeInOutQuad',
 })
 ```
 
@@ -548,7 +567,7 @@ anime({
   targets: '.element',
   translateX: [0, 250],
   opacity: [0, 1],
-  duration: 1000
+  duration: 1000,
 })
 ```
 
@@ -557,14 +576,9 @@ anime({
 ```javascript
 anime({
   targets: '.element',
-  keyframes: [
-    { translateX: 100 },
-    { translateY: 100 },
-    { translateX: 0 },
-    { translateY: 0 }
-  ],
+  keyframes: [{ translateX: 100 }, { translateY: 100 }, { translateX: 0 }, { translateY: 0 }],
   duration: 4000,
-  loop: true
+  loop: true,
 })
 ```
 
@@ -575,12 +589,14 @@ const tl = anime.timeline()
 
 tl.add({
   targets: '.box1',
-  translateX: 250
-})
-.add({
-  targets: '.box2',
-  translateX: 250
-}, '-=500')
+  translateX: 250,
+}).add(
+  {
+    targets: '.box2',
+    translateX: 250,
+  },
+  '-=500',
+)
 ```
 
 ### Stagger Animation
@@ -590,7 +606,7 @@ anime({
   targets: '.stagger-item',
   translateY: [-50, 0],
   opacity: [0, 1],
-  delay: anime.stagger(100, { from: 'center' })
+  delay: anime.stagger(100, { from: 'center' }),
 })
 ```
 
@@ -601,7 +617,7 @@ anime({
   targets: '#morphing-path',
   d: 'M10 80 Q 77.5 150, 145 80',
   duration: 2000,
-  easing: 'easeInOutQuad'
+  easing: 'easeInOutQuad',
 })
 ```
 
@@ -616,6 +632,6 @@ anime({
   round: 1,
   update: () => {
     document.querySelector('.counter').textContent = obj.count
-  }
+  },
 })
 ```

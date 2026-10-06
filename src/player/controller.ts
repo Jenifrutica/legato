@@ -57,6 +57,7 @@ export class PlayerController {
   #transitionToken = 0
   #lastError: string | null = null
   #sourcePlaylistId: string | null = null
+  #autoCrossfading = false
   #externalPlayer: {
     play: (uri: string, startVolume?: number) => Promise<void> | void
     stop: () => void
@@ -82,6 +83,7 @@ export class PlayerController {
       engine.on('time', () => {
         if (engine === this.#engine) {
           this.#enforceAbLoop()
+          this.#maybeAutoCrossfade()
           this.#notify()
         }
       })
@@ -512,6 +514,49 @@ export class PlayerController {
     }
 
     this.#notify()
+  }
+
+  /**
+   * Crossfade automático: cuando faltan `crossfadeSeconds` para el final, se
+   * arranca la siguiente pista en el otro deck y se cruzan (si no, al terminar
+   * el motor ya está en pausa y no hay nada que fundir → corte de golpe).
+   */
+  #maybeAutoCrossfade(): void {
+    if (this.#crossfadeSeconds <= 0 || this.#externalActive || this.#autoCrossfading) {
+      return
+    }
+    if (this.#abLoop !== null || this.#queue.loopMode === 'one') {
+      return
+    }
+
+    const duration = this.#engine.duration
+    if (duration <= 0 || this.#engine.paused) {
+      return
+    }
+
+    const remaining = duration - this.#engine.currentTime
+    if (remaining > this.#crossfadeSeconds || remaining <= 0) {
+      return
+    }
+
+    // Aviso de fin de pista (temporizador); si alguien lo maneja, no avanzamos.
+    for (const listener of this.#trackEndedListeners) {
+      if (listener() === true) {
+        this.#notify()
+        return
+      }
+    }
+
+    const track = this.#queue.next()
+    if (track === null) {
+      return
+    }
+
+    this.#autoCrossfading = true
+    this.#resetAbLoop()
+    void this.#transitionTo(track, true).finally(() => {
+      this.#autoCrossfading = false
+    })
   }
 
   async #transitionTo(track: QueueTrack, fadeOutCurrent: boolean): Promise<void> {

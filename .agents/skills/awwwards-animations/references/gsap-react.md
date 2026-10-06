@@ -3,6 +3,7 @@
 Complete GSAP patterns for React with useGSAP hook. Based on official GSAP documentation.
 
 ## Table of Contents
+
 1. [useGSAP Fundamentals](#usegsap-fundamentals)
 2. [ScrollTrigger in React](#scrolltrigger-in-react)
 3. [Context Safe Functions](#context-safe-functions)
@@ -33,9 +34,12 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
 function AnimatedBox() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.to('.box', { x: 360, rotation: 360, duration: 1 })
-  }, { scope: containerRef }) // scope limits selectors to container
+  useGSAP(
+    () => {
+      gsap.to('.box', { x: 360, rotation: 360, duration: 1 })
+    },
+    { scope: containerRef },
+  ) // scope limits selectors to container
 
   return (
     <div ref={containerRef}>
@@ -51,17 +55,20 @@ function AnimatedBox() {
 function AnimatedCounter({ count }: { count: number }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.from('.counter', {
-      textContent: 0,
-      duration: 1,
-      snap: { textContent: 1 }
-    })
-  }, {
-    scope: containerRef,
-    dependencies: [count],     // Re-run when count changes
-    revertOnUpdate: true       // Cleanup before re-running
-  })
+  useGSAP(
+    () => {
+      gsap.from('.counter', {
+        textContent: 0,
+        duration: 1,
+        snap: { textContent: 1 },
+      })
+    },
+    {
+      scope: containerRef,
+      dependencies: [count], // Re-run when count changes
+      revertOnUpdate: true, // Cleanup before re-running
+    },
+  )
 
   return (
     <div ref={containerRef}>
@@ -74,14 +81,17 @@ function AnimatedCounter({ count }: { count: number }) {
 ### Cleanup Function
 
 ```tsx
-useGSAP(() => {
-  const animation = gsap.to('.box', { x: 100 })
+useGSAP(
+  () => {
+    const animation = gsap.to('.box', { x: 100 })
 
-  return () => {
-    // Custom cleanup (useGSAP auto-reverts GSAP objects)
-    console.log('Component unmounting')
-  }
-}, { scope: containerRef })
+    return () => {
+      // Custom cleanup (useGSAP auto-reverts GSAP objects)
+      console.log('Component unmounting')
+    }
+  },
+  { scope: containerRef },
+)
 ```
 
 ## ScrollTrigger in React
@@ -92,20 +102,23 @@ useGSAP(() => {
 function ScrollSection() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.from('.content', {
-      opacity: 0,
-      y: 50,
-      duration: 1,
-      scrollTrigger: {
-        trigger: '.content',
-        start: 'top 80%',
-        end: 'top 30%',
-        toggleActions: 'play none none reverse',
-        // markers: true, // Debug only
-      }
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      gsap.from('.content', {
+        opacity: 0,
+        y: 50,
+        duration: 1,
+        scrollTrigger: {
+          trigger: '.content',
+          start: 'top 80%',
+          end: 'top 30%',
+          toggleActions: 'play none none reverse',
+          // markers: true, // Debug only
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
@@ -121,18 +134,21 @@ function ScrollSection() {
 function ScrubSection() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.to('.progress', {
-      scaleX: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.3, // Smooth catch-up (seconds)
-      }
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      gsap.to('.progress', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.3, // Smooth catch-up (seconds)
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="h-[300vh]">
@@ -148,20 +164,23 @@ function ScrubSection() {
 function PinnedSection() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.to('.pinned-content', {
-      y: 200,
-      opacity: 0.5,
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=1000', // Pin for 1000px of scroll
-        pin: true,
-        scrub: true,
-        anticipatePin: 1, // Prevents jump
-      }
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      gsap.to('.pinned-content', {
+        y: 200,
+        opacity: 0.5,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: '+=1000', // Pin for 1000px of scroll
+          pin: true,
+          scrub: true,
+          anticipatePin: 1, // Prevents jump
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="h-screen">
@@ -177,27 +196,32 @@ function PinnedSection() {
 function MultipleAnimations() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const sections = gsap.utils.toArray<HTMLElement>('.section')
+  useGSAP(
+    () => {
+      const sections = gsap.utils.toArray<HTMLElement>('.section')
 
-    sections.forEach((section, i) => {
-      gsap.from(section, {
-        opacity: 0,
-        y: 50,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        }
+      sections.forEach((section, i) => {
+        gsap.from(section, {
+          opacity: 0,
+          y: 50,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        })
       })
-    })
-  }, { scope: containerRef })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
-      {[1, 2, 3, 4].map(i => (
-        <div key={i} className="section h-screen">Section {i}</div>
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="section h-screen">
+          Section {i}
+        </div>
       ))}
     </div>
   )
@@ -220,7 +244,7 @@ function ClickAnimation() {
     gsap.to('.box', {
       rotation: '+=360',
       duration: 0.5,
-      ease: 'power2.out'
+      ease: 'power2.out',
     })
   })
 
@@ -250,11 +274,7 @@ function HoverCard() {
   })
 
   return (
-    <div
-      ref={containerRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div ref={containerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="card-content">Hover me</div>
     </div>
   )
@@ -269,20 +289,22 @@ function HoverCard() {
 function TimelineAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top center',
-      }
-    })
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top center',
+        },
+      })
 
-    tl.from('.title', { opacity: 0, y: 50, duration: 0.6 })
-      .from('.subtitle', { opacity: 0, y: 30, duration: 0.5 }, '-=0.3')
-      .from('.cta', { opacity: 0, scale: 0.9, duration: 0.4 }, '-=0.2')
-      .from('.decoration', { opacity: 0, x: -20, stagger: 0.1 }, '-=0.3')
-
-  }, { scope: containerRef })
+      tl.from('.title', { opacity: 0, y: 50, duration: 0.6 })
+        .from('.subtitle', { opacity: 0, y: 30, duration: 0.5 }, '-=0.3')
+        .from('.cta', { opacity: 0, scale: 0.9, duration: 0.4 }, '-=0.2')
+        .from('.decoration', { opacity: 0, x: -20, stagger: 0.1 }, '-=0.3')
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
@@ -303,12 +325,16 @@ function ControlledTimeline() {
   const containerRef = useRef<HTMLDivElement>(null)
   const tl = useRef<gsap.core.Timeline>(null)
 
-  useGSAP(() => {
-    tl.current = gsap.timeline({ paused: true })
-      .to('.box', { x: 200, duration: 0.5 })
-      .to('.box', { y: 100, duration: 0.5 })
-      .to('.box', { rotation: 360, duration: 0.5 })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      tl.current = gsap
+        .timeline({ paused: true })
+        .to('.box', { x: 200, duration: 0.5 })
+        .to('.box', { y: 100, duration: 0.5 })
+        .to('.box', { rotation: 360, duration: 0.5 })
+    },
+    { scope: containerRef },
+  )
 
   const play = () => tl.current?.play()
   const reverse = () => tl.current?.reverse()
@@ -340,7 +366,7 @@ function TextReveal() {
   useGSAP(() => {
     splitRef.current = new SplitText(textRef.current, {
       type: 'chars, words, lines',
-      linesClass: 'overflow-hidden'
+      linesClass: 'overflow-hidden',
     })
 
     gsap.from(splitRef.current.chars, {
@@ -353,7 +379,7 @@ function TextReveal() {
       scrollTrigger: {
         trigger: textRef.current,
         start: 'top 80%',
-      }
+      },
     })
 
     return () => splitRef.current?.revert()
@@ -383,7 +409,7 @@ function ScrambleText() {
       scrollTrigger: {
         trigger: textRef.current,
         start: 'top 80%',
-      }
+      },
     })
   })
 
@@ -397,18 +423,21 @@ function ScrambleText() {
 function LineMaskReveal({ text }: { text: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.from('.line-inner', {
-      yPercent: 100,
-      duration: 0.8,
-      ease: 'power4.out',
-      stagger: 0.1,
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top 80%',
-      }
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      gsap.from('.line-inner', {
+        yPercent: 100,
+        duration: 0.8,
+        ease: 'power4.out',
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 80%',
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
@@ -431,26 +460,29 @@ function HorizontalScroll() {
   const containerRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const sections = gsap.utils.toArray<HTMLElement>('.panel')
+  useGSAP(
+    () => {
+      const sections = gsap.utils.toArray<HTMLElement>('.panel')
 
-    gsap.to(sections, {
-      xPercent: -100 * (sections.length - 1),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: wrapperRef.current,
-        pin: true,
-        scrub: 1,
-        snap: 1 / (sections.length - 1),
-        end: () => '+=' + wrapperRef.current!.offsetWidth,
-      }
-    })
-  }, { scope: containerRef })
+      gsap.to(sections, {
+        xPercent: -100 * (sections.length - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          pin: true,
+          scrub: 1,
+          snap: 1 / (sections.length - 1),
+          end: () => '+=' + wrapperRef.current!.offsetWidth,
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
       <div ref={wrapperRef} className="flex w-[400vw]">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="panel w-screen h-screen flex-shrink-0">
             Panel {i}
           </div>
@@ -467,23 +499,26 @@ function HorizontalScroll() {
 function StackedSections() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const sections = gsap.utils.toArray<HTMLElement>('.stack-section')
+  useGSAP(
+    () => {
+      const sections = gsap.utils.toArray<HTMLElement>('.stack-section')
 
-    sections.forEach((section, i) => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        pin: true,
-        pinSpacing: false,
-        snap: 1,
+      sections.forEach((section, i) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          pin: true,
+          pinSpacing: false,
+          snap: 1,
+        })
       })
-    })
-  }, { scope: containerRef })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
-      {[1, 2, 3].map(i => (
+      {[1, 2, 3].map((i) => (
         <div key={i} className="stack-section h-screen" style={{ zIndex: i }}>
           Section {i}
         </div>
@@ -501,20 +536,23 @@ function StackedSections() {
 function BatchGrid() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    ScrollTrigger.batch('.grid-item', {
-      onEnter: (elements) => {
-        gsap.from(elements, {
-          opacity: 0,
-          y: 60,
-          stagger: 0.1,
-          duration: 0.6,
-          ease: 'power3.out',
-        })
-      },
-      start: 'top 85%',
-    })
-  }, { scope: containerRef })
+  useGSAP(
+    () => {
+      ScrollTrigger.batch('.grid-item', {
+        onEnter: (elements) => {
+          gsap.from(elements, {
+            opacity: 0,
+            y: 60,
+            stagger: 0.1,
+            duration: 0.6,
+            ease: 'power3.out',
+          })
+        },
+        start: 'top 85%',
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="grid grid-cols-4 gap-4">
@@ -546,7 +584,7 @@ function DrawSVG() {
       scrollTrigger: {
         trigger: svgRef.current,
         start: 'top 70%',
-      }
+      },
     })
   })
 
@@ -580,7 +618,11 @@ function MorphShape() {
   return (
     <svg viewBox="0 0 100 100">
       <path ref={shapeRef} id="start-shape" d="M50,10 L90,90 L10,90 Z" />
-      <path id="target-shape" d="M50,10 A40,40 0 1,1 50,90 A40,40 0 1,1 50,10" style={{ visibility: 'hidden' }} />
+      <path
+        id="target-shape"
+        d="M50,10 A40,40 0 1,1 50,90 A40,40 0 1,1 50,10"
+        style={{ visibility: 'hidden' }}
+      />
       <button onClick={morph}>Morph</button>
     </svg>
   )
@@ -611,7 +653,7 @@ useEffect(() => {
 // In a layout or route component
 useEffect(() => {
   return () => {
-    ScrollTrigger.getAll().forEach(t => t.kill())
+    ScrollTrigger.getAll().forEach((t) => t.kill())
   }
 }, [])
 ```

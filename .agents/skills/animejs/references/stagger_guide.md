@@ -14,7 +14,7 @@ Stagger distributes animation delays across multiple elements, creating cascadin
 anime({
   targets: '.element',
   translateX: 250,
-  delay: anime.stagger(100) // Increment delay by 100ms
+  delay: anime.stagger(100), // Increment delay by 100ms
 })
 ```
 
@@ -25,7 +25,7 @@ anime({
 ```javascript
 anime({
   targets: '.element',
-  translateX: anime.stagger([0, 100, 200, 300])
+  translateX: anime.stagger([0, 100, 200, 300]),
 })
 ```
 
@@ -37,12 +37,12 @@ anime({
 
 ```javascript
 anime.stagger(value, {
-  start: 0,              // Starting delay (ms)
-  from: 'first',         // Starting point
-  direction: 'normal',   // Direction of stagger
-  easing: 'linear',      // Easing for stagger progression
-  grid: [rows, cols],    // Grid dimensions
-  axis: null             // Grid axis ('x', 'y', or null)
+  start: 0, // Starting delay (ms)
+  from: 'first', // Starting point
+  direction: 'normal', // Direction of stagger
+  easing: 'linear', // Easing for stagger progression
+  grid: [rows, cols], // Grid dimensions
+  axis: null, // Grid axis ('x', 'y', or null)
 })
 ```
 
@@ -60,7 +60,7 @@ Start from the first element:
 anime({
   targets: '.element',
   scale: [0, 1],
-  delay: anime.stagger(100, { from: 'first' })
+  delay: anime.stagger(100, { from: 'first' }),
 })
 ```
 
@@ -72,7 +72,7 @@ Start from the last element:
 anime({
   targets: '.element',
   scale: [0, 1],
-  delay: anime.stagger(100, { from: 'last' })
+  delay: anime.stagger(100, { from: 'last' }),
 })
 ```
 
@@ -84,7 +84,7 @@ Start from the center and expand outward:
 anime({
   targets: '.element',
   scale: [0, 1],
-  delay: anime.stagger(100, { from: 'center' })
+  delay: anime.stagger(100, { from: 'center' }),
 })
 ```
 
@@ -96,7 +96,7 @@ Start from a specific index:
 anime({
   targets: '.element',
   scale: [0, 1],
-  delay: anime.stagger(100, { from: 5 }) // Start from 6th element (0-indexed)
+  delay: anime.stagger(100, { from: 5 }), // Start from 6th element (0-indexed)
 })
 ```
 
@@ -110,8 +110,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(50, {
     grid: [10, 10],
-    from: [5, 5] // Start from center of grid
-  })
+    from: [5, 5], // Start from center of grid
+  }),
 })
 ```
 
@@ -128,8 +128,8 @@ anime({
   targets: '.grid-item',
   scale: [0, 1],
   delay: anime.stagger(50, {
-    grid: [14, 5] // 14 columns, 5 rows
-  })
+    grid: [14, 5], // 14 columns, 5 rows
+  }),
 })
 ```
 
@@ -141,8 +141,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(50, {
     grid: [14, 5],
-    from: 'center'
-  })
+    from: 'center',
+  }),
 })
 ```
 
@@ -160,8 +160,8 @@ anime({
   delay: anime.stagger(30, {
     grid: [10, 10],
     from: 'center',
-    axis: 'x' // Stagger primarily along x-axis
-  })
+    axis: 'x', // Stagger primarily along x-axis
+  }),
 })
 
 // Vertical waves
@@ -171,8 +171,8 @@ anime({
   delay: anime.stagger(30, {
     grid: [10, 10],
     from: 'center',
-    axis: 'y' // Stagger primarily along y-axis
-  })
+    axis: 'y', // Stagger primarily along y-axis
+  }),
 })
 ```
 
@@ -186,7 +186,7 @@ anime({
 anime({
   targets: '.element',
   scale: [0, 1],
-  delay: anime.stagger(100, { direction: 'normal' })
+  delay: anime.stagger(100, { direction: 'normal' }),
 })
 ```
 
@@ -200,8 +200,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(100, {
     from: 'first',
-    direction: 'reverse' // Last to first
-  })
+    direction: 'reverse', // Last to first
+  }),
 })
 ```
 
@@ -216,8 +216,8 @@ anime({
   targets: '.element',
   translateY: [-50, 0],
   delay: anime.stagger(100, {
-    easing: 'easeOutQuad' // Ease the delay distribution
-  })
+    easing: 'easeOutQuad', // Ease the delay distribution
+  }),
 })
 ```
 
@@ -234,12 +234,13 @@ anime({
   targets: '.element',
   scale: [0, 1],
   delay: anime.stagger(100, {
-    start: 500 // Wait 500ms before starting stagger
-  })
+    start: 500, // Wait 500ms before starting stagger
+  }),
 })
 ```
 
 **Result:**
+
 - Element 1: 500ms delay
 - Element 2: 600ms delay
 - Element 3: 700ms delay
@@ -256,7 +257,7 @@ anime({
   translateY: [30, 0],
   opacity: [0, 1],
   delay: anime.stagger(80),
-  easing: 'easeOutQuad'
+  easing: 'easeOutQuad',
 })
 ```
 
@@ -268,9 +269,9 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(30, {
     grid: [10, 10],
-    from: 'center'
+    from: 'center',
   }),
-  easing: 'easeOutElastic(1, .8)'
+  easing: 'easeOutElastic(1, .8)',
 })
 ```
 
@@ -281,10 +282,10 @@ anime({
   targets: '.wave-element',
   translateY: [
     { value: -20, duration: 300 },
-    { value: 0, duration: 300 }
+    { value: 0, duration: 300 },
   ],
   delay: anime.stagger(50),
-  loop: true
+  loop: true,
 })
 ```
 
@@ -298,8 +299,8 @@ anime({
   delay: anime.stagger(20, {
     grid: [10, 10],
     from: [0, 0], // Top-left corner
-    axis: null // Both axes
-  })
+    axis: null, // Both axes
+  }),
 })
 ```
 
@@ -315,7 +316,7 @@ anime({
   translateY: [100, 0],
   opacity: [0, 1],
   delay: anime.stagger(30),
-  easing: 'easeOutExpo'
+  easing: 'easeOutExpo',
 })
 ```
 
@@ -327,9 +328,9 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(100, {
     from: 'center',
-    easing: 'linear'
+    easing: 'linear',
   }),
-  rotate: anime.stagger([0, 360])
+  rotate: anime.stagger([0, 360]),
 })
 ```
 
@@ -338,9 +339,9 @@ anime({
 ```javascript
 anime({
   targets: '.row',
-  translateX: (el, i) => i % 2 === 0 ? [-250, 0] : [250, 0],
+  translateX: (el, i) => (i % 2 === 0 ? [-250, 0] : [250, 0]),
   opacity: [0, 1],
-  delay: anime.stagger(100)
+  delay: anime.stagger(100),
 })
 ```
 
@@ -354,7 +355,7 @@ anime({
 anime({
   targets: '.element',
   translateX: 250, // Same for all
-  delay: anime.stagger(100) // Different delays
+  delay: anime.stagger(100), // Different delays
 })
 ```
 
@@ -364,7 +365,7 @@ anime({
 anime({
   targets: '.element',
   translateX: anime.stagger([0, 50, 100, 150]), // Different values
-  duration: 1000 // Same duration
+  duration: 1000, // Same duration
 })
 ```
 
@@ -374,7 +375,7 @@ anime({
 anime({
   targets: '.element',
   translateX: anime.stagger([0, 50, 100, 150]),
-  delay: anime.stagger(100)
+  delay: anime.stagger(100),
 })
 ```
 
@@ -397,8 +398,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(50, {
     grid: getGridSize(),
-    from: 'center'
-  })
+    from: 'center',
+  }),
 })
 ```
 
@@ -411,7 +412,7 @@ anime({
     // Custom calculation
     return (i / total) * 100
   }),
-  delay: anime.stagger(100)
+  delay: anime.stagger(100),
 })
 ```
 
@@ -423,7 +424,7 @@ anime({
   translateX: anime.stagger([0, 100]),
   translateY: anime.stagger([0, 50]),
   rotate: anime.stagger([0, 360]),
-  delay: anime.stagger(100, { from: 'center' })
+  delay: anime.stagger(100, { from: 'center' }),
 })
 ```
 
@@ -447,7 +448,7 @@ anime({
 anime({
   targets: '.single-element', // Only one element
   scale: [0, 1],
-  delay: anime.stagger(100) // No effect
+  delay: anime.stagger(100), // No effect
 })
 ```
 
@@ -457,7 +458,7 @@ anime({
 anime({
   targets: '.multiple-elements', // Multiple elements
   scale: [0, 1],
-  delay: anime.stagger(100)
+  delay: anime.stagger(100),
 })
 ```
 
@@ -468,8 +469,8 @@ anime({
   targets: '.grid-item',
   scale: [0, 1],
   delay: anime.stagger(50, {
-    from: 'center' // Missing grid dimensions!
-  })
+    from: 'center', // Missing grid dimensions!
+  }),
 })
 ```
 
@@ -481,8 +482,8 @@ anime({
   scale: [0, 1],
   delay: anime.stagger(50, {
     grid: [10, 10],
-    from: 'center'
-  })
+    from: 'center',
+  }),
 })
 ```
 
@@ -491,6 +492,7 @@ anime({
 ## Debugging Tips
 
 **Log stagger values:**
+
 ```javascript
 anime({
   targets: '.element',
@@ -500,11 +502,12 @@ anime({
     anim.animatables.forEach((animatable, i) => {
       console.log(`Element ${i}: delay ${animatable.delay}ms`)
     })
-  }
+  },
 })
 ```
 
 **Visualize stagger:**
+
 ```javascript
 // Add data-index to elements
 document.querySelectorAll('.element').forEach((el, i) => {

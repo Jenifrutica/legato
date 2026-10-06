@@ -3,6 +3,7 @@
 Three.js integration, WebGL, Canvas effects, and advanced SVG animations.
 
 ## Table of Contents
+
 1. [Three.js + GSAP](#threejs--gsap)
 2. [WebGL Shaders](#webgl-shaders)
 3. [Canvas Effects](#canvas-effects)
@@ -46,7 +47,7 @@ function AnimatedMesh() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-      }
+      },
     })
 
     gsap.to(meshRef.current.position, {
@@ -56,7 +57,7 @@ function AnimatedMesh() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-      }
+      },
     })
   }, [])
 
@@ -101,17 +102,11 @@ function AnimatedMaterial() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-      }
+      },
     })
   }, [])
 
-  return (
-    <meshStandardMaterial
-      ref={materialRef}
-      color="#ffffff"
-      transparent
-    />
-  )
+  return <meshStandardMaterial ref={materialRef} color="#ffffff" transparent />
 }
 ```
 
@@ -131,8 +126,8 @@ function CameraRig() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-        onUpdate: () => camera.lookAt(0, 0, 0)
-      }
+        onUpdate: () => camera.lookAt(0, 0, 0),
+      },
     })
   }, [camera])
 
@@ -154,7 +149,7 @@ function ScrollLinkedMesh() {
       end: 'bottom bottom',
       onUpdate: (self) => {
         scrollProgress.current = self.progress
-      }
+      },
     })
   }, [])
 
@@ -214,7 +209,7 @@ function ShaderPlane() {
   const materialRef = useRef<THREE.ShaderMaterial>(null)
   const uniforms = useRef({
     uTime: { value: 0 },
-    uProgress: { value: 0 }
+    uProgress: { value: 0 },
   })
 
   useEffect(() => {
@@ -225,7 +220,7 @@ function ShaderPlane() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-      }
+      },
     })
   }, [])
 
@@ -277,14 +272,14 @@ function DistortedImage({ src }: { src: string }) {
   const uniforms = useRef({
     uTexture: { value: texture },
     uProgress: { value: 0 },
-    uTime: { value: 0 }
+    uTime: { value: 0 },
   })
 
   useEffect(() => {
     gsap.to(uniforms.current.uProgress, {
       value: 1,
       duration: 1,
-      ease: 'power2.out'
+      ease: 'power2.out',
     })
   }, [])
 
@@ -359,7 +354,7 @@ export function ParticleCanvas() {
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 2,
         vy: (Math.random() - 0.5) * 2,
-        size: Math.random() * 3 + 1
+        size: Math.random() * 3 + 1,
       })
     }
 
@@ -370,7 +365,7 @@ export function ParticleCanvas() {
       end: 'bottom bottom',
       onUpdate: (self) => {
         scrollProgress.current = self.progress
-      }
+      },
     })
 
     // Animation loop
@@ -378,7 +373,7 @@ export function ParticleCanvas() {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      particles.current.forEach(p => {
+      particles.current.forEach((p) => {
         // Move particles faster based on scroll
         p.x += p.vx * (1 + scrollProgress.current * 5)
         p.y += p.vy * (1 + scrollProgress.current * 5)
@@ -425,7 +420,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-export function ImageSequence({ frameCount = 120, basePath }: {
+export function ImageSequence({
+  frameCount = 120,
+  basePath,
+}: {
   frameCount?: number
   basePath: string
 }) {
@@ -479,7 +477,7 @@ export function ImageSequence({ frameCount = 120, basePath }: {
       onUpdate: () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(images.current[Math.round(frameObj.frame)], 0, 0)
-      }
+      },
     })
   }, [loaded, frameCount])
 
@@ -487,10 +485,7 @@ export function ImageSequence({ frameCount = 120, basePath }: {
     <div ref={containerRef} className="h-[500vh]">
       <div className="fixed inset-0 flex items-center justify-center">
         {!loaded && <div>Loading frames...</div>}
-        <canvas
-          ref={canvasRef}
-          className="max-w-full max-h-full object-contain"
-        />
+        <canvas ref={canvasRef} className="max-w-full max-h-full object-contain" />
       </div>
     </div>
   )
@@ -514,9 +509,9 @@ export function MorphingSVG() {
     anime({
       targets: pathRef.current,
       d: [
-        { value: 'M50,10 L90,90 L10,90 Z' },           // Triangle
+        { value: 'M50,10 L90,90 L10,90 Z' }, // Triangle
         { value: 'M50,10 A40,40 0 1,1 50,90 A40,40 0 1,1 50,10' }, // Circle
-        { value: 'M10,10 L90,10 L90,90 L10,90 Z' },   // Square
+        { value: 'M10,10 L90,10 L90,90 L10,90 Z' }, // Square
       ],
       duration: 3000,
       easing: 'easeInOutQuad',
@@ -527,13 +522,7 @@ export function MorphingSVG() {
 
   return (
     <svg viewBox="0 0 100 100" className="w-64 h-64">
-      <path
-        ref={pathRef}
-        d="M50,10 L90,90 L10,90 Z"
-        fill="none"
-        stroke="white"
-        strokeWidth="2"
-      />
+      <path ref={pathRef} d="M50,10 L90,90 L10,90 Z" fill="none" stroke="white" strokeWidth="2" />
     </svg>
   )
 }
@@ -563,7 +552,7 @@ function MotionPathAnimation() {
         start: 'top center',
         end: 'bottom center',
         scrub: 1,
-      }
+      },
     })
   })
 
@@ -577,10 +566,7 @@ function MotionPathAnimation() {
           stroke="rgba(255,255,255,0.2)"
         />
       </svg>
-      <div
-        ref={ballRef}
-        className="fixed w-10 h-10 bg-white rounded-full"
-      />
+      <div ref={ballRef} className="fixed w-10 h-10 bg-white rounded-full" />
     </div>
   )
 }
@@ -596,10 +582,7 @@ function MotionPathAnimation() {
 
 import { useRouter } from 'next/navigation'
 
-export function TransitionLink({ href, children }: {
-  href: string
-  children: React.ReactNode
-}) {
+export function TransitionLink({ href, children }: { href: string; children: React.ReactNode }) {
   const router = useRouter()
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -639,13 +622,21 @@ export function TransitionLink({ href, children }: {
 }
 
 @keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 ```
 

@@ -3,6 +3,7 @@
 Motor de física 2D para experiencias interactivas estilo Awwwards.
 
 ## Table of Contents
+
 1. [Setup](#setup)
 2. [React Integration](#react-integration)
 3. [Bodies (Cuerpos)](#bodies-cuerpos)
@@ -91,7 +92,7 @@ export function PhysicsScene() {
         render: {
           fillStyle: `hsl(${i * 36}, 70%, 60%)`,
         },
-      })
+      }),
     )
 
     // Agregar al mundo
@@ -243,30 +244,40 @@ const trapezoid = Bodies.trapezoid(x, y, width, height, slope, {
 
 ```tsx
 // Forma L (Tetris)
-const lShape = Bodies.fromVertices(400, 300, [
-  { x: 0, y: 0 },
-  { x: 30, y: 0 },
-  { x: 30, y: 60 },
-  { x: 60, y: 60 },
-  { x: 60, y: 90 },
-  { x: 0, y: 90 },
-], {
-  render: { fillStyle: '#ff6b6b' },
-})
+const lShape = Bodies.fromVertices(
+  400,
+  300,
+  [
+    { x: 0, y: 0 },
+    { x: 30, y: 0 },
+    { x: 30, y: 60 },
+    { x: 60, y: 60 },
+    { x: 60, y: 90 },
+    { x: 0, y: 90 },
+  ],
+  {
+    render: { fillStyle: '#ff6b6b' },
+  },
+)
 
 // Forma T
-const tShape = Bodies.fromVertices(400, 300, [
-  { x: 0, y: 0 },
-  { x: 90, y: 0 },
-  { x: 90, y: 30 },
-  { x: 60, y: 30 },
-  { x: 60, y: 60 },
-  { x: 30, y: 60 },
-  { x: 30, y: 30 },
-  { x: 0, y: 30 },
-], {
-  render: { fillStyle: '#4ecdc4' },
-})
+const tShape = Bodies.fromVertices(
+  400,
+  300,
+  [
+    { x: 0, y: 0 },
+    { x: 90, y: 0 },
+    { x: 90, y: 30 },
+    { x: 60, y: 30 },
+    { x: 60, y: 60 },
+    { x: 30, y: 60 },
+    { x: 30, y: 30 },
+    { x: 0, y: 30 },
+  ],
+  {
+    render: { fillStyle: '#4ecdc4' },
+  },
+)
 ```
 
 ### Propiedades de Bodies
@@ -274,16 +285,16 @@ const tShape = Bodies.fromVertices(400, 300, [
 ```tsx
 const body = Bodies.circle(400, 300, 50, {
   // Física
-  mass: 10,                    // Masa
-  density: 0.001,              // Densidad
-  friction: 0.1,               // Fricción (0-1)
-  frictionAir: 0.01,           // Resistencia del aire
-  frictionStatic: 0.5,         // Fricción estática
-  restitution: 0.8,            // Rebote (0-1)
+  mass: 10, // Masa
+  density: 0.001, // Densidad
+  friction: 0.1, // Fricción (0-1)
+  frictionAir: 0.01, // Resistencia del aire
+  frictionStatic: 0.5, // Fricción estática
+  restitution: 0.8, // Rebote (0-1)
 
   // Estado
-  isStatic: false,             // Estático (no se mueve)
-  isSensor: false,             // Solo detecta colisiones, no físicas
+  isStatic: false, // Estático (no se mueve)
+  isSensor: false, // Solo detecta colisiones, no físicas
 
   // Render
   render: {
@@ -300,7 +311,7 @@ const body = Bodies.circle(400, 300, 50, {
   // Colisiones
   collisionFilter: {
     category: 0x0001,
-    mask: 0xFFFFFFFF,
+    mask: 0xffffffff,
     group: 0,
   },
 })
@@ -348,9 +359,9 @@ const engine = Engine.create({
 })
 
 // Cambiar gravedad dinámicamente
-engine.gravity.y = 0      // Sin gravedad
-engine.gravity.y = -1     // Gravedad invertida
-engine.gravity.x = 0.5    // Gravedad lateral
+engine.gravity.y = 0 // Sin gravedad
+engine.gravity.y = -1 // Gravedad invertida
+engine.gravity.x = 0.5 // Gravedad lateral
 ```
 
 ### Bounds del World
@@ -404,7 +415,7 @@ const rope = Constraint.create({
 
 // Constraint a punto fijo
 const pendulum = Constraint.create({
-  pointA: { x: 400, y: 0 },  // Punto fijo en el mundo
+  pointA: { x: 400, y: 0 }, // Punto fijo en el mundo
   bodyB: ball,
   length: 200,
   stiffness: 1,
@@ -414,7 +425,7 @@ const pendulum = Constraint.create({
 const spring = Constraint.create({
   bodyA: ball1,
   bodyB: ball2,
-  stiffness: 0.01,  // Más bajo = más elástico
+  stiffness: 0.01, // Más bajo = más elástico
   damping: 0.1,
 })
 
@@ -434,13 +445,9 @@ function createChain(x: number, y: number, links: number, linkSize: number) {
 
   let prevBody = anchor
   for (let i = 0; i < links; i++) {
-    const link = Bodies.rectangle(
-      x,
-      y + (i + 1) * linkSize,
-      linkSize * 0.8,
-      linkSize * 0.3,
-      { render: { fillStyle: '#4ecdc4' } }
-    )
+    const link = Bodies.rectangle(x, y + (i + 1) * linkSize, linkSize * 0.8, linkSize * 0.3, {
+      render: { fillStyle: '#4ecdc4' },
+    })
     bodies.push(link)
 
     constraints.push(
@@ -449,7 +456,7 @@ function createChain(x: number, y: number, links: number, linkSize: number) {
         bodyB: link,
         length: linkSize * 0.5,
         stiffness: 0.9,
-      })
+      }),
     )
 
     prevBody = link
@@ -484,7 +491,7 @@ export function DraggablePhysics() {
     const boxes = Array.from({ length: 5 }, (_, i) =>
       Bodies.rectangle(200 + i * 100, 200, 60, 60, {
         render: { fillStyle: `hsl(${i * 60}, 70%, 60%)` },
-      })
+      }),
     )
 
     const ground = Bodies.rectangle(400, 580, 800, 40, { isStatic: true })
@@ -605,7 +612,7 @@ export function PhysicsWithSound() {
         // Calcular intensidad del impacto
         const velocity = Math.sqrt(
           Math.pow(pair.bodyA.velocity.x - pair.bodyB.velocity.x, 2) +
-          Math.pow(pair.bodyA.velocity.y - pair.bodyB.velocity.y, 2)
+            Math.pow(pair.bodyA.velocity.y - pair.bodyB.velocity.y, 2),
         )
 
         if (velocity > 2) {
@@ -712,7 +719,7 @@ export function ScrollSpawnBodies() {
               render: {
                 fillStyle: `hsl(${Math.random() * 360}, 70%, 60%)`,
               },
-            }
+            },
           )
 
           Matter.Composite.add(engineRef.current!.world, body)
@@ -813,14 +820,9 @@ function createSoftBody(x: number, y: number, columns: number, rows: number, spa
   // Crear partículas en grid
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < columns; col++) {
-      const particle = Matter.Bodies.circle(
-        x + col * spacing,
-        y + row * spacing,
-        spacing * 0.3,
-        {
-          render: { fillStyle: '#4ecdc4' },
-        }
-      )
+      const particle = Matter.Bodies.circle(x + col * spacing, y + row * spacing, spacing * 0.3, {
+        render: { fillStyle: '#4ecdc4' },
+      })
       particles.push(particle)
     }
   }
@@ -838,7 +840,7 @@ function createSoftBody(x: number, y: number, columns: number, rows: number, spa
             bodyB: particles[index + 1],
             stiffness: 0.1,
             render: { visible: false },
-          })
+          }),
         )
       }
 
@@ -850,7 +852,7 @@ function createSoftBody(x: number, y: number, columns: number, rows: number, spa
             bodyB: particles[index + columns],
             stiffness: 0.1,
             render: { visible: false },
-          })
+          }),
         )
       }
 
@@ -862,7 +864,7 @@ function createSoftBody(x: number, y: number, columns: number, rows: number, spa
             bodyB: particles[index + columns + 1],
             stiffness: 0.05,
             render: { visible: false },
-          })
+          }),
         )
       }
     }
@@ -880,17 +882,12 @@ function createNewtonsCradle(x: number, y: number, ballCount: number, ballRadius
   const constraints: Matter.Constraint[] = []
 
   for (let i = 0; i < ballCount; i++) {
-    const ball = Matter.Bodies.circle(
-      x + i * ballRadius * 2.1,
-      y + 200,
-      ballRadius,
-      {
-        restitution: 1,
-        friction: 0,
-        frictionAir: 0,
-        render: { fillStyle: '#c0c0c0' },
-      }
-    )
+    const ball = Matter.Bodies.circle(x + i * ballRadius * 2.1, y + 200, ballRadius, {
+      restitution: 1,
+      friction: 0,
+      frictionAir: 0,
+      render: { fillStyle: '#c0c0c0' },
+    })
 
     const constraint = Matter.Constraint.create({
       pointA: { x: x + i * ballRadius * 2.1, y },

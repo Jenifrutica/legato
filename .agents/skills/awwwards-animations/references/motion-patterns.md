@@ -3,6 +3,7 @@
 React animation patterns using Motion library (formerly Framer Motion).
 
 ## Table of Contents
+
 1. [Setup](#setup)
 2. [Basic Animations](#basic-animations)
 3. [Scroll Animations](#scroll-animations)
@@ -45,9 +46,9 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
+      delayChildren: 0.2,
+    },
+  },
 }
 
 const itemVariants = {
@@ -55,18 +56,14 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' }
-  }
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
 }
 
 function List({ items }) {
   return (
-    <motion.ul
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {items.map(item => (
+    <motion.ul variants={containerVariants} initial="hidden" animate="visible">
+      {items.map((item) => (
         <motion.li key={item.id} variants={itemVariants}>
           {item.name}
         </motion.li>
@@ -99,12 +96,7 @@ import { motion, useScroll, useTransform } from 'motion/react'
 function ScrollProgress() {
   const { scrollYProgress } = useScroll()
 
-  return (
-    <motion.div
-      className="progress-bar"
-      style={{ scaleX: scrollYProgress }}
-    />
-  )
+  return <motion.div className="progress-bar" style={{ scaleX: scrollYProgress }} />
 }
 ```
 
@@ -132,7 +124,7 @@ function ScrollSection() {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start end', 'end start']
+    offset: ['start end', 'end start'],
   })
 
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8])
@@ -156,11 +148,7 @@ function VelocityText() {
   const scrollVelocity = useVelocity(scrollY)
   const skewY = useTransform(scrollVelocity, [-1000, 0, 1000], [-3, 0, 3])
 
-  return (
-    <motion.h1 style={{ skewY }}>
-      Velocity Skew
-    </motion.h1>
-  )
+  return <motion.h1 style={{ skewY }}>Velocity Skew</motion.h1>
 }
 ```
 
@@ -173,18 +161,14 @@ function VelocityText() {
 import { AnimatePresence } from 'motion/react'
 
 function Layout({ children }) {
-  return (
-    <AnimatePresence mode="wait">
-      {children}
-    </AnimatePresence>
-  )
+  return <AnimatePresence mode="wait">{children}</AnimatePresence>
 }
 
 // page.jsx
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 }
 
 function Page() {
@@ -210,12 +194,12 @@ const overlayVariants = {
   initial: { scaleY: 0 },
   animate: {
     scaleY: 1,
-    transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] }
+    transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
   },
   exit: {
     scaleY: 0,
-    transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1], delay: 0.2 }
-  }
+    transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1], delay: 0.2 },
+  },
 }
 
 function PageTransition({ children }) {
@@ -242,12 +226,8 @@ function CardGrid({ items, selectedId, setSelectedId }) {
   return (
     <>
       <div className="grid">
-        {items.map(item => (
-          <motion.div
-            key={item.id}
-            layoutId={item.id}
-            onClick={() => setSelectedId(item.id)}
-          >
+        {items.map((item) => (
+          <motion.div key={item.id} layoutId={item.id} onClick={() => setSelectedId(item.id)}>
             <motion.h2 layoutId={`title-${item.id}`}>{item.title}</motion.h2>
           </motion.div>
         ))}
@@ -255,13 +235,9 @@ function CardGrid({ items, selectedId, setSelectedId }) {
 
       <AnimatePresence>
         {selectedId && (
-          <motion.div
-            layoutId={selectedId}
-            className="modal"
-            onClick={() => setSelectedId(null)}
-          >
+          <motion.div layoutId={selectedId} className="modal" onClick={() => setSelectedId(null)}>
             <motion.h2 layoutId={`title-${selectedId}`}>
-              {items.find(i => i.id === selectedId).title}
+              {items.find((i) => i.id === selectedId).title}
             </motion.h2>
           </motion.div>
         )}
@@ -283,8 +259,8 @@ function AnimatedText({ text }) {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.02 }
-    }
+      transition: { staggerChildren: 0.02 },
+    },
   }
 
   const child = {
@@ -293,8 +269,8 @@ function AnimatedText({ text }) {
       opacity: 1,
       y: 0,
       rotateX: 0,
-      transition: { type: 'spring', damping: 12 }
-    }
+      transition: { type: 'spring', damping: 12 },
+    },
   }
 
   return (
@@ -306,11 +282,7 @@ function AnimatedText({ text }) {
       style={{ display: 'inline-block' }}
     >
       {chars.map((char, i) => (
-        <motion.span
-          key={i}
-          variants={child}
-          style={{ display: 'inline-block' }}
-        >
+        <motion.span key={i} variants={child} style={{ display: 'inline-block' }}>
           {char === ' ' ? '\u00A0' : char}
         </motion.span>
       ))}
@@ -331,7 +303,7 @@ function AnimatedWords({ text }) {
       whileInView="visible"
       viewport={{ once: true }}
       variants={{
-        visible: { transition: { staggerChildren: 0.05 } }
+        visible: { transition: { staggerChildren: 0.05 } },
       }}
     >
       {words.map((word, i) => (
@@ -340,7 +312,7 @@ function AnimatedWords({ text }) {
           className="word"
           variants={{
             hidden: { opacity: 0, y: 20 },
-            visible: { opacity: 1, y: 0 }
+            visible: { opacity: 1, y: 0 },
           }}
         >
           {word}{' '}
@@ -413,10 +385,7 @@ function HoverCard() {
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
     >
-      <motion.img
-        whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.4 }}
-      />
+      <motion.img whileHover={{ scale: 1.1 }} transition={{ duration: 0.4 }} />
     </motion.div>
   )
 }
@@ -451,7 +420,7 @@ function ReorderList() {
 
   return (
     <Reorder.Group values={items} onReorder={setItems}>
-      {items.map(item => (
+      {items.map((item) => (
         <Reorder.Item key={item} value={item}>
           {item}
         </Reorder.Item>

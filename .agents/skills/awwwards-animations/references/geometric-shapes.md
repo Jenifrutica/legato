@@ -3,6 +3,7 @@
 Patterns for creating geometric shapes, grids, and Tetris-style animations in React.
 
 ## Table of Contents
+
 1. [Decision Matrix](#decision-matrix)
 2. [SVG Programático](#svg-programático)
 3. [Canvas 2D](#canvas-2d)
@@ -13,14 +14,14 @@ Patterns for creating geometric shapes, grids, and Tetris-style animations in Re
 
 ## Decision Matrix
 
-| Necesidad | Herramienta | Por qué |
-|-----------|-------------|---------|
-| Formas vectoriales simples | SVG en JSX | Nativo, animable con GSAP/Motion |
-| Grids animados | CSS Grid + GSAP | Layout + animaciones |
-| Dibujo programático | Canvas 2D | Performance, píxeles |
-| Pseudo-3D estilizado | Zdog | Flat design 3D, ~2kb |
-| Creative coding/arte | p5.js | Ecosistema, comunidad |
-| Formas 3D reales | Three.js | WebGL completo |
+| Necesidad                  | Herramienta     | Por qué                          |
+| -------------------------- | --------------- | -------------------------------- |
+| Formas vectoriales simples | SVG en JSX      | Nativo, animable con GSAP/Motion |
+| Grids animados             | CSS Grid + GSAP | Layout + animaciones             |
+| Dibujo programático        | Canvas 2D       | Performance, píxeles             |
+| Pseudo-3D estilizado       | Zdog            | Flat design 3D, ~2kb             |
+| Creative coding/arte       | p5.js           | Ecosistema, comunidad            |
+| Formas 3D reales           | Three.js        | WebGL completo                   |
 
 ## SVG Programático
 
@@ -49,35 +50,19 @@ export function GeometricShapes() {
       <line x1="10" y1="120" x2="90" y2="180" stroke="#fff" strokeWidth="3" />
 
       {/* Polilínea (líneas conectadas) */}
-      <polyline
-        points="110,180 150,120 190,180"
-        fill="none"
-        stroke="#ffeaa7"
-        strokeWidth="3"
-      />
+      <polyline points="110,180 150,120 190,180" fill="none" stroke="#ffeaa7" strokeWidth="3" />
 
       {/* Polígono (cerrado) - Triángulo */}
       <polygon points="250,120 210,180 290,180" fill="#dfe6e9" />
 
       {/* Polígono - Hexágono */}
-      <polygon
-        points="350,120 380,140 380,170 350,190 320,170 320,140"
-        fill="#a29bfe"
-      />
+      <polygon points="350,120 380,140 380,170 350,190 320,170 320,140" fill="#a29bfe" />
 
       {/* Path - Forma custom */}
-      <path
-        d="M10,220 L50,260 L10,300 L50,300 Z"
-        fill="#fd79a8"
-      />
+      <path d="M10,220 L50,260 L10,300 L50,300 Z" fill="#fd79a8" />
 
       {/* Path - Curva Bézier */}
-      <path
-        d="M110,260 Q150,200 190,260"
-        fill="none"
-        stroke="#00cec9"
-        strokeWidth="3"
-      />
+      <path d="M110,260 Q150,200 190,260" fill="none" stroke="#00cec9" strokeWidth="3" />
     </svg>
   )
 }
@@ -92,7 +77,7 @@ function generatePolygonPoints(
   sides: number,
   radius: number,
   centerX: number,
-  centerY: number
+  centerY: number,
 ): string {
   const points: string[] = []
   for (let i = 0; i < sides; i++) {
@@ -122,8 +107,8 @@ export function RegularPolygon({
 }
 
 // Uso
-<svg viewBox="0 0 400 400">
-  <RegularPolygon sides={3} radius={40} cx={50} cy={50} fill="#ff6b6b" />   {/* Triángulo */}
+;<svg viewBox="0 0 400 400">
+  <RegularPolygon sides={3} radius={40} cx={50} cy={50} fill="#ff6b6b" /> {/* Triángulo */}
   <RegularPolygon sides={5} radius={40} cx={150} cy={50} fill="#4ecdc4" /> {/* Pentágono */}
   <RegularPolygon sides={6} radius={40} cx={250} cy={50} fill="#45b7d1" /> {/* Hexágono */}
   <RegularPolygon sides={8} radius={40} cx={350} cy={50} fill="#96ceb4" /> {/* Octágono */}
@@ -141,58 +126,43 @@ import { gsap, useGSAP } from '@/lib/gsap'
 export function AnimatedShapes() {
   const svgRef = useRef<SVGSVGElement>(null)
 
-  useGSAP(() => {
-    // Rotar polígono
-    gsap.to('.rotating-shape', {
-      rotation: 360,
-      transformOrigin: 'center center',
-      duration: 4,
-      ease: 'none',
-      repeat: -1,
-    })
+  useGSAP(
+    () => {
+      // Rotar polígono
+      gsap.to('.rotating-shape', {
+        rotation: 360,
+        transformOrigin: 'center center',
+        duration: 4,
+        ease: 'none',
+        repeat: -1,
+      })
 
-    // Pulsar círculo
-    gsap.to('.pulsing-circle', {
-      scale: 1.2,
-      duration: 0.8,
-      ease: 'power2.inOut',
-      yoyo: true,
-      repeat: -1,
-    })
+      // Pulsar círculo
+      gsap.to('.pulsing-circle', {
+        scale: 1.2,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        yoyo: true,
+        repeat: -1,
+      })
 
-    // Morph path
-    gsap.to('.morphing-rect', {
-      attr: { rx: 40 },
-      duration: 1,
-      ease: 'power2.inOut',
-      yoyo: true,
-      repeat: -1,
-    })
-  }, { scope: svgRef })
+      // Morph path
+      gsap.to('.morphing-rect', {
+        attr: { rx: 40 },
+        duration: 1,
+        ease: 'power2.inOut',
+        yoyo: true,
+        repeat: -1,
+      })
+    },
+    { scope: svgRef },
+  )
 
   return (
     <svg ref={svgRef} viewBox="0 0 400 200">
-      <polygon
-        className="rotating-shape"
-        points="50,20 80,80 20,80"
-        fill="#ff6b6b"
-      />
-      <circle
-        className="pulsing-circle"
-        cx="150"
-        cy="50"
-        r="30"
-        fill="#4ecdc4"
-      />
-      <rect
-        className="morphing-rect"
-        x="220"
-        y="20"
-        width="60"
-        height="60"
-        rx="0"
-        fill="#45b7d1"
-      />
+      <polygon className="rotating-shape" points="50,20 80,80 20,80" fill="#ff6b6b" />
+      <circle className="pulsing-circle" cx="150" cy="50" r="30" fill="#4ecdc4" />
+      <rect className="morphing-rect" x="220" y="20" width="60" height="60" rx="0" fill="#45b7d1" />
     </svg>
   )
 }
@@ -289,7 +259,6 @@ export function CanvasShapes() {
 
     // Polígono regular (hexágono)
     drawPolygon(ctx, 50, 150, 40, 6, '#a29bfe')
-
   }, [])
 
   return <canvas ref={canvasRef} className="w-full h-full" />
@@ -301,7 +270,7 @@ function drawPolygon(
   y: number,
   radius: number,
   sides: number,
-  color: string
+  color: string,
 ) {
   ctx.beginPath()
   for (let i = 0; i < sides; i++) {
@@ -410,28 +379,28 @@ import { gsap, useGSAP, stagger } from '@/lib/gsap'
 export function AnimatedGrid() {
   const gridRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    gsap.from('.grid-block', {
-      scale: 0,
-      rotation: 180,
-      opacity: 0,
-      duration: 0.6,
-      stagger: {
-        amount: 1,
-        grid: [4, 4],
-        from: 'center',
-      },
-      ease: 'back.out(1.7)',
-    })
-  }, { scope: gridRef })
+  useGSAP(
+    () => {
+      gsap.from('.grid-block', {
+        scale: 0,
+        rotation: 180,
+        opacity: 0,
+        duration: 0.6,
+        stagger: {
+          amount: 1,
+          grid: [4, 4],
+          from: 'center',
+        },
+        ease: 'back.out(1.7)',
+      })
+    },
+    { scope: gridRef },
+  )
 
   const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#a29bfe']
 
   return (
-    <div
-      ref={gridRef}
-      className="grid grid-cols-4 gap-2 w-64 h-64"
-    >
+    <div ref={gridRef} className="grid grid-cols-4 gap-2 w-64 h-64">
       {Array.from({ length: 16 }).map((_, i) => (
         <div
           key={i}
@@ -665,7 +634,7 @@ export function P5Sketch() {
         p.fill(78, 205, 196)
         p.beginShape()
         for (let i = 0; i < 6; i++) {
-          const angle = p.TWO_PI / 6 * i - p.HALF_PI
+          const angle = (p.TWO_PI / 6) * i - p.HALF_PI
           const x = p.cos(angle) * 50
           const y = p.sin(angle) * 50
           p.vertex(x, y)
@@ -718,7 +687,7 @@ import type { P5CanvasInstance } from '@p5-wrapper/react'
 // Importar dinámicamente para evitar SSR issues
 const ReactP5Wrapper = dynamic(
   () => import('@p5-wrapper/react').then((mod) => mod.ReactP5Wrapper),
-  { ssr: false }
+  { ssr: false },
 )
 
 function sketch(p5: P5CanvasInstance) {
@@ -743,7 +712,7 @@ function sketch(p5: P5CanvasInstance) {
 function regularPolygon(p5: P5CanvasInstance, x: number, y: number, r: number, sides: number) {
   p5.beginShape()
   for (let i = 0; i < sides; i++) {
-    const angle = p5.TWO_PI / sides * i - p5.HALF_PI
+    const angle = (p5.TWO_PI / sides) * i - p5.HALF_PI
     p5.vertex(x + p5.cos(angle) * r, y + p5.sin(angle) * r)
   }
   p5.endShape(p5.CLOSE)
@@ -767,12 +736,48 @@ type TetrisPiece = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L'
 
 const PIECES: Record<TetrisPiece, { shape: number[][]; color: string }> = {
   I: { shape: [[1, 1, 1, 1]], color: '#00f5ff' },
-  O: { shape: [[1, 1], [1, 1]], color: '#ffeb3b' },
-  T: { shape: [[0, 1, 0], [1, 1, 1]], color: '#9c27b0' },
-  S: { shape: [[0, 1, 1], [1, 1, 0]], color: '#4caf50' },
-  Z: { shape: [[1, 1, 0], [0, 1, 1]], color: '#f44336' },
-  J: { shape: [[1, 0, 0], [1, 1, 1]], color: '#2196f3' },
-  L: { shape: [[0, 0, 1], [1, 1, 1]], color: '#ff9800' },
+  O: {
+    shape: [
+      [1, 1],
+      [1, 1],
+    ],
+    color: '#ffeb3b',
+  },
+  T: {
+    shape: [
+      [0, 1, 0],
+      [1, 1, 1],
+    ],
+    color: '#9c27b0',
+  },
+  S: {
+    shape: [
+      [0, 1, 1],
+      [1, 1, 0],
+    ],
+    color: '#4caf50',
+  },
+  Z: {
+    shape: [
+      [1, 1, 0],
+      [0, 1, 1],
+    ],
+    color: '#f44336',
+  },
+  J: {
+    shape: [
+      [1, 0, 0],
+      [1, 1, 1],
+    ],
+    color: '#2196f3',
+  },
+  L: {
+    shape: [
+      [0, 0, 1],
+      [1, 1, 1],
+    ],
+    color: '#ff9800',
+  },
 }
 
 export function TetrisPiece({
@@ -906,7 +911,9 @@ const CELL_SIZE = 30
 export function TetrisBoard() {
   const boardRef = useRef<HTMLDivElement>(null)
   const [grid, setGrid] = useState<string[][]>(
-    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''))
+    Array(GRID_SIZE)
+      .fill(null)
+      .map(() => Array(GRID_SIZE).fill('')),
   )
 
   const { contextSafe } = useGSAP({ scope: boardRef })
@@ -919,7 +926,7 @@ export function TetrisBoard() {
     gsap.fromTo(
       `[data-cell="${row}-${col}"]`,
       { scale: 0, rotation: 180 },
-      { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }
+      { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' },
     )
 
     setGrid((prev) => {
@@ -950,7 +957,7 @@ export function TetrisBoard() {
             }}
             onClick={() => handleCellClick(rowIndex, colIndex)}
           />
-        ))
+        )),
       )}
     </div>
   )

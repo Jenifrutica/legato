@@ -3,6 +3,7 @@
 Tone.js y Web Audio API para experiencias sonoras interactivas estilo Awwwards.
 
 ## Table of Contents
+
 1. [Decision Matrix](#decision-matrix)
 2. [Tone.js Setup](#tonejs-setup)
 3. [React Integration](#react-integration)
@@ -14,13 +15,13 @@ Tone.js y Web Audio API para experiencias sonoras interactivas estilo Awwwards.
 
 ## Decision Matrix
 
-| Necesidad | Herramienta | Por qué |
-|-----------|-------------|---------|
-| Sintetizadores/música | Tone.js | API musical completa |
-| Efectos simples (clicks) | Web Audio API nativo | Sin dependencias |
+| Necesidad                | Herramienta             | Por qué              |
+| ------------------------ | ----------------------- | -------------------- |
+| Sintetizadores/música    | Tone.js                 | API musical completa |
+| Efectos simples (clicks) | Web Audio API nativo    | Sin dependencias     |
 | Audio reactivo al scroll | Tone.js + ScrollTrigger | Sync con animaciones |
-| Visualizador de audio | Web Audio Analyzer | FFT data |
-| Samples/loops | Tone.Sampler | Fácil de usar |
+| Visualizador de audio    | Web Audio Analyzer      | FFT data             |
+| Samples/loops            | Tone.Sampler            | Fácil de usar        |
 
 ## Tone.js Setup
 
@@ -107,7 +108,9 @@ import { useRef, useEffect, useMemo } from 'react'
 import * as Tone from 'tone'
 
 export function useSynth(type: 'synth' | 'fm' | 'am' | 'membrane' = 'synth') {
-  const synthRef = useRef<Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.MembraneSynth | null>(null)
+  const synthRef = useRef<Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.MembraneSynth | null>(
+    null,
+  )
 
   useEffect(() => {
     // Crear synth según tipo
@@ -398,12 +401,7 @@ export function FFTVisualizer() {
         const barHeight = value * canvas.height
 
         ctx.fillStyle = colors[i % colors.length]
-        ctx.fillRect(
-          i * barWidth,
-          canvas.height - barHeight,
-          barWidth - 2,
-          barHeight
-        )
+        ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth - 2, barHeight)
       }
 
       requestAnimationFrame(draw)
@@ -449,34 +447,37 @@ export function ScrollAudio() {
     }
   }, [])
 
-  useGSAP(() => {
-    // Cambiar frecuencia del filtro con scroll
-    ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: (self) => {
-        // Mapear progreso a frecuencia (200Hz - 5000Hz)
-        const freq = 200 + self.progress * 4800
-        filterRef.current?.frequency.rampTo(freq, 0.1)
-      },
-    })
-
-    // Trigger notas en secciones específicas
-    const sections = gsap.utils.toArray<HTMLElement>('.audio-section')
-    const notes = ['C4', 'E4', 'G4', 'B4']
-
-    sections.forEach((section, i) => {
+  useGSAP(
+    () => {
+      // Cambiar frecuencia del filtro con scroll
       ScrollTrigger.create({
-        trigger: section,
-        start: 'top center',
-        onEnter: async () => {
-          await Tone.start()
-          synthRef.current?.triggerAttackRelease(notes[i % notes.length], '8n')
+        trigger: containerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: (self) => {
+          // Mapear progreso a frecuencia (200Hz - 5000Hz)
+          const freq = 200 + self.progress * 4800
+          filterRef.current?.frequency.rampTo(freq, 0.1)
         },
       })
-    })
-  }, { scope: containerRef })
+
+      // Trigger notas en secciones específicas
+      const sections = gsap.utils.toArray<HTMLElement>('.audio-section')
+      const notes = ['C4', 'E4', 'G4', 'B4']
+
+      sections.forEach((section, i) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top center',
+          onEnter: async () => {
+            await Tone.start()
+            synthRef.current?.triggerAttackRelease(notes[i % notes.length], '8n')
+          },
+        })
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef} className="h-[400vh]">
@@ -674,23 +675,26 @@ export function useNativeAudio() {
     return contextRef.current
   }, [])
 
-  const playTone = useCallback((frequency: number, duration: number = 0.1) => {
-    const ctx = getContext()
-    const oscillator = ctx.createOscillator()
-    const gainNode = ctx.createGain()
+  const playTone = useCallback(
+    (frequency: number, duration: number = 0.1) => {
+      const ctx = getContext()
+      const oscillator = ctx.createOscillator()
+      const gainNode = ctx.createGain()
 
-    oscillator.connect(gainNode)
-    gainNode.connect(ctx.destination)
+      oscillator.connect(gainNode)
+      gainNode.connect(ctx.destination)
 
-    oscillator.frequency.value = frequency
-    oscillator.type = 'sine'
+      oscillator.frequency.value = frequency
+      oscillator.type = 'sine'
 
-    gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
 
-    oscillator.start(ctx.currentTime)
-    oscillator.stop(ctx.currentTime + duration)
-  }, [getContext])
+      oscillator.start(ctx.currentTime)
+      oscillator.stop(ctx.currentTime + duration)
+    },
+    [getContext],
+  )
 
   const playClick = useCallback(() => playTone(800, 0.05), [playTone])
   const playHover = useCallback(() => playTone(1200, 0.03), [playTone])
@@ -705,9 +709,13 @@ export function useNativeAudio() {
 
 ```tsx
 // El audio NO funciona sin interacción
-document.addEventListener('click', async () => {
-  await Tone.start()
-}, { once: true })
+document.addEventListener(
+  'click',
+  async () => {
+    await Tone.start()
+  },
+  { once: true },
+)
 ```
 
 ### 2. Dispose de Recursos

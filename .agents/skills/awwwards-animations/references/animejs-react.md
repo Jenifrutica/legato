@@ -3,6 +3,7 @@
 Complete Anime.js 4.0 patterns for React. Lightweight alternative for simple animations.
 
 ## Table of Contents
+
 1. [Installation & Setup](#installation--setup)
 2. [React Integration](#react-integration)
 3. [Basic Animations](#basic-animations)
@@ -33,7 +34,7 @@ import {
   stagger,
   svg,
   utils,
-  engine
+  engine,
 } from 'animejs'
 ```
 
@@ -137,9 +138,9 @@ animate('.element', {
 
 ```tsx
 animate('.element', {
-  translateX: [0, 250],     // from 0 to 250
-  opacity: [0, 1],          // from 0 to 1
-  scale: [0.5, 1],          // from 0.5 to 1
+  translateX: [0, 250], // from 0 to 250
+  opacity: [0, 1], // from 0 to 1
+  scale: [0.5, 1], // from 0.5 to 1
   duration: 800,
 })
 ```
@@ -204,13 +205,13 @@ const animation = animate('.element', {
   autoplay: false,
 })
 
-animation.play()      // Play forward
-animation.pause()     // Pause
-animation.resume()    // Resume in current direction
-animation.reverse()   // Play backward
-animation.restart()   // Restart from beginning
-animation.seek(500)   // Seek to 500ms
-animation.reset()     // Reset to initial state
+animation.play() // Play forward
+animation.pause() // Pause
+animation.resume() // Resume in current direction
+animation.reverse() // Play backward
+animation.restart() // Restart from beginning
+animation.seek(500) // Seek to 500ms
+animation.reset() // Reset to initial state
 ```
 
 ## Timeline
@@ -224,12 +225,12 @@ const tl = createTimeline({
   defaults: {
     duration: 500,
     ease: 'out(3)',
-  }
+  },
 })
 
 tl.add('.box-1', { translateX: 250 })
-  .add('.box-2', { translateX: 250 }, '-=200')  // 200ms before previous ends
-  .add('.box-3', { translateX: 250 }, '+=100')  // 100ms after previous ends
+  .add('.box-2', { translateX: 250 }, '-=200') // 200ms before previous ends
+  .add('.box-3', { translateX: 250 }, '+=100') // 100ms after previous ends
 ```
 
 ### Timeline in React
@@ -247,7 +248,7 @@ export function TimelineAnimation() {
   useEffect(() => {
     scopeRef.current = createScope({ root: rootRef.current }).add(() => {
       const tl = createTimeline({
-        defaults: { duration: 600, ease: 'out(3)' }
+        defaults: { duration: 600, ease: 'out(3)' },
       })
 
       tl.add('.title', { opacity: [0, 1], translateY: [30, 0] })
@@ -278,7 +279,7 @@ import { stagger } from 'animejs'
 animate('.grid-item', {
   opacity: [0, 1],
   translateY: [50, 0],
-  delay: stagger(100),  // 100ms between each
+  delay: stagger(100), // 100ms between each
   duration: 600,
 })
 ```
@@ -288,7 +289,7 @@ animate('.grid-item', {
 ```tsx
 animate('.item', {
   translateX: 250,
-  delay: stagger(100, { start: 500 }),  // Start at 500ms, then +100ms each
+  delay: stagger(100, { start: 500 }), // Start at 500ms, then +100ms each
 })
 ```
 
@@ -298,8 +299,8 @@ animate('.item', {
 animate('.grid-item', {
   scale: [0, 1],
   delay: stagger(50, {
-    grid: [4, 4],           // 4x4 grid
-    from: 'center',         // Animate from center outward
+    grid: [4, 4], // 4x4 grid
+    from: 'center', // Animate from center outward
   }),
 })
 ```
@@ -310,7 +311,7 @@ animate('.grid-item', {
 animate('.item', {
   opacity: [0, 1],
   delay: stagger(100, {
-    from: 'first',   // 'first', 'last', 'center', or index number
+    from: 'first', // 'first', 'last', 'center', or index number
   }),
 })
 ```
@@ -319,7 +320,7 @@ animate('.item', {
 
 ```tsx
 animate('.bar', {
-  scaleY: stagger([0.5, 1]),  // Scale from 0.5 to 1 distributed
+  scaleY: stagger([0.5, 1]), // Scale from 0.5 to 1 distributed
   duration: 800,
 })
 ```
@@ -355,7 +356,7 @@ export function ScrollReveal() {
             }
           })
         },
-        { threshold: 0.2 }
+        { threshold: 0.2 },
       )
 
       document.querySelectorAll('.reveal-item').forEach((el) => {
@@ -468,7 +469,7 @@ export function DrawSVG() {
       const drawable = svg.createDrawable('.draw-path')
 
       animate(drawable, {
-        draw: ['0 0', '0 1'],  // From 0% to 100%
+        draw: ['0 0', '0 1'], // From 0% to 100%
         duration: 2000,
         ease: 'inOut(2)',
       })
@@ -581,10 +582,10 @@ export function DraggableBox() {
 
 ```tsx
 createDraggable(element, {
-  container: containerRef.current,  // Constrain to container
-  x: { min: 0, max: 500 },          // X bounds
-  y: { min: 0, max: 300 },          // Y bounds
-  snap: { x: 50, y: 50 },           // Snap to grid
+  container: containerRef.current, // Constrain to container
+  x: { min: 0, max: 500 }, // X bounds
+  y: { min: 0, max: 300 }, // Y bounds
+  snap: { x: 50, y: 50 }, // Snap to grid
 })
 ```
 
@@ -595,10 +596,10 @@ createDraggable(element, {
 ```tsx
 // v4 easing syntax (no 'ease' prefix)
 ease: 'linear'
-ease: 'in(2)'       // Power in
-ease: 'out(2)'      // Power out (default)
-ease: 'inOut(2)'    // Power in-out
-ease: 'out(4)'      // Stronger ease out
+ease: 'in(2)' // Power in
+ease: 'out(2)' // Power out (default)
+ease: 'inOut(2)' // Power in-out
+ease: 'out(4)' // Stronger ease out
 ```
 
 ### Spring Easing
@@ -626,35 +627,35 @@ animate('.element', {
 ease: 'cubicBezier(0.76, 0, 0.24, 1)'
 
 // Custom function
-ease: (t) => t * t  // Quadratic
+ease: (t) => t * t // Quadratic
 ```
 
 ## v3 to v4 Migration
 
-| v3 | v4 |
-|----|----|
+| v3                             | v4                               |
+| ------------------------------ | -------------------------------- |
 | `anime({ targets, ...props })` | `animate(targets, { ...props })` |
-| `easing: 'easeOutQuad'` | `ease: 'out(2)'` |
-| `easing: 'easeInOutCubic'` | `ease: 'inOut(3)'` |
-| `endDelay` | `loopDelay` |
-| `direction: 'reverse'` | `reversed: true` |
-| `direction: 'alternate'` | `alternate: true` |
-| `update` callback | `onUpdate` callback |
-| `begin` callback | `onBegin` callback |
-| `complete` callback | `onComplete` callback |
-| `.finished.then()` | `.then()` |
-| `anime.timeline()` | `createTimeline()` |
-| `anime.stagger()` | `stagger()` |
+| `easing: 'easeOutQuad'`        | `ease: 'out(2)'`                 |
+| `easing: 'easeInOutCubic'`     | `ease: 'inOut(3)'`               |
+| `endDelay`                     | `loopDelay`                      |
+| `direction: 'reverse'`         | `reversed: true`                 |
+| `direction: 'alternate'`       | `alternate: true`                |
+| `update` callback              | `onUpdate` callback              |
+| `begin` callback               | `onBegin` callback               |
+| `complete` callback            | `onComplete` callback            |
+| `.finished.then()`             | `.then()`                        |
+| `anime.timeline()`             | `createTimeline()`               |
+| `anime.stagger()`              | `stagger()`                      |
 
 ## When to Use Anime.js vs GSAP
 
-| Use Anime.js | Use GSAP |
-|--------------|----------|
-| Simple animations | Complex scroll-driven |
+| Use Anime.js              | Use GSAP               |
+| ------------------------- | ---------------------- |
+| Simple animations         | Complex scroll-driven  |
 | Lightweight needs (~17kb) | ScrollTrigger required |
-| Quick prototypes | Production timelines |
-| SVG morphing | SplitText, MorphSVG |
-| Draggable elements | Pin sections |
+| Quick prototypes          | Production timelines   |
+| SVG morphing              | SplitText, MorphSVG    |
+| Draggable elements        | Pin sections           |
 
 ## Sources
 

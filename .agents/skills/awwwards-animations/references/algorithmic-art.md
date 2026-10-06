@@ -25,8 +25,13 @@ Recursive branching with animated growth.
 import { useRef, useEffect, useCallback } from 'react'
 
 interface BranchParams {
-  x: number; y: number; length: number; angle: number; depth: number
-  maxDepth: number; progress: number
+  x: number
+  y: number
+  length: number
+  angle: number
+  depth: number
+  maxDepth: number
+  progress: number
 }
 
 export function FractalTree({ maxDepth = 10, branchAngle = 25 }) {
@@ -34,28 +39,47 @@ export function FractalTree({ maxDepth = 10, branchAngle = 25 }) {
   const animRef = useRef<number>(0)
   const progressRef = useRef(0)
 
-  const drawBranch = useCallback((ctx: CanvasRenderingContext2D, params: BranchParams) => {
-    const { x, y, length, angle, depth, maxDepth, progress } = params
-    if (depth > maxDepth || length < 2) return
+  const drawBranch = useCallback(
+    (ctx: CanvasRenderingContext2D, params: BranchParams) => {
+      const { x, y, length, angle, depth, maxDepth, progress } = params
+      if (depth > maxDepth || length < 2) return
 
-    const depthProgress = Math.max(0, Math.min(1, progress * maxDepth - depth))
-    if (depthProgress <= 0) return
+      const depthProgress = Math.max(0, Math.min(1, progress * maxDepth - depth))
+      if (depthProgress <= 0) return
 
-    const endX = x + Math.cos((angle * Math.PI) / 180) * length * depthProgress
-    const endY = y - Math.sin((angle * Math.PI) / 180) * length * depthProgress
+      const endX = x + Math.cos((angle * Math.PI) / 180) * length * depthProgress
+      const endY = y - Math.sin((angle * Math.PI) / 180) * length * depthProgress
 
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-    ctx.lineTo(endX, endY)
-    ctx.strokeStyle = `hsl(${120 + depth * 15}, 60%, ${30 + depth * 5}%)`
-    ctx.lineWidth = Math.max(1, (maxDepth - depth) * 1.5)
-    ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.lineTo(endX, endY)
+      ctx.strokeStyle = `hsl(${120 + depth * 15}, 60%, ${30 + depth * 5}%)`
+      ctx.lineWidth = Math.max(1, (maxDepth - depth) * 1.5)
+      ctx.stroke()
 
-    const newLength = length * 0.72
-    const spread = branchAngle + Math.sin(depth * 0.5) * 5
-    drawBranch(ctx, { x: endX, y: endY, length: newLength, angle: angle + spread, depth: depth + 1, maxDepth, progress })
-    drawBranch(ctx, { x: endX, y: endY, length: newLength, angle: angle - spread, depth: depth + 1, maxDepth, progress })
-  }, [branchAngle])
+      const newLength = length * 0.72
+      const spread = branchAngle + Math.sin(depth * 0.5) * 5
+      drawBranch(ctx, {
+        x: endX,
+        y: endY,
+        length: newLength,
+        angle: angle + spread,
+        depth: depth + 1,
+        maxDepth,
+        progress,
+      })
+      drawBranch(ctx, {
+        x: endX,
+        y: endY,
+        length: newLength,
+        angle: angle - spread,
+        depth: depth + 1,
+        maxDepth,
+        progress,
+      })
+    },
+    [branchAngle],
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current!
@@ -68,9 +92,13 @@ export function FractalTree({ maxDepth = 10, branchAngle = 25 }) {
       progressRef.current = Math.min(1, progressRef.current + 0.008)
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
       drawBranch(ctx, {
-        x: canvas.offsetWidth / 2, y: canvas.offsetHeight,
-        length: canvas.offsetHeight * 0.28, angle: 90,
-        depth: 0, maxDepth, progress: progressRef.current,
+        x: canvas.offsetWidth / 2,
+        y: canvas.offsetHeight,
+        length: canvas.offsetHeight * 0.28,
+        angle: 90,
+        depth: 0,
+        maxDepth,
+        progress: progressRef.current,
       })
       if (progressRef.current < 1) animRef.current = requestAnimationFrame(animate)
     }
@@ -90,23 +118,34 @@ Lindenmayer systems with turtle graphics.
 'use client'
 import { useRef, useEffect } from 'react'
 
-interface LSystemRule { [key: string]: string }
+interface LSystemRule {
+  [key: string]: string
+}
 
 function generateLSystem(axiom: string, rules: LSystemRule, iterations: number): string {
   let current = axiom
   for (let i = 0; i < iterations; i++) {
-    current = current.split('').map(c => rules[c] || c).join('')
+    current = current
+      .split('')
+      .map((c) => rules[c] || c)
+      .join('')
   }
   return current
 }
 
-interface TurtleState { x: number; y: number; angle: number }
+interface TurtleState {
+  x: number
+  y: number
+  angle: number
+}
 
 function drawLSystem(
   ctx: CanvasRenderingContext2D,
   instructions: string,
-  startX: number, startY: number,
-  stepLength: number, turnAngle: number
+  startX: number,
+  startY: number,
+  stepLength: number,
+  turnAngle: number,
 ) {
   const stack: TurtleState[] = []
   let state: TurtleState = { x: startX, y: startY, angle: -90 }
@@ -116,14 +155,21 @@ function drawLSystem(
 
   for (const char of instructions) {
     switch (char) {
-      case 'F': case 'G':
+      case 'F':
+      case 'G':
         state.x += Math.cos((state.angle * Math.PI) / 180) * stepLength
         state.y += Math.sin((state.angle * Math.PI) / 180) * stepLength
         ctx.lineTo(state.x, state.y)
         break
-      case '+': state.angle += turnAngle; break
-      case '-': state.angle -= turnAngle; break
-      case '[': stack.push({ ...state }); break
+      case '+':
+        state.angle += turnAngle
+        break
+      case '-':
+        state.angle -= turnAngle
+        break
+      case '[':
+        stack.push({ ...state })
+        break
       case ']':
         state = stack.pop()!
         ctx.moveTo(state.x, state.y)
@@ -157,7 +203,12 @@ export function LSystemCanvas({ preset = 'plant' }: { preset?: keyof typeof L_SY
 
     ctx.strokeStyle = '#4ade80'
     ctx.lineWidth = 0.5
-    const step = preset === 'plant' ? 4 : preset === 'hilbert' ? canvas.offsetWidth / Math.pow(2, iterations) : 3
+    const step =
+      preset === 'plant'
+        ? 4
+        : preset === 'hilbert'
+          ? canvas.offsetWidth / Math.pow(2, iterations)
+          : 3
     const startX = preset === 'plant' ? canvas.offsetWidth / 2 : 20
     const startY = preset === 'plant' ? canvas.offsetHeight : canvas.offsetHeight - 20
 
@@ -180,8 +231,12 @@ type CurveType = 'lissajous' | 'rose' | 'spiral' | 'superformula'
 
 interface CurveParams {
   type: CurveType
-  a?: number; b?: number   // Lissajous frequencies / rose petals
-  m?: number; n1?: number; n2?: number; n3?: number  // Superformula
+  a?: number
+  b?: number // Lissajous frequencies / rose petals
+  m?: number
+  n1?: number
+  n2?: number
+  n3?: number // Superformula
 }
 
 function getCurvePoint(t: number, params: CurveParams, scale: number): [number, number] {
@@ -200,8 +255,8 @@ function getCurvePoint(t: number, params: CurveParams, scale: number): [number, 
     }
     case 'superformula': {
       const phi = t
-      const r1 = Math.pow(Math.abs(Math.cos(m * phi / 4) / 1), n2)
-      const r2 = Math.pow(Math.abs(Math.sin(m * phi / 4) / 1), n3)
+      const r1 = Math.pow(Math.abs(Math.cos((m * phi) / 4) / 1), n2)
+      const r2 = Math.pow(Math.abs(Math.sin((m * phi) / 4) / 1), n3)
       const r = Math.pow(r1 + r2, -1 / n1) * scale
       return [r * Math.cos(phi), r * Math.sin(phi)]
     }
@@ -280,7 +335,13 @@ function smoothNoise(x: number, y: number, scale: number): number {
   return a + ux * (b - a) + uy * (c - a) + ux * uy * (a - b - c + d)
 }
 
-interface Particle { x: number; y: number; vx: number; vy: number; life: number }
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  life: number
+}
 
 export function FlowField({ particleCount = 2000, noiseScale = 120 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -297,8 +358,11 @@ export function FlowField({ particleCount = 2000, noiseScale = 120 }) {
 
     let time = 0
     const particles: Particle[] = Array.from({ length: particleCount }, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      vx: 0, vy: 0, life: Math.random() * 100,
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: 0,
+      vy: 0,
+      life: Math.random() * 100,
     }))
 
     ctx.fillStyle = '#000'
@@ -309,7 +373,7 @@ export function FlowField({ particleCount = 2000, noiseScale = 120 }) {
       ctx.fillRect(0, 0, w, h)
       time += 0.002
 
-      particles.forEach(p => {
+      particles.forEach((p) => {
         const angle = smoothNoise(p.x + time * 50, p.y, noiseScale) * Math.PI * 4
         p.vx = Math.cos(angle) * 1.5
         p.vy = Math.sin(angle) * 1.5
@@ -348,22 +412,24 @@ import { useRef, useEffect } from 'react'
 
 type AttractorType = 'lorenz' | 'rossler'
 
-function step(type: AttractorType, x: number, y: number, z: number, dt: number): [number, number, number] {
+function step(
+  type: AttractorType,
+  x: number,
+  y: number,
+  z: number,
+  dt: number,
+): [number, number, number] {
   if (type === 'lorenz') {
-    const sigma = 10, rho = 28, beta = 8 / 3
-    return [
-      x + (sigma * (y - x)) * dt,
-      y + (x * (rho - z) - y) * dt,
-      z + (x * y - beta * z) * dt,
-    ]
+    const sigma = 10,
+      rho = 28,
+      beta = 8 / 3
+    return [x + sigma * (y - x) * dt, y + (x * (rho - z) - y) * dt, z + (x * y - beta * z) * dt]
   }
   // Rössler
-  const a = 0.2, b = 0.2, c = 5.7
-  return [
-    x + (-y - z) * dt,
-    y + (x + a * y) * dt,
-    z + (b + z * (x - c)) * dt,
-  ]
+  const a = 0.2,
+    b = 0.2,
+    c = 5.7
+  return [x + (-y - z) * dt, y + (x + a * y) * dt, z + (b + z * (x - c)) * dt]
 }
 
 export function StrangeAttractor({ type = 'lorenz' }: { type?: AttractorType }) {
@@ -379,7 +445,9 @@ export function StrangeAttractor({ type = 'lorenz' }: { type?: AttractorType }) 
     canvas.height = h * 2
     ctx.scale(2, 2)
 
-    let x = 0.1, y = 0, z = 0
+    let x = 0.1,
+      y = 0,
+      z = 0
     const dt = 0.005
     const points: [number, number, number][] = []
     const maxPoints = 8000
@@ -459,7 +527,8 @@ export function ReactionDiffusion({ width = 200, height = 200, feed = 0.055, kil
       }
     }
 
-    const dA = 1.0, dB = 0.5
+    const dA = 1.0,
+      dB = 0.5
     const imageData = ctx.createImageData(width, height)
 
     function laplacian(grid: Float32Array, x: number, y: number): number {
@@ -467,12 +536,12 @@ export function ReactionDiffusion({ width = 200, height = 200, feed = 0.055, kil
       let sum = -grid[i]
       sum += grid[((y - 1 + height) % height) * width + x] * 0.2
       sum += grid[((y + 1) % height) * width + x] * 0.2
-      sum += grid[y * width + (x - 1 + width) % width] * 0.2
-      sum += grid[y * width + (x + 1) % width] * 0.2
-      sum += grid[((y - 1 + height) % height) * width + (x - 1 + width) % width] * 0.05
-      sum += grid[((y - 1 + height) % height) * width + (x + 1) % width] * 0.05
-      sum += grid[((y + 1) % height) * width + (x - 1 + width) % width] * 0.05
-      sum += grid[((y + 1) % height) * width + (x + 1) % width] * 0.05
+      sum += grid[y * width + ((x - 1 + width) % width)] * 0.2
+      sum += grid[y * width + ((x + 1) % width)] * 0.2
+      sum += grid[((y - 1 + height) % height) * width + ((x - 1 + width) % width)] * 0.05
+      sum += grid[((y - 1 + height) % height) * width + ((x + 1) % width)] * 0.05
+      sum += grid[((y + 1) % height) * width + ((x - 1 + width) % width)] * 0.05
+      sum += grid[((y + 1) % height) * width + ((x + 1) % width)] * 0.05
       return sum
     }
 
@@ -481,7 +550,8 @@ export function ReactionDiffusion({ width = 200, height = 200, feed = 0.055, kil
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const i = y * width + x
-            const a = gridA[i], b = gridB[i]
+            const a = gridA[i],
+              b = gridB[i]
             const abb = a * b * b
             nextA[i] = a + (dA * laplacian(gridA, x, y) - abb + feed * (1 - a))
             nextB[i] = b + (dB * laplacian(gridB, x, y) + abb - (kill + feed) * b)
@@ -509,11 +579,7 @@ export function ReactionDiffusion({ width = 200, height = 200, feed = 0.055, kil
   }, [width, height, feed, kill])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full"
-      style={{ imageRendering: 'pixelated' }}
-    />
+    <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: 'pixelated' }} />
   )
 }
 ```
@@ -528,8 +594,14 @@ import { useRef, useEffect, useCallback } from 'react'
 
 type AutomatonType = 'gameOfLife' | 'elementary'
 
-export function CellularAutomaton({ type = 'gameOfLife', rule = 110, cellSize = 4 }: {
-  type?: AutomatonType; rule?: number; cellSize?: number
+export function CellularAutomaton({
+  type = 'gameOfLife',
+  rule = 110,
+  cellSize = 4,
+}: {
+  type?: AutomatonType
+  rule?: number
+  cellSize?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number>(0)
@@ -549,8 +621,12 @@ export function CellularAutomaton({ type = 'gameOfLife', rule = 110, cellSize = 
         }
         const alive = grid[y * cols + x]
         next[y * cols + x] = alive
-          ? (neighbors === 2 || neighbors === 3 ? 1 : 0)
-          : (neighbors === 3 ? 1 : 0)
+          ? neighbors === 2 || neighbors === 3
+            ? 1
+            : 0
+          : neighbors === 3
+            ? 1
+            : 0
       }
     }
     return next
@@ -644,8 +720,14 @@ import { useRef, useEffect } from 'react'
 // Install: npm install simplex-noise
 import { createNoise3D } from 'simplex-noise'
 
-export function NoiseTexture({ scale = 100, speed = 0.5, colorMode = 'gradient' }: {
-  scale?: number; speed?: number; colorMode?: 'gradient' | 'contour' | 'domain-warp'
+export function NoiseTexture({
+  scale = 100,
+  speed = 0.5,
+  colorMode = 'gradient',
+}: {
+  scale?: number
+  speed?: number
+  colorMode?: 'gradient' | 'contour' | 'domain-warp'
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number>(0)
@@ -653,7 +735,8 @@ export function NoiseTexture({ scale = 100, speed = 0.5, colorMode = 'gradient' 
   useEffect(() => {
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
-    const w = 300, h = 300
+    const w = 300,
+      h = 300
     canvas.width = w
     canvas.height = h
 
@@ -685,7 +768,8 @@ export function NoiseTexture({ scale = 100, speed = 0.5, colorMode = 'gradient' 
           } else {
             const hue = val * 360
             // HSL to RGB approximate
-            const c = 0.6, m = 0.2
+            const c = 0.6,
+              m = 0.2
             imageData.data[idx] = (val * 0.3 + 0.1) * 255
             imageData.data[idx + 1] = val * 200
             imageData.data[idx + 2] = (1 - val * 0.5) * 255
@@ -701,11 +785,7 @@ export function NoiseTexture({ scale = 100, speed = 0.5, colorMode = 'gradient' 
   }, [scale, speed, colorMode])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full"
-      style={{ imageRendering: 'pixelated' }}
-    />
+    <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: 'pixelated' }} />
   )
 }
 ```
@@ -732,7 +812,8 @@ export function SacredGeometry({ type = 'flower-of-life' }: { type?: SacredType 
     canvas.width = w * 2
     canvas.height = h * 2
     ctx.scale(2, 2)
-    const cx = w / 2, cy = h / 2
+    const cx = w / 2,
+      cy = h / 2
 
     let progress = 0
 
@@ -788,7 +869,8 @@ export function SacredGeometry({ type = 'flower-of-life' }: { type?: SacredType 
       // Draw golden rectangles
       ctx.strokeStyle = 'rgba(251, 191, 36, 0.3)'
       let size = 2
-      let rx = cx, ry = cy
+      let rx = cx,
+        ry = cy
       for (let i = 0; i < Math.floor(p * 12); i++) {
         ctx.strokeRect(rx - size / 2, ry - size / 2, size, size)
         size *= phi
@@ -841,9 +923,15 @@ export function SacredGeometry({ type = 'flower-of-life' }: { type?: SacredType 
       progress = Math.min(1, progress + 0.005)
 
       switch (type) {
-        case 'flower-of-life': drawFlowerOfLife(progress); break
-        case 'golden-spiral': drawGoldenSpiral(progress); break
-        case 'metatron': drawMetatron(progress); break
+        case 'flower-of-life':
+          drawFlowerOfLife(progress)
+          break
+        case 'golden-spiral':
+          drawGoldenSpiral(progress)
+          break
+        case 'metatron':
+          drawMetatron(progress)
+          break
       }
 
       if (progress < 1) animRef.current = requestAnimationFrame(animate)

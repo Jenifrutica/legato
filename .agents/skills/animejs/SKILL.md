@@ -12,6 +12,7 @@ Lightweight JavaScript animation library with powerful timeline and stagger capa
 Anime.js (pronounced "Anime JS") is a versatile animation engine that works with DOM elements, CSS properties, SVG attributes, and JavaScript objects. Unlike React-specific libraries, Anime.js works with vanilla JavaScript and any framework.
 
 **When to use this skill:**
+
 - Timeline-based animation sequences with precise choreography
 - Staggered animations across multiple elements
 - SVG path morphing and drawing animations
@@ -20,6 +21,7 @@ Anime.js (pronounced "Anime JS") is a versatile animation engine that works with
 - Complex easing functions (spring, steps, cubic-bezier)
 
 **Core features:**
+
 - Timeline sequencing with relative positioning
 - Powerful stagger utilities (grid, from center, easing)
 - SVG morphing and path animations
@@ -41,7 +43,7 @@ anime({
   translateX: 250,
   rotate: '1turn',
   duration: 800,
-  easing: 'easeInOutQuad'
+  easing: 'easeInOutQuad',
 })
 ```
 
@@ -67,44 +69,48 @@ anime({ targets: obj, x: 100 })
 ### Animatable Properties
 
 **CSS Properties:**
+
 ```javascript
 anime({
   targets: '.element',
   translateX: 250,
   scale: 2,
   opacity: 0.5,
-  backgroundColor: '#FFF'
+  backgroundColor: '#FFF',
 })
 ```
 
 **CSS Transforms (Individual):**
+
 ```javascript
 anime({
   targets: '.element',
-  translateX: 250,   // Individual transform
-  rotate: '1turn',   // Not 'transform: rotate()'
-  scale: 2
+  translateX: 250, // Individual transform
+  rotate: '1turn', // Not 'transform: rotate()'
+  scale: 2,
 })
 ```
 
 **SVG Attributes:**
+
 ```javascript
 anime({
   targets: 'path',
   d: 'M10 80 Q 77.5 10, 145 80', // Path morphing
   fill: '#FF0000',
-  strokeDashoffset: [anime.setDashoffset, 0] // Line drawing
+  strokeDashoffset: [anime.setDashoffset, 0], // Line drawing
 })
 ```
 
 **JavaScript Objects:**
+
 ```javascript
 const obj = { value: 0 }
 anime({
   targets: obj,
   value: 100,
   round: 1,
-  update: () => console.log(obj.value)
+  update: () => console.log(obj.value),
 })
 ```
 
@@ -115,22 +121,28 @@ Create complex sequences with precise control:
 ```javascript
 const timeline = anime.timeline({
   duration: 750,
-  easing: 'easeOutExpo'
+  easing: 'easeOutExpo',
 })
 
 timeline
   .add({
     targets: '.box1',
-    translateX: 250
+    translateX: 250,
   })
-  .add({
-    targets: '.box2',
-    translateX: 250
-  }, '-=500') // Start 500ms before previous animation ends
-  .add({
-    targets: '.box3',
-    translateX: 250
-  }, '+=200') // Start 200ms after previous animation ends
+  .add(
+    {
+      targets: '.box2',
+      translateX: 250,
+    },
+    '-=500',
+  ) // Start 500ms before previous animation ends
+  .add(
+    {
+      targets: '.box3',
+      translateX: 250,
+    },
+    '+=200',
+  ) // Start 200ms after previous animation ends
 ```
 
 ## Common Patterns
@@ -144,7 +156,7 @@ anime({
   opacity: [0, 1],
   delay: anime.stagger(100), // Increase delay by 100ms
   easing: 'easeOutQuad',
-  duration: 600
+  duration: 600,
 })
 ```
 
@@ -157,9 +169,9 @@ anime({
   delay: anime.stagger(50, {
     grid: [14, 5],
     from: 'center', // Also: 'first', 'last', index, [x, y]
-    axis: 'x'       // Also: 'y', null
+    axis: 'x', // Also: 'y', null
   }),
-  easing: 'easeOutQuad'
+  easing: 'easeOutQuad',
 })
 ```
 
@@ -171,7 +183,7 @@ anime({
   strokeDashoffset: [anime.setDashoffset, 0],
   easing: 'easeInOutQuad',
   duration: 2000,
-  delay: (el, i) => i * 250
+  delay: (el, i) => i * 250,
 })
 ```
 
@@ -182,12 +194,12 @@ anime({
   targets: '#morphing-path',
   d: [
     { value: 'M10 80 Q 77.5 10, 145 80' }, // Start shape
-    { value: 'M10 80 Q 77.5 150, 145 80' }  // End shape
+    { value: 'M10 80 Q 77.5 150, 145 80' }, // End shape
   ],
   duration: 2000,
   easing: 'easeInOutQuad',
   loop: true,
-  direction: 'alternate'
+  direction: 'alternate',
 })
 ```
 
@@ -196,24 +208,30 @@ anime({
 ```javascript
 const tl = anime.timeline({
   easing: 'easeOutExpo',
-  duration: 750
+  duration: 750,
 })
 
 tl.add({
   targets: '.title',
   translateY: [-50, 0],
-  opacity: [0, 1]
+  opacity: [0, 1],
 })
-.add({
-  targets: '.subtitle',
-  translateY: [-30, 0],
-  opacity: [0, 1]
-}, '-=500')
-.add({
-  targets: '.button',
-  scale: [0, 1],
-  opacity: [0, 1]
-}, '-=300')
+  .add(
+    {
+      targets: '.subtitle',
+      translateY: [-30, 0],
+      opacity: [0, 1],
+    },
+    '-=500',
+  )
+  .add(
+    {
+      targets: '.button',
+      scale: [0, 1],
+      opacity: [0, 1],
+    },
+    '-=300',
+  )
 ```
 
 ### 6. Keyframe Animation
@@ -221,15 +239,10 @@ tl.add({
 ```javascript
 anime({
   targets: '.element',
-  keyframes: [
-    { translateX: 100 },
-    { translateY: 100 },
-    { translateX: 0 },
-    { translateY: 0 }
-  ],
+  keyframes: [{ translateX: 100 }, { translateY: 100 }, { translateX: 0 }, { translateY: 0 }],
   duration: 4000,
   easing: 'easeInOutQuad',
-  loop: true
+  loop: true,
 })
 ```
 
@@ -241,7 +254,7 @@ const animation = anime({
   translateY: [100, 0],
   opacity: [0, 1],
   easing: 'easeOutQuad',
-  autoplay: false
+  autoplay: false,
 })
 
 window.addEventListener('scroll', () => {
@@ -266,7 +279,7 @@ function AnimatedComponent() {
       targets: ref.current,
       translateX: 250,
       duration: 800,
-      easing: 'easeInOutQuad'
+      easing: 'easeInOutQuad',
     })
 
     return () => animation.pause()
@@ -284,9 +297,9 @@ export default {
     anime({
       targets: this.$el,
       translateX: 250,
-      duration: 800
+      duration: 800,
     })
-  }
+  },
 }
 ```
 
@@ -302,7 +315,7 @@ anime({
   rotate: path('angle'),
   easing: 'linear',
   duration: 2000,
-  loop: true
+  loop: true,
 })
 ```
 
@@ -315,7 +328,7 @@ anime({
   targets: '.element',
   translateX: 250,
   easing: 'spring(1, 80, 10, 0)', // mass, stiffness, damping, velocity
-  duration: 2000
+  duration: 2000,
 })
 ```
 
@@ -326,7 +339,7 @@ anime({
   targets: '.element',
   translateX: 250,
   easing: 'steps(5)',
-  duration: 1000
+  duration: 1000,
 })
 ```
 
@@ -337,7 +350,7 @@ anime({
   targets: '.element',
   translateX: 250,
   easing: 'cubicBezier(.5, .05, .1, .3)',
-  duration: 1000
+  duration: 1000,
 })
 ```
 
@@ -348,8 +361,8 @@ anime({
   targets: '.element',
   translateX: 250,
   direction: 'alternate', // 'normal', 'reverse', 'alternate'
-  loop: true,             // or number of iterations
-  easing: 'easeInOutQuad'
+  loop: true, // or number of iterations
+  easing: 'easeInOutQuad',
 })
 ```
 
@@ -359,7 +372,7 @@ anime({
 const animation = anime({
   targets: '.element',
   translateX: 250,
-  autoplay: false
+  autoplay: false,
 })
 
 animation.play()
@@ -378,14 +391,14 @@ animation.seek(500) // Seek to 500ms
 anime({
   targets: '.element',
   translateX: 250,
-  opacity: 0.5
+  opacity: 0.5,
 })
 
 // ❌ Avoid: Triggers layout
 anime({
   targets: '.element',
   left: '250px',
-  width: '500px'
+  width: '500px',
 })
 ```
 
@@ -395,11 +408,11 @@ anime({
 // ✅ Single animation for multiple targets
 anime({
   targets: '.multiple-elements',
-  translateX: 250
+  translateX: 250,
 })
 
 // ❌ Avoid: Multiple separate animations
-elements.forEach(el => {
+elements.forEach((el) => {
   anime({ targets: el, translateX: 250 })
 })
 ```
@@ -418,7 +431,7 @@ elements.forEach(el => {
 const animation = anime({
   targets: '.element',
   translateX: 250,
-  autoplay: false // Control manually
+  autoplay: false, // Control manually
 })
 ```
 
@@ -501,15 +514,18 @@ anime({
 ## Resources
 
 ### Scripts
+
 - `animation_generator.py` - Generate Anime.js animation boilerplate (8 types)
 - `timeline_builder.py` - Build complex timeline sequences
 
 ### References
+
 - `api_reference.md` - Complete Anime.js API documentation
 - `stagger_guide.md` - Stagger utilities and patterns
 - `timeline_guide.md` - Timeline sequencing deep dive
 
 ### Assets
+
 - `starter_animejs/` - Vanilla JS + Vite template with examples
 - `examples/` - Real-world patterns (SVG morphing, stagger grids, timelines)
 

@@ -3,6 +3,7 @@
 Complete Lenis smooth scroll integration for React/Next.js with GSAP ScrollTrigger.
 
 ## Table of Contents
+
 1. [Installation](#installation)
 2. [Basic Setup](#basic-setup)
 3. [GSAP Integration](#gsap-integration)
@@ -58,7 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```css
 /* globals.css */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -221,8 +223,8 @@ function ScrollToSection() {
     const element = document.getElementById(id)
     if (element && lenis) {
       lenis.scrollTo(element, {
-        offset: -100,        // Offset from top
-        duration: 1.5,       // Animation duration
+        offset: -100, // Offset from top
+        duration: 1.5, // Animation duration
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       })
     }
@@ -258,11 +260,7 @@ function Modal({ isOpen, onClose, children }) {
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50">
-      {children}
-    </div>
-  )
+  return <div className="fixed inset-0 z-50">{children}</div>
 }
 ```
 
@@ -299,35 +297,35 @@ function VelocitySkew() {
   root
   options={{
     // Smoothing
-    lerp: 0.1,              // Linear interpolation (0-1), lower = smoother
-    duration: 1.2,          // Animation duration in seconds
+    lerp: 0.1, // Linear interpolation (0-1), lower = smoother
+    duration: 1.2, // Animation duration in seconds
 
     // Wheel
-    smoothWheel: true,      // Smooth wheel scrolling
-    wheelMultiplier: 1,     // Wheel sensitivity
+    smoothWheel: true, // Smooth wheel scrolling
+    wheelMultiplier: 1, // Wheel sensitivity
 
     // Touch
-    touchMultiplier: 2,     // Touch sensitivity
-    syncTouch: false,       // Sync touch with lerp (experimental)
-    syncTouchLerp: 0.075,   // Lerp for sync touch
+    touchMultiplier: 2, // Touch sensitivity
+    syncTouch: false, // Sync touch with lerp (experimental)
+    syncTouchLerp: 0.075, // Lerp for sync touch
 
     // Direction
     orientation: 'vertical', // 'vertical' | 'horizontal'
     gestureOrientation: 'vertical',
 
     // Behavior
-    infinite: false,        // Infinite scroll
-    autoRaf: false,         // Use built-in RAF (false when using GSAP ticker)
+    infinite: false, // Infinite scroll
+    autoRaf: false, // Use built-in RAF (false when using GSAP ticker)
 
     // Content
-    wrapper: window,        // Scroll wrapper element
+    wrapper: window, // Scroll wrapper element
     content: document.documentElement,
 
     // Events
-    eventsTarget: window,   // Event listener target
+    eventsTarget: window, // Event listener target
 
     // Misc
-    prevent: undefined,     // Function to prevent scroll on certain elements
+    prevent: undefined, // Function to prevent scroll on certain elements
     virtualScroll: undefined, // Custom virtual scroll handler
   }}
 >
@@ -456,26 +454,29 @@ function HorizontalSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const sections = gsap.utils.toArray<HTMLElement>('.h-section')
+  useGSAP(
+    () => {
+      const sections = gsap.utils.toArray<HTMLElement>('.h-section')
 
-    gsap.to(sections, {
-      xPercent: -100 * (sections.length - 1),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: wrapperRef.current,
-        pin: true,
-        scrub: 1,
-        snap: 1 / (sections.length - 1),
-        end: () => '+=' + wrapperRef.current!.scrollWidth,
-      }
-    })
-  }, { scope: containerRef })
+      gsap.to(sections, {
+        xPercent: -100 * (sections.length - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          pin: true,
+          scrub: 1,
+          snap: 1 / (sections.length - 1),
+          end: () => '+=' + wrapperRef.current!.scrollWidth,
+        },
+      })
+    },
+    { scope: containerRef },
+  )
 
   return (
     <div ref={containerRef}>
       <div ref={wrapperRef} className="flex" data-lenis-prevent-wheel>
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-section w-screen h-screen flex-shrink-0">
             Section {i}
           </div>

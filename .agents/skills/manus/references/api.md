@@ -6,9 +6,11 @@ Authentication: `API_KEY` header
 ## Tasks
 
 ### Create Task
+
 `POST /v1/tasks`
 
 **Request:**
+
 ```json
 {
   "prompt": "string (required)",
@@ -26,6 +28,7 @@ Authentication: `API_KEY` header
 ```
 
 **Response:**
+
 ```json
 {
   "task_id": "string",
@@ -36,9 +39,11 @@ Authentication: `API_KEY` header
 ```
 
 ### Get Task
+
 `GET /v1/tasks/{task_id}`
 
 **Response:**
+
 ```json
 {
   "id": "string",
@@ -58,8 +63,8 @@ Authentication: `API_KEY` header
       "type": "message",
       "status": "completed",
       "content": [
-        {"type": "output_text", "text": "string"},
-        {"type": "output_file", "fileName": "string", "fileUrl": "string", "mimeType": "string"}
+        { "type": "output_text", "text": "string" },
+        { "type": "output_file", "fileName": "string", "fileUrl": "string", "mimeType": "string" }
       ]
     }
   ],
@@ -69,20 +74,25 @@ Authentication: `API_KEY` header
 ```
 
 ### List Tasks
+
 `GET /v1/tasks`
 
 ### Update Task
+
 `PUT /v1/tasks/{task_id}`
 
 ### Delete Task
+
 `DELETE /v1/tasks/{task_id}`
 
 ## Projects
 
 ### Create Project
+
 `POST /v1/projects`
 
 **Request:**
+
 ```json
 {
   "name": "string (required)",
@@ -91,6 +101,7 @@ Authentication: `API_KEY` header
 ```
 
 **Response:**
+
 ```json
 {
   "id": "string",
@@ -101,14 +112,17 @@ Authentication: `API_KEY` header
 ```
 
 ### List Projects
+
 `GET /v1/projects`
 
 ## Files
 
 ### Create File Upload
+
 `POST /v1/files`
 
 **Request:**
+
 ```json
 {
   "filename": "string"
@@ -116,6 +130,7 @@ Authentication: `API_KEY` header
 ```
 
 **Response:**
+
 ```json
 {
   "id": "string",
@@ -131,23 +146,29 @@ Authentication: `API_KEY` header
 Upload file to `upload_url` via PUT request within 3 minutes.
 
 ### List Files
+
 `GET /v1/files`
 
 ### Get File
+
 `GET /v1/files/{file_id}`
 
 ### Delete File
+
 `DELETE /v1/files/{file_id}`
 
 ## Webhooks
 
 ### Create Webhook
+
 `POST /v1/webhooks`
 
 ### Delete Webhook
+
 `DELETE /v1/webhooks/{webhook_id}`
 
 **Webhook Events:**
+
 - `task_created` - Task initialized
 - `task_progress` - Status updates during execution
 - `task_stopped` - Completed or needs input (`stop_reason`: `finish` or `ask`)
