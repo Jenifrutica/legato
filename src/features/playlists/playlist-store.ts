@@ -41,6 +41,8 @@ type PlaylistsState = {
   addTrackToPlaylist: (playlistId: string, track: LibraryTrack) => boolean
   /** Agrega muchas pistas con un solo paso de historial (importaciones). */
   addTracksToPlaylist: (playlistId: string, tracks: LibraryTrack[]) => number
+  /** Quita de todas las playlists las pistas que ya no existen en la biblioteca. */
+  pruneTracks: (validIds: Set<string>) => void
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => void
   moveTrackInPlaylist: (playlistId: string, trackId: string, targetIndex: number) => void
 }
@@ -133,6 +135,26 @@ export const usePlaylistsStore = create<PlaylistsState>((set, get) => ({
     }
 
     return added
+  },
+
+  pruneTracks: (validIds) => {
+    const before = collection.toSnapshots()
+    const beforeSelected = get().selectedPlaylistId
+    let changed = false
+
+    for (const snapshot of before) {
+      for (const trackId of snapshot.trackIds) {
+        if (!validIds.has(trackId) && collection.removeTrack(snapshot.id, trackId)) {
+          changed = true
+        }
+      }
+    }
+
+    if (changed) {
+      const after = collection.toSnapshots()
+      set({ playlists: after })
+      registerHistory('prune-tracks', before, beforeSelected, after, beforeSelected)
+    }
   },
 
   removeTrackFromPlaylist: (playlistId, trackId) => {

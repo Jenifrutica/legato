@@ -427,6 +427,8 @@ export function LibraryPanel() {
                       onClick={() => {
                         usePlayerStore.getState().clearQueue()
                         clearLibrary()
+                        // Quita las referencias de las playlists: quedan a 0.
+                        usePlaylistsStore.getState().pruneTracks(new Set())
                         setConfirmClear(false)
                         setNotice(t('library.cleared'))
                       }}
