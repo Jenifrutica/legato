@@ -148,9 +148,10 @@ export const pt: typeof es = {
     errorUnknown: 'Não foi possível concluir. Tente de novo.',
     privacy: 'Sua biblioteca de áudio vive só neste navegador. A conta serve para entrar.',
     verifyTitle: 'Confirme seu e-mail',
-    verifyText: 'Enviamos um link para {{email}}. Confirme para entrar.',
+    verifyText: 'Enviamos um link para {{email}} para confirmar seu e-mail (recomendado).',
     verifyHint:
-      'Não chegou? Verifique a pasta de spam (procure «firebaseapp» ou «Legato») e espere um minuto antes de reenviar.',
+      'Não chegou? Verifique a pasta de spam (procure «firebaseapp» ou «Legato») e espere um minuto antes de reenviar. Verificar é recomendado, mas você pode entrar sem isso.',
+    continueUnverified: 'Entrar sem verificar',
     verifyGoogle: 'Entrar com Google (sem e-mail de verificação)',
     resend: 'Reenviar e-mail',
     resent: 'E-mail reenviado.',

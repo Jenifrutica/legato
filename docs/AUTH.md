@@ -4,7 +4,7 @@
 
 ## 1. Cómo funciona
 
-- **Gate en `App`**: al abrir, `AuthContextProvider` inicializa el proveedor; sin usuario → `LoginScreen` (Entrar / Crear cuenta / Recuperar); con usuario sin verificar → pantalla «Confirma tu correo» (reenviar, «ya lo confirmé» o entrar con Google); con sesión verificada → el shell completo. En la pantalla de acceso, **Google es la acción principal** (sin correo de verificación).
+- **Gate en `App`**: al abrir, `AuthContextProvider` inicializa el proveedor; sin usuario → `LoginScreen` (Entrar / Crear cuenta / Recuperar); con usuario sin verificar → pantalla «Confirma tu correo» (reenviar, «ya lo confirmé», entrar con Google o **«Entrar sin verificar»**); con sesión → el shell completo. La **verificación es recomendada pero NO bloqueante** (el correo de Firebase puede no llegar); en la pantalla de acceso, **Google es una vía cómoda** (ya viene verificado).
 - **Firebase (correo/contraseña + Google)**: verificación de correo obligatoria, restablecimiento por correo, Google siempre verificado, sesiones gestionadas por el SDK y **política de 7 días** (`legato.auth.loginAt`; pasados 7 días se cierra la sesión).
 - **Respaldo local** (`LocalAuthProvider`): cuentas en IndexedDB con **PBKDF2-HMAC-SHA256** (310 000 iteraciones, salt de 16 bytes, comparación en tiempo constante) y token de sesión opaco (solo se guarda su SHA-256; caduca a los 7 días). No tiene recuperación por correo (la UI la oculta).
 - **Datos por usuario**: canciones, playlists, sesión, análisis, acordes, letras, setlists y notas llevan `userId`; los stores se hidratan al entrar y se vacían al salir. **El primer usuario adopta los datos huérfanos** (tu biblioteca actual pasa a tu cuenta). Los tokens de Spotify (`legato.spotify.tokens.<uid>`) y el historial de la cápsula (`legato.plays.*`) también son por usuario y **sobreviven al cerrar sesión** en el mismo navegador. Los ajustes del dispositivo (tema, accesibilidad, ondas, idioma, consentimiento) quedan globales.
@@ -59,7 +59,7 @@ La sincronización entre dispositivos usa **Firestore** para todo: metadatos por
 
 - La contraseña **nunca** se guarda en claro: Firebase la cifra en su backend; el respaldo local guarda PBKDF2 + salt.
 - La sesión local es un token aleatorio de 32 bytes; en IndexedDB solo vive su SHA-256, con caducidad; al cerrar sesión se revoca.
-- Verificación de correo obligatoria con Firebase (los usuarios de Google ya vienen verificados).
+- Verificación de correo **recomendada, no obligatoria** con Firebase (se puede entrar sin confirmar; los usuarios de Google ya vienen verificados).
 - El borrado de cuenta elimina también los datos musicales del usuario en este navegador.
 - Cognito queda como vía futura (bloqueado por la SCP de la cuenta AWS); su provider sigue en el repo con métodos «no soportado».
 

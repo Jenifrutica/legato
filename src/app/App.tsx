@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthContextProvider, useAuth } from '../features/auth'
 import { usePlayLogStore, usePlayTracker } from '../features/capsule'
@@ -36,6 +36,13 @@ export default function App() {
 export function AuthGate() {
   const { t } = useTranslation()
   const { user, ready, kind } = useAuth()
+  // La verificación de correo es recomendada pero no obligatoria (el correo
+  // de Firebase puede no llegar): se puede entrar sin confirmar.
+  const [skipVerification, setSkipVerification] = useState(false)
+
+  useEffect(() => {
+    setSkipVerification(false)
+  }, [user?.id])
 
   if (!ready) {
     return (
@@ -52,8 +59,8 @@ export function AuthGate() {
     return <LoginScreen />
   }
 
-  if (!user.emailVerified) {
-    return <VerifyEmailScreen />
+  if (!user.emailVerified && !skipVerification) {
+    return <VerifyEmailScreen onContinue={() => setSkipVerification(true)} />
   }
 
   return <AppShell authKind={kind} userId={user.id} />

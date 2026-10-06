@@ -223,7 +223,7 @@ export function LoginScreen() {
   )
 }
 
-export function VerifyEmailScreen() {
+export function VerifyEmailScreen({ onContinue }: { onContinue?: () => void }) {
   const { t } = useTranslation()
   const { user, resendVerificationEmail, refreshUser, signOut, supportsGoogle, signInWithGoogle } =
     useAuth()
@@ -277,6 +277,16 @@ export function VerifyEmailScreen() {
         )}
 
         <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t('auth.verifyHint')}</p>
+
+        {onContinue !== undefined && (
+          <button
+            className="mt-3 w-full border-2 border-rule bg-accent px-3 py-2.5 font-mono text-[0.6875rem] tracking-[0.1em] text-on-accent uppercase transition-transform hover:-translate-y-0.5"
+            onClick={onContinue}
+            type="button"
+          >
+            {t('auth.continueUnverified')}
+          </button>
+        )}
 
         {supportsGoogle && signInWithGoogle !== undefined && (
           <button

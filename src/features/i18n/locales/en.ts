@@ -148,9 +148,10 @@ export const en: typeof es = {
     errorUnknown: 'Could not complete. Please try again.',
     privacy: 'Your audio library lives only in this browser. The account is used to sign in.',
     verifyTitle: 'Confirm your email',
-    verifyText: 'We sent a link to {{email}}. Confirm it to sign in.',
+    verifyText: 'We sent a link to {{email}} to confirm your email (recommended).',
     verifyHint:
-      'Not arriving? Check the spam folder (look for “firebaseapp” or “Legato”) and wait a minute before resending.',
+      'Not arriving? Check the spam folder (look for “firebaseapp” or “Legato”) and wait a minute before resending. Verifying is recommended, but you can sign in without it.',
+    continueUnverified: 'Continue without verifying',
     verifyGoogle: 'Sign in with Google (no verification email)',
     resend: 'Resend email',
     resent: 'Email resent.',

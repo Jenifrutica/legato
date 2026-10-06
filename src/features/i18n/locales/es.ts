@@ -147,9 +147,10 @@ export const es = {
     errorUnknown: 'No se pudo completar. Inténtalo de nuevo.',
     privacy: 'Tu biblioteca de audio vive solo en este navegador. La cuenta se usa para entrar.',
     verifyTitle: 'Confirma tu correo',
-    verifyText: 'Te enviamos un enlace a {{email}}. Confírmalo para entrar.',
+    verifyText: 'Te enviamos un enlace a {{email}} para confirmar tu correo (recomendado).',
     verifyHint:
-      '¿No llega? Revisa la carpeta de spam (busca «firebaseapp» o «Legato») y espera un minuto antes de reenviar.',
+      '¿No llega? Revisa la carpeta de spam (busca «firebaseapp» o «Legato») y espera un minuto antes de reenviar. Verificar es recomendado, pero puedes entrar sin hacerlo.',
+    continueUnverified: 'Entrar sin verificar',
     verifyGoogle: 'Entrar con Google (sin correo de verificación)',
     resend: 'Reenviar correo',
     resent: 'Correo reenviado.',
