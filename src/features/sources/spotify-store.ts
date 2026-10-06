@@ -17,7 +17,7 @@ type SpotifyStore = {
   volume: number
   connect: () => Promise<boolean>
   disconnect: () => void
-  playUris: (uris: string[]) => Promise<void>
+  playUris: (uris: string[], startVolume?: number) => Promise<void>
   toggle: () => Promise<void>
   next: () => Promise<void>
   previous: () => Promise<void>
@@ -95,16 +95,16 @@ export const useSpotifyStore = create<SpotifyStore>((set, get) => ({
     set({ status: 'idle', deviceId: null, playback: null, error: null })
   },
 
-  playUris: async (uris) => {
+  playUris: async (uris, startVolume) => {
     const ready = await get().connect()
     if (!ready || bridge === null) {
       throw new Error(get().error ?? 'No se pudo iniciar Spotify')
     }
 
     usePlayerStore.getState().pause()
-    // No se toca el volumen aquí: el crossfade lo controla (si se pusiera el
-    // volumen del usuario justo antes, la pista nueva daría un golpe al bajar
-    // luego a 0 para el fundido de entrada).
+    // Volumen con el que arranca la pista: el del usuario (o 0 si el crossfade
+    // va a subirla). Así no hay golpe y tampoco se queda mudo.
+    await bridge.setVolume(startVolume ?? get().volume)
     await bridge.playUris(uris)
   },
 

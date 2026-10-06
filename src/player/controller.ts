@@ -58,7 +58,7 @@ export class PlayerController {
   #lastError: string | null = null
   #sourcePlaylistId: string | null = null
   #externalPlayer: {
-    play: (uri: string) => Promise<void> | void
+    play: (uri: string, startVolume?: number) => Promise<void> | void
     stop: () => void
     setVolume?: (value: number) => void
     getVolume?: () => number
@@ -101,7 +101,7 @@ export class PlayerController {
 
   setExternalPlayer(
     player: {
-      play: (uri: string) => Promise<void> | void
+      play: (uri: string, startVolume?: number) => Promise<void> | void
       stop: () => void
       setVolume?: (value: number) => void
       getVolume?: () => number
@@ -187,10 +187,12 @@ export class PlayerController {
     }
 
     if (this.#isExternal(current)) {
-      // Restaura el volumen del usuario (un fundido anterior pudo dejarlo en 0).
-      this.#externalPlayer?.setVolume?.(this.#externalPlayer?.getVolume?.() ?? 1)
       try {
-        await this.#externalPlayer?.play(current.sourceUrl)
+        // Restaura el volumen del usuario (un fundido anterior pudo dejarlo en 0).
+        await this.#externalPlayer?.play(
+          current.sourceUrl,
+          this.#externalPlayer?.getVolume?.() ?? 1,
+        )
       } catch {
         this.#lastError = 'No se pudo reproducir en Spotify'
       }
@@ -548,10 +550,10 @@ export class PlayerController {
       this.#lastError = null
       this.#engine.pause()
       this.#externalActive = true
-      this.#externalPlayer?.setVolume?.(shouldFade ? 0 : externalVolume)
 
       try {
-        await this.#externalPlayer?.play(track.sourceUrl)
+        // El puente fija el volumen de arranque (0 si el crossfade lo subirá).
+        await this.#externalPlayer?.play(track.sourceUrl, shouldFade ? 0 : externalVolume)
       } catch (error) {
         this.#lastError =
           error instanceof Error ? `Spotify: ${error.message}` : 'No se pudo reproducir en Spotify'

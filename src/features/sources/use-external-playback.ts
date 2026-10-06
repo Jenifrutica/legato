@@ -13,7 +13,7 @@ export function isExternalTrack(track: { external?: boolean; sourceUrl: string }
 export function useExternalPlayback(): void {
   useEffect(() => {
     setExternalPlayer({
-      play: async (rawUri) => {
+      play: async (rawUri, startVolume) => {
         const uri = rawUri
           .replace('https://open.spotify.com/track/', 'spotify:track:')
           .split('?')[0]
@@ -24,7 +24,7 @@ export function useExternalPlayback(): void {
             throw new Error('spotify-not-connected')
           }
         }
-        await useSpotifyStore.getState().playUris([uri])
+        await useSpotifyStore.getState().playUris([uri], startVolume)
       },
       stop: () => {
         const store = useSpotifyStore.getState()

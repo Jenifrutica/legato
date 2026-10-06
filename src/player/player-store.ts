@@ -29,7 +29,7 @@ export function getMediaElement(): HTMLMediaElement {
 
 export function setExternalPlayer(
   player: {
-    play: (uri: string) => Promise<void> | void
+    play: (uri: string, startVolume?: number) => Promise<void> | void
     stop: () => void
     setVolume?: (value: number) => void
     getVolume?: () => number
