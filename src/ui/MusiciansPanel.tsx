@@ -9,7 +9,6 @@ import { XIcon } from './icons'
 import { useMusiciansPanelStore } from './panel-tabs'
 import { MetronomePanel } from './MetronomePanel'
 import { NotesPanel } from './NotesPanel'
-import { SetlistPanel } from './SetlistPanel'
 import { StructureView } from './StructureView'
 import { TrackAnalysisPanel } from './TrackAnalysisPanel'
 
@@ -58,9 +57,7 @@ export function MusiciansPanel() {
   const lyricsEnabled = useLyricsStore((state) => state.enabled)
   const toggleLyrics = useLyricsStore((state) => state.toggle)
   const musicianEnabled = useMusicianStore((state) => state.enabled)
-  const [tab, setTab] = useState<'structure' | 'practice' | 'chords' | 'setlist' | 'notes'>(
-    'structure',
-  )
+  const [tab, setTab] = useState<'structure' | 'practice' | 'chords' | 'notes'>('structure')
   const activeTab = musicianEnabled ? tab : 'structure'
 
   useEffect(() => {
@@ -197,7 +194,6 @@ export function MusiciansPanel() {
                     ['structure', t('playlists.structure')],
                     ['practice', t('musician.practice')],
                     ['chords', t('chords.tab')],
-                    ['setlist', t('setlist.tab')],
                     ['notes', t('notes.tab')],
                   ] as const
                 ).map(([id, label]) => (
@@ -231,7 +227,6 @@ export function MusiciansPanel() {
                 </>
               )}
               {activeTab === 'chords' && <ChordsPanel />}
-              {activeTab === 'setlist' && <SetlistPanel />}
               {activeTab === 'notes' && <NotesPanel />}
             </div>
           </div>

@@ -2,7 +2,7 @@ import Dexie from 'dexie'
 import type { Table } from 'dexie'
 import type { LibraryTrack } from '../library'
 import type { LocalLyrics } from '../lyrics'
-import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
+import type { ChordSheet, Note, TrackAnalysis } from '../musician'
 import type { PlaylistRestoreRecord } from '../playlists'
 import type { ChannelMode, LoopMode } from '../../player'
 
@@ -26,8 +26,6 @@ export type PlaylistRecord = PlaylistRestoreRecord & OwnedRecord
 export type AnalysisRecord = TrackAnalysis & OwnedRecord
 
 export type ChordRecord = ChordSheet & OwnedRecord
-
-export type SetlistRecord = Setlist & OwnedRecord
 
 export type NoteRecord = Note & OwnedRecord
 
@@ -79,7 +77,6 @@ class LegatoDatabase extends Dexie {
   session!: Table<SessionRecord, string>
   analysis!: Table<AnalysisRecord, string>
   chords!: Table<ChordRecord, string>
-  setlists!: Table<SetlistRecord, string>
   notes!: Table<NoteRecord>
   lyrics!: Table<LyricsRecord, string>
   users!: Table<UserRecord, string>
@@ -156,6 +153,19 @@ class LegatoDatabase extends Dexie {
       analysis: 'trackId, userId',
       chords: 'trackId, userId',
       setlists: 'id, userId',
+      notes: '[targetType+targetId], userId',
+      lyrics: 'trackId, userId',
+      users: 'id, &email',
+      authSessions: 'tokenHash, userId',
+      tombstones: 'id, userId',
+    })
+    // v9: se elimina la tabla `setlists` (función retirada).
+    this.version(9).stores({
+      songs: 'id, userId',
+      playlists: 'id, userId',
+      session: 'key',
+      analysis: 'trackId, userId',
+      chords: 'trackId, userId',
       notes: '[targetType+targetId], userId',
       lyrics: 'trackId, userId',
       users: 'id, &email',

@@ -4,7 +4,6 @@ export const SYNC_TABLES = [
   'session',
   'analysis',
   'chords',
-  'setlists',
   'notes',
   'lyrics',
 ] as const

@@ -31,7 +31,7 @@
 - **Velocidad sin cambiar el tono** (SoundTouch o `Tone.GrainPlayer`), con presets 0.5/0.75/0.9/1.
 - **Pitch shift** ±12 semitonos independiente de la velocidad.
 - **Loop A–B con precisión de compás** (imán a beats) y repeticiones con incremento de velocidad (práctica progresiva).
-- **Setlist**: orden de concierto por playlist con notas y duración total.
+- **Setlist** (retirada): era redundante con Playlists/Lista; se eliminó de la app.
 
 ### 4. Separación de instrumentos (stems)
 

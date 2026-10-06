@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
 import { useLocalLyricsStore } from '../lyrics'
-import { useChordStore, useNotesStore, useSetlistStore, useTrackAnalysisStore } from '../musician'
+import { useChordStore, useNotesStore, useTrackAnalysisStore } from '../musician'
 import { getDatabase } from './db'
 import { recordToTrack, trackToRecord } from './mappers'
 import {
@@ -14,7 +14,6 @@ import {
   syncChords,
   syncLyrics,
   syncNotes,
-  syncSetlists,
   wipeLocalData,
 } from './persistence'
 
@@ -67,7 +66,6 @@ describe('persistence database', () => {
       await db.session.clear()
       await db.analysis.clear()
       await db.chords.clear()
-      await db.setlists.clear()
       await db.notes.clear()
       await db.users.clear()
       await db.authSessions.clear()
@@ -77,7 +75,6 @@ describe('persistence database', () => {
     useLibraryStore.getState().hydrate([])
     useTrackAnalysisStore.getState().hydrate([])
     useChordStore.getState().hydrate([])
-    useSetlistStore.getState().hydrate([])
     useNotesStore.getState().hydrate([])
     useLocalLyricsStore.getState().hydrate([])
     setActiveUserId('u1')
@@ -199,28 +196,6 @@ describe('persistence database', () => {
 
     const keys = await db.chords.toCollection().primaryKeys()
     expect(keys).toEqual(['a'])
-  })
-
-  it('guarda y carga setlists', async () => {
-    const db = getDatabase()
-    expect(db).not.toBeNull()
-    if (db === null) {
-      return
-    }
-
-    await syncSetlists([
-      {
-        id: 's1',
-        name: 'Bolo',
-        items: [{ trackId: 'a', played: true }],
-        createdAt: 1,
-        updatedAt: 2,
-      },
-    ])
-    const record = await db.setlists.get('s1')
-
-    expect(record?.name).toBe('Bolo')
-    expect(record?.items).toEqual([{ trackId: 'a', played: true }])
   })
 
   it('syncNotes guarda destinos existentes y borra los que ya no están', async () => {

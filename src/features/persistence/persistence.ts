@@ -2,14 +2,8 @@ import { useLibraryStore } from '../library'
 import type { LibraryTrack } from '../library'
 import { useLocalLyricsStore } from '../lyrics'
 import type { LocalLyrics } from '../lyrics'
-import {
-  noteKey,
-  useChordStore,
-  useNotesStore,
-  useSetlistStore,
-  useTrackAnalysisStore,
-} from '../musician'
-import type { ChordSheet, Note, Setlist, TrackAnalysis } from '../musician'
+import { noteKey, useChordStore, useNotesStore, useTrackAnalysisStore } from '../musician'
+import type { ChordSheet, Note, TrackAnalysis } from '../musician'
 import { usePlaylistsStore } from '../playlists'
 import type { PlaylistRestoreRecord } from '../playlists'
 import { usePlayerStore } from '../../player'
@@ -51,7 +45,6 @@ export async function adoptOrphanData(
     db.playlists,
     db.analysis,
     db.chords,
-    db.setlists,
     db.notes,
     db.lyrics,
   ] as unknown as Array<Table<{ userId?: string }>>
@@ -131,9 +124,6 @@ export async function hydrateStores(): Promise<boolean> {
   const chordRecords = await db.chords.where('userId').equals(userId).toArray()
   useChordStore.getState().hydrate(chordRecords)
 
-  const setlistRecords = await db.setlists.where('userId').equals(userId).toArray()
-  useSetlistStore.getState().hydrate(setlistRecords)
-
   const noteRecords = await db.notes.where('userId').equals(userId).toArray()
   useNotesStore.getState().hydrate(noteRecords)
 
@@ -157,7 +147,6 @@ export function resetStores(): void {
   usePlaylistsStore.getState().hydrate([], [])
   useTrackAnalysisStore.getState().hydrate([])
   useChordStore.getState().hydrate([])
-  useSetlistStore.getState().hydrate([])
   useNotesStore.getState().hydrate([])
   useLocalLyricsStore.getState().hydrate([])
 }
@@ -176,7 +165,6 @@ export function startPersistence(): void {
   let lastPlaylists = usePlaylistsStore.getState().playlists
   let lastAnalysis = useTrackAnalysisStore.getState().records
   let lastChords = useChordStore.getState().records
-  let lastSetlists = useSetlistStore.getState().setlists
   let lastNotes = useNotesStore.getState().records
   let lastLyrics = useLocalLyricsStore.getState().records
   let sessionTimer: ReturnType<typeof setTimeout> | null = null
@@ -209,13 +197,6 @@ export function startPersistence(): void {
       }
       lastChords = state.records
       void syncChords(state.records)
-    }),
-    useSetlistStore.subscribe((state) => {
-      if (state.setlists === lastSetlists) {
-        return
-      }
-      lastSetlists = state.setlists
-      void syncSetlists(state.setlists)
     }),
     useNotesStore.subscribe((state) => {
       if (state.records === lastNotes) {
@@ -433,28 +414,6 @@ export async function syncPlaylists(playlists: PlaylistRestoreRecord[]): Promise
   })
 }
 
-export async function syncSetlists(setlists: Setlist[]): Promise<void> {
-  const db = getDatabase()
-  const userId = activeUserId
-  if (db === null || userId === null) {
-    return
-  }
-
-  const records = setlists.map((setlist) => ({ ...setlist, userId }))
-  const ids = new Set(records.map((setlist) => setlist.id))
-  const existing = await db.setlists.where('userId').equals(userId).primaryKeys()
-  const stale = existing.filter((id) => !ids.has(id))
-
-  await db.transaction('rw', db.setlists, db.tombstones, async () => {
-    if (stale.length > 0) {
-      const deletedAt = Date.now()
-      await db.setlists.bulkDelete(stale)
-      await db.tombstones.bulkPut(stale.map((id) => ({ id: `setlists:${id}`, userId, deletedAt })))
-    }
-    await db.setlists.bulkPut(records)
-  })
-}
-
 export async function syncNotes(records: Record<string, Note>): Promise<void> {
   const db = getDatabase()
   const userId = activeUserId
@@ -534,7 +493,6 @@ export async function deleteUserData(userId: string): Promise<void> {
       db.session,
       db.analysis,
       db.chords,
-      db.setlists,
       db.notes,
       db.lyrics,
       db.authSessions,
@@ -546,7 +504,6 @@ export async function deleteUserData(userId: string): Promise<void> {
       await db.playlists.where('userId').equals(userId).delete()
       await db.analysis.where('userId').equals(userId).delete()
       await db.chords.where('userId').equals(userId).delete()
-      await db.setlists.where('userId').equals(userId).delete()
       await db.notes.where('userId').equals(userId).delete()
       await db.lyrics.where('userId').equals(userId).delete()
       await db.authSessions.where('userId').equals(userId).delete()

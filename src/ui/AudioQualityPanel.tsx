@@ -69,6 +69,8 @@ export function AudioQualityPanel() {
   const setAnalysisBeatOffset = useTrackAnalysisStore((state) => state.setBeatOffset)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const currentTime = usePlayerStore((state) => state.currentTime)
+  const spotifyActive =
+    spotifyPlayback !== null && (currentTrack === null || currentTrack.external === true)
   const [taps, setTaps] = useState<number[]>([])
   const [tapPositions, setTapPositions] = useState<number[]>([])
   const anchorRef = useRef<{ position: number; at: number } | null>(null)
@@ -160,13 +162,23 @@ export function AudioQualityPanel() {
       </dl>
 
       <div className="mt-4">
-        <label className="text-xs font-medium text-ink-muted" htmlFor="audio-balance">
-          {t('audio.balance')}
-        </label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs font-medium text-ink-muted" htmlFor="audio-balance">
+            {t('audio.balance')}
+          </label>
+          <button
+            className="border-2 border-rule/40 px-2 py-0.5 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-colors hover:border-accent hover:text-ink disabled:opacity-40"
+            disabled={balance === 0}
+            onClick={() => setBalance(0)}
+            type="button"
+          >
+            {t('audio.center')}
+          </button>
+        </div>
         <div className="mt-1 flex items-center gap-3">
           <span className="font-mono text-xs text-ink-muted">L</span>
           <input
-            className="h-1.5 flex-1 cursor-pointer accent-primary"
+            className="h-3 min-w-0 flex-1 cursor-pointer"
             id="audio-balance"
             max={100}
             min={-100}
@@ -200,6 +212,9 @@ export function AudioQualityPanel() {
             </button>
           ))}
         </div>
+        {spotifyActive && (
+          <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('audio.dspSpotify')}</p>
+        )}
       </div>
 
       {canSelectOutput && (
@@ -213,12 +228,21 @@ export function AudioQualityPanel() {
             onChange={(event) => void setOutputDevice(event.target.value)}
             value={outputDeviceId}
           >
-            {outputDevices.map((device) => (
+            {outputDevices.map((device, index) => (
               <option key={device.id === '' ? 'default' : device.id} value={device.id}>
-                {device.label === '' ? t('audio.outputDefault') : device.label}
+                {device.label !== ''
+                  ? device.label
+                  : index === 0
+                    ? t('audio.outputDefault')
+                    : `${t('audio.outputDefault')} ${index + 1}`}
               </option>
             ))}
           </select>
+          {spotifyActive && (
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              {t('audio.outputSpotify')}
+            </p>
+          )}
         </div>
       )}
 

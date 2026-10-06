@@ -104,8 +104,14 @@ export const usePlayerStore = create<PlayerState>(() => ({
   },
 
   setOutputDevice: async (deviceId) => {
-    const applied = await applyOutputDevice(audio, deviceId)
-    if (applied) {
+    // Aplica la salida a TODOS los elementos locales (los dos decks del
+    // crossfade y el de streaming), no solo al principal.
+    const results = await Promise.all([
+      applyOutputDevice(audio, deviceId),
+      applyOutputDevice(audioB, deviceId),
+      applyOutputDevice(streamAudio, deviceId),
+    ])
+    if (results.some(Boolean)) {
       usePlayerStore.setState({ outputDeviceId: deviceId })
     }
   },

@@ -84,7 +84,6 @@ async function resetDatabase() {
       db.session.clear(),
       db.analysis.clear(),
       db.chords.clear(),
-      db.setlists.clear(),
       db.notes.clear(),
       db.lyrics.clear(),
       db.tombstones.clear(),

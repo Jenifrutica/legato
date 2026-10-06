@@ -3,7 +3,7 @@
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
 - **Fecha:** 4 de octubre de 2026 (sesión 6: cierre de login/sincronización y arreglos de reproductor).
-- **Estado base:** 327 unitarios + 17 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
+- **Estado base:** 318 unitarios + 17 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
 - **Orden actual:** B → C (músicos) → D (login) → **N (sync, hecho)** → A (import de Spotify, justo antes del deploy) → E (deploy). B, C, D y N están cerrados; solo quedan A, E y las verificaciones manuales de login.
 - **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
 - **Tokens/entorno:** no hay tokens de OpenAI válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
@@ -114,7 +114,7 @@ Rediseño **Duotono 62** completo (F0–F10), **Cápsula nostálgica** (F11), **
 | **Transposición** | **Hecho (C3)**: ±11 semitonos sobre ChordPro (acordes con barra y enarmonía correcta); solo cambia la vista, la hoja original no se toca |
 | **LRC local** | **Hecho (C5)**: cargar `.lrc` por pista desde la pestaña Notas, con prioridad sobre LRCLIB y persistencia en IndexedDB (`lyrics`, Dexie v5) |
 | **Pitch shift** | Cambiar tono sin cambiar tempo (fase/vocoder; considerar librería o `detune` con trade-offs); UI en el panel |
-| **Setlists** | **Hecho (C4)**: otra DLL del núcleo; crear vacía o desde playlist, reordenar con `moveNode`, marcar tocadas, quitar, duración total y reproducir; persistidas en IndexedDB (`setlists`, Dexie v4) |
+| **Setlists** | **Retirada**: era redundante con Playlists/Lista; se eliminó la pestaña y su soporte (Dexie v9 borra la tabla) |
 | **Notas** | **Hecho (C4)**: notas por pista y por playlist en IndexedDB (`notes`, clave compuesta) con autoguardado; pendiente post-entrega lo de marcas de tiempo por sección |
 | **Stems (Demucs)** | **Hecho (S)**: `scripts/practice-mix.sh` con Docker separa y genera mezclas de práctica («sin voz», «sin guitarra», «solo batería», «solo bajo»); ver `docs/STEMS.md`. La integración dentro de la web con servidor local queda como mejora futura; aproximaciones DSP (karaoke M/S, canales, bajos) siguen disponibles |
 

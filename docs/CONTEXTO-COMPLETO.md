@@ -4,7 +4,7 @@
 
 - **Última actualización:** 5 de octubre de 2026, sesión 7 (cierre, versión **v0.2.0**).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado. Etiqueta **`v0.2.0`**.
-- **Tests:** 327 unitarios + 17 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
+- **Tests:** 318 unitarios + 17 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
 - **Pendientes detallados:** `docs/PENDIENTES.md` (**import de playlists de Spotify** — casi resuelto, falta confirmar; **despliegue** S3+CloudFront y **rotar la access key**). Lo demás (login con Google, sync, músicos, reproductor) está cerrado.
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
@@ -631,6 +631,12 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Ondas más dinámicas**: suavizado temporal a 0.65 y gamma de intensidad `^1.55` (los golpes flojos quedan cortos, los fuertes saltan); pulso `×3.4` y opacidad con base más baja y pico más alto.
 - **Letras sin delay**: `displayLineIndex` cambia de línea hasta `LYRIC_LEAD_SECONDS` (0.25 s) **antes** de su marca para compensar la latencia del fetch y del render; el héroe muestra la **siguiente línea** durante los huecos largos (a ≤1.2 s) para que el relevo no se sienta tardío. Tests nuevos en `lrc.test.ts` (317 unit en total).
 - **La letra no desaparece al pausar**: `Lyrics` solo se oculta si no hay líneas; al pausar se queda la última línea vigente (antes el `!isPlaying` la borraba).
+
+### AG Setlist retirada y calidad de audio (implementado)
+
+- **Setlist retirada**: la pestaña **Setlist** del panel de músicos era redundante con Playlists/Lista. Se eliminó la UI y todo su soporte (`setlist.ts`, `setlist-store.ts`, persistencia `syncSetlists`, tabla de sync, tabla Dexie — **esquema v9** la borra —, i18n y tests). El panel queda **Estructura · Práctica · Acordes · Notas**.
+- **Salida de audio**: `setOutputDevice` ahora aplica `setSinkId` a **todos** los elementos locales (`audio`, `audioB` y el de streaming), no solo al principal; la lista siempre trae al menos «Salida predeterminada» (aunque falten permisos/labels).
+- **Balance/aislamiento/bajos**: solo pueden procesar **audio local** (pasan por el Web Audio `AudioGraph`); con **Spotify (DRM)** no aplican y ahora se avisa en el panel (y que la salida de Spotify la elige Spotify). El **balance** incluye botón **Centro** y el slider es más cómodo.
 
 ### AF Lista persistente y vaciar biblioteca (implementado)
 

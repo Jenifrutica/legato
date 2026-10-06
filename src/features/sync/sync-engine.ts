@@ -1,6 +1,6 @@
 import { useLibraryStore } from '../library'
 import { useLocalLyricsStore } from '../lyrics'
-import { useChordStore, useNotesStore, useSetlistStore, useTrackAnalysisStore } from '../musician'
+import { useChordStore, useNotesStore, useTrackAnalysisStore } from '../musician'
 import { usePlaylistsStore } from '../playlists'
 import { getActiveUserId, getDatabase, hydrateStores } from '../persistence'
 import type {
@@ -10,7 +10,6 @@ import type {
   NoteRecord,
   PlaylistRecord,
   SessionRecord,
-  SetlistRecord,
   SongRecord,
 } from '../persistence'
 import { usePlayerStore } from '../../player'
@@ -148,12 +147,6 @@ async function readLocalTable(table: SyncTable): Promise<SyncRecord[]> {
       const rows = await db.lyrics.where('userId').equals(userId).toArray()
       return rows.map((row) =>
         mapRow(row as unknown as Record<string, unknown>, row.trackId, row.updatedAt),
-      )
-    }
-    case 'setlists': {
-      const rows = await db.setlists.where('userId').equals(userId).toArray()
-      return rows.map((row) =>
-        mapRow(row as unknown as Record<string, unknown>, row.id, row.updatedAt),
       )
     }
     case 'notes': {
@@ -319,19 +312,6 @@ async function applyPlans(
         await db.lyrics.bulkPut(
           plan.toApplyLocal.map((record) =>
             rowFromPayload<LyricsRecord>('lyrics', record.payload, userId),
-          ),
-        )
-      },
-    ],
-    [
-      'setlists',
-      async () => {
-        const plan = plans.get('setlists')
-        if (plan === undefined) return
-        await db.setlists.bulkDelete(plan.toDeleteLocal)
-        await db.setlists.bulkPut(
-          plan.toApplyLocal.map((record) =>
-            rowFromPayload<SetlistRecord>('setlists', record.payload, userId),
           ),
         )
       },
@@ -548,7 +528,6 @@ export function startCloudSync(nextUid: string, nextBackend: CloudBackend): Prom
     usePlaylistsStore,
     useTrackAnalysisStore,
     useChordStore,
-    useSetlistStore,
     useNotesStore,
     useLocalLyricsStore,
     usePlayerStore,

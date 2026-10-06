@@ -22,11 +22,21 @@ export async function listOutputDevices(): Promise<OutputDevice[]> {
 
   try {
     const devices = await navigator.mediaDevices.enumerateDevices()
-    return devices
+    const outputs = devices
       .filter((device) => device.kind === 'audiooutput')
-      .map((device) => ({ id: device.deviceId, label: device.label }))
+      .map((device) => ({
+        id: device.deviceId === '' ? 'default' : device.deviceId,
+        label: device.label,
+      }))
+
+    // Garantiza que siempre haya una opción (aunque falten permisos/labels).
+    if (outputs.length === 0) {
+      return [{ id: 'default', label: '' }]
+    }
+
+    return outputs
   } catch {
-    return []
+    return [{ id: 'default', label: '' }]
   }
 }
 

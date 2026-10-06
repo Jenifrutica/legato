@@ -7,7 +7,6 @@ export type {
   NoteRecord,
   PlaylistRecord,
   SessionRecord,
-  SetlistRecord,
   SongRecord,
   UserRecord,
 } from './db'
@@ -27,7 +26,6 @@ export {
   syncLyrics,
   syncNotes,
   syncPlaylists,
-  syncSetlists,
   syncSongs,
   wipeLocalData,
 } from './persistence'
