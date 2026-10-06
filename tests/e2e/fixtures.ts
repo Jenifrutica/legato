@@ -46,7 +46,8 @@ export async function registerAndEnter(
   await page.getByLabel('Correo').fill(email)
   await page.getByLabel('Contraseña').fill(password)
   await page.locator('form').getByRole('button', { name: 'Crear cuenta' }).click()
-  await expect(page.getByRole('tab', { name: 'Biblioteca' })).toBeVisible({ timeout: 15_000 })
+  // Señal estable en móvil y escritorio: el título de la app en la barra superior.
+  await expect(page.getByRole('heading', { name: 'Legato' })).toBeVisible({ timeout: 15_000 })
 }
 
 export async function createPlaylist(page: Page, name: string): Promise<void> {

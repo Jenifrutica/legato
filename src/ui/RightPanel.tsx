@@ -38,17 +38,7 @@ import { AudioQualityPanel } from './AudioQualityPanel'
 import { LibraryPanel } from './LibraryPanel'
 import { PlaylistPicker } from './PlaylistPicker'
 import { CopyIcon, GripIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from './icons'
-
-const TAB_KEYS = {
-  library: 'tabs.library',
-  search: 'tabs.search',
-  playlists: 'tabs.playlists',
-  queue: 'tabs.queue',
-  audio: 'tabs.audio',
-} as const
-
-type Tab = keyof typeof TAB_KEYS
-const TABS: Tab[] = ['library', 'search', 'playlists', 'queue', 'audio']
+import { PANEL_TAB_KEYS as TAB_KEYS, PANEL_TABS as TABS, usePanelTabStore } from './panel-tabs'
 
 function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const { t } = useTranslation()
@@ -701,7 +691,8 @@ function QueueTab() {
 
 export function RightPanel() {
   const { t } = useTranslation()
-  const [tab, setTab] = useState<Tab>('library')
+  const tab = usePanelTabStore((state) => state.tab)
+  const setTab = usePanelTabStore((state) => state.setTab)
   const [queueDragOver, setQueueDragOver] = useState(false)
   const [playlistsDragOver, setPlaylistsDragOver] = useState(false)
   const selectPlaylist = usePlaylistsStore((state) => state.selectPlaylist)
@@ -714,10 +705,13 @@ export function RightPanel() {
   }
 
   return (
-    <aside className="relative z-20 flex min-h-0 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0">
+    <aside
+      className="relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0"
+      id="panel-principal"
+    >
       <div
         aria-label={t('tabs.label')}
-        className="flex flex-wrap items-center gap-1 gap-y-1 border-b-2 border-rule px-3 py-2"
+        className="hidden flex-wrap items-center gap-1 gap-y-1 border-b-2 border-rule px-3 py-2 lg:flex"
         role="tablist"
       >
         {TABS.map((candidate) => {
