@@ -281,3 +281,38 @@ export function MoonIcon({ className }: IconProps) {
     </Icon>
   )
 }
+
+export function PlayFillIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  )
+}
+
+export function PauseFillIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
+      <rect height="14" width="4" x="6" y="5" />
+      <rect height="14" width="4" x="14" y="5" />
+    </svg>
+  )
+}
+
+export function SkipBackFillIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
+      <rect height="14" width="3" x="5" y="5" />
+      <path d="M20 5v14l-10-7z" />
+    </svg>
+  )
+}
+
+export function SkipForwardFillIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M4 5v14l10-7z" />
+      <rect height="14" width="3" x="16" y="5" />
+    </svg>
+  )
+}

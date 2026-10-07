@@ -18,10 +18,10 @@
   --color-primary-strong: #000000;
   --color-primary-soft: #e7e1d3;
   --color-on-primary: #fbf8f1;
-  --color-accent: #e14a1f;
-  --color-accent-ink: #b23a12;
-  --color-accent-soft: #fbe0d6;
-  --color-on-accent: #13100c;
+  --color-accent: #a54f31;
+  --color-accent-ink: #7c3a20;
+  --color-accent-soft: #ecd9cf;
+  --color-on-accent: #ffffff;
   --color-success: #2f7d4f;
   --color-danger: #c62828;
 
@@ -131,6 +131,17 @@
     position: relative;
     overflow: hidden;
     height: calc(var(--disc) * 0.62);
+    transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* "Ver completo": el disco baja y se ve la circunferencia entera */
+  .disc-zone.is-expanded {
+    height: var(--disc);
+  }
+
+  .disc-zone.is-expanded .disc-wrap,
+  .disc-zone.is-expanded .disc-field {
+    top: 0;
   }
 
   .disc-field {
@@ -142,6 +153,7 @@
     transform: translateX(-50%);
     background: var(--color-accent);
     box-shadow: 8px 8px 0 var(--color-rule);
+    transition: top 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .disc-wrap {
@@ -151,6 +163,7 @@
     width: var(--disc);
     height: var(--disc);
     transform: translateX(-50%);
+    transition: top 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .disc-plate {
@@ -382,4 +395,57 @@ html.a11y-large-controls input[type='range']::-webkit-slider-thumb {
   width: 26px;
   height: 26px;
   margin-top: -7px;
+}
+
+/* Animación de Legui (mascota): flotar suave. Solo movimiento, no estilo. */
+@keyframes legui-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+.animate-legui-bob {
+  animation: legui-bob 3.6s ease-in-out infinite;
+}
+
+/* Legui cae y se acomoda en la esquina al llegar a la sección del vinilo. */
+@keyframes legui-fall {
+  0% {
+    transform: translateY(-170px) rotate(-16deg);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(14px) rotate(6deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-legui-fall {
+  animation: legui-fall 1s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+/* Cae y luego se queda flotando en la esquina. */
+.animate-legui-drop {
+  animation:
+    legui-fall 0.9s cubic-bezier(0.2, 0.9, 0.2, 1) both,
+    legui-bob 3.6s 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-legui-bob,
+  .animate-legui-fall,
+  .animate-legui-drop {
+    animation: none;
+  }
 }

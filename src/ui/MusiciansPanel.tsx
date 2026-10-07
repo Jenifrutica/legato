@@ -6,7 +6,7 @@ import { useMusicianStore } from '../features/musician'
 import { usePlayerStore } from '../player'
 import { ChordsPanel } from './ChordsPanel'
 import { XIcon } from './icons'
-import { useMusiciansPanelStore } from './panel-tabs'
+import { useMusiciansPanelStore, usePanelVisibilityStore } from './panel-tabs'
 import { MetronomePanel } from './MetronomePanel'
 import { NotesPanel } from './NotesPanel'
 import { StructureView } from './StructureView'
@@ -48,6 +48,10 @@ export function MusiciansPanel() {
   const saved = useRef(readSaved())
   const open = useMusiciansPanelStore((state) => state.open)
   const setOpen = useMusiciansPanelStore((state) => state.setOpen)
+  const collapsed = usePanelVisibilityStore((state) => state.collapsed)
+  const toggleCollapsed = usePanelVisibilityStore((state) => state.toggle)
+  // La "costura" del panel: a 25/27rem cuando está abierto; al borde si está plegado.
+  const seamRight = collapsed ? 'lg:right-0' : 'lg:right-[25rem] xl:right-[27rem]'
   const [tabTop, setTabTop] = useState(saved.current.top)
   const drag = useRef<{ startY: number; startTop: number; moved: boolean } | null>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -124,18 +128,42 @@ export function MusiciansPanel() {
 
   return (
     <>
-      <button
-        aria-expanded={open}
-        className="fixed right-0 z-40 hidden cursor-grab border-2 border-r-0 border-rule bg-surface px-1.5 py-4 font-mono text-[0.6875rem] tracking-[0.24em] text-ink uppercase shadow-[-3px_3px_0_var(--color-rule)] select-none active:cursor-grabbing lg:right-[25rem] lg:block xl:right-[27rem]"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        style={{ top: tabTop, writingMode: 'vertical-rl', touchAction: 'none' }}
-        title={t('structure.region')}
-        type="button"
-      >
-        {t('playlists.structure')}
-      </button>
+      <div className={`fixed z-40 hidden flex-col lg:flex ${seamRight}`} style={{ top: tabTop }}>
+        <button
+          aria-expanded={open}
+          className="cursor-grab border-2 border-r-0 border-rule bg-surface px-2 py-4 font-mono text-[0.6875rem] tracking-[0.24em] text-ink uppercase shadow-[-3px_3px_0_var(--color-rule)] select-none active:cursor-grabbing"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          style={{ writingMode: 'vertical-rl', touchAction: 'none' }}
+          title={t('structure.region')}
+          type="button"
+        >
+          {t('playlists.structure')}
+        </button>
+
+        <button
+          aria-label={collapsed ? t('panel.show') : t('panel.hide')}
+          className="grid cursor-pointer place-items-center border-2 border-t-0 border-r-0 border-rule bg-surface px-2 py-2 text-ink transition-colors hover:bg-accent-soft"
+          onClick={toggleCollapsed}
+          style={{ touchAction: 'none' }}
+          title={collapsed ? t('panel.show') : t('panel.hide')}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            {collapsed ? <path d="m9 6 6 6-6 6" /> : <path d="m15 6-6 6 6 6" />}
+          </svg>
+        </button>
+      </div>
 
       {open && (
         <div

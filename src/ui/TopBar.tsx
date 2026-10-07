@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { A11yPanel, useA11yStore } from '../features/a11y'
-import { AccountChip } from '../features/auth'
+import { AccountChip, AccountMenu } from '../features/auth'
 import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import { SettingsPanel } from '../features/sources'
 import { useThemeStore } from '../features/theme'
-import { AccessibilityIcon, DiscMark, MoonIcon, SettingsIcon, SunIcon, TimerIcon } from './icons'
+import { AccessibilityIcon, MoonIcon, SettingsIcon, SunIcon, TimerIcon } from './icons'
+import { LegatoLogo } from './Legui'
 import { useMusiciansPanelStore } from './panel-tabs'
 
 export function TopBar() {
@@ -50,27 +51,31 @@ export function TopBar() {
     playlists.find((playlist) => playlist.id === selectedPlaylistId)?.name ?? t('nav.library')
 
   return (
-    <header className="sticky top-0 z-30 border-b-2 border-rule bg-ink text-bg">
+    <header className="sticky top-0 z-30 border-b-2 border-rule bg-surface text-ink">
       <div className="mx-auto flex max-w-[110rem] items-center gap-3 px-4 py-2.5 sm:px-6">
-        <span className="grid size-9 place-items-center border-2 border-bg/25 bg-accent text-on-accent">
-          <DiscMark className="size-5" />
-        </span>
-        <h1 className="font-display text-xl font-black tracking-[0.08em] uppercase">Legato</h1>
+        <h1
+          aria-label="Legato"
+          className={`flex shrink-0 items-center ${
+            themeMode === 'dark' ? 'border-2 border-rule bg-[#f6f2ea] px-2 py-0.5' : ''
+          }`}
+        >
+          <LegatoLogo className="h-7 w-auto" />
+        </h1>
 
-        <span aria-hidden="true" className="mx-1 hidden h-6 w-0.5 bg-bg/25 sm:block" />
+        <span aria-hidden="true" className="mx-1 hidden h-6 w-0.5 bg-rule/20 sm:block" />
 
         <div className="relative hidden sm:block" ref={collectionRef}>
           <button
             aria-expanded={collectionOpen}
             aria-haspopup="listbox"
             aria-label={t('topbar.collection')}
-            className="flex max-w-52 cursor-pointer items-center gap-2 border-2 border-bg/40 bg-transparent py-1.5 pr-2.5 pl-3 text-sm font-semibold text-bg focus:border-accent focus:outline-none"
+            className="flex max-w-52 cursor-pointer items-center gap-2 border-2 border-rule/50 bg-transparent py-1.5 pr-2.5 pl-3 text-sm font-semibold text-ink transition-colors hover:border-accent focus:border-accent focus:outline-none"
             onClick={() => setCollectionOpen((value) => !value)}
             title={currentCollectionName}
             type="button"
           >
             <span className="truncate">{currentCollectionName}</span>
-            <span aria-hidden="true" className="font-mono text-xs text-bg/70">
+            <span aria-hidden="true" className="font-mono text-xs text-ink-muted">
               ▾
             </span>
           </button>
@@ -122,11 +127,11 @@ export function TopBar() {
 
         <span
           aria-hidden="true"
-          className="ml-auto size-3 border border-bg/50 bg-accent transition-colors duration-300"
+          className="ml-auto size-3 border border-rule/50 bg-accent transition-colors duration-300"
         />
         <button
           aria-label={t('musician.title')}
-          className="p-2 text-bg/70 transition-colors hover:text-bg"
+          className="p-2 text-ink-muted transition-colors hover:text-ink"
           onClick={() => openMusicians(true)}
           type="button"
         >
@@ -134,7 +139,7 @@ export function TopBar() {
         </button>
         <button
           aria-label={t('a11y.title')}
-          className="p-2 text-bg/70 transition-colors hover:text-bg"
+          className="p-2 text-ink-muted transition-colors hover:text-ink"
           onClick={openA11yPanel}
           type="button"
         >
@@ -142,7 +147,7 @@ export function TopBar() {
         </button>
         <button
           aria-label={t('theme.toggle')}
-          className="p-2 text-bg/70 transition-colors hover:text-bg"
+          className="p-2 text-ink-muted transition-colors hover:text-ink"
           onClick={toggleTheme}
           type="button"
         >
@@ -150,15 +155,18 @@ export function TopBar() {
         </button>
         <button
           aria-label={t('settings.title')}
-          className="p-2 text-bg/70 transition-colors hover:text-bg"
+          className="p-2 text-ink-muted transition-colors hover:text-ink"
           onClick={() => setSettingsOpen(true)}
           type="button"
         >
           <SettingsIcon className="size-5" />
         </button>
-        <LanguageSelector compact onDark />
+        <LanguageSelector compact />
         <div className="hidden min-w-0 max-w-44 sm:block">
           <AccountChip />
+        </div>
+        <div className="sm:hidden">
+          <AccountMenu />
         </div>
       </div>
       <A11yPanel />

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { LeguiSticker } from '../../ui/Legui'
 import { useConsentStore } from './consent-store'
 
 export function CookieConsent() {
@@ -22,7 +23,15 @@ export function CookieConsent() {
           className="fixed inset-x-3 bottom-28 z-40 mx-auto max-w-3xl  border border-border bg-surface p-4 shadow-soft lg:bottom-24"
           role="region"
         >
-          <p className="text-sm text-ink">{t('cookies.message')}</p>
+          <div className="flex items-start gap-3">
+            <LeguiSticker className="size-12" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-ink">{t('cookies.message')}</p>
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+                {t('legui.cookiesText')}
+              </p>
+            </div>
+          </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <button
               className=" bg-primary-strong px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"

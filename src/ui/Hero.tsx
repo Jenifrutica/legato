@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useState } from 'react'
+import { useVideoPrefs } from './video-prefs'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '../features/library'
 import { isExternalTrack, useSpotifyStore } from '../features/sources'
@@ -7,8 +7,9 @@ import { usePlayerStore } from '../player'
 import { PracticePanel } from './PracticePanel'
 import { TimerPanel } from './TimerPanel'
 import { TransportButton } from './TransportButton'
-import { VideoOverlay } from './VideoOverlay'
+import { DiscStage } from './DiscStage'
 import { VinylVisual } from './VinylVisual'
+import { LeguiBubble } from './Legui'
 import { activeLineIndex, useLyrics, useLyricsStore } from '../features/lyrics'
 import { Lyrics, useDemoLyrics } from './Lyrics'
 import { QueueStrip } from './QueueStrip'
@@ -54,12 +55,11 @@ export function Hero() {
   const spotifyPrevious = useSpotifyStore((state) => state.previous)
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
-  const [videoOpen, setVideoOpen] = useState(false)
+  const [discExpanded, setDiscExpanded] = useState(false)
+  const [stageMode, setStageMode] = useState<'full' | 'disc' | null>(null)
+  const videoInDisc = useVideoPrefs((state) => state.inDisc)
+  const toggleVideo = useVideoPrefs((state) => state.toggle)
   const demoLyrics = useDemoLyrics()
-
-  useEffect(() => {
-    setVideoOpen(false)
-  }, [currentTrack?.id])
 
   const externalCurrent = isExternalTrack(currentTrack)
   const spotifyActive = spotifyPlayback !== null && (currentTrack === null || externalCurrent)
@@ -157,9 +157,13 @@ export function Hero() {
       </div>
 
       <div className="relative mx-auto flex w-full max-w-[110rem] flex-col lg:flex-1">
-        <VinylVisual />
+        <VinylVisual expanded={discExpanded} />
 
-        <div className="mt-8 flex max-w-3xl flex-col lg:mt-10 lg:flex-1">
+        <div
+          className={`mt-8 flex max-w-3xl flex-col lg:mt-10 lg:flex-1 ${
+            discExpanded ? 'lg:mx-auto lg:items-center lg:text-center' : ''
+          }`}
+        >
           <h1 className="font-display text-[clamp(2.6rem,7.5vw,5.5rem)] leading-[0.9] font-black tracking-[-0.01em] uppercase">
             {titleTail !== null && <span className="u-display block">{titleHead}</span>}
             <span
@@ -174,9 +178,9 @@ export function Hero() {
           </p>
 
           {playerError !== null && (
-            <p className="mt-4 border-2 border-danger bg-surface px-3 py-2 text-xs text-ink">
-              {playerError}
-            </p>
+            <LeguiBubble bubbleClassName="mt-4 border-danger text-xs" size="size-10">
+              <b>{t('legui.errorPrefix')}</b> {playerError}
+            </LeguiBubble>
           )}
 
           <Lyrics lines={lyricsLines} next={lyricsNext} source={lyricsSource} />
@@ -184,7 +188,11 @@ export function Hero() {
           {lyricsLines.length === 0 && <QueueStrip />}
 
           <div className="lg:mt-auto lg:pt-4">
-            <div className="mt-8 hidden items-center gap-3 lg:flex">
+            <div
+              className={`mt-8 hidden items-center gap-3 lg:flex ${
+                discExpanded ? 'lg:justify-center' : ''
+              }`}
+            >
               <span className="w-10 text-right font-mono text-[0.6875rem] text-ink-muted">
                 {formatDuration(progressTime)}
               </span>
@@ -211,7 +219,11 @@ export function Hero() {
               </span>
             </div>
 
-            <div className="mt-5 hidden flex-wrap items-center gap-3 lg:flex">
+            <div
+              className={`mt-5 hidden flex-wrap items-center gap-3 lg:flex ${
+                discExpanded ? 'lg:justify-center' : ''
+              }`}
+            >
               <TransportButton
                 disabled={!hasPlayable}
                 icon={<ShuffleIcon className="size-4" />}
@@ -331,30 +343,69 @@ export function Hero() {
 
               {currentTrack?.mediaType === 'video' && (
                 <button
-                  aria-pressed={videoOpen}
+                  aria-pressed={videoInDisc}
                   className={`h-11 border-2 border-rule px-3 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-transform hover:-translate-y-0.5 ${
-                    videoOpen
+                    videoInDisc
                       ? 'bg-accent text-on-accent shadow-[3px_3px_0_var(--color-rule)]'
                       : 'bg-surface text-ink-muted'
                   }`}
-                  onClick={() => setVideoOpen((value) => !value)}
+                  onClick={toggleVideo}
                   type="button"
                 >
-                  {videoOpen ? t('player.hideVideo') : t('player.showVideo')}
+                  {videoInDisc ? t('player.hideVideo') : t('player.showVideo')}
                 </button>
               )}
+
+              {currentTrack !== null && isExternalTrack(currentTrack) && (
+                <button
+                  className="h-11 border-2 border-rule bg-surface px-3 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-transform hover:-translate-y-0.5 hover:text-ink"
+                  onClick={() => {
+                    const url = currentTrack.sourceUrl.replace(
+                      'spotify:track:',
+                      'https://open.spotify.com/track/',
+                    )
+                    window.open(url, '_blank', 'noopener')
+                  }}
+                  type="button"
+                >
+                  {t('spotify.openInApp')}
+                </button>
+              )}
+
+              <span aria-hidden="true" className="mx-1 h-8 w-0.5 bg-rule/20" />
+
+              <button
+                aria-pressed={discExpanded}
+                className={`h-11 border-2 border-rule px-3 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-transform hover:-translate-y-0.5 ${
+                  discExpanded
+                    ? 'bg-accent text-on-accent shadow-[3px_3px_0_var(--color-rule)]'
+                    : 'bg-surface text-ink-muted'
+                }`}
+                onClick={() => setDiscExpanded((value) => !value)}
+                type="button"
+              >
+                {t('player.viewFull')}
+              </button>
+              <button
+                className="h-11 border-2 border-rule bg-surface px-3 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-transform hover:-translate-y-0.5 hover:text-ink"
+                onClick={() => setStageMode('full')}
+                type="button"
+              >
+                {t('player.fullscreen')}
+              </button>
+              <button
+                className="h-11 border-2 border-rule bg-surface px-3 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-transform hover:-translate-y-0.5 hover:text-ink"
+                onClick={() => setStageMode('disc')}
+                type="button"
+              >
+                {t('player.discOnly')}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {videoOpen &&
-        currentTrack !== null &&
-        currentTrack.mediaType === 'video' &&
-        createPortal(
-          <VideoOverlay onClose={() => setVideoOpen(false)} src={currentTrack.sourceUrl} />,
-          document.body,
-        )}
+      {stageMode !== null && <DiscStage mode={stageMode} onClose={() => setStageMode(null)} />}
     </section>
   )
 }

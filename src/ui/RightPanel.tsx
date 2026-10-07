@@ -35,6 +35,7 @@ import type { SourceTrack, SpotifyPlaylistSummary } from '../features/sources'
 import { usePlayerStore } from '../player'
 import type { QueueTrack } from '../player'
 import { AudioQualityPanel } from './AudioQualityPanel'
+import { LeguiBubble } from './Legui'
 import { LibraryPanel } from './LibraryPanel'
 import { PlaylistPicker } from './PlaylistPicker'
 import { CopyIcon, GripIcon, PencilIcon, PlusIcon, TrashIcon, XIcon } from './icons'
@@ -319,6 +320,10 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
               </li>
             ))}
           </ul>
+
+          <LeguiBubble bubbleClassName="mt-3 text-[0.6875rem]" size="size-10">
+            {t('legui.spotifyImportHint', { email: 'jenifer.urbano@campusucc.edu.co' })}
+          </LeguiBubble>
 
           <p className="mt-3 border-t border-border pt-2 text-[0.6875rem] leading-relaxed text-ink-muted">
             {t('spotify.requestAccess')}
@@ -689,7 +694,7 @@ function QueueTab() {
   )
 }
 
-export function RightPanel() {
+export function RightPanel({ collapsed = false }: { collapsed?: boolean }) {
   const { t } = useTranslation()
   const tab = usePanelTabStore((state) => state.tab)
   const setTab = usePanelTabStore((state) => state.setTab)
@@ -706,7 +711,9 @@ export function RightPanel() {
 
   return (
     <aside
-      className="relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0"
+      className={`relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0 ${
+        collapsed ? 'lg:hidden' : ''
+      }`}
       id="panel-principal"
     >
       <div

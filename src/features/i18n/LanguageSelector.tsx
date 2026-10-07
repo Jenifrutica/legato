@@ -21,10 +21,10 @@ export function LanguageSelector({
   return (
     <select
       aria-label={t('language.label')}
-      className={`cursor-pointer appearance-none border-2 bg-transparent px-2.5 py-1 text-xs font-semibold transition-colors focus:border-accent focus:outline-none ${
+      className={`cursor-pointer appearance-none border-2 px-2.5 py-1 text-xs font-bold transition-colors focus:border-accent focus:outline-none ${
         onDark
-          ? 'border-bg/40 text-bg hover:border-bg/70'
-          : 'border-ink/40 text-ink hover:border-ink/70'
+          ? 'border-bg/40 bg-transparent text-bg hover:border-bg/70'
+          : 'border-rule/60 bg-bg text-ink hover:border-accent'
       }`}
       onChange={(event) => setLanguage(event.target.value as Language)}
       value={i18n.language}

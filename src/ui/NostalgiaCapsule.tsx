@@ -34,7 +34,7 @@ export function NostalgiaCapsule() {
   const [open, setOpen] = useState(false)
   const [session, setSession] = useState<NostalgiaCapsuleData | null>(null)
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [savedId, setSavedId] = useState<string | null>(null)
   const startedAt = useRef(0)
@@ -61,7 +61,7 @@ export function NostalgiaCapsule() {
   const close = useCallback(() => {
     setOpen(false)
     setSession(null)
-    setPaused(false)
+    setPlaying(false)
     usePlayerStore.getState().pause()
   }, [])
 
@@ -87,9 +87,10 @@ export function NostalgiaCapsule() {
     }
   }, [close, goTo, index, slides.length])
 
-  // Fragmento: al abrir o cambiar de tarjeta, suena desde el segundo elegido.
+  // El fragmento suena SOLO cuando el usuario lo pide con un botón: nada
+  // se reproduce de forma automática al abrir (ni al cambiar de tarjeta).
   useEffect(() => {
-    if (!open || slide === null || tracks.length === 0) {
+    if (!open || !playing || slide === null || tracks.length === 0) {
       return
     }
 
@@ -103,11 +104,11 @@ export function NostalgiaCapsule() {
 
     return () => window.clearTimeout(seekTimer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, slide?.trackId, tracks.length])
+  }, [open, playing, slide?.trackId, tracks.length])
 
-  // Temporizador de 15 s por tarjeta.
+  // Temporizador de 15 s por tarjeta (solo mientras se está reproduciendo).
   useEffect(() => {
-    if (!open || paused || slide === null) {
+    if (!open || !playing || slide === null) {
       return
     }
 
@@ -120,9 +121,22 @@ export function NostalgiaCapsule() {
     }, 120)
 
     return () => window.clearInterval(interval)
-  }, [advance, open, paused, slide])
+  }, [advance, open, playing, slide])
 
-  // Teclado del visor: Esc cierra, flechas navegan, espacio pausa.
+  const togglePlaying = useCallback(() => {
+    setPlaying((value) => {
+      const next = !value
+      if (!next) {
+        usePlayerStore.getState().pause()
+      } else {
+        startedAt.current = performance.now()
+        setElapsed(0)
+      }
+      return next
+    })
+  }, [])
+
+  // Teclado del visor: Esc cierra, flechas navegan, espacio reproduce/pausa.
   useEffect(() => {
     if (!open) {
       return
@@ -137,26 +151,13 @@ export function NostalgiaCapsule() {
         goTo(index + 1)
       } else if (event.key === ' ') {
         event.preventDefault()
-        setPaused((value) => !value)
+        togglePlaying()
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [close, goTo, index, open])
-
-  function togglePaused() {
-    setPaused((value) => {
-      const next = !value
-      if (next) {
-        usePlayerStore.getState().pause()
-      } else {
-        startedAt.current = performance.now() - elapsed
-        void usePlayerStore.getState().toggle()
-      }
-      return next
-    })
-  }
+  }, [close, goTo, index, open, togglePlaying])
 
   function playFull() {
     if (slide === null) {
@@ -253,25 +254,7 @@ export function NostalgiaCapsule() {
                     {t('capsule.empty')}
                   </p>
                 ) : (
-                  <article
-                    className="w-full max-w-md border-2 border-rule bg-surface text-ink shadow-[8px_8px_0_var(--color-rule)]"
-                    onPointerDown={() => {
-                      if (!paused) {
-                        setPaused(true)
-                        usePlayerStore.getState().pause()
-                      }
-                    }}
-                    onPointerLeave={() => {
-                      if (paused) {
-                        togglePaused()
-                      }
-                    }}
-                    onPointerUp={() => {
-                      if (paused) {
-                        togglePaused()
-                      }
-                    }}
-                  >
+                  <article className="w-full max-w-md border-2 border-rule bg-surface text-ink shadow-[8px_8px_0_var(--color-rule)]">
                     <div className="relative aspect-square w-full overflow-hidden border-b-2 border-rule bg-surface-2">
                       {slide.artworkUrl !== null ? (
                         <img
@@ -347,13 +330,13 @@ export function NostalgiaCapsule() {
                   <SkipBackIcon className="size-5" />
                 </button>
                 <button
-                  aria-label={paused ? t('capsule.resume') : t('capsule.pause')}
+                  aria-label={playing ? t('capsule.pause') : t('capsule.play')}
                   className="border-2 border-bg/60 bg-accent p-3 text-on-accent disabled:opacity-40"
                   disabled={total === 0}
-                  onClick={togglePaused}
+                  onClick={togglePlaying}
                   type="button"
                 >
-                  {paused ? <PlayIcon className="size-5" /> : <PauseIcon className="size-5" />}
+                  {playing ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
                 </button>
                 <button
                   aria-label={t('capsule.next')}

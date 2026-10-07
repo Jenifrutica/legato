@@ -408,7 +408,7 @@ export function LibraryPanel() {
                 {isImporting ? t('library.importing') : t('library.import')}
               </button>
               <input
-                accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus"
+                accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus,.mp4,.m4v,.mov"
                 aria-label={t('library.import')}
                 className="sr-only"
                 multiple
