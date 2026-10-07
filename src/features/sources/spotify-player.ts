@@ -17,6 +17,8 @@ export type SpotifyBridge = {
   seek: (positionMs: number) => Promise<void>
   setVolume: (value: number) => Promise<void>
   getState: () => Promise<SpotifyPlaybackState | null>
+  /** Desbloquea el audio en iOS: debe llamarse dentro de un gesto del usuario. */
+  activateElement: () => Promise<void>
 }
 
 type SdkTrack = {
@@ -39,6 +41,7 @@ type SdkPlayer = {
   addListener: (event: string, callback: (payload: unknown) => void) => void
   getCurrentState: () => Promise<SdkState | null>
   setVolume: (value: number) => Promise<void>
+  activateElement?: () => Promise<void>
 }
 
 declare global {
@@ -92,6 +95,7 @@ function toPlaybackState(state: SdkState | null): SpotifyPlaybackState | null {
 export async function createSpotifyBridge(options: {
   getToken: () => Promise<string | null>
   onState: (state: SpotifyPlaybackState | null) => void
+  onAutoplayFailed?: () => void
 }): Promise<{ bridge: SpotifyBridge; deviceId: string; disconnect: () => void }> {
   await loadSpotifySdk()
   const sdk = window.Spotify
@@ -124,6 +128,11 @@ export async function createSpotifyBridge(options: {
 
   player.addListener('player_state_changed', (payload) => {
     options.onState(toPlaybackState(payload as SdkState | null))
+  })
+
+  // iOS: el navegador puede bloquear el arranque del audio.
+  player.addListener('autoplay_failed', () => {
+    options.onAutoplayFailed?.()
   })
 
   const api = async (path: string, init?: RequestInit): Promise<void> => {
@@ -160,6 +169,12 @@ export async function createSpotifyBridge(options: {
       api(`/me/player/seek?position_ms=${Math.max(0, Math.round(positionMs))}`, { method: 'PUT' }),
     setVolume: (value) => player.setVolume(Math.min(1, Math.max(0, value))),
     getState: async () => toPlaybackState(await player.getCurrentState()),
+    activateElement: async () => {
+      // Solo existe en SDK recientes; desbloquea el audio en iOS.
+      if (player.activateElement !== undefined) {
+        await player.activateElement()
+      }
+    },
   }
 
   return { bridge, deviceId, disconnect: () => player.disconnect() }
