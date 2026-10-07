@@ -13,6 +13,11 @@ import { StructureView } from './StructureView'
 import { TrackAnalysisPanel } from './TrackAnalysisPanel'
 
 const STORAGE_KEY = 'legato.musicians'
+// Posición heredada por defecto (antes 420); se migra a la nueva para que la
+// pestaña baje aunque ya hubiera un valor guardado sin haberla arrastrado.
+const LEGACY_DEFAULT_TOP = 420
+const DEFAULT_TOP =
+  typeof window === 'undefined' ? LEGACY_DEFAULT_TOP : Math.round(window.innerHeight * 0.62)
 
 type SavedState = {
   open: boolean
@@ -21,7 +26,7 @@ type SavedState = {
 
 function readSaved(): SavedState {
   if (typeof localStorage === 'undefined') {
-    return { open: false, top: 420 }
+    return { open: false, top: DEFAULT_TOP }
   }
 
   try {
@@ -29,13 +34,14 @@ function readSaved(): SavedState {
     if (raw !== null) {
       const parsed = JSON.parse(raw) as Partial<SavedState>
       const top = Number(parsed.top)
-      return { open: parsed.open === true, top: Number.isFinite(top) ? top : 420 }
+      const valid = Number.isFinite(top) && top !== LEGACY_DEFAULT_TOP
+      return { open: parsed.open === true, top: valid ? top : DEFAULT_TOP }
     }
   } catch {
     // ignorar almacenamiento no disponible
   }
 
-  return { open: false, top: 420 }
+  return { open: false, top: DEFAULT_TOP }
 }
 
 /**
