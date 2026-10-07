@@ -4,9 +4,11 @@ import { getMicAnalyser, useMicStore, useTrackAnalysisStore } from '../features/
 import { isExternalTrack, useSpotifyStore } from '../features/sources'
 import { getAnalyser, usePlayerStore } from '../player'
 import { DiscMark } from './icons'
+import { DiscVideo } from './DiscVideo'
+import { useVideoPrefs } from './video-prefs'
 import { WaveRing } from './WaveRing'
 
-export function VinylVisual() {
+export function VinylVisual({ expanded = false }: { expanded?: boolean }) {
   const { t } = useTranslation()
   const currentTrack = usePlayerStore((state) => state.currentTrack)
   const status = usePlayerStore((state) => state.status)
@@ -15,6 +17,7 @@ export function VinylVisual() {
   const toggle = usePlayerStore((state) => state.toggle)
   const spotifyPlayback = useSpotifyStore((state) => state.playback)
   const spotifyToggle = useSpotifyStore((state) => state.toggle)
+  const videoInDisc = useVideoPrefs((state) => state.inDisc)
   const trackId = currentTrack?.id ?? null
   const analysis = useTrackAnalysisStore((state) =>
     trackId === null ? null : (state.records[trackId] ?? null),
@@ -27,6 +30,9 @@ export function VinylVisual() {
   const artworkUrl = spotifyActive ? spotifyPlayback.artworkUrl : (currentTrack?.artworkUrl ?? null)
   const title = spotifyActive ? spotifyPlayback.title : (currentTrack?.title ?? '')
   const hasTrack = spotifyActive || currentTrack !== null
+  // Para mp4 el disco queda estático y el video se reproduce dentro.
+  const isVideo = !spotifyActive && currentTrack?.mediaType === 'video'
+  const showVideo = isVideo && videoInDisc && currentTrack !== null
 
   const nodeIndex =
     currentTrack === null ? -1 : queue.findIndex((item) => item.id === currentTrack.id)
@@ -42,7 +48,10 @@ export function VinylVisual() {
 
   return (
     <section aria-label={t('vinyl.region')} className="relative">
-      <div className="disc-zone" style={{ '--disc': 'min(46rem, 80vw, 72dvh)' } as CSSProperties}>
+      <div
+        className={`disc-zone${expanded ? ' is-expanded' : ''}`}
+        style={{ '--disc': 'min(46rem, 80vw, 72dvh)' } as CSSProperties}
+      >
         <span aria-hidden="true" className="disc-field" />
 
         <div className="disc-wrap">
@@ -58,9 +67,14 @@ export function VinylVisual() {
 
           <div
             className="disc-plate motion-reduce:animate-none"
-            style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}
+            style={{
+              animation: isVideo ? 'none' : 'legato-disc 6s linear infinite',
+              animationPlayState: isPlaying && !isVideo ? 'running' : 'paused',
+            }}
           >
-            {artworkUrl !== null ? (
+            {showVideo ? (
+              <DiscVideo src={currentTrack.sourceUrl} />
+            ) : artworkUrl !== null ? (
               <img
                 alt={t('vinyl.coverAlt', { title })}
                 className="absolute inset-0 size-full object-cover"
@@ -72,7 +86,7 @@ export function VinylVisual() {
               </span>
             )}
             <span aria-hidden="true" className="disc-grooves" />
-            {artworkUrl === null && (
+            {!showVideo && artworkUrl === null && (
               <span className="disc-label">
                 <b className="font-mono text-[0.6875rem] tracking-[0.14em]">{nodeCode}</b>
               </span>

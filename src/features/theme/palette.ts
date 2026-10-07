@@ -139,6 +139,69 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   })
 }
 
+/**
+ * Paleta a partir de un fotograma del video (mp4): se toma el inicio para que
+ * la interfaz se tiña como con las portadas. Si el video no es del mismo
+ * origen, el canvas queda "manchado" y se devuelve null (sin tema).
+ */
+export async function extractPaletteFromVideo(url: string): Promise<AlbumPalette | null> {
+  const key = `video:${url}`
+  const cached = cache.get(key)
+  if (cached !== undefined) {
+    return cached
+  }
+
+  try {
+    const video = document.createElement('video')
+    video.muted = true
+    video.playsInline = true
+    video.preload = 'auto'
+    video.crossOrigin = 'anonymous'
+    video.src = url
+
+    await new Promise<void>((resolve, reject) => {
+      const done = () => resolve()
+      video.addEventListener('loadeddata', done, { once: true })
+      video.addEventListener('error', () => reject(new Error('No se pudo cargar el video')), {
+        once: true,
+      })
+    })
+
+    // Un fotograma al inicio (el 0 suele ser negro).
+    const target =
+      Number.isFinite(video.duration) && video.duration > 0
+        ? Math.min(0.5, video.duration / 2)
+        : 0.1
+    const seeked = new Promise<void>((resolve) => {
+      video.addEventListener('seeked', () => resolve(), { once: true })
+      window.setTimeout(resolve, 900)
+    })
+    try {
+      video.currentTime = target
+    } catch {
+      // sin seek disponible: se usa el fotograma actual
+    }
+    await seeked
+
+    const size = 48
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    if (context === null) {
+      return null
+    }
+
+    context.drawImage(video, 0, 0, size, size)
+    const data = context.getImageData(0, 0, size, size).data
+    const palette = derivePalette(extractClusters(data))
+    cache.set(key, palette)
+    return palette
+  } catch {
+    return null
+  }
+}
+
 export function isLikelyLight(palette: AlbumPalette): boolean {
   return isLight(palette.dominant)
 }
