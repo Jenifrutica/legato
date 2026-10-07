@@ -6,12 +6,14 @@
 
 **Reproductor de música web para músicos**, construido sobre **listas doblemente enlazadas implementadas a mano**.
 
+**App en vivo:** **https://legato.jenilarper.dev**
+
 </div>
 
-> Presenta a **Legui**: la “o” de Legato convertida en un vinilo con patitas que acompaña
-> al usuario por la app (bienvenida, cookies, avisos y errores). El disco va en tinta,
-> la etiqueta en papel y los zapatitos usan la **tinta directa del álbum**, así que el
-> personaje se tiñe con la portada que suena.
+> **Legato** es el nombre oficial del proyecto. Su mascota es **Legui**: la “o” de Legato
+> convertida en un vinilo con patitas que acompaña al usuario por la app (bienvenida,
+> cookies, avisos y errores). El disco va en tinta, la etiqueta en papel y los zapatitos
+> usan la **tinta directa del álbum**, así que el personaje se tiñe con la portada que suena.
 
 Reproductor en PC y móvil, con interfaz tipo **edición musical a dos tintas**, drag & drop,
 visualizador en vivo de la estructura de datos (la Lista), herramientas para músicos y
@@ -26,6 +28,23 @@ playlists, biblioteca, herramientas de músicos, login con **Google** o invitado
 en la nube** (Firebase/Firestore) e importación de Spotify. Interfaz **Duotono 62** con la mascota
 **Legui**, landing de inicio y Spotify Connect en iPhone. El respaldo local (IndexedDB) sigue
 disponible si no hay configuración de Firebase.
+
+## Legui, la mascota
+
+**Legui** es la mascota oficial de **Legato**: un vinilo con patitas cuya cara vive en la
+etiqueta del disco. Se implementa como componente reutilizable en
+[`src/ui/Legui.tsx`](src/ui/Legui.tsx):
+
+| Componente    | Uso                                                        |
+| ------------- | ---------------------------------------------------------- |
+| `LeguiMark`   | Legui suelto (disco en tinta).                             |
+| `LeguiSticker`| Legui encerrado en un “sticker” de papel, legible sobre cualquier fondo. |
+| `LeguiBubble` | Sticker + burbuja de diálogo con **X para cerrar** el aviso. |
+| `LegatoLogo`  | Wordmark `LEGAT` + Legui como “o”.                         |
+
+Aparece en la barra superior, la landing de acceso, la bienvenida, el aviso de cookies,
+el panel de Spotify y los errores del reproductor. Los zapatitos usan la **tinta directa
+del álbum**, así que Legui se tiñe con la portada que suena. Assets en `public/` y `brand/`.
 
 ## Stack
 
