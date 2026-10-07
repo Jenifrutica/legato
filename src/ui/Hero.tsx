@@ -14,6 +14,7 @@ import { activeLineIndex, useLyrics, useLyricsStore } from '../features/lyrics'
 import { Lyrics, useDemoLyrics } from './Lyrics'
 import { QueueStrip } from './QueueStrip'
 import { NostalgiaCapsule } from './NostalgiaCapsule'
+import { usePanelVisibilityStore } from './panel-tabs'
 import {
   FlagIcon,
   PauseIcon,
@@ -56,6 +57,9 @@ export function Hero() {
   const [practiceOpen, setPracticeOpen] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
   const [discExpanded, setDiscExpanded] = useState(false)
+  const panelCollapsed = usePanelVisibilityStore((state) => state.collapsed)
+  // Al ocultar el panel de listas, el héroe se centra solo (sin pulsar «Ver completo»).
+  const centered = discExpanded || panelCollapsed
   const [stageMode, setStageMode] = useState<'full' | 'disc' | null>(null)
   const videoInDisc = useVideoPrefs((state) => state.inDisc)
   const toggleVideo = useVideoPrefs((state) => state.toggle)
@@ -161,7 +165,7 @@ export function Hero() {
 
         <div
           className={`mt-8 flex max-w-3xl flex-col lg:mt-10 lg:flex-1 ${
-            discExpanded ? 'lg:mx-auto lg:items-center lg:text-center' : ''
+            centered ? 'lg:mx-auto lg:items-center lg:text-center' : ''
           }`}
         >
           <h1 className="font-display text-[clamp(2.6rem,7.5vw,5.5rem)] leading-[0.9] font-black tracking-[-0.01em] uppercase">
@@ -190,7 +194,7 @@ export function Hero() {
           <div className="lg:mt-auto lg:pt-4">
             <div
               className={`mt-8 hidden items-center gap-3 lg:flex ${
-                discExpanded ? 'lg:justify-center' : ''
+                centered ? 'lg:justify-center' : ''
               }`}
             >
               <span className="w-10 text-right font-mono text-[0.6875rem] text-ink-muted">
@@ -221,7 +225,7 @@ export function Hero() {
 
             <div
               className={`mt-5 hidden flex-wrap items-center gap-3 lg:flex ${
-                discExpanded ? 'lg:justify-center' : ''
+                centered ? 'lg:justify-center' : ''
               }`}
             >
               <TransportButton
