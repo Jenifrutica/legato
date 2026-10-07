@@ -18,7 +18,7 @@ Cuenta AWS **437845271540** (usuario IAM **`legato`**, `us-east-1`). Recursos:
 - **Actualizar**: `aws s3 sync dist s3://legato-jenilarper --delete` + `create-invalidation --distribution-id E9MLZCEKQU3MI --paths "/*"`.
 - **Firebase**: añadir `legato.jenilarper.dev` en Authentication → Authorized domains.
 - **Spotify**: añadir `https://legato.jenilarper.dev` en Redirect URIs; para el import, **Add user** en User Management (Development mode).
-- **Seguridad**: rotar la access key `AKIAWL4M4UP2IUKRGZGL` (expuesta) y crear alerta de presupuesto.
+- **Seguridad**: rotar la access key de AWS (expuesta) y crear alerta de presupuesto.
 
 ## Restricción antigua (cuenta anterior 793452510776)
 

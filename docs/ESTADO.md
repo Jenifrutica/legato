@@ -172,7 +172,7 @@ Si tras agregar archivos nuevos la interfaz queda en blanco con un error de mód
 - **Firebase restaurado**: Auth (Google + correo, **sin verificación obligatoria**) + sincronización; proyecto `legato-5ba6f` (añadir `legato.jenilarper.dev` en Authorized domains).
 - **Spotify iOS**: modo **Connect** (controla la app de Spotify del teléfono) porque el SDK no es fiable en iOS; botón «Abrir en Spotify»; guardia de auto-avance (no salta si la pista nunca sonó).
 - **Avisos de Spotify**: el panel de import explica que en Development mode se bloquean las playlists **que no creaste tú** (seguidas/editoriales) y sugiere **copiarlas a tu cuenta** (o Add user / Extended Quota). En **móvil (iPhone)** aparece un aviso de **mantener Spotify abierto en segundo plano** (`spotify.backgroundHint`).
-- **Pendiente (autora):** añadir el **Redirect URI** `https://legato.jenilarper.dev` en Spotify; **reconectar Spotify** en cada dispositivo (los tokens van por `userId`, cambió con Google); añadir la cuenta en **Spotify User Management** para el import; **rotar la access key** `AKIAWL4M4UP2IUKRGZGL` (expuesta) + alerta de presupuesto.
+- **Pendiente (autora):** añadir el **Redirect URI** `https://legato.jenilarper.dev` en Spotify; **reconectar Spotify** en cada dispositivo (los tokens van por `userId`, cambió con Google); añadir la cuenta en **Spotify User Management** para el import; **rotar la access key de AWS** (expuesta) + alerta de presupuesto.
 - **Detalle completo:** `docs/CONTEXTO-COMPLETO.md` (Sesión 9), `docs/DESPLIEGUE.md`, `docs/AUTH.md`, `docs/PENDIENTES.md`.
 
 ## v1 lista para desplegar — sin base de datos

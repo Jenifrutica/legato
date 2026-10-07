@@ -777,7 +777,7 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 
 ### Seguridad pendiente (importante)
 
-- La **access key `AKIAWL4M4UP2IUKRGZGL`** quedó **expuesta en el chat** → **desactivar/eliminar** en IAM y, si se necesita, crear una nueva (o una política limitada a S3/CloudFront/ACM del bucket `legato-jenilarper`).
+- La **access key de AWS** quedó **expuesta en el chat** → **desactivar/eliminar** en IAM y, si se necesita, crear una nueva (o una política limitada a S3/CloudFront/ACM del bucket `legato-jenilarper`).
 - Recomendado: **alerta de presupuesto** en la cuenta nueva.
 
 ### Comandos útiles
