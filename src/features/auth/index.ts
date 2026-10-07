@@ -1,6 +1,6 @@
 export { AccountChip } from './AccountChip'
+export { AccountMenu } from './AccountMenu'
 export { AuthContextProvider, useAuth } from './auth-context'
-export { CognitoAuthProvider } from './cognito-auth-provider'
 export { createAuthProvider, readAuthEnv, resolveAuthMode } from './create-auth-provider'
 export { FirebaseAuthProvider } from './firebase-auth-provider'
 export { LocalAuthProvider } from './local-auth-provider'

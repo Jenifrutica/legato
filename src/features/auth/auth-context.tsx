@@ -56,8 +56,8 @@ export function AuthContextProvider({
   useEffect(() => {
     let active = true
 
-    // La inicialización de Firebase puede no resolver si la red la bloquea
-    // (p. ej. escudos del navegador): nunca dejamos la puerta colgada.
+    // La inicialización del proveedor puede tardar (o quedarse): nunca
+    // dejamos la puerta colgada.
     const timeout = new Promise<void>((resolve) => {
       setTimeout(resolve, 5000)
     })

@@ -1,4 +1,4 @@
-export type AuthProviderKind = 'local' | 'firebase' | 'cognito'
+export type AuthProviderKind = 'local' | 'firebase'
 
 export type AuthUser = {
   id: string
@@ -65,9 +65,6 @@ export interface AuthProvider {
 
 export type AuthEnv = {
   mode: AuthProviderKind
-  cognitoDomain?: string
-  cognitoClientId?: string
-  redirectUri?: string
   firebase?: {
     apiKey: string
     authDomain: string

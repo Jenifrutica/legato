@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthContextProvider, useAuth } from '../features/auth'
 import { usePlayLogStore, usePlayTracker } from '../features/capsule'
@@ -17,11 +17,15 @@ import { useAlbumTheme } from '../features/theme'
 import { useAudioFxStore } from '../player'
 import { teardownSession } from './teardown-session'
 import { Hero } from '../ui/Hero'
-import { LoginScreen, VerifyEmailScreen } from '../ui/LoginScreen'
+import { Landing } from '../ui/Landing'
+import { LegatoLogo, LeguiMark } from '../ui/Legui'
+import { LeguiWelcome } from '../ui/LeguiWelcome'
+
 import { MiniPlayer } from '../ui/MiniPlayer'
 import { MobileNav } from '../ui/MobileNav'
 import { MusiciansPanel } from '../ui/MusiciansPanel'
 import { PlayerBar } from '../ui/PlayerBar'
+import { usePanelVisibilityStore } from '../ui/panel-tabs'
 import { RightPanel } from '../ui/RightPanel'
 import { TopBar } from '../ui/TopBar'
 
@@ -36,13 +40,6 @@ export default function App() {
 export function AuthGate() {
   const { t } = useTranslation()
   const { user, ready, kind, isGuest } = useAuth()
-  // La verificación de correo es recomendada pero no obligatoria (el correo
-  // de Firebase puede no llegar): se puede entrar sin confirmar.
-  const [skipVerification, setSkipVerification] = useState(false)
-
-  useEffect(() => {
-    setSkipVerification(false)
-  }, [user?.id])
 
   if (!ready) {
     return (
@@ -50,17 +47,17 @@ export function AuthGate() {
         aria-label={t('app.loading')}
         className="grid min-h-dvh place-items-center bg-bg text-ink"
       >
-        <span className="font-display text-xl font-black tracking-[0.1em] uppercase">Legato</span>
+        <div className="flex flex-col items-center gap-4">
+          <LeguiMark className="animate-legui-bob w-24" />
+          <LegatoLogo className="h-8 w-auto" />
+          <span className="sr-only">Legato</span>
+        </div>
       </div>
     )
   }
 
   if (user === null) {
-    return <LoginScreen />
-  }
-
-  if (!user.emailVerified && !skipVerification) {
-    return <VerifyEmailScreen onContinue={() => setSkipVerification(true)} />
+    return <Landing />
   }
 
   return <AppShell authKind={kind} guest={isGuest} userId={user.id} />
@@ -77,6 +74,7 @@ function AppShell({
 }) {
   const { t } = useTranslation()
   useAlbumTheme()
+  const panelCollapsed = usePanelVisibilityStore((state) => state.collapsed)
   usePlayTracker()
   useExternalPlayback()
 
@@ -153,12 +151,19 @@ function AppShell({
       <TopBar />
       <SpotifyBanner />
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_25rem] xl:grid-cols-[minmax(0,1fr)_27rem]">
+      <div
+        className={`min-w-0 lg:grid ${
+          panelCollapsed
+            ? 'lg:grid-cols-1'
+            : 'lg:grid-cols-[minmax(0,1fr)_25rem] xl:grid-cols-[minmax(0,1fr)_27rem]'
+        }`}
+      >
         <main className="min-w-0" id="contenido">
+          <LeguiWelcome />
           <Hero />
         </main>
 
-        <RightPanel />
+        <RightPanel collapsed={panelCollapsed} />
       </div>
 
       <footer className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border px-5 py-4 text-xs text-ink-muted lg:px-8">

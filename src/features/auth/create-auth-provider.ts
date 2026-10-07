@@ -1,4 +1,3 @@
-import { CognitoAuthProvider } from './cognito-auth-provider'
 import { FirebaseAuthProvider } from './firebase-auth-provider'
 import { LocalAuthProvider } from './local-auth-provider'
 import type { AuthEnv, AuthProvider, AuthProviderKind } from './types'
@@ -14,17 +13,9 @@ export function readAuthEnv(): AuthEnv {
   const projectId = envValue(import.meta.env.VITE_FIREBASE_PROJECT_ID)
   const appId = envValue(import.meta.env.VITE_FIREBASE_APP_ID)
   const storageBucket = envValue(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET)
-  const cognitoDomain = envValue(import.meta.env.VITE_COGNITO_DOMAIN)
-  const cognitoClientId = envValue(import.meta.env.VITE_COGNITO_CLIENT_ID)
 
   return {
-    mode:
-      mode === 'firebase' || mode === 'cognito' || mode === 'local'
-        ? (mode as AuthProviderKind)
-        : 'firebase',
-    cognitoDomain,
-    cognitoClientId,
-    redirectUri: envValue(import.meta.env.VITE_COGNITO_REDIRECT_URI),
+    mode: mode === 'firebase' || mode === 'local' ? (mode as AuthProviderKind) : 'firebase',
     firebase:
       apiKey !== undefined &&
       authDomain !== undefined &&
@@ -37,13 +28,6 @@ export function readAuthEnv(): AuthEnv {
 
 /** Decide el proveedor real: Firebase si está configurado, si no el respaldo local. */
 export function resolveAuthMode(env: AuthEnv): AuthProviderKind {
-  if (
-    env.mode === 'cognito' &&
-    env.cognitoDomain !== undefined &&
-    env.cognitoClientId !== undefined
-  ) {
-    return 'cognito'
-  }
   if (env.mode === 'local') {
     return 'local'
   }
@@ -55,14 +39,6 @@ export function createAuthProvider(env: AuthEnv = readAuthEnv()): AuthProvider {
 
   if (mode === 'firebase' && env.firebase !== undefined) {
     return new FirebaseAuthProvider(env.firebase)
-  }
-
-  if (mode === 'cognito' && env.cognitoDomain !== undefined && env.cognitoClientId !== undefined) {
-    return new CognitoAuthProvider({
-      domain: env.cognitoDomain,
-      clientId: env.cognitoClientId,
-      redirectUri: env.redirectUri ?? window.location.origin,
-    })
   }
 
   return new LocalAuthProvider()

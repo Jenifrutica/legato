@@ -16,26 +16,26 @@ export function AccountChip() {
       {user.pictureUrl !== null ? (
         <img
           alt=""
-          className="size-8 shrink-0 border border-bg/40 object-cover"
+          className="size-8 shrink-0 border border-rule/40 object-cover"
           referrerPolicy="no-referrer"
           src={user.pictureUrl}
         />
       ) : (
         <span
           aria-hidden="true"
-          className="grid size-8 shrink-0 place-items-center border border-bg/40 bg-accent text-sm font-bold text-on-accent"
+          className="grid size-8 shrink-0 place-items-center border border-rule/40 bg-accent text-sm font-bold text-on-accent"
         >
           {initial}
         </span>
       )}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-bg">{user.name}</span>
-        <span className="hidden truncate text-xs text-bg/60 sm:block">
+        <span className="block truncate text-sm font-semibold text-ink">{user.name}</span>
+        <span className="hidden truncate text-xs text-ink-muted sm:block">
           {user.email ?? t('account.localProfile')}
         </span>
       </span>
       <button
-        className="shrink-0 px-1 py-1 text-xs font-medium text-bg/60 transition-colors hover:text-accent-ink"
+        className="shrink-0 px-1 py-1 text-xs font-medium text-ink-muted transition-colors hover:text-accent-ink"
         onClick={() => void signOut()}
         type="button"
       >
