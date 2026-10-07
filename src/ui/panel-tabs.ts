@@ -37,13 +37,15 @@ export const useMusiciansPanelStore = create<MusiciansPanelState>((set) => ({
 type PanelVisibilityState = {
   collapsed: boolean
   toggle: () => void
+  setCollapsed: (collapsed: boolean) => void
 }
 
 /**
- * Plegado del panel lateral derecho en escritorio (para dejar la pantalla
- * limpia, solo el escenario). En móvil no aplica.
+ * Plegado del panel lateral derecho (para dejar la pantalla limpia, solo el
+ * escenario). Aplica en escritorio y en móvil.
  */
 export const usePanelVisibilityStore = create<PanelVisibilityState>((set) => ({
   collapsed: false,
   toggle: () => set((state) => ({ collapsed: !state.collapsed })),
+  setCollapsed: (collapsed) => set({ collapsed }),
 }))

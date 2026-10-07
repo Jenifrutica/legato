@@ -90,6 +90,9 @@ export const pt: typeof es = {
   },
   theme: {
     toggle: 'Alternar tema claro/escuro',
+    appearance: 'Aparência',
+    dark: 'Modo escuro',
+    darkHint: 'Alterne entre papel claro e tinta escura.',
   },
   topbar: {
     collection: 'Coleção',

@@ -75,6 +75,7 @@ function AppShell({
   const { t } = useTranslation()
   useAlbumTheme()
   const panelCollapsed = usePanelVisibilityStore((state) => state.collapsed)
+  const togglePanel = usePanelVisibilityStore((state) => state.toggle)
   usePlayTracker()
   useExternalPlayback()
 
@@ -194,6 +195,28 @@ function AppShell({
         <span aria-hidden="true">·</span>
         <span>{t('academic')}</span>
       </footer>
+
+      <button
+        aria-label={panelCollapsed ? t('panel.show') : t('panel.hide')}
+        aria-pressed={panelCollapsed}
+        className="fixed right-3 z-40 grid size-9 place-items-center border-2 border-rule bg-surface text-ink shadow-[3px_3px_0_var(--color-rule)] lg:hidden"
+        onClick={togglePanel}
+        style={{ bottom: 'calc(var(--bottom-bar) + 0.75rem)' }}
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          className="size-4"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          {panelCollapsed ? <path d="m6 15 6-6 6 6" /> : <path d="m6 9 6 6 6-6" />}
+        </svg>
+      </button>
 
       <div className="fixed inset-x-0 bottom-0 z-30 lg:hidden">
         <PlayerBar />

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FolderIcon, LibraryIcon, ListMusicIcon, SearchIcon, VolumeIcon } from './icons'
-import { PANEL_TAB_KEYS, PANEL_TABS, usePanelTabStore } from './panel-tabs'
+import { PANEL_TAB_KEYS, PANEL_TABS, usePanelTabStore, usePanelVisibilityStore } from './panel-tabs'
 import type { PanelTab } from './panel-tabs'
 
 const TAB_ICONS: Record<PanelTab, ReactNode> = {
@@ -17,9 +17,11 @@ export function MobileNav() {
   const { t } = useTranslation()
   const tab = usePanelTabStore((state) => state.tab)
   const setTab = usePanelTabStore((state) => state.setTab)
+  const setCollapsed = usePanelVisibilityStore((state) => state.setCollapsed)
 
   function open(next: PanelTab) {
     setTab(next)
+    setCollapsed(false)
     document
       .getElementById('panel-principal')
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' })

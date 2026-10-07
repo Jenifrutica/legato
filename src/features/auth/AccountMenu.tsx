@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from './auth-context'
 
-/** Menú de cuenta compacto (perfil + salir), pensado para móvil. */
-export function AccountMenu() {
+/** Menú de cuenta compacto (perfil + ajustes + salir), pensado para móvil. */
+export function AccountMenu({ onOpenSettings }: { onOpenSettings?: () => void }) {
   const { t } = useTranslation()
   const { user, signOut } = useAuth()
   const [open, setOpen] = useState(false)
@@ -69,8 +69,21 @@ export function AccountMenu() {
           <p className="truncate text-xs text-ink-muted">
             {user.email ?? t('account.localProfile')}
           </p>
+          {onOpenSettings !== undefined && (
+            <button
+              className="mt-3 w-full border-2 border-rule bg-surface px-3 py-2 font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-ink uppercase transition-transform hover:-translate-y-0.5"
+              onClick={() => {
+                setOpen(false)
+                onOpenSettings()
+              }}
+              role="menuitem"
+              type="button"
+            >
+              {t('settings.title')}
+            </button>
+          )}
           <button
-            className="mt-3 w-full border-2 border-rule bg-accent px-3 py-2 font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-on-accent uppercase transition-transform hover:-translate-y-0.5"
+            className="mt-2 w-full border-2 border-rule bg-accent px-3 py-2 font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-on-accent uppercase transition-transform hover:-translate-y-0.5"
             onClick={() => {
               setOpen(false)
               void signOut()

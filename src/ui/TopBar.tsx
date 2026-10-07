@@ -230,31 +230,6 @@ export function TopBar() {
                 <AccessibilityIcon className="size-5" />
                 {t('a11y.title')}
               </button>
-              <button
-                className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-accent-soft"
-                onClick={toggleTheme}
-                role="menuitem"
-                type="button"
-              >
-                {themeMode === 'dark' ? (
-                  <SunIcon className="size-5" />
-                ) : (
-                  <MoonIcon className="size-5" />
-                )}
-                {t('theme.toggle')}
-              </button>
-              <button
-                className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-accent-soft"
-                onClick={() => {
-                  setMoreOpen(false)
-                  setSettingsOpen(true)
-                }}
-                role="menuitem"
-                type="button"
-              >
-                <SettingsIcon className="size-5" />
-                {t('settings.title')}
-              </button>
               <div className="mt-1 border-t border-border px-3 pt-3">
                 <LanguageSelector compact />
               </div>
@@ -266,7 +241,7 @@ export function TopBar() {
           <AccountChip />
         </div>
         <div className="sm:hidden">
-          <AccountMenu />
+          <AccountMenu onOpenSettings={() => setSettingsOpen(true)} />
         </div>
       </div>
       <A11yPanel />

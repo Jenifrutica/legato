@@ -88,6 +88,9 @@ export const es = {
   },
   theme: {
     toggle: 'Cambiar tema claro/oscuro',
+    appearance: 'Apariencia',
+    dark: 'Modo oscuro',
+    darkHint: 'Cambia entre papel claro y tinta oscura.',
   },
   topbar: {
     collection: 'Colección',

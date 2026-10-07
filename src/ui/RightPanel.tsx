@@ -59,6 +59,7 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
   const [dragOverId, setDragOverId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [spotifyOpen, setSpotifyOpen] = useState(false)
+  const [hintDismissed, setHintDismissed] = useState(false)
   const [spotifyPlaylists, setSpotifyPlaylists] = useState<SpotifyPlaylistSummary[]>([])
   const [spotifyStatus, setSpotifyStatus] = useState<'idle' | 'loading' | 'importing' | 'error'>(
     'idle',
@@ -321,9 +322,15 @@ function PlaylistsTab({ onOpen }: { onOpen: () => void }) {
             ))}
           </ul>
 
-          <LeguiBubble bubbleClassName="mt-3 text-[0.6875rem]" size="size-10">
-            {t('legui.spotifyImportHint', { email: 'jenifer.urbano@campusucc.edu.co' })}
-          </LeguiBubble>
+          {!hintDismissed && (
+            <LeguiBubble
+              bubbleClassName="mt-3 text-[0.6875rem]"
+              onDismiss={() => setHintDismissed(true)}
+              size="size-10"
+            >
+              {t('legui.spotifyImportHint', { email: 'jenifer.urbano@campusucc.edu.co' })}
+            </LeguiBubble>
+          )}
 
           <p className="mt-3 border-t border-border pt-2 text-[0.6875rem] leading-relaxed text-ink-muted">
             {t('spotify.requestAccess')}
@@ -712,7 +719,7 @@ export function RightPanel({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <aside
       className={`relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-8 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0 ${
-        collapsed ? 'lg:hidden' : ''
+        collapsed ? 'hidden' : ''
       }`}
       id="panel-principal"
     >
@@ -818,7 +825,7 @@ export function RightPanel({ collapsed = false }: { collapsed?: boolean }) {
         })}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="mx-auto min-h-0 w-full max-w-3xl flex-1 overflow-y-auto px-3 pt-3 lg:max-w-none lg:px-0 lg:pt-0">
         {tab === 'library' && <LibraryPanel />}
         {tab === 'search' && <SearchTab />}
         {tab === 'playlists' && <PlaylistsTab onOpen={() => setTab('library')} />}

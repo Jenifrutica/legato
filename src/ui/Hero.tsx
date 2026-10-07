@@ -61,6 +61,7 @@ export function Hero() {
   // Al ocultar el panel de listas, el héroe se centra solo (sin pulsar «Ver completo»).
   const centered = discExpanded || panelCollapsed
   const [stageMode, setStageMode] = useState<'full' | 'disc' | null>(null)
+  const [dismissedError, setDismissedError] = useState<string | null>(null)
   const videoInDisc = useVideoPrefs((state) => state.inDisc)
   const toggleVideo = useVideoPrefs((state) => state.toggle)
   const demoLyrics = useDemoLyrics()
@@ -210,8 +211,12 @@ export function Hero() {
             {displaySubtitle}
           </p>
 
-          {playerError !== null && (
-            <LeguiBubble bubbleClassName="mt-4 border-danger text-xs" size="size-10">
+          {playerError !== null && playerError !== dismissedError && (
+            <LeguiBubble
+              bubbleClassName="mt-4 border-danger text-xs"
+              onDismiss={() => setDismissedError(playerError)}
+              size="size-10"
+            >
               <b>{t('legui.errorPrefix')}</b> {playerError}
             </LeguiBubble>
           )}

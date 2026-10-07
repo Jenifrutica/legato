@@ -90,6 +90,9 @@ export const en: typeof es = {
   },
   theme: {
     toggle: 'Toggle light/dark theme',
+    appearance: 'Appearance',
+    dark: 'Dark mode',
+    darkHint: 'Switch between light paper and dark ink.',
   },
   topbar: {
     collection: 'Collection',

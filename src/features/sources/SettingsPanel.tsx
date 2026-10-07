@@ -6,6 +6,7 @@ import { usePlayLogStore } from '../capsule'
 import { useMusicianStore } from '../musician'
 import { deleteUserData, wipeLocalData } from '../persistence'
 import { configureCloudSync, syncNow, useSyncStore } from '../sync'
+import { useThemeStore } from '../theme'
 import { isJamendoConfigured } from './jamendo'
 import { useProvidersStore } from './providers-store'
 import {
@@ -37,6 +38,8 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
   const syncLastAt = useSyncStore((state) => state.lastSyncAt)
   const setSyncEnabled = useSyncStore((state) => state.setEnabled)
   const cloudConfigured = readAuthEnv().firebase !== undefined
+  const themeMode = useThemeStore((state) => state.mode)
+  const setThemeMode = useThemeStore((state) => state.setMode)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletePassword, setDeletePassword] = useState('')
   const [deleteBusy, setDeleteBusy] = useState(false)
@@ -161,6 +164,26 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             <XIcon className="size-4" />
           </button>
         </div>
+
+        <section aria-label={t('theme.appearance')} className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            {t('theme.appearance')}
+          </h3>
+
+          <div className="mt-3 flex items-center justify-between gap-3 border border-border bg-bg/50 p-3">
+            <div className="min-w-0">
+              <span className="text-sm font-medium">{t('theme.dark')}</span>
+              <p className="mt-1 text-xs text-ink-muted">{t('theme.darkHint')}</p>
+            </div>
+            <input
+              aria-label={t('theme.dark')}
+              checked={themeMode === 'dark'}
+              className="size-5 shrink-0 accent-primary"
+              onChange={(event) => setThemeMode(event.target.checked ? 'dark' : 'light')}
+              type="checkbox"
+            />
+          </div>
+        </section>
 
         <section aria-label={t('sources.title')} className="mt-5">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { XIcon } from './icons'
 
 const INK = '#13100c'
 const PAPER = '#f6f2ea'
@@ -125,12 +127,15 @@ export function LeguiBubble({
   className = '',
   bubbleClassName = '',
   size = 'size-12',
+  onDismiss,
 }: {
   children: ReactNode
   className?: string
   bubbleClassName?: string
   size?: string
+  onDismiss?: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <div className={`flex items-end gap-2 ${className}`}>
       <LeguiSticker className={size} />
@@ -141,6 +146,16 @@ export function LeguiBubble({
           aria-hidden="true"
           className="absolute top-1/2 -left-[7px] size-3 -translate-y-1/2 rotate-45 border-b-2 border-l-2 border-rule bg-surface"
         />
+        {onDismiss !== undefined && (
+          <button
+            aria-label={t('cookies.close')}
+            className="absolute -top-2 -right-2 grid size-6 place-items-center border-2 border-rule bg-surface text-ink transition-transform hover:-translate-y-0.5"
+            onClick={onDismiss}
+            type="button"
+          >
+            <XIcon className="size-3" />
+          </button>
+        )}
         {children}
       </div>
     </div>

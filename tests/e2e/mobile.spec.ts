@@ -38,3 +38,16 @@ test('no hay desbordamiento horizontal a 320px', async ({ page }) => {
   )
   expect(app).toBeLessThanOrEqual(1)
 })
+
+test('ajustes y modo oscuro desde el perfil en móvil', async ({ page }) => {
+  await page.goto('/')
+  await registerAndEnter(page)
+  await acceptCookies(page)
+
+  await page.getByRole('button', { name: 'Cuenta' }).click()
+  await page.getByRole('menuitem', { name: 'Ajustes' }).click()
+  await expect(page.getByRole('dialog', { name: 'Ajustes' })).toBeVisible()
+
+  await page.getByRole('checkbox', { name: 'Modo oscuro' }).check()
+  await expect(page.locator('html')).toHaveClass(/theme-dark/)
+})
