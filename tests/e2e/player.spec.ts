@@ -40,6 +40,7 @@ test('en móvil la barra tiene volumen y velocidad', async ({ page }) => {
   await page.getByRole('button', { name: 'Reproducir M' }).click()
   await expect(page.getByRole('button', { name: 'Pausar' }).first()).toBeVisible()
 
+  await page.getByRole('button', { name: 'Volumen' }).click()
   const volume = page.locator('input[aria-label="Volumen"]:visible')
   await volume.fill('30')
   expect(await page.evaluate(() => window.__legato.getMediaElement().volume)).toBeCloseTo(0.3, 3)

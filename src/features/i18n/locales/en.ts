@@ -93,6 +93,7 @@ export const en: typeof es = {
   },
   topbar: {
     collection: 'Collection',
+    more: 'More options',
   },
   queue: {
     empty: 'The list is empty. Play something from your library or a playlist.',

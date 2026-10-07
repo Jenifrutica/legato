@@ -225,16 +225,16 @@ export function DiscStage({ mode, onClose }: { mode: 'full' | 'disc'; onClose: (
         discFace('min(84vmin, 84vh)')
       )}
 
-      {mode === 'full' && (
-        <button
-          aria-label={t('player.exitFullscreen')}
-          className="absolute top-4 right-4 border-2 border-bg/60 bg-ink/80 p-2 text-bg transition-transform hover:-translate-y-0.5"
-          onClick={onClose}
-          type="button"
-        >
-          <XIcon className="size-5" />
-        </button>
-      )}
+      <button
+        aria-label={t('player.exitFullscreen')}
+        className={`absolute top-4 right-4 border-2 border-bg/60 bg-ink/80 p-2 text-bg transition-transform hover:-translate-y-0.5 ${
+          mode === 'disc' ? 'lg:hidden' : ''
+        }`}
+        onClick={onClose}
+        type="button"
+      >
+        <XIcon className="size-5" />
+      </button>
     </div>,
     document.body,
   )

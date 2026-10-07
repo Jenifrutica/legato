@@ -140,7 +140,7 @@ function AppShell({
   }, [])
 
   return (
-    <div className="min-h-dvh bg-bg text-ink">
+    <div className="min-h-dvh bg-bg text-ink" style={{ paddingBottom: 'var(--bottom-bar)' }}>
       <a
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:border-2 focus:border-rule focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-accent"
         href="#contenido"

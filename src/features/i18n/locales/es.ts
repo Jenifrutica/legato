@@ -91,6 +91,7 @@ export const es = {
   },
   topbar: {
     collection: 'Colección',
+    more: 'Más opciones',
   },
   queue: {
     empty: 'La lista está vacía. Reproduce algo desde tu biblioteca o una playlist.',

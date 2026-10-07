@@ -20,3 +20,21 @@ test('navegación inferior y panel de músicos en móvil', async ({ page }) => {
   await page.getByRole('button', { name: 'Panel de músicos' }).click()
   await expect(page.getByRole('heading', { name: 'Estructura' })).toBeVisible()
 })
+
+test('no hay desbordamiento horizontal a 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 })
+  await page.goto('/')
+
+  const landing = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(landing).toBeLessThanOrEqual(1)
+
+  await registerAndEnter(page)
+  await acceptCookies(page)
+
+  const app = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(app).toBeLessThanOrEqual(1)
+})

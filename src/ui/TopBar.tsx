@@ -6,7 +6,7 @@ import { LanguageSelector } from '../features/i18n'
 import { usePlaylistsStore } from '../features/playlists'
 import { SettingsPanel } from '../features/sources'
 import { useThemeStore } from '../features/theme'
-import { AccessibilityIcon, MoonIcon, SettingsIcon, SunIcon, TimerIcon } from './icons'
+import { AccessibilityIcon, MoreIcon, MoonIcon, SettingsIcon, SunIcon, TimerIcon } from './icons'
 import { LegatoLogo } from './Legui'
 import { useMusiciansPanelStore } from './panel-tabs'
 
@@ -21,7 +21,9 @@ export function TopBar() {
   const toggleTheme = useThemeStore((state) => state.toggle)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [collectionOpen, setCollectionOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const collectionRef = useRef<HTMLDivElement>(null)
+  const moreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!collectionOpen) {
@@ -47,11 +49,38 @@ export function TopBar() {
     }
   }, [collectionOpen])
 
+  useEffect(() => {
+    if (!moreOpen) {
+      return
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (moreRef.current !== null && !moreRef.current.contains(event.target as Node)) {
+        setMoreOpen(false)
+      }
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMoreOpen(false)
+      }
+    }
+
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [moreOpen])
+
   const currentCollectionName =
     playlists.find((playlist) => playlist.id === selectedPlaylistId)?.name ?? t('nav.library')
 
   return (
-    <header className="sticky top-0 z-30 border-b-2 border-rule bg-surface text-ink">
+    <header
+      className="sticky top-0 z-30 border-b-2 border-rule bg-surface text-ink"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="mx-auto flex max-w-[110rem] items-center gap-3 px-4 py-2.5 sm:px-6">
         <h1
           aria-label="Legato"
@@ -129,6 +158,7 @@ export function TopBar() {
           aria-hidden="true"
           className="ml-auto size-3 border border-rule/50 bg-accent transition-colors duration-300"
         />
+
         <button
           aria-label={t('musician.title')}
           className="p-2 text-ink-muted transition-colors hover:text-ink"
@@ -137,31 +167,101 @@ export function TopBar() {
         >
           <TimerIcon className="size-5" />
         </button>
-        <button
-          aria-label={t('a11y.title')}
-          className="p-2 text-ink-muted transition-colors hover:text-ink"
-          onClick={openA11yPanel}
-          type="button"
-        >
-          <AccessibilityIcon className="size-5" />
-        </button>
-        <button
-          aria-label={t('theme.toggle')}
-          className="p-2 text-ink-muted transition-colors hover:text-ink"
-          onClick={toggleTheme}
-          type="button"
-        >
-          {themeMode === 'dark' ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}
-        </button>
-        <button
-          aria-label={t('settings.title')}
-          className="p-2 text-ink-muted transition-colors hover:text-ink"
-          onClick={() => setSettingsOpen(true)}
-          type="button"
-        >
-          <SettingsIcon className="size-5" />
-        </button>
-        <LanguageSelector compact />
+
+        <div className="hidden items-center gap-3 sm:flex">
+          <button
+            aria-label={t('a11y.title')}
+            className="p-2 text-ink-muted transition-colors hover:text-ink"
+            onClick={openA11yPanel}
+            type="button"
+          >
+            <AccessibilityIcon className="size-5" />
+          </button>
+          <button
+            aria-label={t('theme.toggle')}
+            className="p-2 text-ink-muted transition-colors hover:text-ink"
+            onClick={toggleTheme}
+            type="button"
+          >
+            {themeMode === 'dark' ? (
+              <SunIcon className="size-5" />
+            ) : (
+              <MoonIcon className="size-5" />
+            )}
+          </button>
+          <button
+            aria-label={t('settings.title')}
+            className="p-2 text-ink-muted transition-colors hover:text-ink"
+            onClick={() => setSettingsOpen(true)}
+            type="button"
+          >
+            <SettingsIcon className="size-5" />
+          </button>
+          <LanguageSelector compact />
+        </div>
+
+        <div className="relative sm:hidden" ref={moreRef}>
+          <button
+            aria-expanded={moreOpen}
+            aria-haspopup="menu"
+            aria-label={t('topbar.more')}
+            className="grid size-9 place-items-center text-ink-muted transition-colors hover:text-ink"
+            onClick={() => setMoreOpen((value) => !value)}
+            type="button"
+          >
+            <MoreIcon className="size-5" />
+          </button>
+
+          {moreOpen && (
+            <div
+              aria-label={t('topbar.more')}
+              className="absolute top-full right-0 z-40 mt-1 w-60 border-2 border-rule bg-surface p-2 text-ink shadow-[4px_4px_0_var(--color-rule)]"
+              role="menu"
+            >
+              <button
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-accent-soft"
+                onClick={() => {
+                  setMoreOpen(false)
+                  openA11yPanel()
+                }}
+                role="menuitem"
+                type="button"
+              >
+                <AccessibilityIcon className="size-5" />
+                {t('a11y.title')}
+              </button>
+              <button
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-accent-soft"
+                onClick={toggleTheme}
+                role="menuitem"
+                type="button"
+              >
+                {themeMode === 'dark' ? (
+                  <SunIcon className="size-5" />
+                ) : (
+                  <MoonIcon className="size-5" />
+                )}
+                {t('theme.toggle')}
+              </button>
+              <button
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-accent-soft"
+                onClick={() => {
+                  setMoreOpen(false)
+                  setSettingsOpen(true)
+                }}
+                role="menuitem"
+                type="button"
+              >
+                <SettingsIcon className="size-5" />
+                {t('settings.title')}
+              </button>
+              <div className="mt-1 border-t border-border px-3 pt-3">
+                <LanguageSelector compact />
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="hidden min-w-0 max-w-44 sm:block">
           <AccountChip />
         </div>

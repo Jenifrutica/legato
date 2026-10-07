@@ -51,10 +51,20 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* Alto de la barra fija inferior (reproductor + navegación) en móvil.
+       Se pone a 0 en escritorio. */
+    --bottom-bar: calc(9rem + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 64rem) {
+    :root {
+      --bottom-bar: 0px;
+    }
   }
 
   html {
     @apply bg-bg font-body text-ink antialiased;
+    overflow-x: hidden;
   }
 
   body {

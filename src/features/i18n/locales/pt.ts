@@ -93,6 +93,7 @@ export const pt: typeof es = {
   },
   topbar: {
     collection: 'Coleção',
+    more: 'Mais opções',
   },
   queue: {
     empty: 'A lista está vazia. Reproduza algo da sua biblioteca ou de uma playlist.',

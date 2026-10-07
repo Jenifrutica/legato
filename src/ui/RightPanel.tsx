@@ -711,7 +711,7 @@ export function RightPanel({ collapsed = false }: { collapsed?: boolean }) {
 
   return (
     <aside
-      className={`relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-52 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0 ${
+      className={`relative z-20 flex min-h-0 scroll-mt-16 flex-col border-t-2 border-rule bg-surface pb-8 lg:sticky lg:top-[4.4rem] lg:h-[calc(100dvh-4.4rem)] lg:border-t-0 lg:border-l-2 lg:pb-0 ${
         collapsed ? 'lg:hidden' : ''
       }`}
       id="panel-principal"

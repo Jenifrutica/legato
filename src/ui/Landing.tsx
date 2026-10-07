@@ -190,7 +190,10 @@ export function Landing() {
         backgroundColor: holaIn ? 'var(--color-accent)' : 'var(--color-bg)',
       }}
     >
-      <header className="sticky top-0 z-30 border-b-2 border-rule bg-surface text-ink">
+      <header
+        className="sticky top-0 z-30 border-b-2 border-rule bg-surface text-ink"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="mx-auto flex max-w-[110rem] items-center gap-3 px-4 py-2.5 sm:px-6">
           <span className="flex shrink-0 items-center">
             <LegatoLogo className="h-7 w-auto" />
@@ -262,7 +265,7 @@ export function Landing() {
             <LandingDisc />
           </div>
 
-          <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-12 grid gap-5 sm:grid-cols-2 md:grid-cols-3">
             {FEATURES.map((feature) => (
               <li
                 className="border-2 border-rule bg-surface p-5 shadow-[4px_4px_0_var(--color-rule)]"

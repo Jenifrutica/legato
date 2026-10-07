@@ -163,6 +163,35 @@ export function Hero() {
       <div className="relative mx-auto flex w-full max-w-[110rem] flex-col lg:flex-1">
         <VinylVisual expanded={discExpanded} />
 
+        <div className="mt-4 flex flex-wrap gap-2 lg:hidden">
+          <button
+            aria-pressed={discExpanded}
+            className={`h-9 border-2 border-rule px-3 font-mono text-[0.6875rem] tracking-[0.1em] uppercase transition-transform hover:-translate-y-0.5 ${
+              discExpanded
+                ? 'bg-accent text-on-accent shadow-[3px_3px_0_var(--color-rule)]'
+                : 'bg-surface text-ink-muted'
+            }`}
+            onClick={() => setDiscExpanded((value) => !value)}
+            type="button"
+          >
+            {t('player.viewFull')}
+          </button>
+          <button
+            className="h-9 border-2 border-rule bg-surface px-3 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-transform hover:-translate-y-0.5 hover:text-ink"
+            onClick={() => setStageMode('full')}
+            type="button"
+          >
+            {t('player.fullscreen')}
+          </button>
+          <button
+            className="h-9 border-2 border-rule bg-surface px-3 font-mono text-[0.6875rem] tracking-[0.1em] text-ink-muted uppercase transition-transform hover:-translate-y-0.5 hover:text-ink"
+            onClick={() => setStageMode('disc')}
+            type="button"
+          >
+            {t('player.discOnly')}
+          </button>
+        </div>
+
         <div
           className={`mt-8 flex max-w-3xl flex-col lg:mt-10 lg:flex-1 ${
             centered ? 'lg:mx-auto lg:items-center lg:text-center' : ''
