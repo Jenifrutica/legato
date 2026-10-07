@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Actualizado: 5 de octubre de 2026 (sesión 7, cierre de reproductor, import de Spotify, herramientas de biblioteca y base para el rediseño móvil).
+Actualizado: 6 de octubre de 2026 (sesión 9, **v1 desplegada** en `https://legato.jenilarper.dev`; Legui, landing, animaciones, Firebase restaurado y Spotify Connect en iOS).
 
 ## Issues
 
@@ -141,3 +141,47 @@ Si tras agregar archivos nuevos la interfaz queda en blanco con un error de mód
 ## ⚠️ Pendiente #1: REDISEÑO COMPLETO DE LA INTERFAZ
 
 **Dirección elegida:** **Duotono 62** — edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Plan por fases, contrato de dirección y validación en **`docs/REDISENO.md`**. Artefactos: comp aprobado y sidecar en `.impeccable/mocks/decision/b-duotono.png(.json)`, contrato en `.impeccable/surfaces/src-app-app-tsx.md`, `buildPath: comp`. Reglas: nada oscuro por defecto (oscuro opcional), la portada completa en el disco (círculo completo, nunca `clip-path`), UI teñida por el álbum, ondas de líneas planas saliendo del disco, una sola barra por vista, panel de músicos slide-over, letras diseñadas ahora (conexión LRCLIB/.lrc después) y Cápsula nostálgica con su carril reservado.
+
+## Legui (mascota) y marca
+
+- **Legui** es la mascota de Legato: la “o” del nombre convertida en un **vinilo con patitas**, cara en la etiqueta y zapatitos en la **tinta directa del álbum**. Componente reutilizable `src/ui/Legui.tsx` (`LeguiMark`, `LeguiSticker`, `LeguiBubble`).
+- **Assets en el repo:** `public/favicon.svg` (pestaña), `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`, `public/legui.svg`; y en `brand/`: `legui.svg`, `legui.png`, `legato-wordmark.svg`, `legato-wordmark.png`. `manifest.webmanifest` e `index.html` actualizados.
+- **Dónde aparece Legui:** barra superior (el **wordmark completo** `LEGAT` + Legui como “o”), landing de acceso (saludo «¡Hola! Soy Legui» + invitación), **nubecita de bienvenida** al entrar («conecta Spotify»; al conectar, aviso de importar playlists escribiendo a jenifer.urbano@campusucc.edu.co), **aviso de cookies**, **panel de importar de Spotify** y **errores** del reproductor.
+- **Estilo:** se mantiene la base **Duotono 62 inicial** (cuadrada, sombras duras, radio 0). El rediseño redondeado/suave se **revirtió** por decisión de la autora; a partir de aquí solo se añaden **animaciones**, sin cambiar el estilo. Legui se integra en ese estilo (barra oscura con el wordmark en versión clara).
+- **i18n** ES/EN/PT con la clave `legui.*`. `README.md` reescrito con la marca y la tabla de assets.
+- Verificado: **320 unit + 17 E2E**, typecheck, oxlint, Prettier y build en verde; axe 0.
+
+## Landing de inicio y video mp4
+
+- **Landing en 3 fases** (`src/ui/Landing.tsx`): **(1) Legui solo** sobre fondo **rojo** con burbuja **blanca cuadrada** («¡Hola! Soy Legui» + info + «Empezar ahora» con flecha); al bajar, el fondo pasa de **rojo a blanco** con transición (IntersectionObserver). **(2) El vinilo** (disco girando) con la info y las **tarjetas cuadradas**; Legui **cae** a la esquina inferior y ahí está «Empezar ahora» (Legui **no** va sobre el disco). **(3) Entrar**: login a **pantalla completa**, con Legui cayendo junto al título. Sin redondeados (estilo app). Header como el de la página principal, con el **logo normal**.
+- **Landing original (referencia):** antes era una sola pantalla cuadrada con héroe + funciones + login.
+- **Video mp4 en el disco:** al reproducir un mp4 el disco queda **estático** y el `<video>` se pinta **dentro** del disco (silenciado, sincronizado con el motor); botón **«Ver/Ocultar video»** que activa/desactiva la opción (preferencia `legato.video.v1`). El `accept` del importador ahora incluye `video/*` y `.mp4/.m4v/.mov`. El mp3 (audio) no cambió.
+
+## Sesión 9 — v1 DESPLEGADA en `https://legato.jenilarper.dev`
+
+- **Producción:** **https://legato.jenilarper.dev** (S3 privado `legato-jenilarper` + CloudFront `E9MLZCEKQU3MI` + ACM wildcard `*.jenilarper.dev`). Cuenta AWS **437845271540**, usuario **`legato`**, `us-east-1`.
+- **Tests:** **317 unit + 17 E2E**; typecheck, oxlint, Prettier y build OK.
+- **Marca:** **Legui** (mascota vinilo) en barra, landing, bienvenida, cookies, Spotify y errores; assets en `public/` y `brand/`.
+- **Landing de inicio** en 3 fases (solo Legui con 3 textos → vinilo blanco con info → login). Header claro con logo normal; sin «listas dobles».
+- **Animaciones** (CSS): halo del álbum, revelado por líneas, entradas escalonadas, `legui-bob/fall/drop`. Color por defecto de la app: **rojo apagado `#a54f31`**.
+- **Video**: dentro del disco, estático, con **tema desde el primer fotograma** (`extractPaletteFromVideo`).
+- **Discos**: «Ver completo» (baja/sube), «Pantalla completa» (reproductor completo) y «Solo disco» (controles al mover el mouse).
+- **Panel plegable (PC)**: pestañita bajo «Estructura».
+- **Cápsula**: ya no reproduce sola (solo con botón).
+- **PiP**: circular, transparente, controles al hover, se reabre al cambiar de pestaña.
+- **Service worker v2**: network-first para HTML, cache-first para assets (arregla el “queda pegado a la versión vieja” tras desplegar).
+- **Firebase restaurado**: Auth (Google + correo, **sin verificación obligatoria**) + sincronización; proyecto `legato-5ba6f` (añadir `legato.jenilarper.dev` en Authorized domains).
+- **Spotify iOS**: modo **Connect** (controla la app de Spotify del teléfono) porque el SDK no es fiable en iOS; botón «Abrir en Spotify»; guardia de auto-avance (no salta si la pista nunca sonó).
+- **Avisos de Spotify**: el panel de import explica que en Development mode se bloquean las playlists **que no creaste tú** (seguidas/editoriales) y sugiere **copiarlas a tu cuenta** (o Add user / Extended Quota). En **móvil (iPhone)** aparece un aviso de **mantener Spotify abierto en segundo plano** (`spotify.backgroundHint`).
+- **Pendiente (autora):** añadir el **Redirect URI** `https://legato.jenilarper.dev` en Spotify; **reconectar Spotify** en cada dispositivo (los tokens van por `userId`, cambió con Google); añadir la cuenta en **Spotify User Management** para el import; **rotar la access key** `AKIAWL4M4UP2IUKRGZGL` (expuesta) + alerta de presupuesto.
+- **Detalle completo:** `docs/CONTEXTO-COMPLETO.md` (Sesión 9), `docs/DESPLIEGUE.md`, `docs/AUTH.md`, `docs/PENDIENTES.md`.
+
+## v1 lista para desplegar — sin base de datos
+
+- **Eliminado Firebase y Cognito** y **toda la sincronización en la nube** (`src/features/sync/`). La app es **100 % local-first**: la cuenta (correo/contraseña con PBKDF2 o invitado) y los datos viven en **IndexedDB**.
+- `createAuthProvider()` devuelve siempre el **proveedor local**; `AuthProviderKind` = `local`.
+- Limpieza: `.env.example`/`.env.local` sin `VITE_FIREBASE_*` ni `VITE_COGNITO_*`; se quitó la dependencia **`firebase`**; textos legales y `docs/AUTH.md` actualizados; Ajustes sin la sección de nube.
+- Verificado: **304 unit + 17 E2E**, typecheck, oxlint, Prettier y build. `bun run build` listo para S3 + CloudFront.
+
+
+

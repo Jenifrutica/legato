@@ -1,6 +1,29 @@
 # Despliegue
 
-## Restricción descubierta (3 oct 2026)
+## Estado: DESPLEGADO (6 oct 2026) — https://legato.jenilarper.dev
+
+Cuenta AWS **437845271540** (usuario IAM **`legato`**, `us-east-1`). Recursos:
+
+| Recurso | Valor |
+|---|---|
+| Dominio | **https://legato.jenilarper.dev** (alias `app.jenilarper.dev` en CloudFront, sin DNS) |
+| Bucket S3 | `legato-jenilarper` (privado) |
+| CloudFront | distribución **`E9MLZCEKQU3MI`** → `dcrshaabn8bkj.cloudfront.net` |
+| OAC | `E2Z4MMF0ZX0PCN` |
+| ACM (us-east-1) | wildcard **`*.jenilarper.dev`** |
+| DNS (name.com) | `legato` CNAME → `dcrshaabn8bkj.cloudfront.net` + CNAME de validación del wildcard |
+
+- **CloudFront**: HTTPS, `403/404 → /index.html 200` (SPA), `sw.js`/`manifest.webmanifest` sin caché.
+- **Build**: `VITE_SPOTIFY_REDIRECT_URI=https://legato.jenilarper.dev bun run build`.
+- **Actualizar**: `aws s3 sync dist s3://legato-jenilarper --delete` + `create-invalidation --distribution-id E9MLZCEKQU3MI --paths "/*"`.
+- **Firebase**: añadir `legato.jenilarper.dev` en Authentication → Authorized domains.
+- **Spotify**: añadir `https://legato.jenilarper.dev` en Redirect URIs; para el import, **Add user** en User Management (Development mode).
+- **Seguridad**: rotar la access key `AKIAWL4M4UP2IUKRGZGL` (expuesta) y crear alerta de presupuesto.
+
+## Restricción antigua (cuenta anterior 793452510776)
+
+> Nota histórica: la cuenta anterior tenía una SCP que bloqueaba Cognito/Amplify/Lambda/DynamoDB. El despliegue actual ya NO depende de esa cuenta.
+
 
 La cuenta AWS `793452510776` pertenece a una organización con una **Service Control Policy (SCP)** que bloquea explícitamente: **Cognito, Amplify, Lambda y DynamoDB**. Servicios disponibles verificados: **S3, CloudFront, ACM, Route 53, EC2 e IAM**.
 

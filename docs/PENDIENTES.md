@@ -2,13 +2,11 @@
 
 > Documento de trabajo para la siguiente sesión (modo plan → build). Recoge **qué falta, por qué, cómo verificarlo y qué decisiones están abiertas**. El contexto histórico completo está en `docs/CONTEXTO-COMPLETO.md`; el plan del rediseño en `docs/REDISENO.md`; y el prompt de arranque en **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
 
-- **Fecha:** 5 de octubre de 2026 (cierre **v1.0.0**).
-- **Estado base:** 318 unitarios + 17 E2E en verde; typecheck/lint/build OK; axe 0; detector de impeccable `[]`.
-- **Lo único pendiente:** (1) **rediseño de front** para que no se vea genérico (usar los skills instalados; modo plan; prompt en `docs/PROMPT-PLAN-NUEVA-SESION.md`); (2) **despliegue** (S3 + CloudFront + ACM + `app.jenilarper.dev` y **rotar la access key**).
-- **Respaldo:** tag **`v1.0.0`**. El **backend y las funcionalidades están completos**; el móvil, reorganizado.
-- **Skills instalados en el proyecto** (`.agents/skills/`): **awwwards-animations**, **animejs**, **manus**.
-- **Último commit:** ver `git log --oneline -1` (rama `main`, todo pusheado).
-- **Tokens/entorno:** no hay tokens de IA válidos; no hay sesión de Spotify en el entorno de desarrollo; la access key de AWS debe rotarse antes de terminar.
+- **Fecha:** 6 de octubre de 2026 (sesión 9, **v1 DESPLEGADA**).
+- **Estado base:** 317 unitarios + 17 E2E en verde; typecheck/lint/build OK. **Producción en https://legato.jenilarper.dev** (S3 `legato-jenilarper` + CloudFront `E9MLZCEKQU3MI` + ACM wildcard `*.jenilarper.dev`; cuenta AWS `437845271540`).
+- **Lo pendiente ahora:** (1) **rotar la access key** `AKIAWL4M4UP2IUKRGZGL` (expuesta en chat) y alerta de presupuesto; (2) verificar **Spotify en el iPhone** (modo Connect: abrir la app y pulsar play); (3) **reconectar Spotify** en cada dispositivo tras el cambio de cuenta; (4) **Spotify User Management** (Add user) para el import; (5) añadir `legato.jenilarper.dev` en **Firebase Authorized domains** y el **Redirect URI** en Spotify.
+- **Respaldo:** tag **`v1.0.0`**. **Skills instalados** (`.agents/skills/`): **awwwards-animations**, **animejs**, **manus**.
+- **Tokens/entorno:** no hay tokens de IA válidos; no hay sesión de Spotify en el entorno de desarrollo.
 
 ---
 

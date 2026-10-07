@@ -683,3 +683,120 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 - **Decisión de la autora**: en Spotify el control de velocidad no hace nada (SDK/DRM); se **oculta** en vez de mostrar un aviso.
 - **Cambios**: `Hero.tsx`, `PlayerBar.tsx` (barra móvil) y la sección de velocidad de `PracticePanel.tsx` solo aparecen con `!spotifyActive`. En local se mantiene el ciclo **1→1.25→1.5→2→0.9→0.75→0.5** (`controller.cycleRate`). Se retiran el estado `speedNotice` y la clave i18n `player.speedSpotify` (ES/EN/PT) para no dejar huérfanas.
 - **Verificación**: `player.spec.ts` (velocidad en local) sigue verde; detector de impeccable `[]`.
+
+---
+
+## Sesión 8 (6 oct 2026) — Fix del bucle en Spotify, logo con Legui
+
+### Bucle (repetir) en Spotify (arreglado)
+
+- **Diagnóstico:** en local, `none`/`all`/`one` y el **bucle A–B** funcionaban (verificado en navegador real con WAV). El fallo estaba en **Spotify**: al terminar una pista externa, `use-external-playback.ts` hacía **siempre** `next()`, así que «repetir una» avanzaba en vez de repetir.
+- **Arreglo:** `externalEndAction(loopMode)` — con `one` se **reinicia la misma referencia** (`playUris([sourceUrl])`); con `all`/`none` avanza como antes. Test en `external-track.test.ts`.
+- **Pendiente conocido:** el **bucle A–B no aplica a Spotify** (marca con el tiempo del motor local); requeriría conectar la posición/seek del SDK.
+- Baseline tras el cambio: **320 unit + 17 E2E**, build, typecheck, lint OK.
+
+### Legui (mascota) y marca
+
+- **Legui** = la “o” de Legato convertida en **vinilo con patitas** (disco en tinta, etiqueta con carita, zapatitos/cachetes en la tinta directa del álbum). Refinada con las skills `high-end-visual-design` y `minimalist-ui`; versión final: trazo grueso, **sin líneas laterales**.
+- **Componente** `src/ui/Legui.tsx`: `LeguiMark`, `LeguiSticker`, `LeguiBubble` y `LegatoLogo` (el wordmark `LEGAT` + Legui como “o”, con variante clara/oscura).
+- **Estilo:** se conserva la base **Duotono 62 inicial** (cuadrada, sombras duras). El rediseño redondeado/suave se **revirtió** (decisión de la autora): a partir de aquí **solo se añaden animaciones**, sin alterar el estilo. Legui se integra en la barra oscura con el wordmark en versión clara.
+- **Assets:** `public/favicon.svg`, `public/icon-192.png`, `public/icon-512.png`, `public/apple-touch-icon.png`, `public/legui.svg`; `brand/legui.svg|png`, `brand/legato-wordmark.svg|png`. `manifest.webmanifest` + `index.html` + `README.md` actualizados.
+- **Apariciones:** barra superior, landing de acceso («¡Hola! Soy Legui»), **nubecita de bienvenida** al entrar (conectar Spotify; al conectar, aviso de importar playlists escribiendo a **jenifer.urbano@campusucc.edu.co**), **cookies**, **panel de importar de Spotify** y **errores**. i18n `legui.*` ES/EN/PT.
+- Verificado: **320 unit + 17 E2E**, typecheck, oxlint, Prettier, build y axe 0.
+
+### Landing de inicio y video mp4
+
+- **Landing de inicio** (`src/ui/Landing.tsx`, estilo app cuadrado): barra con logo, héroe con Legui y **disco girando**, funciones (iconos SVG, sin emojis) y **login incrustado** (`LoginScreen` con `embedded`). Se muestra cuando no hay sesión; **no menciona «listas dobles»**.
+- **mp4 en el disco:** disco **estático** + `<video>` dentro del disco, con botón **«Ver/Ocultar video»** (preferencia `legato.video.v1`); el `accept` incluye `video/*` y `.mp4/.m4v/.mov`. El mp3 no cambió.
+- El estilo sigue siendo el **Duotono 62 inicial** (cuadrado); solo se añade lo anterior.
+
+### v1 lista para desplegar — sin base de datos
+
+- **Se retiraron Firebase y Cognito** y **toda la sincronización en la nube** (`src/features/sync/` eliminado). Login **local** (correo/contraseña PBKDF2 o invitado) con datos en **IndexedDB**; `createAuthProvider()` siempre local; `AuthProviderKind = local`.
+- `.env.local`/`.env.example` sin variables de Firebase/Cognito; dependencia **`firebase`** eliminada; textos legales, `docs/AUTH.md` y Ajustes actualizados (sin sección de nube).
+- Verificado: **304 unit + 17 E2E**, typecheck, oxlint, Prettier y build. Listo para `bun run build` → S3 + CloudFront (SPA 403/404 → `/index.html`).
+
+---
+
+## Sesión 9 (6 oct 2026) — DESPLEGADO en `legato.jenilarper.dev`
+
+> Esta es la sesión grande: marca (Legui), landing, animaciones, video, vistas del disco, panel plegable, PiP, fix de Spotify iOS, service worker v2, **restauración de Firebase** y **despliegue real en AWS**. **No hay tokens de IA** en el entorno de desarrollo.
+
+### Estado final
+
+- **Producción:** **https://legato.jenilarper.dev** (HTTPS, SPA). También existe el alias `app.jenilarper.dev` en CloudFront (sin DNS, opcional).
+- **Tests:** **317 unit + 17 E2E** en verde; typecheck, oxlint, Prettier y build OK.
+- **Cuenta AWS nueva:** `437845271540`, usuario IAM **`legato`**, región **us-east-1** (no es la antigua `793452510776`).
+- **Recursos AWS:**
+  - **S3** bucket privado `legato-jenilarper` (sin acceso público), con **Origin Access Control** `E2Z4MMF0ZX0PCN`.
+  - **CloudFront** distribución `E9MLZCEKQU3MI` → dominio `dcrshaabn8bkj.cloudfront.net`. Comportamiento: HTTPS, `403/404 → /index.html 200` (SPA), `sw.js` y `manifest.webmanifest` con **caché deshabilitada**, resto optimizado.
+  - **ACM (us-east-1)** certificado **wildcard `*.jenilarper.dev`** (cubre `legato` y `app`). ARN guardado en la sesión.
+- **DNS (name.com, pestaña DNS Records):**
+  - `legato` → CNAME `dcrshaabn8bkj.cloudfront.net`
+  - `_41248462b8d2ba9b947d951e9c899842` → CNAME de validación del wildcard (`...acm-validations.aws`)
+  - (obsoletos, se pueden borrar: `_96976d…app…` y cualquier CNAME de `app`.)
+- **Build de producción:** `VITE_SPOTIFY_REDIRECT_URI=https://legato.jenilarper.dev bun run build` (el redirect de Spotify se embebe en el bundle).
+
+### Qué se construyó (front)
+
+- **Legui** (mascota vinilo, "la o de Legato") con componente reutilizable (`src/ui/Legui.tsx`: `LeguiMark`, `LeguiSticker`, `LeguiBubble`, `LegatoLogo`) y assets en `public/` + `brand/`. Aparece en barra, login/landing, bienvenida, cookies, Spotify y errores.
+- **Landing de inicio** (`src/ui/Landing.tsx`) en 3 fases: (1) solo Legui con bocadillo (rojo apagado, 3 textos al hacer clic, luego "Empezar ahora"); (2) el vinilo (disco **blanco**) con la info y tarjetas cuadradas; (3) login (`LoginScreen` con modo `embedded`). Header claro con logo normal; sin "listas dobles".
+- **Animaciones/efectos**: halo del álbum, revelado por líneas, `.animate-rise/pop/print`, `legui-bob`, `legui-fall`, `legui-drop` (en `index.css`), botones con levante/sombra dura.
+- **Color por defecto de la app**: acento **rojo apagado** `#a54f31` (tokens en `index.css`).
+- **Video (mp4)**: en el disco, **estático**, reproduce el mp4; **tema (color) desde el primer fotograma** (`extractPaletteFromVideo` en `features/theme`). Toggle «Ver/Ocultar video».
+- **Vistas del disco**: botón **«Ver completo»** (baja/sube el disco), **«Pantalla completa»** (reproductor completo: info + progreso + transporte) y **«Solo disco»** (solo el disco, controles al mover el mouse). Ambas a pantalla completa del navegador (`requestFullscreen` con respaldo).
+- **Panel plegable (PC)**: pestañita debajo de «Estructura» para ocultar/mostrar el panel lateral (`usePanelVisibilityStore`).
+- **Cápsula**: ya **no reproduce sola**; solo con el botón «Reproducir fragmento».
+- **Mini reproductor / PiP**: circular, fondo transparente, controles al hover, se reabre al cambiar de pestaña; resuelve "cerrado → no reabre" con `.closed`.
+
+### Spotify en iOS (iPhone)
+
+- **Problema:** el **Web Playback SDK** (DRM) **no es fiable en iOS**; la pista cargaba pero no sonaba y el auto-avance saltaba.
+- **Solución (modo Connect):** en Apple móvil (`isAppleMobile`, `features/sources/spotify-connect.ts`) la app **no usa el SDK**: controla la **app de Spotify del teléfono** vía Web API de Connect (`/me/player/devices`, `play?device_id=`, pausa/next/prev/seek/volume, `/me/player` para el estado). `spotify-store.ts` ramifica por modo.
+- **En PC/Android** se mantiene el SDK (funciona).
+- **Guardia de auto-avance** (`use-external-playback.ts`): no avanza si la pista **nunca sonó** (posición máxima < 3 s).
+- **Botón «Abrir en Spotify»** (héroe) para abrir la pista en la app.
+- **Pendiente de verificar en el iPhone real** (abrir la app de Spotify para que sea dispositivo y pulsar play).
+
+### Service worker (PWA) — arreglo de raíz
+
+- **Bug:** `public/sw.js` era *cache-first* para todo (incluido `/index.html`) y **no cambiaba entre despliegues**, así que tras un redeploy el navegador servía el `index.html` viejo con assets borrados (404) → app “rota” hasta limpiar caché.
+- **Fix:** `CACHE_NAME = 'legato-v2'`, **network-first para HTML/navegación** y cache-first solo para assets con hash. `sw.js` y `manifest` siempre desde la red.
+
+### Firebase (restaurado)
+
+- Se retiró y **se volvió a poner** por decisión de la autora: **Firebase Auth (Google + correo) + sincronización en Firestore**, como estaba. **Sin verificación de correo obligatoria**.
+- Proyecto Firebase: **`legato-5ba6f`**. Dominios autorizados: añadir **`legato.jenilarper.dev`** en Firebase → Authentication → Settings → Authorized domains.
+- `.env.local` vuelve a tener `VITE_FIREBASE_*` + `VITE_AUTH_MODE=firebase`.
+- **Consecuencia importante:** los **tokens de Spotify se guardan por `userId`**; al pasar a login Google cambia el `userId` y hay que **reconectar Spotify** en cada dispositivo (Ajustes → Conectar Spotify).
+
+### Spotify dashboard (acciones de la autora)
+
+- **Redirect URIs:** añadir `https://legato.jenilarper.dev` (y mantener `http://127.0.0.1:5173`).
+- **Import de playlists:** en **Development mode** con **User Management vacío**, `/playlists/{id}/tracks` da **403** → el panel muestra el aviso de “Add user” (hasta 5) o “Extended Quota”. Añadir la cuenta usada (la suya o la del profe).
+
+### Seguridad pendiente (importante)
+
+- La **access key `AKIAWL4M4UP2IUKRGZGL`** quedó **expuesta en el chat** → **desactivar/eliminar** en IAM y, si se necesita, crear una nueva (o una política limitada a S3/CloudFront/ACM del bucket `legato-jenilarper`).
+- Recomendado: **alerta de presupuesto** en la cuenta nueva.
+
+### Comandos útiles
+
+```bash
+# Dev local (Spotify exige 127.0.0.1)
+~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort   # http://127.0.0.1:5173
+
+# Validación
+~/.bun/bin/bun run format && ~/.bun/bin/bun run typecheck && ~/.bun/bin/bun run lint
+~/.bun/bin/bun run test        # 317 unit
+~/.bun/bin/bun run test:e2e    # 17 E2E
+
+# Build + deploy (con el redirect del dominio)
+VITE_SPOTIFY_REDIRECT_URI=https://legato.jenilarper.dev ~/.bun/bin/bun run build
+aws s3 sync dist s3://legato-jenilarper --delete
+aws cloudfront create-invalidation --distribution-id E9MLZCEKQU3MI --paths "/*"
+```
+
+
+
+
