@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 14 152 182" role="img" aria-label="Legato">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Legui, la mascota vinilo de Legato">
   <g stroke="#13100c" stroke-width="13" stroke-linecap="round">
     <path d="M85 156V172" />
     <path d="M115 156V172" />
   </g>
-  <g fill="#e14a1f" stroke="#13100c" stroke-width="4">
+  <g fill="var(--legui-accent, #e14a1f)" stroke="#13100c" stroke-width="4">
     <ellipse cx="83" cy="181" rx="15" ry="9" />
     <ellipse cx="117" cy="181" rx="15" ry="9" />
   </g>
@@ -20,6 +20,6 @@
   <circle cx="90" cy="86" r="3.6" fill="#13100c" />
   <circle cx="110" cy="86" r="3.6" fill="#13100c" />
   <path d="M92 96q8 7 16 0" fill="none" stroke="#13100c" stroke-width="2.8" stroke-linecap="round" />
-  <circle cx="73" cy="104" r="6" fill="#e14a1f" opacity="0.9" />
-  <circle cx="127" cy="104" r="6" fill="#e14a1f" opacity="0.9" />
+  <circle cx="73" cy="104" r="6" fill="var(--legui-accent, #e14a1f)" opacity="0.9" />
+  <circle cx="127" cy="104" r="6" fill="var(--legui-accent, #e14a1f)" opacity="0.9" />
 </svg>

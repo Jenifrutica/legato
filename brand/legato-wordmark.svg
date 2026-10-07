@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="902.42" height="223.54411764705884" viewBox="-8.28 -162 902.42 223.54411764705884">
+    <text x="0" y="0" font-family="'Archivo',system-ui,sans-serif" font-weight="900" font-size="200" fill="#13100c">LEGAT</text>
+    <g transform="translate(797.69 -69) scale(1.0654411764705882) translate(-100 -90)">
+  <g stroke="#13100c" stroke-width="13" stroke-linecap="round">
+    <path d="M85 156 V172"/><path d="M115 156 V172"/>
+  </g>
+  <g fill="#e14a1f" stroke="#13100c" stroke-width="4">
+    <ellipse cx="83" cy="181" rx="15" ry="9"/>
+    <ellipse cx="117" cy="181" rx="15" ry="9"/>
+  </g>
+  <circle cx="100" cy="90" r="68" fill="#13100c"/>
+  <g fill="none" stroke="#f3efe6" stroke-width="1.2" opacity=".17">
+    <circle cx="100" cy="90" r="32"/><circle cx="100" cy="90" r="40"/>
+    <circle cx="100" cy="90" r="48"/><circle cx="100" cy="90" r="56"/>
+    <circle cx="100" cy="90" r="63"/>
+  </g>
+  <path d="M52 56 q18 -20 46 -24" fill="none" stroke="#f3efe6" stroke-width="6" opacity=".22" stroke-linecap="round"/>
+  <circle cx="100" cy="90" r="31" fill="#f3efe6" stroke="#13100c" stroke-width="3.5"/>
+  <circle cx="90" cy="86" r="3.6" fill="#13100c"/>
+  <circle cx="110" cy="86" r="3.6" fill="#13100c"/>
+  <path d="M92 96 q8 7 16 0" fill="none" stroke="#13100c" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="73" cy="104" r="6" fill="#e14a1f" opacity=".9"/>
+  <circle cx="127" cy="104" r="6" fill="#e14a1f" opacity=".9"/>
+</g>
+  </svg>
