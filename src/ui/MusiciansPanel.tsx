@@ -134,7 +134,10 @@ export function MusiciansPanel() {
 
   return (
     <>
-      <div className={`fixed z-40 hidden flex-col lg:flex ${seamRight}`} style={{ top: tabTop }}>
+      <div
+        className={`fixed z-40 hidden flex-col gap-5 lg:flex ${seamRight}`}
+        style={{ top: tabTop }}
+      >
         <button
           aria-expanded={open}
           className="cursor-grab border-2 border-r-0 border-rule bg-surface px-2 py-4 font-mono text-[0.6875rem] tracking-[0.24em] text-ink uppercase shadow-[-3px_3px_0_var(--color-rule)] select-none active:cursor-grabbing"
@@ -150,7 +153,7 @@ export function MusiciansPanel() {
 
         <button
           aria-label={collapsed ? t('panel.show') : t('panel.hide')}
-          className="grid cursor-pointer place-items-center border-2 border-t-0 border-r-0 border-rule bg-surface px-2 py-2 text-ink transition-colors hover:bg-accent-soft"
+          className="grid cursor-pointer place-items-center border-2 border-r-0 border-rule bg-surface px-2 py-2 text-ink shadow-[-3px_3px_0_var(--color-rule)] transition-colors hover:bg-accent-soft"
           onClick={toggleCollapsed}
           style={{ touchAction: 'none' }}
           title={collapsed ? t('panel.show') : t('panel.hide')}
