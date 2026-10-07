@@ -28,8 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Artefactos de diseño (impeccable)
-.impeccable/build/
-.impeccable/review/
+ai/impeccable/build/
+ai/impeccable/review/
 
 # Sistema
 .DS_Store
@@ -43,6 +43,3 @@ Thumbs.db
 
 # Salidas del separador de stems (Demucs)
 stems/
-
-# Copia duplicada de skills que genera el CLI (la canónica es .agents/skills)
-agent/

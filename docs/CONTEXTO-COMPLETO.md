@@ -5,7 +5,7 @@
 - **Última actualización:** 5 de octubre de 2026, sesión 7 (cierre, versión **v1.0.0**).
 - **Último commit:** ver `git log --oneline -1`. Rama `main`, todo pusheado. Etiqueta **`v1.0.0`** (base estable previa al rediseño de front).
 - **Tests:** 318 unitarios + 17 E2E en verde. typecheck/lint/build en verde. axe 0 y detector de impeccable `[]`.
-- **Pendientes:** (1) **rediseño de front** para que no se vea genérico, usando los **skills** instalados; (2) **despliegue** (S3+CloudFront+ACM+`app.jenilarper.dev` y rotar la access key). El **backend y las funcionalidades están completos**; el móvil, reorganizado. Detalle en `docs/PENDIENTES.md` y el prompt `docs/PROMPT-PLAN-NUEVA-SESION.md`.
+- **Pendientes:** (1) **rediseño de front** para que no se vea genérico, usando los **skills** instalados; (2) **despliegue** (S3+CloudFront+ACM+`app.jenilarper.dev` y rotar la access key). El **backend y las funcionalidades están completos**; el móvil, reorganizado. Detalle en `docs/PENDIENTES.md`.
 - **Servidor de desarrollo:** `~/.bun/bin/bun run dev --host 127.0.0.1 --port 5173 --strictPort` → `http://127.0.0.1:5173` (no `localhost`, por Spotify).
 
 ---
@@ -241,11 +241,11 @@ docs/                           # ver §19
 
 ## 19. Mapa de documentación del repo (`docs/`)
 
-`PLAN.md` (4 días), `DECISIONES.md` (D01–D42), `ARQUITECTURA.md`, `ESTRUCTURA-DATOS.md` (DLL + bug #12), `FUNCIONALIDADES.md` (MVP/extra/post), `UI-UX.md`, `ACCESIBILIDAD.md`, `LEGAL.md`, `TESTING.md`, `DESPLIEGUE.md`, `ENTORNO.md`, `JAM.md` (post-entrega), `ESTADO.md` (tablero vivo), **`CONTEXTO-COMPLETO.md` (este)** y **`PROMPT-NUEVA-SESION.md`**.
+`PLAN.md` (4 días), `DECISIONES.md` (D01–D42), `ARQUITECTURA.md`, `ESTRUCTURA-DATOS.md` (DLL + bug #12), `FUNCIONALIDADES.md` (MVP/extra/post), `UI-UX.md`, `ACCESIBILIDAD.md`, `LEGAL.md`, `TESTING.md`, `DESPLIEGUE.md`, `ENTORNO.md`, `JAM.md` (post-entrega), `ESTADO.md` (tablero vivo), **`CONTEXTO-COMPLETO.md` (este)**.
 
 ## 20. Prompt listo para una sesión nueva
 
-Ver `docs/PROMPT-NUEVA-SESION.md` (copiar y pegar tal cual). Resumen: pedirle que lea este archivo, verifique el estado (tests/build), arranque el dev server en `127.0.0.1`, y pregunte por la nueva funcionalidad antes de planificar; recordar las reglas (commits en inglés sin co-authored, nada oscuro, portada en el vinilo, validar todo, documentar).
+Resumen: pedirle que lea este archivo, verifique el estado (tests/build), arranque el dev server en `127.0.0.1`, y pregunte por la nueva funcionalidad antes de planificar; recordar las reglas (commits en inglés sin co-authored, nada oscuro, portada en el vinilo, validar todo, documentar).
 
 ---
 
@@ -370,9 +370,9 @@ La autora especificó la funcionalidad pendiente: un **carrusel interactivo tipo
 Tras el flujo de impeccable (`context` → `new-work` → roll `concept-seed --scope direction --mode operate`, semilla `b6f5b18f` → cuatro comps), la autora eligió **Duotono 62**: edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Refinamientos pedidos por la autora e incorporados: **tintas adaptadas a la portada**, **ondas de líneas planas estilo tipográfico saliendo del disco** y **panel de músicos/partitura como slide-over con pestaña arrastrable, minimizable/maximizable** (solo para quien explora). Se descartaron A (Círculo armónico), C (Partitura) y D (Dos tintas); la notación de C vive dentro del panel de músicos de Duotono.
 
 - Plan, paleta, tipografías y validación: **`docs/REDISENO.md`**.
-- Contrato de dirección: `.impeccable/surfaces/src-app-app-tsx.md`.
-- Comp aprobado: `.impeccable/mocks/decision/b-duotono.png` + sidecar con `"approved": true`; `buildPath: comp` en `.impeccable/config.json`.
-- Comps construidos como mocks HTML locales capturados con Playwright (la key de OpenAI estaba vencida, error 401); previsualizaciones en `.impeccable/mocks/mockups/`.
+- Contrato de dirección: `ai/impeccable/surfaces/src-app-app-tsx.md`.
+- Comp aprobado: `ai/impeccable/mocks/decision/b-duotono.png` + sidecar con `"approved": true`; `buildPath: comp` en `ai/impeccable/config.json`.
+- Comps construidos como mocks HTML locales capturados con Playwright (la key de OpenAI estaba vencida, error 401); previsualizaciones en `ai/impeccable/mocks/mockups/`.
 
 ### Fases
 
@@ -387,7 +387,7 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 
 - **F0–F10 cerradas**: tokens Duotono, shell/barra, héroe con media luna, vinilo con portada completa, ondas de líneas, panel + partitura slide-over, barras móvil, playlists estrella, letras diseñadas (bandera `legato.lyrics.demo`), responsive 390/768/1024/1280/1440, oscuro conmutable, vacíos y accesibilidad.
 - **Verificación final:** 154 unit + 4 E2E en verde, typecheck/lint/build OK, **axe 0 violaciones** (claro/oscuro/390/legales) y `impeccable detect` en `[]`.
-- **Documentación de diseño:** `DESIGN.md` en la raíz (spec con frontmatter de tokens) y `.impeccable/design.json`.
+- **Documentación de diseño:** `DESIGN.md` en la raíz (spec con frontmatter de tokens) y `ai/impeccable/design.json`.
 - **Pendiente inmediato:** Día 4 (deploy S3 + CloudFront + rotar la access key) y verificación fina del SDK de Spotify; futuras: jam (#36), ACRCloud (#30), Demucs (#32), Google IdP (#29), sync (#28). Día 4 sigue en pausa hasta pedido explícito.
 - **F11 Cápsula nostálgica cerrada** (issue #49): carrusel diario tipo historias en el héroe; DTOs, registro local de escuchas, generador determinista, visor con 15 s por tarjeta, fragmento desde ~30 s, mantener para pausar, teclado, «Escuchar completa» y «Guardar en Favoritos» (playlist automática).
 - **F12 Letras reales cerrada** (issue #50): parser LRC propio + LRCLIB (`/api/get` con respaldo de búsqueda), hook con caché/timeout, atribución «Letra vía LRCLIB» y política de privacidad actualizada en ES/EN/PT (LRCLIB siempre activo por decisión de la autora). La bandera `legato.lyrics.demo` sigue disponible para previsualizar el diseño sin red.
@@ -424,7 +424,7 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 
 - **No hay tokens**: la key de OpenAI está vencida; no hay sesión de Spotify en el entorno de desarrollo (verificación con el navegador de la autora y Premium); la access key de AWS debe rotarse.
 - Si la UI queda en blanco o un módulo «no exporta X» tras agregar archivos: reiniciar el server y `rm -rf node_modules/.vite`.
-- Prompt listo para la próxima sesión (modo plan): **`docs/PROMPT-PLAN-NUEVA-SESION.md`** (canónico, copiar y pegar); `docs/PROMPT-NUEVA-SESION.md` queda como entrada rápida.
+- Prompt de arranque para la próxima sesión (modo plan): se mantiene en el historial de git; el handoff vive en este archivo y en `docs/PENDIENTES.md`.
 
 ---
 
@@ -635,14 +635,14 @@ F0 tokens y fuentes · F1 shell/barra · F2 héroe y vinilo · F3 ondas de líne
 ### AH Cierre v1.0.0, skills de front y siguiente paso (implementado)
 
 - **Versión de respaldo `v1.0.0`**: backend y funcionalidades completos y estables; queda como base previa al rediseño de front. `package.json` 1.0.0, `CHANGELOG.md` y tag `v1.0.0`.
-- **Skills instalados en el proyecto** (`~/.bun/bin` vía `npx skills add`, quedan en `.agents/skills/` + `skills-lock.json`):
+- **Skills instalados en el proyecto** (`~/.bun/bin` vía `npx skills add`, quedan en `ai/agents/skills/` + `ai/skills-lock.json`):
   - **awwwards-animations** (`devmartinese/awwwards-animations-skill`): animaciones premium con GSAP/Motion/Anime.js/Lenis (scroll, transiciones, micro-interacciones, cursores).
   - **animejs** (`freshtechbro/claudedesignskills`): motor Anime.js (timelines, stagger, SVG).
   - **manus** (`sanjay3290/ai-skills`): delegar investigación/diseño largo al agente Manus AI.
   - Nota: `open.manus.ai@manus-api` no clonaba (no es repo git); se usó el de `sanjay3290`.
 - **Crossfade automático al final de pista (corregido)**: el cambio de canción **manual** ya fundía, pero al pasar de canción **consecutiva** empezaba de golpe: al llegar al final, el motor ya está en pausa y no hay nada que fundir. Ahora `#maybeAutoCrossfade` (en el handler de tiempo) dispara el cruce cuando faltan `crossfadeSeconds` para el final, arrancando la siguiente en el **otro deck** y cruzando ambas (misma vía que el manual). Con Spotify no hay solape (DRM), solo fundido de volumen.
 - **Falta un buen logo**: hoy hay un **marcador Duotono temporal**; en el rediseño de front hay que crear el logo/icono definitivo (wordmark + símbolo + favicon/icono PWA).
-- **Siguiente paso**: **rediseño de front** (modo plan) usando estos skills, manteniendo el estilo Duotono 62 y **todas** las funciones; después, **despliegue**. Prompt canónico: `docs/PROMPT-PLAN-NUEVA-SESION.md`.
+- **Siguiente paso**: **rediseño de front** (modo plan) usando estos skills, manteniendo el estilo Duotono 62 y **todas** las funciones; después, **despliegue**.
 
 ### AG Setlist retirada y calidad de audio (implementado)
 

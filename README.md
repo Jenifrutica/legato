@@ -79,7 +79,6 @@ del álbum**, así que Legui se tiñe con la portada que suena. Assets en `publi
 | Documento                                                            | Contenido                                                    |
 | -------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [docs/CONTEXTO-COMPLETO.md](docs/CONTEXTO-COMPLETO.md)               | **Contexto absoluto del proyecto (handoff entre sesiones)**  |
-| [docs/PROMPT-PLAN-NUEVA-SESION.md](docs/PROMPT-PLAN-NUEVA-SESION.md) | Prompt para continuar en una sesión nueva                    |
 | [docs/ESTADO.md](docs/ESTADO.md)                                     | Tablero vivo del avance                                      |
 | [docs/PLAN.md](docs/PLAN.md)                                         | Plan de entrega, alcance y riesgos                           |
 | [docs/DECISIONES.md](docs/DECISIONES.md)                             | Registro de decisiones del proyecto                          |
@@ -92,6 +91,17 @@ del álbum**, así que Legui se tiñe con la portada que suena. Assets en `publi
 | [docs/TESTING.md](docs/TESTING.md)                                   | Estrategia de pruebas y regresión del bug #12                |
 | [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)                             | AWS S3 + CloudFront, dominio y DNS en name.com               |
 | [docs/ENTORNO.md](docs/ENTORNO.md)                                   | Entorno local, Bun, AWS CLI y skills                         |
+
+## Carpeta `ai/`
+
+Todo lo relacionado con las herramientas de IA vive en **`ai/`**, separado del proyecto:
+
+| Ruta                  | Contenido                                                        |
+| --------------------- | ---------------------------------------------------------------- |
+| `ai/agents/skills/`   | Skills de diseño/animación (awwwards-animations, animejs, manus). |
+| `ai/claude/skills/`   | Enlaces a los mismos skills para Claude.                         |
+| `ai/impeccable/`      | Artefactos de diseño (comps aprobados, contrato y tokens).       |
+| `ai/skills-lock.json` | Lockfile de los skills instalados.                               |
 
 ## Aviso académico
 

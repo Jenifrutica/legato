@@ -105,7 +105,7 @@ Actualizado: 6 de octubre de 2026 (sesión 9, **v1 desplegada** en `https://lega
 | 97 | **Cuadrado del disco, ondas y letras**: campo de tinta a `1.08×` y zona recortada por abajo a `0.62×` (ondas sin chocar); ondas con más rango dinámico (suavizado 0.65, gamma `^1.55`, pulso ×3.4); la letra cambia de línea 0.25 s antes de su marca y el héroe enseña la siguiente en los huecos para quitar el retraso; la letra se mantiene al pausar (solo se oculta si no hay líneas) | Cerrada: 317 unit + 13 E2E, build, detector 0 |
 | 96 | **Ocultar la velocidad en Spotify**: el control de velocidad desaparece en héroe, barra móvil y panel de ensayo cuando la fuente es Spotify (el SDK/DRM no permite cambiarla); en archivos locales se mantiene el ciclo 1→1.25→1.5→2→0.9→0.75→0.5. Se retira el aviso y la clave i18n huérfana | Cerrada: 313 unit + typecheck + lint + build + E2E, detector 0 |
 | 111 | **Crossfade automático al final de pista**: al cambio manual ya fundía, pero al pasar de canción **consecutiva** empezaba de golpe (al terminar la pista el motor ya está en pausa y no hay nada que fundir). Ahora, cuando faltan `crossfadeSeconds` para el final, se arranca la siguiente en el **otro deck** y se cruzan (misma lógica que el manual). Test nuevo | Cerrada: 319 unit + 17 E2E, build, detector 0 |
-| 110 | **Cierre `v1.0.0` + skills para el front**: se etiqueta la **v1.0.0** como respaldo (backend y funcionalidades completos) y se instalan en el proyecto los **skills de animación/diseño** (`.agents/skills/`): **awwwards-animations**, **animejs** y **manus**. El único trabajo pendiente es el **rediseño de front** (para que no sea genérico) y, después, el **despliegue** | Cerrada: 318 unit + 17 E2E, build, detector 0 |
+| 110 | **Cierre `v1.0.0` + skills para el front**: se etiqueta la **v1.0.0** como respaldo (backend y funcionalidades completos) y se instalan en el proyecto los **skills de animación/diseño** (`ai/agents/skills/`): **awwwards-animations**, **animejs** y **manus**. El único trabajo pendiente es el **rediseño de front** (para que no sea genérico) y, después, el **despliegue** | Cerrada: 318 unit + 17 E2E, build, detector 0 |
 
 ## Estado técnico
 
@@ -123,7 +123,7 @@ Actualizado: 6 de octubre de 2026 (sesión 9, **v1 desplegada** en `https://lega
 
 **Estado: `v1.0.0` (respaldo). Backend y funcionalidades completos.** Lo único pendiente es **rediseñar el front** (que no se vea genérico) y, después, **desplegar**.
 
-- **Rediseño de front (nueva sesión, modo plan)**: usar los skills instalados en el proyecto (`.agents/skills/`): **awwwards-animations** (animaciones premium GSAP/Motion/Anime.js/Lenis), **animejs** y **manus**; mantener el estilo **Duotono 62** y **todas** las funciones. Prompt canónico: **`docs/PROMPT-PLAN-NUEVA-SESION.md`**.
+- **Rediseño de front (nueva sesión, modo plan)**: usar los skills instalados en el proyecto (`ai/agents/skills/`): **awwwards-animations** (animaciones premium GSAP/Motion/Anime.js/Lenis), **animejs** y **manus**; mantener el estilo **Duotono 62** y **todas** las funciones.
 - **Logo**: **falta un buen logo/icono** definitivo (hoy es un marcador Duotono temporal). Hay que diseñarlo (wordmark + símbolo + favicon/icono PWA) en el rediseño de front.
 - **Despliegue (después del front)**: Firebase → Authorized domains `app.jenilarper.dev`; Spotify Redirect URI; `bun run build` → S3 + CloudFront (OAC) + ACM `us-east-1` → CNAME en name.com → SPA 403/404 → `/index.html`; **rotar la access key** (issue #27).
 - El import de Spotify quedó funcional (con o sin `Add user`); el «error de conexión» se descartó (era audio silenciado del sistema). Detalle en **`docs/PENDIENTES.md`**.
@@ -131,7 +131,6 @@ Actualizado: 6 de octubre de 2026 (sesión 9, **v1 desplegada** en `https://lega
 ## Handoff
 
 - **Contexto absoluto:** `docs/CONTEXTO-COMPLETO.md` (todo el proyecto, para continuar en una sesión nueva).
-- **Prompt de arranque:** `docs/PROMPT-NUEVA-SESION.md` (copiar y pegar).
 - Copia en Obsidian: `/home/jenifrutica/Downloads/asas/` → "Legato - Contexto completo.md" y "Legato - Prompt nueva sesion.md".
 
 ## Nota de desarrollo
@@ -140,7 +139,7 @@ Si tras agregar archivos nuevos la interfaz queda en blanco con un error de mód
 
 ## ⚠️ Pendiente #1: REDISEÑO COMPLETO DE LA INTERFAZ
 
-**Dirección elegida:** **Duotono 62** — edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Plan por fases, contrato de dirección y validación en **`docs/REDISENO.md`**. Artefactos: comp aprobado y sidecar en `.impeccable/mocks/decision/b-duotono.png(.json)`, contrato en `.impeccable/surfaces/src-app-app-tsx.md`, `buildPath: comp`. Reglas: nada oscuro por defecto (oscuro opcional), la portada completa en el disco (círculo completo, nunca `clip-path`), UI teñida por el álbum, ondas de líneas planas saliendo del disco, una sola barra por vista, panel de músicos slide-over, letras diseñadas ahora (conexión LRCLIB/.lrc después) y Cápsula nostálgica con su carril reservado.
+**Dirección elegida:** **Duotono 62** — edición musical impresa a dos tintas (papel hueso, tinta negra y una tinta directa derivada de la portada). Plan por fases, contrato de dirección y validación en **`docs/REDISENO.md`**. Artefactos: comp aprobado y sidecar en `ai/impeccable/mocks/decision/b-duotono.png(.json)`, contrato en `ai/impeccable/surfaces/src-app-app-tsx.md`, `buildPath: comp`. Reglas: nada oscuro por defecto (oscuro opcional), la portada completa en el disco (círculo completo, nunca `clip-path`), UI teñida por el álbum, ondas de líneas planas saliendo del disco, una sola barra por vista, panel de músicos slide-over, letras diseñadas ahora (conexión LRCLIB/.lrc después) y Cápsula nostálgica con su carril reservado.
 
 ## Legui (mascota) y marca
 
