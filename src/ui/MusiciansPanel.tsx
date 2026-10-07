@@ -169,7 +169,7 @@ export function MusiciansPanel() {
             strokeWidth={2}
             viewBox="0 0 24 24"
           >
-            {collapsed ? <path d="m9 6 6 6-6 6" /> : <path d="m15 6-6 6 6 6" />}
+            {collapsed ? <path d="m15 6-6 6 6 6" /> : <path d="m9 6 6 6-6 6" />}
           </svg>
         </button>
       </div>
